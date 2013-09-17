@@ -50,7 +50,7 @@ Panels - Meant for more action and user input
 
 Popups - Meant more for display purposes, more output than action
 
-*Conclusion*
+### Conclusion
 
 Gluten promises to optimize the writer's workflow, creating a great experience for them and encouraging writing in other students by 
 removing the barrier of formatting that creates a large amount of friction.
