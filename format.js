@@ -126,7 +126,7 @@ function post_format_mltext(m) {
 function post_format_content(m) {
 	var out = "";
 	out = "<div class='content toolbar'></div>";
-	out = out + "<div contenteditable='true' class='content content_textarea' onclick='postRange()'></div>";
+	out = out + "<div contenteditable='true' class='content content_textarea' onfocus='postRange()' onclick='postRange()'></div>";
 	out = out + "<div class='content_wordcount'></div>";
 	return out;	
 }
@@ -155,6 +155,9 @@ function update_toolbar_style() {
 	var sy = scrollY-110;
 	if(sy <= 0)
 		sy = 0;
+		
+	/*if($('.content_textarea').html().substr(-1) == '>')
+		contentAddText(' ');*/
 	
 	$('#panel_plugin').css('margin-top', sy);
 	//$('#panel_plugin').css('height', window.innerHeight);

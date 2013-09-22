@@ -91,6 +91,56 @@ body {
 		padding-left: 2px;
 		padding-right: 2px;
 }	
+
+.fullscreen {
+	position:fixed;
+	left:-0.1%;
+	top:-0.1%;
+	width:100.3%;
+	height:100.3%;	
+}
+.popupbg {
+	background-color:rgba(0,0,0,.8);	
+}
+.popuptop {
+	position:fixed;
+	width:70%;
+	left:15%;
+	height:60%;
+	top: 20%;
+	border: solid 1px #CCCCCC;
+	background-color:#EEEEEE;
+	min-width:3in;
+	min-height:2in;
+}
+.popuptitle {
+	font-size: 24pt;
+	margin-left: 15px;
+	color: #333;
+}
+.popupsubtitle {
+	font-size: 13pt;
+	margin-left: 35px;
+	color: #999;	
+}
+.popupbody {
+	margin-left: 60px;
+	font-size: 11pt;
+	width:80%;
+}
+.popupimg {
+	
+}
+.popupcontent {
+	max-height: 75%;
+overflow: auto;
+width: 90%;
+/*background-color: rgba(100,100,100,.05);*/	
+}
+.citationInput {
+	margin-left:25px;
+	display:none;	
+}
 /* Colors */
 .gluten_gray {
 	color: #999;	

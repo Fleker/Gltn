@@ -6,18 +6,20 @@ function runPanel(panel_id_name) {
 	$('.panel_plugin_title').append('&emsp;<button onclick="hidePanelPlugin()">X</button>');
 	$('#panel_plugin').css("border-color", p.bordercolor);
 	
-	//for a phone, do a type of check so that it isn't too small. Like, make the minimum width 4 inches.
+	//for a phone, do a type of check so that it isn't too small. 
+	//Like, make the minimum width 2 inches; 3in is 25% of screen, but that may not look great on phones.
 	//for now, relative to a 13.3" screen (11.59" wide)
 	var min = 11.59*p.width;
-	if(min > 4)
-		min = 4;
+	if(min > 2)
+		min = 2;
 	
 	openPanelPlugin(p.width, min, panel_id_name);
 }
 function openPanelPlugin(percent, min, panel_id_name) {
 	$('#panel_plugin').css('display', 'block').css('opacity', 0);
 	$('#panel_plugin').animate({
-		width: percent+"%",
+		/*width: percent+"%",*/
+		width:'95%',
 		minWidth: min+"in",
 		opacity: 1,
 		marginLeft: 0
