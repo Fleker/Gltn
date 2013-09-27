@@ -81,6 +81,10 @@
   
 </div>
 
+<div class="hovertag">
+
+</div>
+
 <div class="footer">
 
 </div>
@@ -231,20 +235,23 @@ function initiateCitationEditor(q, hovertag) {
 			//q = '"';
 			if(q == undefined)
 				q = '';
-            var range = rangy.getSelection();
+            //var range = rangy.getSelection();
+			var range = getRange();
 			citei = citationi;
 			citeid = citation.length+1;
-			citationi++;
-			if(range.toHtml().length == 0) {
+			if(range.toHtml().length == 0 && hovertag == undefined) {
+				citationi++;
 				//Add quote and citation stuff
 				contentAddText('  ');
 				contentAddSpan({class: 'citation', id:'citation'+citei, node:'span', leading_quote:(q.length>0)});
 				//contentAddSpan({node:'span'});
 			}
-			else if(false /*citation is selected OR hovertag click - hovertag is the citei*/) {
-				//
+			else if(hovertag >= 0 /*citation is selected OR hovertag click - hovertag is the citei*/) {
+				citei = hovertag;
+				citeid = $('#citation'+hovertag).attr('data-id');
 			}
             else { //if you're selecting a bunch of text
+				citationi++;
                 var el = document.createElement("span");
                 el.className = "citation";
 				el.setAttribute("id", "citation"+citei);
@@ -275,7 +282,7 @@ function initiateCitationEditor(q, hovertag) {
 			}
 			var ht = out+"</datalist>";
 			
-			ht = ht + "<div class='citationEditorTitle citationInput'><input type='text' placeholder='Title of the work' list='citetitlelist' style='width: 30em' id='citationEdtiorITitle'></div>";
+			ht = ht + "<div class='citationEditorTitle citationInput'><input type='text' placeholder='Title of the work' list='citetitlelist' style='width: 30em' id='citationEditorITitle'></div>";
 			ht = ht + "<div class='citationEditorDescription citationInput'><input type='text' style='width:35em' placeholder='If no official title, please describe' id='citationEditorIDescription'></div>";
 			ht = ht + "<div class='citationEditorPlay citationInput'>Act: <input id='citationEditorIAct' style='width:4em'>&nbsp;Scene:<input type='citationEditorIScene' style='width:4em'>&nbsp;Line(s): <input id='citationEditorILines' style='width:10em'></div>";
 			ht = ht + "<div class='citationEditorBookpub citationInput'><input type='text' placeholder='Page #' style='width:4em' id='citationEditorIPage'>&nbsp;<input placeholder='Volume' style='width:5em' id='citationEditorIVolume'>&nbsp;<input type='text' placeholder='Edition' style='width:6em' id='citationEditorIEdition'>&nbsp;<input type='text' placeholder='Series' id='citationEditorISeries'>Main Title?<input type='checkbox' id='citationEditorIMain' value='off'></div>";
@@ -316,7 +323,7 @@ function initiateCitationEditor(q, hovertag) {
 								citationShow('Title Author Bookpub Publication Medium');
 							break;
 							case 'theater':
-								citationShow('Title Play Bookpub Author Publication');
+								citationShow('Title Play Author Publication');
 							break;
 							case 'eimage':
 								citationShow('Title Description Author Website Pubdate Accdate');
@@ -340,14 +347,17 @@ function initiateCitationEditor(q, hovertag) {
 				//if abstracts for citations are turned on,
 				//$('.citationEditorAbstract').css('display', 'block');
 			}
-			var citeAttributes = new Array('Type', 'Title','Description','Act','Scene','Lines','Page','Volume','Edition','Main','AuthorFirst','AuthorMiddle','AuthorLast','Publisher','City','Year','Website','WebPublisher','Url','Pubdate','Accdate','Database','DbUrl','Medium','Abstract');	
+			var citeAttributes = new Array('Type', 'Title','Description','Page','Volume','Edition','Main','AuthorFirst','AuthorMiddle','AuthorLast','Publisher','City','Year','Website','WebPublisher','Url','Pubdate','Accdate','Database','DbUrl','Medium','Abstract');	
 			function citationSave() {
 				citation[citeid] = {};
 				for(i in citeAttributes) {
 					//get attributes cattr= $('#citationEditorI'+citeAttributes[i]);
 					var cattr = $('#citationEditorI'+citeAttributes[i]).val();
+					//console.log('#citationEditorI'+citeAttributes[i], cattr);
 					
 					//save attributes to citation[id][citeAttributes[i]]
+					//TODO - ,'Act','Scene','Lines'
+					
 					if(citeAttributes[i] == 'Page')
 						$('#citation'+citei).attr('data-page', cattr);
 					else if(cattr != undefined)
@@ -357,25 +367,47 @@ function initiateCitationEditor(q, hovertag) {
 					
 					
 					//citation[citeid]['type'] = $('#citationEditorIType');	
-					$('#citation'+citei).attr('data-id', citeid);
 				}
+				$('#citation'+citei).attr('data-id', citeid);
+				$('#citation'+citei).attr('data-i', citei);
+				citationHovertag();
 				closePopup();
 			}
 			function citationRestore() {
 				for(i in citeAttributes) {
 					
 					if(citeAttributes[i] == 'Page')
-						new Array();
-						//$('#citation'+0).attr('data-page', cattr);
+						$('#citationEditorIPage').val($('#citation'+0).attr('data-page'));
 					else {
 						//get attribute citation[id][citeAttributes[i]]
-						//store in $('#citationEditorI'+citeAttributes[i]).val(citation[id][citeAttributes[i]]);	
+						//store in $('#citationEditorI'+citeAttributes[i]).val(citation[id][citeAttributes[i]]);
+						$('#citationEditorI'+citeAttributes[i]).val(citation[citeid][citeAttributes[i]]);	
 					}
 				}
 			}
 		};
 	
 			initiatePopup({title: "Citations", border: "#09f", ht: ht, fnc: fnc});
+}
+
+function citationHovertag() {
+	/*$('.citation').off('hover');
+	$('.citation').on('hover', function() {
+		alert(5);
+		displayHovertag(citation[$(this).attr('data-id')].title, {ypos: $(this).offset().top});
+	}, function() {
+		alert(4);
+		hideHovertag();
+	});*/
+	$('.citation').off('mouseenter');
+	$('.citation').off('mouseleave');
+	
+	$('.citation').on('mouseenter', function() {
+		displayHovertag(citation[$(this).attr('data-id')].Title, {ypos: $(this).offset().top}, "initiateCitationEditor(undefined,"+$(this).attr('data-i')+")");
+	});
+	$('.citation').on('mouseleave', function() {
+		//hideHovertag();
+	});
 }
 
 function toggleItalics() {
@@ -529,6 +561,55 @@ function initFind() {
 function moveCarat(length, delta) {
 	rangy.getSelection().move(length, delta);
     return false;
+}
+
+
+/*** HOVERTAG ***/
+//Get position of mouse with relation to scroll
+mousex = 0;
+mousey = 0;
+$( document ).on( "mousemove", function( event ) {
+  mousex = event.pageX;
+  mousey = event.pageY;
+});
+function mouseX() {
+	return mousex-scrollX;
+}
+function mouseY() {
+	return mousey-scrollY;
+}
+function displayHovertag(text, data, fnc) {
+	ypos = data.ypos;
+	if(data.ypos == undefined) 
+		ypos = mouseY()-scrollY;
+	else
+		ypos = ypos - scrollY;
+	if(text == undefined)
+		text = "object";
+		
+	if(mousex-($('.hovertag').width()/2) < 0)
+		xpos = 0;
+	else
+		mousex-($('.hovertag').width()/2);
+	$('.hovertag').css('left', xpos).css('top', ypos+20).css('opacity', 0).animate({
+		opacity: 1}, 100, function() {
+			$('.hovertag').html(text);	
+		});
+	$('.hovertag').off('click');
+	if(fnc != undefined) {
+		$('.hovertag').on('click', function() {
+			eval(fnc);
+		});
+		console.warn(fnc);
+		$('.hovertag').css('cursor', 'pointer');
+	} else {
+		$('.hovertag').css('cursor', 'initial');
+	}
+				
+}
+function hideHovertag() {
+	$('.hovertag').animate({
+		opacity: 0}, 100);
 }
 </script>
 
