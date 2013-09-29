@@ -105,7 +105,7 @@ function post_format_text(m, inv) {
 		if(m.description.length)
 			out = out + "<br><span class='format_description'>"+m.description+"</span><br>";
 	}
-	out = out + "<input id='format_item_"+m.index+"' placeholder='"+m.placeholder+"'>";
+	out = out + "<input id='format_item_"+m.index+"' placeholder='"+m.placeholder+"' onmouseenter='hideHovertag()'>";
 	if(m.min.length != 0 || m.max.length != 0) {
 		out = out + "<br><div class='format_count' id='format_count_"+m.index+"'></div>";	
 	}
@@ -117,7 +117,7 @@ function post_format_mltext(m) {
 	out = out + m.label + "<br>";
 	if(m.description.length)
 		out = out + "<span class='format_description'>"+m.description+"</span><br>";	
-	out = out + "<textarea id='format_item_"+m.index+"'></textarea>";
+	out = out + "<textarea id='format_item_"+m.index+"' onmouseenter='hideHovertag()'></textarea>";
 	if(m.min.length != 0 || m.max.length != 0) {
 		out = out + "<br><div class='format_count' id='format_count_"+m.index+"'></div>";	
 	}
@@ -126,7 +126,7 @@ function post_format_mltext(m) {
 function post_format_content(m) {
 	var out = "";
 	out = "<div class='content toolbar'></div>";
-	out = out + "<div contenteditable='true' class='content content_textarea' onfocus='postRange()' onclick='postRange()'></div>";
+	out = out + "<div contenteditable='true' class='content content_textarea' onfocus='postRange()' onclick='postRange()' onmouseleave='/*hideHovertag()*/'></div>";
 	out = out + "<div class='content_wordcount'></div>";
 	return out;	
 }

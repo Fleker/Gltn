@@ -239,6 +239,7 @@ function initiateCitationEditor(q, hovertag) {
 			var range = getRange();
 			citei = citationi;
 			citeid = citation.length+1;
+			window.citationrestore = false;
 			if(range.toHtml().length == 0 && hovertag == undefined) {
 				citationi++;
 				//Add quote and citation stuff
@@ -249,6 +250,7 @@ function initiateCitationEditor(q, hovertag) {
 			else if(hovertag >= 0 /*citation is selected OR hovertag click - hovertag is the citei*/) {
 				citei = hovertag;
 				citeid = $('#citation'+hovertag).attr('data-id');
+				window.citationrestore = true;
 			}
             else { //if you're selecting a bunch of text
 				citationi++;
@@ -376,6 +378,7 @@ function initiateCitationEditor(q, hovertag) {
 			function citationRestore() {
 				for(i in citeAttributes) {
 					
+					//Support for theater
 					if(citeAttributes[i] == 'Page')
 						$('#citationEditorIPage').val($('#citation'+0).attr('data-page'));
 					else {
@@ -383,7 +386,12 @@ function initiateCitationEditor(q, hovertag) {
 						//store in $('#citationEditorI'+citeAttributes[i]).val(citation[id][citeAttributes[i]]);
 						$('#citationEditorI'+citeAttributes[i]).val(citation[citeid][citeAttributes[i]]);	
 					}
+					citationReformat();	
 				}
+			}
+			//Do this last
+			if(window.citationrestore == true) {
+				citationRestore();
 			}
 		};
 	
@@ -609,7 +617,9 @@ function displayHovertag(text, data, fnc) {
 }
 function hideHovertag() {
 	$('.hovertag').animate({
-		opacity: 0}, 100);
+		opacity: 0}, 100, function(data) {
+		$('.hovertag').css('left', '110%').css('top', '110%');	
+	});
 }
 </script>
 
