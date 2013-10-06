@@ -1,9 +1,9 @@
-// JavaScript Document
+	// JavaScript Document
 function runPanel(panel_id_name) {
 	//Get Properties of the Panel First
 	var p = eval("GetPanel"+panel_id_name+"();");
 	$('.panel_plugin_title').html(p.title);
-	$('.panel_plugin_title').append('&emsp;<button onclick="hidePanelPlugin()">X</button>');
+	$('.panel_plugin_title').append('&emsp;<span class="PanelPopupEvent"></span><button onclick="hidePanelPlugin()">X</button>');
 	$('#panel_plugin').css("border-color", p.bordercolor);
 	
 	//for a phone, do a type of check so that it isn't too small. 
@@ -12,7 +12,7 @@ function runPanel(panel_id_name) {
 	var min = 11.59*p.width;
 	if(min > 2)
 		min = 2;
-	
+	window.paneltitle = panel_id_name;
 	openPanelPlugin(p.width, min, panel_id_name);
 }
 function openPanelPlugin(percent, min, panel_id_name) {
@@ -58,6 +58,7 @@ function hidePanelPlugin() {
 			$('#panel_plugin').css('display', 'none');
 		}
 	);
+	window.paneltitle = undefined;
 }
 function postPanelOutput(text) {
 	$('.panel_plugin_content').html(text+"<br><br><br><br><br>");
@@ -81,7 +82,10 @@ function StylePanelClass(classname, arr) {
 	}
 	
 }
-
+function PanelOnPopupClose(title) {
+	$('.PanelPopupEvent').attr('data-title', title);
+	$('.PanelPopupEvent').click();		
+}
 
 //Default Plugins Here:
 
@@ -139,4 +143,85 @@ function RunPanelmain_Character() {
 }
 function StylePanelmain_Character() {
 
+}
+function GetPanelmain_Citation() {
+	return {title: "Citation Editor", bordercolor: "#09f", width: 25};
+}	
+function RunPanelmain_Citation() {
+	function getCitationI(index) {
+		initiateCitationEditor(undefined, -1, index);	
+	}
+	
+	//var out = "<div class='citationPanel_refresh' style='font-size:10pt;cursor:pointer;'>REFRESH</div>";
+
+	function populateCitations() {
+		var out = "";
+		for(i=0;i<citation.length;i++) {
+			if(citation[i] != undefined) {
+				c = citation[i];
+				console.warn(c);
+				out = out + "<div class='citationPanel_citation' data-id='"+i+"' style='background-color:white;border: solid 1px;padding-left: 5px;padding-right: 10px;border-color: #aaa;color: #333;'>"
+				try {
+					out = out + c['Title']+"<br>&emsp;";
+					out = out + "<i>"+c['AuthorFirst']+" "+c['AuthorLast']+"</i><br>&emsp;<span style='font-size:10pt'>Vol. "+c['Volume']+" "+c['Edition']+" ed.</span>";
+				} catch(e) {
+					console.error(e);
+					if(c['Title'] != undefined)
+						out = out + c['Title'];
+					else
+						out = out + "Untitled";
+				}
+				out = out + "<hr><br></div>";
+			}
+		}
+		if(citation.length == 0)
+			out = "<span style='font-size:20pt'>:(</span><br>You haven't added any citations.";
+		postPanelOutput(out);
+		$('.citationPanel_citation').on('click', function() {
+			getCitationI($(this).attr('data-id'));
+		});
+	}
+	
+	$('.PanelPopupEvent').on('click', function() {
+		populateCitations();
+	});
+	populateCitations();
+	//figure out a way to repopulate citations after editing
+}
+function StylePanelmain_Citation() {
+		
+}
+function GetPanelmain_Idea() { 
+	return {title: "Document Notes", bordercolor: "rgb(207,196,29)", width: 40};	
+}
+function RunPanelmain_Idea() {
+	function populateIdeas() {
+		
+		out = "<div style='background-color: white;border: solid 1px;padding-left: 12px;padding-right: 0px;border-color: #aaa;color: #333;padding-top: 6px;width: 94%;'><u>General Notes</u><br><textarea class='PanelIdea' data-id='-1'></textarea></div>";
+		for(i in citation) {
+			out = out+"<hr><div style='background-color: white;border: solid 1px;padding-left: 12px;padding-right: 0px;border-color: #aaa;color: #333;padding-top: 6px;width: 94%;'><u>"+citation[i].Title+"</u><br><textarea class='PanelIdea' data-id='"+i+"'></textarea></div>";
+		}
+		postPanelOutput(out);
+		//Now we have to fill in our content
+		$('.PanelIdea[data-id=-1]').val(ideadefault);
+		for(i in citation) {
+			$('.PanelIdea[data-id='+i+']').val(idea[i]);
+		}
+	
+		$('.PanelIdea').on('input', function() {
+			var id = $(this).attr('data-id');
+			if(id >= 0) 
+				idea[id] = $(this).val();
+			else if(id == -1)
+				ideadefault = $(this).val();
+		});
+	}
+	$('.PanelPopupEvent').on('click', function() {
+		populateIdeas();
+	});
+	populateIdeas();
+}
+function StylePanelmain_Idea() {
+	$('.PanelIdea').css('width', '90%');
+	$('.PanelIdea').css('max-height', '50%');
 }

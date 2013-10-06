@@ -136,29 +136,45 @@ function post_toolbar(tools) {
 	for(i=0;i<tools.length;i++) {
 		out = out + "<span class='toolbar_button' data-t='"+tools[i]+"'>"+tools[i]+"</span>&emsp;|&emsp;";
 	}
+	out = out + "<span class='toolbar_button' data-t='fullscreen'>[^]</span>&emsp;|&emsp;";
+	
 	$('.toolbar').html(out);
 	
 	$('.toolbar_button').on("click", function() {
-		runPanel('main_Character');
+		if($(this).attr('data-t') == "Character")
+			runPanel('main_Character');
+		else if($(this).attr('data-t') == "fullscreen") 
+			fullscreen();
 	});
+	
 	
 	setInterval("update_toolbar_style()", 10);
 }
+window.fullscreenOn = false;
 function update_toolbar_style() {
-	tw = $('.toolbar').width();
-	$('.content_textarea').width(tw);
-	bh = window.innerHeight;
-	$('.content_textarea').height(2*bh/3);
+	if(window.fullscreenOn == false) {
+		tw = $('.toolbar').width();
+		$('.content_textarea').width(tw);
+		bh = window.innerHeight;
+		$('.content_textarea').height(2*bh/3);
+		$('.content_textarea').css('z-index', 0).css('position', 'inherit');
+		/*$('.content_textarea').animate({
+			top: -.1%,
+			left:-.1%;
+			width:100.2%;
+			height:100.2%;
+		});*/
+	} else {
+		$('.content_textarea').css('z-index', 3).css('position', 'fixed').css('background-color', 'white');
+		
+	}
 	
 	//Use this for other dynamic styling stuff
 	
 	var sy = scrollY-110;
 	if(sy <= 0)
 		sy = 0;
-		
-	/*if($('.content_textarea').html().substr(-1) == '>')
-		contentAddText(' ');*/
-	
+
 	$('#panel_plugin').css('margin-top', sy);
 	//$('#panel_plugin').css('height', window.innerHeight);
 	

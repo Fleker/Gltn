@@ -34,6 +34,8 @@ function initiatePopup(data) {
 	} else
 		$('.popuptop').css('border-width', '1px');
 		
+	window.popuptitle = data.title;
+		
 	
 	//now populate the card
 	//DEMO
@@ -80,6 +82,11 @@ function closePopup() {
 	top:'40%',
 	height:'0%'},
 	1000);
+	if(window.paneltitle != undefined)	
+		PanelOnPopupClose(window.popuptitle);
+	
+	window.popuptitle = undefined;
+	
 }
 
 /*** Default Popups - These functions initiate and go through all the proper commands of a popup */

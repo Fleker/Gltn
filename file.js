@@ -3,6 +3,9 @@
 //Since the file initiates when it loads, you can do some initization 
 citation = new Array();
 citationi = 0;
+
+idea = new Array();
+ideadefault = "";
 function saveDoc() {
 	
 }

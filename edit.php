@@ -160,24 +160,32 @@ window.onload = function() {
 				 	if($('.content_textarea').html().length > 1) {				 
 						rangy.getSelection().expand("word", {
 						wordOptions: {
-							includeTrailingSpace: true,
+							includeTrailingSpace: false,
 							wordRegex: /[a-z0-9]+(['\-][a-z0-9]+)*/gi
 						}
                 		});
 					}
+					postRange('click and select');
 			}
+			document.getElementsByClassName("content_textarea")[0].oninput = function() {
+				postRange('oninput');
+			}	
+			document.getElementsByClassName("content_textarea")[0].onkeyup = function() {
+				postRange('onkeyup');
+			}	
 }
 
 content_textarea_var = null;
-function postRange() {
+function postRange(origin) {
 	var sel = rangy.getSelection();
+	//console.warn(origin);
 	content_textarea_var = sel.rangeCount ? sel.getRangeAt(0) : null;	
 	return sel.rangeCount ? sel.getRangeAt(0) : null;	
 }
 function getRange() {
 		//gets first range
 		if(content_textarea_var) {
-			console.warn('gr-0');
+			//console.warn('gr-0');
 			moveCarat("word", 1);
 			return content_textarea_var;
 		}
@@ -231,7 +239,7 @@ function surroundRange() {
             }
 }
 
-function initiateCitationEditor(q, hovertag) {
+function initiateCitationEditor(q, hovertag, h2) {
 			//q = '"';
 			if(q == undefined)
 				q = '';
@@ -251,6 +259,11 @@ function initiateCitationEditor(q, hovertag) {
 				citei = hovertag;
 				citeid = $('#citation'+hovertag).attr('data-id');
 				window.citationrestore = true;
+			}
+			else if(hovertag == -1 && h2) {
+				citei = -1;
+				citeid = h2;
+				window.citationrestore = true;	
 			}
             else { //if you're selecting a bunch of text
 				citationi++;
@@ -598,7 +611,7 @@ function displayHovertag(text, data, fnc) {
 	if(mousex-($('.hovertag').width()/2) < 0)
 		xpos = 0;
 	else
-		mousex-($('.hovertag').width()/2);
+		xpos = mousex-($('.hovertag').width()/2);
 	$('.hovertag').css('left', xpos).css('top', ypos+20).css('opacity', 0).animate({
 		opacity: 1}, 100, function() {
 			$('.hovertag').html(text);	
@@ -620,6 +633,31 @@ function hideHovertag() {
 		opacity: 0}, 100, function(data) {
 		$('.hovertag').css('left', '110%').css('top', '110%');	
 	});
+}
+function fullscreen() {
+	window.fullscreenOn = true;	
+	$('.content_textarea').css('z-index', 3).css('position', 'fixed');
+		$('.content_textarea').animate({
+			top: "-.1%",
+			left:"-.1%",
+			width:"100.2%",
+			height:"100.2%",
+			fontSize:"14pt",
+			paddingLeft:"20px",
+			paddingRight:"30px",
+			paddingTop:"15px"
+		});
+}
+function normalscreen() {
+	window.fullscreenOn = false;	
+	$('.content_textarea').css('z-index', 0).css('position', 'inherit');
+		$('.content_textarea').animate({
+			width: $('.toolbar').width(),
+			fontSize:"12pt",
+			paddingLeft:"0px",
+			paddingRight:"0px",
+			paddingTop:"0px"
+		});
 }
 </script>
 
