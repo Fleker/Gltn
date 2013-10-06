@@ -141,7 +141,7 @@ function post_toolbar(tools) {
 	$('.toolbar').html(out);
 	
 	$('.toolbar_button').on("click", function() {
-		if($(this).attr('data-t') == "Character")
+		if($(this).attr('data-t') == "character")
 			runPanel('main_Character');
 		else if($(this).attr('data-t') == "fullscreen") 
 			fullscreen();
