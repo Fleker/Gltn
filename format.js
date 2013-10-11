@@ -12,7 +12,7 @@ function new_format_item(type, ops) {
 	if(ops == undefined)
 		ops = {};
 	window.metadata[format_js_index] = {type: type, index: format_js_index, min: 0, max: 0};
-	var option_choices = ["label", "max", "min", "mtype", "placeholder", "description"];
+	var option_choices = ["label", "max", "min", "mtype", "placeholder", "description", "id"];
 	//FUTURE - Default Text
 	for(i=0;i<option_choices.length;i++) {
 		if(ops[option_choices[i]] != undefined) {
@@ -27,6 +27,9 @@ function new_format_block() {
 }
 function new_format_nl() {
 	new_format_item("nl");
+}
+function set_up_format(name, property) {
+	
 }
 function post_format() {
 	var out = ""
@@ -141,10 +144,14 @@ function post_toolbar(tools) {
 	$('.toolbar').html(out);
 	
 	$('.toolbar_button').on("click", function() {
-		if($(this).attr('data-t') == "character")
-			runPanel('main_Character');
-		else if($(this).attr('data-t') == "fullscreen") 
-			fullscreen();
+		switch ($(this).attr('data-t')) {
+			case "character":
+				runPanel('main_Character');
+			break;
+			case "fullscreen":
+				fullscreen();
+			break;
+		}
 	});
 	
 	

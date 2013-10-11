@@ -11,6 +11,7 @@
 <script src="panels.js"></script>
 <script src="popup.js"></script>
 <script src="file.js"></script>
+<script src="build.js"></script>
 
 <script src="apa.js"></script>
 
@@ -34,7 +35,7 @@
             <div id="file_metadata">
             
             </div>
-            <div class="content_buttons" style="display:none"> 
+            <div class="content_buttons" style="display:block"> 
                 <button onclick="alert(getRange().collapsed)">Is Collapsed?</button>
                 <button onclick="rangy.getSelection().collapseToStart()">Collapse Range</button>
                 <button onclick="alert(rangy.getSelection().toHtml())">Return HTML</button>
@@ -48,6 +49,11 @@
                 <button onclick="moveCarat('character', -1)">Move Left</button>
                 <button onclick="moveCarat('character', 1)">Move Right</button>
                 <button onclick="moveCarat('word', 1)">Really Move Right</button>
+                <br>
+                <b>Do More Actions:<Br>
+                <button onclick="runPanel('main_Citation')">Citation Panel</button>
+                <button onclick="runPanel('main_Idea')">Idea Panel</button>
+                <button onclick="startBuild()">Build Paper</button>
            </div>
         </div>
       </td>
@@ -75,6 +81,12 @@
         </div>
       </td>
      </tr></table>
+</div>
+<div class="build">
+
+</div>
+<div class="build_progress">
+
 </div>
 
 <div class="popup " style="display:none">
