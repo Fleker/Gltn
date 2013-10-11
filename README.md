@@ -2,6 +2,7 @@ Gluten
 ======
 
 What is Project Gluten?
+*Try it out!' http://felkerdigitalmedia.com/gluten/edit.php
 
 The goal is to build a better document editor. Word, OpenOffice, Google Docs are all "word processors". You can type things and style things.
 But everything you style has to be done yourself.
