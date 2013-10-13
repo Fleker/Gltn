@@ -88,6 +88,13 @@
 <div class="build_progress">
 
 </div>
+<div class="draft">
+<!--This section will be a place between the original content and the final build where HTML tags will still exist-->
+</div>
+<div class="scale">
+<!--This section is used for "Build". It uses pixels to see how high the paper is in inches using this scale-->
+LOREM IPS/um o
+</div>
 
 <div class="popup " style="display:none">
   
@@ -96,6 +103,7 @@
 <div class="hovertag">
 
 </div>
+<div class="fullscreenui" style="display:none; opacity:.1" onMouseOver="$('.fullscreenui').css('background-color', '#ccc').css('opacity',1)" onMouseOut="$('.fullscreenui').css('background-color', 'white').css('opacity', 0.1);"><div class="fullscreenexit" onclick="normalscreen()"><br>X<br><br><br></div> <div class="fullscreencount"></div></div>
 
 <div class="footer">
 
@@ -489,7 +497,9 @@ function contentAddSpan(t) {
 		//<span class="citation" id="citation"0>"&nbsp;"</span>&nbsp;
 		//el = el+document.createTextNode('&nbsp');
 		
-		range.insertNode(document.createTextNode('"'));
+		//Because both quotes must be the ending and closing of a citation, we must add to the text content.anchor(
+		el.textContent += ' "  ';
+			//range.insertNode(document.createTextNode('"'));
 		range.insertNode(el);
 		
 		/*var range = getRange();
@@ -652,13 +662,17 @@ function fullscreen() {
 		$('.content_textarea').animate({
 			top: "-.1%",
 			left:"-.1%",
-			width:"100.2%",
+			width:"95%",
+			width:"calc(100.2% - 50px)",
 			height:"100.2%",
-			fontSize:"14pt",
-			paddingLeft:"20px",
+			fontSize:"16pt",
+			paddingLeft:"50px",
 			paddingRight:"30px",
-			paddingTop:"15px"
-		});
+			paddingTop:"35px",
+			lineHeight:"1.5em"
+		},300);
+	$('.fullscreenui').fadeIn(500);
+	setTimeout("$('.fullscreenui').css('opacity','.1')", 510);
 }
 function normalscreen() {
 	window.fullscreenOn = false;	
@@ -668,8 +682,10 @@ function normalscreen() {
 			fontSize:"12pt",
 			paddingLeft:"0px",
 			paddingRight:"0px",
-			paddingTop:"0px"
-		});
+			paddingTop:"0px",
+			lineHeight:"1em"
+		},300);
+		$('.fullscreenui').fadeOut(100);
 }
 </script>
 

@@ -13,6 +13,10 @@ function startBuild() {
 	updateBuildProgress('Building Text...');
 	onBuildFormat();
 		updateBuildProgress('Setting Headers...');	
+	onGetFormats();
+		updateBuildProgress('Formatting Content...');
+	onBuildBibliography();
+		updateBuildProgress('Building Bibliography...');
 	onSetHeader();
 		updateBuildProgress('Setting up display...');
 		
@@ -75,7 +79,7 @@ function enable_format(setting) {
 //Page generator and manager
 function add_new_page(pagename) {
 		p = $('.page').length;
-		$('.build').append('<div class="page '+pagename+' page'+p+'" data-p="'+p+'"><div class="pageheader page'+p+'header"></div> <div class="pagebody page'+p+'body"></div> <div class="pagefooter"></div></div>');
+		$('.build').append('<div class="page '+pagename+' page'+p+'" data-p="'+p+'"><div class="pageheader page'+p+'header"></div> <div class="pagebody page'+p+'body"></div> <div class="pagefooter"></div></div><hr style="height:2px;width:90%;margin-left:5%;>');
 }
 function newline() {
 	return "<br>";	
@@ -92,10 +96,68 @@ function add_to_page(text, i, name) {
 		p = $('.page').length-1;
 		$('.page'+p+'body').append(text);	
 	}
+}	
+function paste_content() {
+	add_to_page("<div class='pasteContent'></div>");	
 }
 function push_header(text) {
-	$('.pageheader').html(text);	
+	i = 1;
+	$('.pageheader').each(function() {
+		var ptemp = text.replace(/PAGE/g, i);
+		i++;
+		$(this).html(ptemp);
+	});	
 }
 function customize_this_header(page, text) {
+	text = text.replace(/PAGE/g, (parseInt(page)+1));
 	$('.page'+page+'header').html(text);	
 }
+function lcr_split(left, center, right) {
+	return "<table style='width:100%'><tr><td>"+left+"</td><td style='text-align:center'>"+center+"</td><td style='text-align:right'>"+right+"</td></tr></table>";	
+}
+
+//Content Formatting
+function citationFormatted(string, i, id, page) {
+	//Insert a citation content_formatted object and return it with properties filled in
+	string = string.replace(/AUTHOR_LAST/g, citation[id].AuthorLast);
+	string = string.replace(/PAGE/g, page);	
+	return string;	
+}
+function post_content_formatting(object) {
+	//Duplicate paper
+	var cont = $('.content_textarea').html();
+	$('.draft').html(cont);
+	$('.draft > .citation').each(function() {
+		i = $(this).attr('data-i');
+		id = $(this).attr('data-id');
+		page = $(this).attr('data-page');
+		
+		//List various types of citations
+		if(citation[id].Main == "on" && object.citation_main != undefined) {
+			$(this).html($(this).html()+" "+citationFormatted(object.citation_main, i, id, page));
+		} else {
+			$(this).html($(this).html()+" "+citationFormatted(object.citation, i, id, page));
+		}
+	});
+	
+	//Now all formatting is complete. We shall port the content over to the actual paper
+	cont = $('.draft').text();
+	ca =  cont.split(' ');
+	
+	var maxh = $('.scale').height()*6.5;
+	for(j in ca) {
+		//TODO - Find a way to grab the current page, not necessarily the last one. This will be handy for things that are added after content
+		p = $('.page').length-1;
+		add_to_page("<span class='hideme'>"+ca[j]+" "+"</span>");
+		if($('.page'+p+'body').height() > maxh) {
+			add_new_page();
+			/*hm = $('.hideme').length;
+			he = $('.hideme')[hm-1]
+			$(he).css('display','none');*/
+		} 
+		$('.hideme').remove();
+		//$('.pasteContent').append(ca[j]+" ");	
+		add_to_page(ca[j]+' ');
+
+	}
+}	

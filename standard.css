@@ -165,6 +165,28 @@ box-shadow:         0px -2px 1px rgba(0, 0, 0, 1);*/
 	text-align: center;
 	width:100%;	
 }
+.draft {
+	display:none;	
+}
+.scale {
+	display:none;
+	height:1in;	
+}
+.fullscreenui {
+	opacity: 0.1;
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	width: 45px;
+	height: 100%;
+	z-index:4;
+	background-color:#eee;
+	text-align:center;
+	margin-top:1px;
+}	
+.fullscreenexit {
+	cursor: pointer;	
+}
 
 /* Colors */
 .gluten_gray {
@@ -184,7 +206,7 @@ button {
 /* Build Templates */
 .page {
 	width:8.5in;
-	height:11in;
+	height:13in;
 	padding-left:1in;
 	padding-top:0.5in;
 	padding-right:1in;
@@ -192,12 +214,13 @@ button {
 	background-color:white;
 	-webkit-box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 1);
 	box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 1);	
+	text-decoration: none;
 }
 .pageheader {
 	height:1in;
 }
 .pagebody {
-	height:6.5in;	
+	max-height:6.5in;	
 }
 .pagefooter {
 	height: 1in;	
@@ -209,5 +232,8 @@ button {
 	.page {
 		box-shadow: none;
 		-webkit-box-shadow: none;	
+	}
+	hr {
+		display:hidden;	
 	}
 }

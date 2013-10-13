@@ -26,9 +26,21 @@ function onBuildFormat() {
 	add_new_page('coverpage'); 	
 		add_to_page(centerText(valMetadata('Title')));
 		add_to_page(centerText(valMetadata('Author')));
+	add_new_page();
+	paste_content();
 }
 function onSetHeader() {
-	push_header('<span style="text-transform:uppercase">'+valMetadata('Running Head')+'</span>');
-	customize_this_header(find_page('coverpage'), 'Running Head: <span style="text-transform:uppercase">'+valMetadata('Running Head')+'</span>');
+	//push_header('<span style="text-transform:uppercase">'+valMetadata('Running Head')+'</span>');
+	push_header(lcr_split('<span style="text-transform:uppercase">'+valMetadata('Running Head')+'</span>','','PAGE'));
+	//customize_this_header(find_page('coverpage'), 'Running Head: <span style="text-transform:uppercase">'+valMetadata('Running Head')+'</span>');
+	customize_this_header(find_page('coverpage'), lcr_split('Running Head: <span style="text-transform:uppercase">'+valMetadata('Running Head')+'</span>','','PAGE'));
+}
+function onGetFormats() {
+	obj = {};
+	obj.citation = "(AUTHOR_LAST PAGE)";
+	post_content_formatting(obj);	
+}
+function onBuildBibliography() {
+	
 }
 
