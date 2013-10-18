@@ -3,7 +3,7 @@ function runPanel(panel_id_name) {
 	//Get Properties of the Panel First
 	var p = eval("GetPanel"+panel_id_name+"();");
 	$('.panel_plugin_title').html(p.title);
-	$('.panel_plugin_title').append('&emsp;<span class="PanelPopupEvent"></span><button onclick="hidePanelPlugin()">X</button>');
+	$('.panel_plugin_title').append('&emsp;<span class="PanelPopupEvent"></span><button onclick="hidePanelPlugin()" data-step="22" data-intro="Click me to hide the panel.">X</button>');
 	$('#panel_plugin').css("border-color", p.bordercolor);
 	
 	//for a phone, do a type of check so that it isn't too small. 
@@ -106,9 +106,9 @@ function RunPanelmain_Character() {
 	/*Punction*/main.push({val:'—',title:'Emdash',tag:'dash emdash'},{val:'…',title:'Elipsis',tag:'elipsis dot'});
 	
 	var out = "";
-	var searchbar = '<input type="search" id="popup_character_search" style="width:100%" placeholder="Search for Characters"><br>';
+	var searchbar = '<input type="search" id="popup_character_search" style="width:100%" placeholder="Search for Characters" data-step="18" data-intro="Can you find the character you want? You can easily find it using the searchbar."><br>';
 	out = out + searchbar;
-	out = out + "<div class='character_palette_display'></div>";
+	out = out + "<div class='character_palette_display' data-step='17' data-intro='This lists all the special characters that you can insert into your document. After clicking on the one you want, the keyboard switches focus so you can keep typing without having to reposition your mouse. Try it. It is really useful.'></div>";
 	postPanelOutput(out);
 	 
 	function createCharacterPalette(data) {
@@ -160,7 +160,7 @@ function RunPanelmain_Citation() {
 			if(citation[i] != undefined) {
 				c = citation[i];
 				console.warn(c);
-				out = out + "<div class='citationPanel_citation' data-id='"+i+"' style='background-color:white;border: solid 1px;padding-left: 5px;padding-right: 10px;border-color: #aaa;color: #333;'>"
+				out = out + "<div class='citationPanel_citation' data-id='"+i+"' style='background-color:white;border: solid 1px;padding-left: 5px;padding-right: 10px;border-color: #aaa;color: #333;' data-step='15' data-intro='All your citations will be listed in this panel. You can edit them by clicking on the one you want.'>"
 				try {
 					out = out + c['Title']+"<br>&emsp;";
 					out = out + "<i>"+c['AuthorFirst']+" "+c['AuthorLast']+"</i><br>&emsp;<span style='font-size:10pt'>Vol. "+c['Volume']+" "+c['Edition']+" ed.</span>";
@@ -197,7 +197,7 @@ function GetPanelmain_Idea() {
 function RunPanelmain_Idea() {
 	function populateIdeas() {
 		
-		out = "<div style='background-color: white;border: solid 1px;padding-left: 12px;padding-right: 0px;border-color: #aaa;color: #333;padding-top: 6px;width: 94%;'><u>General Notes</u><br><textarea class='PanelIdea' data-id='-1'></textarea></div>";
+		out = "<div style='background-color: white;border: solid 1px;padding-left: 12px;padding-right: 0px;border-color: #aaa;color: #333;padding-top: 6px;width: 94%;' data-step='20' data-intro='What if you are taking notes for your paper? It is easy with the Ideas Panel. Write general notes or for each source you have. The panel scrolls with you, so you can take a look at notes while you write.'><u>General Notes</u><br><textarea class='PanelIdea' data-id='-1'></textarea></div>";
 		for(i in citation) {
 			out = out+"<hr><div style='background-color: white;border: solid 1px;padding-left: 12px;padding-right: 0px;border-color: #aaa;color: #333;padding-top: 6px;width: 94%;'><u>"+citation[i].Title+"</u><br><textarea class='PanelIdea' data-id='"+i+"'></textarea></div>";
 		}

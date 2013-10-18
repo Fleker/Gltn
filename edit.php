@@ -4,8 +4,10 @@
 <meta charset="utf-8">
 <title>Editing Document</title>
 <link rel="stylesheet" type="text/css" href="standard.css">
+<link rel="stylesheet" type="text/css" href="IntroJS/introjs.min.css">
 
 <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+<script src="http://code.jquery.com/color/jquery.color-2.1.2.min.js"></script>
 
 <script src="format.js"></script>
 <script src="panels.js"></script>
@@ -15,21 +17,23 @@
 
 <script src="apa.js"></script>
 
-<script src="C:\Users\N\Documents\GitHub\Gluten_2\rangy-1.3alpha.772\rangy-core.js"></script>
-<script src="C:\Users\N\Documents\GitHub\Gluten_2\rangy-1.3alpha.772\rangy-cssclassapplier.js"></script>
-<script src="C:\Users\N\Documents\GitHub\Gluten_2\rangy-1.3alpha.772\rangy-textrange.js"></script>
+<script src="rangy-1.3alpha.772\rangy-core.js"></script>
+<script src="rangy-1.3alpha.772\rangy-cssclassapplier.js"></script>
+<script src="rangy-1.3alpha.772\rangy-textrange.js"></script>
+<script src="IntroJS/intro.js"></script>
 </head>
 <body>
 
-<div class="header">
-
+<div class="header" style="text-align:center">
+<font size="4" id="temp_header" >Welcome to Gluten!</font><br>
+<button onclick="introJsStart()">Start the Tour!</button> 
 </div>
 
 <div class="body">
 	<table style="width:100%"><tr><td id="panel_content" class="panel">
         <div>
             <i>What Kind of Document do You Want to Create?</i><br>
-            Format:<input type="text" id="file_format" list="gluten_formats">&emsp;&emsp;Language:<input id="file_language" list="gluten_languages" value="English (US)"><br>
+            Format:<input type="text" id="file_format" list="gluten_formats" value="APA">&emsp;&emsp;Language:<input id="file_language" list="gluten_languages" value="English (US)"><br>
             Tags:<input id="file_tags" placeholder="Space Separated Tags">
             
             <div id="file_metadata">
@@ -40,7 +44,7 @@
                 <button onclick="rangy.getSelection().collapseToStart()">Collapse Range</button>
                 <button onclick="alert(rangy.getSelection().toHtml())">Return HTML</button>
                 <button onclick="alert(rangy.getSelection().getRangeAt(0))">Return Text Only</button>
-                <button onclick="initiateCitationEditor()">Add Citation</button>
+                <button onclick="initiateCitationEditor();" data-step="8" id="ADDCITATIONBUTTON">Add Citation</button>
                 <button onclick="toggleItalics()">Toggle Italics</button>
                 <button onclick="appendQuote();">Add Quote</button>
                 <input type="text" placeholder="Search Terms - No REGEX yet." id="searching">
@@ -51,9 +55,9 @@
                 <button onclick="moveCarat('word', 1)">Really Move Right</button>
                 <br>
                 <b>Do More Actions:<Br>
-                <button onclick="runPanel('main_Citation')">Citation Panel</button>
-                <button onclick="runPanel('main_Idea')">Idea Panel</button>
-                <button onclick="startBuild()">Build Paper</button>
+                <button onclick="runPanel('main_Citation')" data-step="14" data-intro="Panels are a way for 3rd party developers to improve the functionality of the editor. The panel framework is documented on GitHub. Let's check it out.">Citation Panel</button>
+                <button onclick="runPanel('main_Idea')" data-step="19" data-intro="Click on me next!">Idea Panel</button>
+                <button onclick="startBuild()" data-step="23" data-intro="After adding all of this rich information, you will need to 'build' the paper. This is when the software puts everything together.">Build Paper</button>
            </div>
         </div>
       </td>
@@ -82,7 +86,7 @@
       </td>
      </tr></table>
 </div>
-<div class="build">
+<div class="build" data-step="24" data-intro="There you go, one perfectly formatted paper. Wasn't that easy? In fact, it was very simple to do, and it didn't require memorizing a computer language or formatting rules. There's a lot of things the human mind is good at; automation isn't one of them. Save you time for, you know, actually <i>writing</i> your paper.<br><br>This project is open source, so check it out on GitHub and contribute if you want. It is easy to develop a panel or add a small feature.<br><br>I hope that this project is exciting, and that you'll use it once it is available.<br>-Nick Felker">
 
 </div>
 <div class="build_progress">
@@ -103,7 +107,7 @@ LOREM IPS/um o
 <div class="hovertag">
 
 </div>
-<div class="fullscreenui" style="display:none; opacity:.1" onMouseOver="$('.fullscreenui').css('background-color', '#ccc').css('opacity',1)" onMouseOut="$('.fullscreenui').css('background-color', 'white').css('opacity', 0.1);"><div class="fullscreenexit" onclick="normalscreen()"><br>X<br><br><br></div> <div class="fullscreencount"></div></div>
+<div class="fullscreenui" style="display:none; opacity:.1" onMouseOver="$('.fullscreenui').css('background-color', '#ccc').css('opacity',1)" onMouseOut="$('.fullscreenui').css('background-color', 'white').css('opacity', window.fsuo);"><div class="fullscreenexit" onclick="normalscreen()"><br>X<br><br><br></div><div class="fullscreennight" onclick="nightscreen()"><br>-O-<br><br><br></div> <div class="fullscreencount"></div></div>
 
 <div class="footer">
 
@@ -344,6 +348,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 					//console.log('-'+citetypes[i].val);
 					if(citetypes[i].val == $('#citationEditorIType').val()) {
 						//console.log('--'+citetypes[i].format);
+						introJsStart(10);
 						switch(citetypes[i].format) {
 							case 'online':
 								citationShow('Title Author Website Pubdate Accdate');
@@ -407,6 +412,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 				$('#citation'+citei).attr('data-i', citei);
 				citationHovertag();
 				closePopup();
+				introJsStart(12);
 			}
 			function citationRestore() {
 				for(i in citeAttributes) {
@@ -673,6 +679,7 @@ function fullscreen() {
 		},300);
 	$('.fullscreenui').fadeIn(500);
 	setTimeout("$('.fullscreenui').css('opacity','.1')", 510);
+	window.fsuo = 0.1;
 }
 function normalscreen() {
 	window.fullscreenOn = false;	
@@ -685,7 +692,62 @@ function normalscreen() {
 			paddingTop:"0px",
 			lineHeight:"1em"
 		},300);
+		nightscreen(1);
 		$('.fullscreenui').fadeOut(100);
+}
+function nightscreen(option) {
+	if($('.content_textarea').css('background-color') == "rgb(0, 0, 0)" || option == 1) {
+		//Return to white
+		jQuery('.content_textarea').animate({
+			backgroundColor: "rgba(255,255,255)",
+			color: "rgba(0,0,0)"
+		},2000);
+		$('.fullscreenui').animate({
+			opacity: 0.1
+		},100);
+		fsuo = .1;
+	} else {
+		jQuery('.content_textarea').animate({
+			backgroundColor: "rgba(0,0,0)",
+			color: "rgba(200,200,200)"
+		},2000);
+		$('.fullscreenui').animate({
+			opacity:0.02
+		},100);
+		fsuo = 0.02;
+	}
+}
+
+//INTRO JS
+//setInterval('introJs().refresh();', 10);
+/*function reintro() {  
+	//console.log('ping');
+  $('#format_item_0').attr('data-step', 4);
+	$('#format_item_0').attr('data-intro', );
+	$('#format_item_1').attr('data-step', 5);
+	$('#format_item_1').attr('data-intro', );
+	//See counter
+	$('#format_item_1').attr('data-position', 'top');
+	$('#format_item_2').attr('data-step', 6);
+	$('#format_item_2').attr('data-intro', );
+	$('.content_textarea').attr('data-step', 7);
+	$('.content_textarea').attr('data-intro', 'This is the main part of your paper. Here you can write your content and add rich formatting.');
+	
+	$('#citationEditorITitle').attr('data-step', 10).attr('data-intro', 'You can enter the source title, author, and plenty of other stuff.');
+	$('#citation0').attr('data-step', 13);
+	$('#citation0').attr('data-intro', "Now the citation appears in your essay. Hovering over it tells you the title of the source, and clicking on that hover sends you back to the editor. What if you want to see all your sources?");
+	$('#citationEditorIAuthorLast').attr('data-step',11).attr('data-intro', 'Type Smith here. Then we can save this source.');
+	$('#citationEditorSave').attr('data-step', 12).attr('data-intro', 'After you type the data, click save.');
+};
+setInterval("reintro()", 100);
+*/
+function introJsStart(id) {
+	if(id == undefined)
+		id = 1;
+var intro = introJs();
+intro.setOptions({steps: [{element: '#temp_header', intro: "Welcome to the Project Gluten. I hope that you are impressed from the work that has been done so far. There's a lot more to go, but there's a lot of potential here already for a great service.<br><br>-Nick Felker"}, {element:'#file_format', intro:"In this demo, we'll be using the APA format. Do you know how to use this format in a paper? The bigger question is, do you <i>need</i> to know how to use this format. Gluten lets the user focus on the art of writing, and formats the paper behind the scenes. How? Let's take a closer look."},{element:'#file_language', intro:"Near the top of the page, you see a bunch of input boxes. You can alter the contents for each box."},{element:'#format_item_0', intro:"The types of input are based on the format. In APA format, the 'Running Head' is a title that displays in the header."},{element:'#format_item_1', intro:"Well, did you try typing in a title? Why not? The format can set a min and/or a max number of characters/words. See the counter below? The title should not be more than 12 words."},{element:'#format_item_2', intro:"Do you see how the word count above changed? If over or under the set limit, the user is alerted. Go back and check it out."},{element:document.querySelectorAll('.content_textarea')[0],intro:'This is the main part of your paper. Here you can write your content and add rich formatting.'},  {element:"#ADDCITATIONBUTTON", intro:"You can add a citation to your paper as easily as clicking this button. What are you waiting for?"},  {element:"#citationEditorIType", intro:"This popup appears giving you the option to cite a variety of different sources. Choose one. (Click 'Done' for now)"},  {element:'#citationEditorITitle', intro:'You can enter the source title, author, and plenty of other stuff.'},  {element:'#citationEditorIAuthorLast', intro:'Type Smith here. Then we can save this source. (Click "Done")'},  {element:'#citation0',intro:"Now the citation appears in your essay. Hovering over it tells you the title of the source, and clicking on that hover sends you back to the editor. What if you want to see all your sources?"}]});
+if(window.introdisabled != false)
+	intro.goToStep(id).start();
 }
 </script>
 

@@ -41,6 +41,11 @@ function onGetFormats() {
 	post_content_formatting(obj);	
 }
 function onBuildBibliography() {
+	add_new_section('bibliography');
+		add_to_page(centerText('Works Cited'));
 	
+	obj = {};
+	obj.def = "";
+	post_bibliography(obj);		
 }
 

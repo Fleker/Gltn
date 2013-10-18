@@ -90,7 +90,10 @@ body {
 		border: solid 1px #dd6;
 		padding-left: 2px;
 		padding-right: 2px;
-}	
+}
+.content_textarea {
+	background-color:white;	
+}
 
 .fullscreen {
 	position:fixed;

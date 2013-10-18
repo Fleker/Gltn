@@ -62,7 +62,6 @@ function post_format() {
 			setInterval("format_check_count("+i+")", 100);
 		}
 	}
-	
 	onInitToolbar();
 }
 
@@ -134,7 +133,7 @@ function post_format_content(m) {
 	return out;	
 }
 function post_toolbar(tools) {
-	out = "&emsp;<span class='toolbar_button' data-t='character'>Character</span>&emsp;|&emsp;";
+	out = "&emsp;<span class='toolbar_button' data-t='character' data-step='16' data-intro='Another useful panel is the character panel.'>Character</span>&emsp;|&emsp;";
 	//TODO - Use labels to make prettier, maybe "new_toolbar/new_toolbar_item"
 	for(i=0;i<tools.length;i++) {
 		out = out + "<span class='toolbar_button' data-t='"+tools[i]+"'>"+tools[i]+"</span>&emsp;|&emsp;";
@@ -172,7 +171,7 @@ function update_toolbar_style() {
 			height:100.2%;
 		});*/
 	} else {
-		$('.content_textarea').css('z-index', 3).css('position', 'fixed').css('background-color', 'white');
+		$('.content_textarea').css('z-index', 3).css('position', 'fixed')/*.css('background-color', 'white')*/;
 		
 	}
 	

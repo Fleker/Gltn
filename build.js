@@ -1,5 +1,6 @@
 function startBuild() {
 	//initiate the build code, show the progress indicator, and start sending stuff to different functions to do different stuff.
+	window.section_name = "";
 	$('.build').empty();
 		$('.build_progress').css('display', 'block').css('position', 'fixed').css('width', '50%').css('height', '50%').css('top','25%').css('left','25%').css('background-color', 'rgba(0,0,0,0.3)').css('font-size','16pt').css('margin-top','10%');
 	updateBuildProgress('Initiating Build...');
@@ -79,7 +80,18 @@ function enable_format(setting) {
 //Page generator and manager
 function add_new_page(pagename) {
 		p = $('.page').length;
-		$('.build').append('<div class="page '+pagename+' page'+p+'" data-p="'+p+'"><div class="pageheader page'+p+'header"></div> <div class="pagebody page'+p+'body"></div> <div class="pagefooter"></div></div><hr style="height:2px;width:90%;margin-left:5%;>');
+		if(window.section_name.length) {
+			p = $('.'+section_name).length;
+			secname = window.section_name+p+" "+window.section_name;
+		} else
+			secname = ""
+		$('.build').append('<div class="page '+pagename+' page'+p+' '+secname+'" data-p="'+p+'"><div class="pageheader page'+p+'header"></div> <div class="pagebody page'+p+'body"></div> <div class="pagefooter"></div></div><hr style="height:2px;width:90%;margin-left:5%;>');
+}
+function add_new_section(section_name) {
+	window.section_name = section_name;
+	p = $('.'+section_name).length;
+	//add_new_page(section_name+p);
+	add_new_page();
 }
 function newline() {
 	return "<br>";	
@@ -161,3 +173,27 @@ function post_content_formatting(object) {
 
 	}
 }	
+function post_bibliography(object) {
+	//Get all citations, limit only to those used in the paper
+	citationSorted = new Array();
+	for(i in citation) {
+		var cites = $('.citation');
+		$('.citation').each(function() {
+			if(citationSorted.indexOf(citation[$(this).attr('data-id')]) > -1) {
+				citationSorted.push(citation[$(this).attr('data-i')]);	
+			}
+		});
+	}	
+	//Sort by object.sortmethod
+	citationSorted = citationSorted.sort(compare);
+	//Clear draft
+	//Send conditional formatting to draft
+	//Add part by part by running through citation. If too much, new page in same method as above.	
+}
+function compare(a,b) {
+  if (a.AuthorLast < b.AuthorLast)
+     return -1;
+  if (a.AuthorLast > b.AuthorLast)
+    return 1;
+  return 0;
+}
