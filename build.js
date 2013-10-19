@@ -81,8 +81,8 @@ function enable_format(setting) {
 function add_new_page(pagename) {
 		p = $('.page').length;
 		if(window.section_name.length) {
-			p = $('.'+section_name).length;
-			secname = window.section_name+p+" "+window.section_name;
+			psec = $('.'+section_name).length;
+			secname = window.section_name+psec+" "+window.section_name;
 		} else
 			secname = ""
 		$('.build').append('<div class="page '+pagename+' page'+p+' '+secname+'" data-p="'+p+'"><div class="pageheader page'+p+'header"></div> <div class="pagebody page'+p+'body"></div> <div class="pagefooter"></div></div><hr style="height:2px;width:90%;margin-left:5%;>');
