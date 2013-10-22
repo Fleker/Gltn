@@ -52,6 +52,9 @@ function post_format() {
 		out = out + "<br>";
 	}
 	$('#file_metadata').html(out);
+	$('.build, .toolbar').on('mouseleave', function() {
+		hideHovertag();
+	});
 	
 	for(i=0;i<=format_js_index;i++) {
 		if(window.metadata[i].min.length != 0 || window.metadata[i].max.length != 0) {
@@ -128,7 +131,7 @@ function post_format_mltext(m) {
 function post_format_content(m) {
 	var out = "";
 	out = "<div class='content toolbar'></div>";
-	out = out + "<div contenteditable='true' class='content content_textarea' onfocus='postRange()' onclick='postRange()' onmouseleave='/*hideHovertag()*/'></div>";
+	out = out + "<div contenteditable='true' class='content content_textarea' onfocus='postRange()' onclick='postRange()' onmouseleave='/*hideHovertag()*/ '></div>";
 	out = out + "<div class='content_wordcount'></div>";
 	return out;	
 }

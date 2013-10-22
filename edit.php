@@ -788,11 +788,11 @@ document.onkeydown = function(e) {
 			//Save
 			//Check beginning and ends of div
 			if($('.content_textarea').html().substr(0,1) == "<") {
-				$('.content_textarea').prepend(" ");
+				$('.content_textarea').prepend("&nbsp;");
 				console.log('"'+$('.content_textarea').html()+'"');
 			}
 			if($('.content_textarea').html().substr(-1) != " ") {
-				$('.content_textarea').append(" ");
+				$('.content_textarea').append("&nbsp;");
 				console.log('"'+$('.content_textarea').html()+'"');
 			}
 		break;
