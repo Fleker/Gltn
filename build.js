@@ -131,7 +131,18 @@ function lcr_split(left, center, right) {
 //Content Formatting
 function citationFormatted(string, i, id, page) {
 	//Insert a citation content_formatted object and return it with properties filled in
+	console.log(string, id);
+	console.warn(citation[id]);
+	string = string.replace(/AUTHOR_FIRST_I/g, citation[id].AuthorFirst.substr(0,1));
+	string = string.replace(/AUTHOR_FIRST/g, citation[id].AuthorFirst);
 	string = string.replace(/AUTHOR_LAST/g, citation[id].AuthorLast);
+	string = string.replace(/EDITION/g, citation[id].Edition);
+	string = string.replace(/PUBCITY/g, citation[id].City);
+	string = string.replace(/PUBCOMP/g, citation[id].Publisher);
+	string = string.replace(/TITLE/g, citation[id].Title);
+	string = string.replace(/VOLUME/g, citation[id].Volume);
+	string = string.replace(/URL/g, citation[id].Url);
+	string = string.replace(/YEAR/g, citation[id].Year);
 	string = string.replace(/PAGE/g, page);	
 	return string;	
 }
@@ -176,19 +187,64 @@ function post_content_formatting(object) {
 function post_bibliography(object) {
 	//Get all citations, limit only to those used in the paper
 	citationSorted = new Array();
-	for(i in citation) {
-		var cites = $('.citation');
-		$('.citation').each(function() {
-			if(citationSorted.indexOf(citation[$(this).attr('data-id')]) > -1) {
-				citationSorted.push(citation[$(this).attr('data-i')]);	
+	//for(i in citation) {
+		$('.content_textarea > .citation').each(function() {
+			if(citationSorted.indexOf(citation[$(this).attr('data-id')]) == -1) {
+				citationSorted.push(citation[$(this).attr('data-id')]);	
 			}
 		});
-	}	
+	//}	
 	//Sort by object.sortmethod
 	citationSorted = citationSorted.sort(compare);
 	//Clear draft
+	$('.draft').empty();
 	//Send conditional formatting to draft
+	for(i in citationSorted) {
+		var str = "";
+		if(false) {
+			
+		} else if(false) {
+			
+		} else {
+			var f = findCitation(citationSorted[i]);
+			console.log("--"+f.id);
+			str = citationFormatted(object.def, f.i, f.id, f.page); 
+			//(findCitation(citationSorted[i]).id)
+		}
+				
+		$('.draft').append('<div style="'+object.style+'">'+str+'</div>');	
+	}
+	
+	
 	//Add part by part by running through citation. If too much, new page in same method as above.	
+	ca = $('.draft').html().split('<div');
+	var maxh = $('.scale').height()*6.5;
+	for(j in ca) {
+		//TODO - Find a way to grab the current page, not necessarily the last one. This will be handy for things that are added after content
+		p = $('.page').length-1;
+		add_to_page("<div class='hideme'>"+ca[j]+" "+"</div>");
+		if($('.page'+p+'body').height() > maxh) {
+			add_new_page();
+			/*hm = $('.hideme').length;
+			he = $('.hideme')[hm-1]
+			$(he).css('display','none');*/
+		} 
+		$('.hideme').remove();
+		//$('.pasteContent').append(ca[j]+" ");	
+		add_to_page("<div"+ca[j]+' ');
+
+	}
+}
+function findCitation(cite) {
+	o = {};
+	for(i in citation) {
+		if(citation[i] == cite) {
+			o.id = i;	
+		}
+	}
+	o.i = $('.citation[data-id="'+i+'"]').attr('data-i');
+	o.page = $('.citation[data-id="'+i+'"]').attr('data-page');
+	return o;
 }
 function compare(a,b) {
   if (a.AuthorLast < b.AuthorLast)

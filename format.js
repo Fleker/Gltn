@@ -150,6 +150,11 @@ function post_toolbar(tools) {
 			case "fullscreen":
 				fullscreen();
 			break;
+			
+			case "heading1":
+				contentAddSpan({node:"span", class:"heading1"});
+				formatHovertag('heading1', '"Heading-1"', 'null');
+			break;
 		}
 	});
 	

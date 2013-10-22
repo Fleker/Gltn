@@ -277,6 +277,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 				//Add quote and citation stuff
 				contentAddText('  ');
 				contentAddSpan({class: 'citation', id:'citation'+citei, node:'span', leading_quote:(q.length>0)});
+				contentAddText('  ');
 				//contentAddSpan({node:'span'});
 			}
 			else if(hovertag >= 0 /*citation is selected OR hovertag click - hovertag is the citei*/) {
@@ -456,6 +457,17 @@ function citationHovertag() {
 		//hideHovertag();
 	});
 }
+function formatHovertag(classname, textcode, action) {
+	$('.'+classname).off('mouseenter');
+	$('.'+classname).off('mouseleave');
+	
+	$('.'+classname).on('mouseenter', function() {
+		displayHovertag(eval(textcode), {ypos: $(this).offset().top}, eval(action));
+	});
+	$('.'+classname).on('mouseleave', function() {
+		//hideHovertag();
+	});
+}
 
 function toggleItalics() {
 	//instead of using the surroundContents function, this will use the CSS Toggle function. This function will allow an individual to remove an element just as easily as applying one.	
@@ -489,14 +501,20 @@ function contentAddText(t) {
 	}
 }
 function contentAddSpan(t) {
+	//contentAddText(" ");
+	//contentAddText(" ");
 	var range = getRange();
 	if (range) {
+		/*var ex = document.createElement("span");
+			ex.textContent = "5";
+			range.insertNode(ex);
+			range.insertNode(ex);*/
 		/*var el = document.createElement("span");
 		el.appendChild(document.createTextNode("**INSERTED NODE**"));*/
 		var el = document.createElement(t.node);
 		el.className = t.class;
 		el.setAttribute("id", t.id);
-		if(!t.leading_quote)
+		if(!t.leading_quote && t.class == "citation")
 			el.textContent = '" ';
 		/*else if(t.leading_quote)
 			el.textContent = ' "';*/
@@ -504,7 +522,10 @@ function contentAddSpan(t) {
 		//el = el+document.createTextNode('&nbsp');
 		
 		//Because both quotes must be the ending and closing of a citation, we must add to the text content.anchor(
-		el.textContent += ' "  ';
+		if(t.class == 'citation')
+			el.textContent += ' "';
+		else
+			el.textContent += t.class.split(" ")[0];
 			//range.insertNode(document.createTextNode('"'));
 		range.insertNode(el);
 		
@@ -513,7 +534,7 @@ function contentAddSpan(t) {
 		
 		rangy.getSelection().setSingleRange(range);
 		//Move forward one to keep typing.
-		moveCarat("character", -2);
+		moveCarat("character", -2-3);
 		
 	}
 }
@@ -750,12 +771,33 @@ if(window.introdisabled != false)
 	intro.goToStep(id).start();
 }
 function exitintro() {
+	window.introdisabled = false;
 	introJs().exit();	
 	alert("There you go, one perfectly formatted paper. Wasn't that easy? In fact, it was very simple to do, and it didn't require memorizing a computer language or formatting rules. There's a lot of things the human mind is good at; automation isn't one of them. Save you time for, you know, actually *writing* your paper.\n\nThis project is open source, so check it out on GitHub and contribute if you want. It is easy to develop a panel or add a small feature.\n\nI hope that this project is exciting, and that you'll use it once it is available.\n-Nick Felker");
 }
 
 //{element:'#CHARACTERPANEL', intro:'Another useful panel is the character palette.'},  {element:'#CHARACTERPANELCHARACTERS', intro:'This lists all the special characters that you can insert into your document. After clicking on the one you want, the keyboard switches focus so you can keep typing without having to reposition your mouse. Try it. It is really useful.' },  {element:'#popup_character_search', intro:"Can you find the character you want? You can easily find it using the searchbar."},  
 //{element:'#build', intro:"There you go, one perfectly formatted paper. Wasn't that easy? In fact, it was very simple to do, and it didn't require memorizing a computer language or formatting rules. There's a lot of things the human mind is good at; automation isn't one of them. Save you time for, you know, actually <i>writing</i> your paper.<br><br>This project is open source, so check it out on GitHub and contribute if you want. It is easy to develop a panel or add a small feature.<br><br>I hope that this project is exciting, and that you'll use it once it is available.<br>-Nick Felker", position:"top"}
+
+/** KEY EVENTS **/
+document.onkeydown = function(e) {
+	//e.ctrlKey - altKey shiftKey metaKey
+	switch(e.keyCode) {
+		case 32: /* Space */
+			//Word filtering
+			//Save
+			//Check beginning and ends of div
+			if($('.content_textarea').html().substr(0,1) == "<") {
+				$('.content_textarea').prepend(" ");
+				console.log('"'+$('.content_textarea').html()+'"');
+			}
+			if($('.content_textarea').html().substr(-1) != " ") {
+				$('.content_textarea').append(" ");
+				console.log('"'+$('.content_textarea').html()+'"');
+			}
+		break;
+	}
+};
 </script>
 
 </body>

@@ -45,7 +45,8 @@ function onBuildBibliography() {
 		add_to_page(centerText('Works Cited'));
 	
 	obj = {};
-	obj.def = "";
+	obj.def = "AUTHOR_LAST, AUTHOR_FIRST_I. (YEAR). TITLE. (Ed EDITION., Vol. VOLUME, p. PAGE). PUBCITY: PUBCOMP. DOI: URL";
+	obj.style = "text-indent:-.5in;margin-left:.5in";
 	post_bibliography(obj);		
 }
 
