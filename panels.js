@@ -104,6 +104,9 @@ function RunPanelmain_Character() {
 	/*GrMath*/	main.push({val:'π',title:'Pi',tag:'math greek pi'},{val:'∆',title:'Delta',tag:'math greek delta'});
 		//Also get Lambda, Beta, Omega
 	/*Punction*/main.push({val:'—',title:'Emdash',tag:'dash emdash'},{val:'…',title:'Elipsis',tag:'elipsis dot'});
+/*Math*/
+/*Symbols*/main.push({val:'♣',title:'Clubs',tag:'symbol cards club'});
+//~`|•♠♥♦√πΠ÷×¶§¥←↑↓→^°′″℅™®©∞±¡¿
 	
 	var out = "";
 	var searchbar = '<input type="search" id="popup_character_search" style="width:100%" placeholder="Search for Characters" ><br>';
