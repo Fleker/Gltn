@@ -3,7 +3,7 @@ function runPanel(panel_id_name) {
 	//Get Properties of the Panel First
 	var p = eval("GetPanel"+panel_id_name+"();");
 	$('.panel_plugin_title').html(p.title);
-	$('.panel_plugin_title').append('&emsp;<span class="PanelPopupEvent"></span><button onclick="hidePanelPlugin()" data-step="22" data-intro="Click me to hide the panel.">X</button>');
+	$('.panel_plugin_title').append('&emsp;<span class="PanelPopupEvent"></span><span class="PanelKeyEvent" data-keycode="" data-alt="" data-ctrl="" data-shift=""></span><button onclick="hidePanelPlugin()" data-step="22" data-intro="Click me to hide the panel.">X</button>');
 	$('#panel_plugin').css("border-color", p.bordercolor);
 	
 	//for a phone, do a type of check so that it isn't too small. 
@@ -101,25 +101,28 @@ function RunPanelmain_Character() {
 	/*Gender*/	main.push({val:'♀', title: 'Female', tag: 'gender sex female'}, {val:'♂', title:'Male', tag:'gender sex male'});
 	/*Currency*/main.push({val:'¥', title:'Yen', tag: 'money currency yen japan'},{val:'€', title:'Euro', tag:'money currency euro europe'},{val:'£', title:'British Pound', tag:'money currency british england pound'},{val:'¢',title:'Cent',tag:'money currency american cent'});
 	/*Legal*/	main.push({val:'©', title:'Copyright', tag:'legal copyright'},{val:'®',title:'Reserved',tag:'legal reserved'},{val:'™',title:'Trademark', tag:'legal trademark trademarked'});
-	/*GrMath*/	main.push({val:'π',title:'Pi',tag:'math greek pi'},{val:'∆',title:'Delta',tag:'math greek delta'});
-		//Also get Lambda, Beta, Omega
-	/*Punction*/main.push({val:'—',title:'Emdash',tag:'dash emdash'},{val:'…',title:'Elipsis',tag:'elipsis dot'});
-/*Math*/
-/*Symbols*/main.push({val:'♣',title:'Clubs',tag:'symbol cards club'});
-//~`|•♠♥♦√πΠ÷×¶§¥←↑↓→^°′″℅™®©∞±¡¿
+	/*GrMath*/	main.push({val:'π',title:'Lowercase Pi',tag:'math greek pi'},{val:'∆',title:'Delta',tag:'math greek delta'},{val:'Π',title:'Uppercase Pi',tag:'math greek pi'});
+		//Also get Lambda, Beta, Omega - Separate out non-math symbols
+	/*Punction*/main.push({val:'—',title:'Emdash',tag:'dash emdash'},{val:'…',title:'Elipsis',tag:'elipsis dot'},{val:'~', title:'tilde', tag:'tilde'},{val:'¿',title:'Upside-Down Question',tag:'question mark upside down'},{val:'¡',title:'Upside-Down Exclamation Point',tag:'exclamation point upside down'},{val:'‽',title:'Interrobang',tag:'question mark exclamation point interrobang interabang'});
+/*Math*/main.push({val:'±', title:'Plus-Minus', tag:'math plus minus'},{val:'√',title:'Root',tag:'math square root'},{val:'÷',title:'Divide',tag:'math divide quotient'},{val:'×',title:'Multiply',tag:'math times multiply multiplication'},{val:'•',title:'Dot',tag:'math dot product multiply'},{val:'°',title:'Degrees',tag:'math degrees'},{val:'′',title:'Minutes',tag:'math degrees minutes'},{val:'″',title:'Seconds',tag:'math degrees minutes seconds'},{val:'℅',title:'Permille',tag:'permille percent'},{val:'∞',title:'Infinity',tag:'math infinite infinity'}); 
+/*Symbols*/main.push({val:'♣',title:'Clubs',tag:'symbol cards club'}, {val:'♠',title:'Spades',tag:'symbol cards spade'},{val:'♥',title:'Hearts',tag:'symbol cards heart'},{val:'♦',title:'Diamond',tag:'symbol cards diamond'},{val:'^',title:'Carat',tag:'carat v'},{val:'←',title:'Left Arrow',tag:'direction arrow left'},{val:'↑',title:'Up Arrow',tag:'direction arrow forward up'},{val:'↓',title:'Down Arrow',tag:'direction arrow backward down'},{val:'→',title:'Right Arrow',tag:'direction arrow right'});
+/*Document Symbols*/main.push({val:'§',title:'Section Symbol',tag:'markup section'},{val:'¶',title:'Paragraph Break',tag:'markup paragraph enter newline'});
 	
 	var out = "";
 	var searchbar = '<input type="search" id="popup_character_search" style="width:100%" placeholder="Search for Characters" ><br>';
 	out = out + searchbar;
 	out = out + "<div class='character_palette_display' id='CHARACTERPANELCHARACTERS'></div>";
 	postPanelOutput(out);
-	 
+	var character = "";
 	function createCharacterPalette(data) {
+		$('#popup_character_search').focus();
 		var out = "";
 		for(i=0;i<data.length;i++) {
-			out = out + '<div style="display:inline" onclick="contentAddText(\''+data[i].val+'\')" title="'+data[i].title+'" class="character_palette_character">' + data[i].val + '</div>&emsp;';
+			out = out + '<div style="display:inline-block" onclick="contentAddText(\''+data[i].val+'\')" title="'+data[i].title+'" class="character_palette_character">' + data[i].val + '</div>&emsp;';
 		}
 		$('.character_palette_display').html(out);
+		character = data[0].val;
+		console.log(character);
 		
 		StylePanelClass('character_palette_character', new Array("cursor", "pointer", "border-bottom", "solid 1px #09f"));
 	}
@@ -140,6 +143,14 @@ function RunPanelmain_Character() {
 		});	
 		
 	createCharacterPalette(main);
+	$('.PanelKeyEvent').on('click', function() {
+			//console.log('click');
+			if($(this).attr('data-keycode') == 13) {
+				console.log(character);
+				contentAddText(character);
+				$(this).attr('data-keycode', '');	
+			}
+		});
 	
 	//if I want to hide symbols, I can always put additional main attributes here, maybe call them a different name, like all_ch
 	

@@ -107,7 +107,7 @@ LOREM IPS/um o
 <div class="hovertag">
 
 </div>
-<div class="fullscreenui" style="display:none; opacity:.1" onMouseOver="$('.fullscreenui').css('background-color', '#ccc').css('opacity',1)" onMouseOut="$('.fullscreenui').css('background-color', 'white').css('opacity', window.fsuo);"><div class="fullscreenexit" onclick="normalscreen()"><br>X<br><br><br></div><div class="fullscreennight" onclick="nightscreen()"><br>-O-<br><br><br></div> <div class="fullscreencount"></div></div>
+<div class="fullscreenui" style="display:none; opacity:.1" onMouseOver="$('.fullscreenui').css('background-color', fsuo).css('opacity',1)" onMouseOut="$('.fullscreenui').css('background-color', fsuo).css('opacity', '.1');"><div class="fullscreenexit" onclick="normalscreen()"><br>X<br><br><br></div><div class="fullscreennight" onclick="nightscreen()"><br>-O-<br><br><br></div> <div class="fullscreencount"></div></div>
 
 <div class="footer">
 
@@ -685,12 +685,13 @@ function hideHovertag() {
 }
 function fullscreen() {
 	window.fullscreenOn = true;	
+	hidePanelPlugin();
 	$('.content_textarea').css('z-index', 3).css('position', 'fixed');
 		$('.content_textarea').animate({
 			top: "-.1%",
 			left:"-.1%",
 			width:"95%",
-			width:"calc(100.2% - 50px)",
+			width:window.innerWidth-50+"px",
 			height:"100.2%",
 			fontSize:"16pt",
 			paddingLeft:"50px",
@@ -700,7 +701,7 @@ function fullscreen() {
 		},300);
 	$('.fullscreenui').fadeIn(500);
 	setTimeout("$('.fullscreenui').css('opacity','.1')", 510);
-	window.fsuo = 0.1;
+	window.fsuo = "rgba(204,204,204)";
 }
 function normalscreen() {
 	window.fullscreenOn = false;	
@@ -722,20 +723,22 @@ function nightscreen(option) {
 		jQuery('.content_textarea').animate({
 			backgroundColor: "rgba(255,255,255)",
 			color: "rgba(0,0,0)"
-		},2000);
-		$('.fullscreenui').animate({
-			opacity: 0.1
+		},5000);
+		fsuo = "rgba(204,204,204)";
+		jQuery('.fullscreenui').animate({
+			opacity: 0.1,
+			color:'black'
 		},100);
-		fsuo = .1;
 	} else {
 		jQuery('.content_textarea').animate({
 			backgroundColor: "rgba(0,0,0)",
 			color: "rgba(200,200,200)"
 		},2000);
-		$('.fullscreenui').animate({
-			opacity:0.02
+		fsuo = "rgba(41,41,41)";
+		jQuery('.fullscreenui').animate({
+			opacity:0.1,
+			color:"white"
 		},100);
-		fsuo = 0.02;
 	}
 }
 
@@ -782,6 +785,7 @@ function exitintro() {
 /** KEY EVENTS **/
 document.onkeydown = function(e) {
 	//e.ctrlKey - altKey shiftKey metaKey
+	//TODO - Add key events to {format}.js and panel.js so panels can receive the same events natively; Also this means moving events to respective functions; Doing so would complete the character panel code
 	switch(e.keyCode) {
 		case 32: /* Space */
 			//Word filtering
@@ -796,6 +800,23 @@ document.onkeydown = function(e) {
 				console.log('"'+$('.content_textarea').html()+'"');
 			}
 		break;
+		case 67: /*C*/
+			if(e.altKey) {
+				runPanel('main_Character');	
+			} 
+		break;
+		case 13: /* Enter */
+		
+		break;
+	}
+	if(window.paneltitle != undefined) {
+		var el = '.PanelKeyEvent';
+		$(el).attr('data-keycode', e.keyCode);
+		$(el).attr('data-alt',e.altKey);
+		$(el).attr('data-ctrl',e.ctrlKey);
+		$(el).attr('data-shift',e.shiftKey);
+		$('.PanelKeyEvent').click();	
+		console.log($(".PanelKeyEvent").attr('data-keycode'))
 	}
 };
 </script>
