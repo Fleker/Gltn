@@ -3,7 +3,7 @@ function runPanel(panel_id_name) {
 	//Get Properties of the Panel First
 	var p = eval("GetPanel"+panel_id_name+"();");
 	$('.panel_plugin_title').html(p.title);
-	$('.panel_plugin_title').append('&emsp;<span class="PanelPopupEvent"></span><span class="PanelKeyEvent" data-keycode="" data-alt="" data-ctrl="" data-shift=""></span><button onclick="hidePanelPlugin()" data-step="22" data-intro="Click me to hide the panel.">X</button>');
+	$('.panel_plugin_title').append('&emsp;<span class="PanelPopupEvent"></span><span class="PanelKeyEvent" data-keycode="" data-alt="" data-ctrl="" data-shift=""></span><span id="PanelCloseEvent"></span> <button onclick="hidePanelPlugin()" data-step="22" data-intro="Click me to hide the panel.">X</button>');
 	$('#panel_plugin').css("border-color", p.bordercolor);
 	
 	//for a phone, do a type of check so that it isn't too small. 
@@ -48,6 +48,7 @@ function animateContentPanel(p) {
 	);
 }
 function hidePanelPlugin() {
+	$('#PanelCloseEvent').click();
 	stretchContentPanel();
 	$('#panel_plugin').animate({
 		width: "0%",

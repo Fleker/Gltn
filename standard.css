@@ -85,7 +85,17 @@ body {
 		border-bottom: solid 1px #0CF;
 	}	
 .heading1 {
-	/*display:block;*/
+	display:block;
+	text-decoration: none;
+	border-bottom: solid 1px #000000;
+}
+.heading2 {
+	display:block;
+	text-decoration: none;
+	border-bottom: solid 1px #000000;
+}
+.heading3 {
+	display:block;
 	text-decoration: none;
 	border-bottom: solid 1px #000000;
 }

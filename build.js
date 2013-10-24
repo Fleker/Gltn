@@ -2,10 +2,11 @@ function startBuild() {
 	//initiate the build code, show the progress indicator, and start sending stuff to different functions to do different stuff.
 	window.section_name = "";
 	$('.build').empty();
-		$('.build_progress').css('display', 'block').css('position', 'fixed').css('width', '50%').css('height', '50%').css('top','25%').css('left','25%').css('background-color', 'rgba(0,0,0,0.3)').css('font-size','16pt').css('margin-top','10%');
+		//$('.build_progress').css('display', 'block').css('position', 'fixed').css('width', '50%').css('height', '50%').css('top','25%').css('left','25%').css('background-color', 'rgba(0,0,0,0.3)').css('font-size','16pt').css('margin-top','10%');
+	initiatePopup({title:"Build Progress",bordercolor:"#8f6",ht:"<div class='build_progress'></div>"});
 	updateBuildProgress('Initiating Build...');
 	
-	//To APA.js
+	//To {format}.js
 	try {
 		onStylePaper();	
 	} catch(e) {
@@ -16,8 +17,10 @@ function startBuild() {
 		updateBuildProgress('Setting Headers...');	
 	onGetFormats();
 		updateBuildProgress('Formatting Content...');
-	onBuildBibliography();
-		updateBuildProgress('Building Bibliography...');
+	if($('.body > .citation').length) {
+		onBuildBibliography();
+			updateBuildProgress('Building Bibliography...');
+	}
 	onSetHeader();
 		updateBuildProgress('Setting up display...');
 		
@@ -33,7 +36,7 @@ function updateBuildProgress(text) {
 }
 function finishBuild() {
 	//$('.build_progress').css('display', 'none');
-	$('.build_progress').fadeOut(250);
+	closePopup();
 	$('.header').hide(1000);
 }
 function exitBuild() {
@@ -150,6 +153,8 @@ function post_content_formatting(object) {
 	//Duplicate paper
 	var cont = $('.content_textarea').html();
 	$('.draft').html(cont);
+	
+	//Format Citations
 	$('.draft > .citation').each(function() {
 		i = $(this).attr('data-i');
 		id = $(this).attr('data-id');
@@ -160,6 +165,27 @@ function post_content_formatting(object) {
 			$(this).html($(this).html()+" "+citationFormatted(object.citation_main, i, id, page));
 		} else {
 			$(this).html($(this).html()+" "+citationFormatted(object.citation, i, id, page));
+		}
+	});
+	
+	//Format Headings
+	mhead = {} /*Master Heading Obj*/
+	var h1 = 1;
+	var h2 = 1;
+	var h3 = 1;
+	$('.draft > .heading').each(function() {
+		if($(this).attr('class').indexOf('heading1') > -1) {
+			$(this).html(headingFormatted(object.heading1,$(this).html(),h1));
+			h1++;
+			h2 = 1;
+			h3 = 1;	
+		} else if($(this).attr('class').indexOf('heading2') > -1) {
+			$(this).html(headingFormatted(object.heading2,$(this).html(),h2));
+			h2++;
+			h3 = 1;	
+		} else if($(this).attr('class').indexOf('heading-3') > -1) {
+			$(this).html(headingFormatted(object.heading3,$(this).html(),h3));
+			h3++;
 		}
 	});
 	

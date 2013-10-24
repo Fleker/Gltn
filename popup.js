@@ -42,7 +42,7 @@ function initiatePopup(data) {
 	if(data.ht == undefined)
 		data.ht = "";
 	if(data.fnc == undefined)
-		data.fnc = function() {alert(0)};
+		data.fnc = function x() {/*alert(0)*/};
 	populatePopup(data.ht, data.fnc);
 	
 	//initiatePopup({title: 'Hello', subtitle: 'World', img: 'https://fbcdn-profile-a.akamaihd.net/hprofile-ak-frc1/c43.27.338.338/s160x160/397165_10150559002575832_1521489086_n.jpg', value: '<b>Hello world.</b>'})

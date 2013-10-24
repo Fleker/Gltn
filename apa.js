@@ -15,7 +15,7 @@ function onInitFormat() {
 }
 
 function onInitToolbar() {
-	var toolbar = ["citation", "heading1", "image", "longquote", "closetag"];	
+	var toolbar = ["citation", "heading1", "heading2", "heading3", "image", "longquote", "closetag"];	
 	post_toolbar(toolbar);
 }
 function onStylePaper() {
@@ -38,6 +38,9 @@ function onSetHeader() {
 function onGetFormats() {
 	obj = {};
 	obj.citation = "(AUTHOR_LAST PAGE)";
+	obj.heading1 = 'LISTA. TEXT<br>';
+	obj.heading2 = 'LIST1. TEXT<br>';
+	obj.heading3 = 'LISTI. TEXT<br>';
 	post_content_formatting(obj);	
 }
 function onBuildBibliography() {

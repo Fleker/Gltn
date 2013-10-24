@@ -89,9 +89,9 @@
 <div class="build" id="build">
 
 </div>
-<div class="build_progress">
+<!--<div class="build_progress">
 
-</div>
+</div>-->
 <div class="draft">
 <!--This section will be a place between the original content and the final build where HTML tags will still exist-->
 </div>
@@ -497,7 +497,7 @@ function contentAddText(t) {
 		rangy.getSelection().setSingleRange(range);
 		//Move forward one to keep typing.
 		moveCarat("character", 1);
-		
+		contentValidate();
 	}
 }
 function contentAddSpan(t) {
@@ -535,6 +535,7 @@ function contentAddSpan(t) {
 		rangy.getSelection().setSingleRange(range);
 		//Move forward one to keep typing.
 		moveCarat("character", -2-3);
+		contentValidate();
 		
 	}
 }
@@ -781,7 +782,16 @@ function exitintro() {
 
 //{element:'#CHARACTERPANEL', intro:'Another useful panel is the character palette.'},  {element:'#CHARACTERPANELCHARACTERS', intro:'This lists all the special characters that you can insert into your document. After clicking on the one you want, the keyboard switches focus so you can keep typing without having to reposition your mouse. Try it. It is really useful.' },  {element:'#popup_character_search', intro:"Can you find the character you want? You can easily find it using the searchbar."},  
 //{element:'#build', intro:"There you go, one perfectly formatted paper. Wasn't that easy? In fact, it was very simple to do, and it didn't require memorizing a computer language or formatting rules. There's a lot of things the human mind is good at; automation isn't one of them. Save you time for, you know, actually <i>writing</i> your paper.<br><br>This project is open source, so check it out on GitHub and contribute if you want. It is easy to develop a panel or add a small feature.<br><br>I hope that this project is exciting, and that you'll use it once it is available.<br>-Nick Felker", position:"top"}
-
+function contentValidate() {
+	if($('.content_textarea').html().substr(0,1) == "<") {
+		$('.content_textarea').prepend("&nbsp;");
+		console.log('"'+$('.content_textarea').html()+'"');
+	}
+	if($('.content_textarea').html().substr(-1) != ";") {
+		$('.content_textarea').append("&nbsp;");
+		console.log('"'+$('.content_textarea').html()+'"');
+	}	
+}
 /** KEY EVENTS **/
 document.onkeydown = function(e) {
 	//e.ctrlKey - altKey shiftKey metaKey
@@ -791,14 +801,7 @@ document.onkeydown = function(e) {
 			//Word filtering
 			//Save
 			//Check beginning and ends of div
-			if($('.content_textarea').html().substr(0,1) == "<") {
-				$('.content_textarea').prepend("&nbsp;");
-				console.log('"'+$('.content_textarea').html()+'"');
-			}
-			if($('.content_textarea').html().substr(-1) != " ") {
-				$('.content_textarea').append("&nbsp;");
-				console.log('"'+$('.content_textarea').html()+'"');
-			}
+			contentValidate();
 		break;
 		case 67: /*C*/
 			if(e.altKey) {

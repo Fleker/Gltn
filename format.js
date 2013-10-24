@@ -155,8 +155,18 @@ function post_toolbar(tools) {
 			break;
 			
 			case "heading1":
-				contentAddSpan({node:"span", class:"heading1"});
+				contentAddSpan({node:"span", class:"heading1 heading"});
 				formatHovertag('heading1', '"Heading-1"', 'null');
+			break;
+			
+			case "heading2":
+				contentAddSpan({node:"span", class:"heading2 heading"});
+				formatHovertag('heading2', '"Heading-2"', 'null');
+			break;
+			
+			case "heading3":
+				contentAddSpan({node:"span", class:"heading3 heading"});
+				formatHovertag('heading3', '"Heading-3"', 'null');
 			break;
 		}
 	});
