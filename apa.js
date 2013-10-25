@@ -38,9 +38,9 @@ function onSetHeader() {
 function onGetFormats() {
 	obj = {};
 	obj.citation = "(AUTHOR_LAST PAGE)";
-	obj.heading1 = 'LISTA. TEXT<br>';
-	obj.heading2 = 'LIST1. TEXT<br>';
-	obj.heading3 = 'LISTI. TEXT<br>';
+	obj.heading1 = 'LISTA. TEXT';
+	obj.heading2 = '<i>LIST1. TEXT</i>';
+	obj.heading3 = 'LISTI. TEXT';
 	post_content_formatting(obj);	
 }
 function onBuildBibliography() {

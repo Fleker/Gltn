@@ -149,6 +149,37 @@ function citationFormatted(string, i, id, page) {
 	string = string.replace(/PAGE/g, page);	
 	return string;	
 }
+function headingFormatted(spec,input,number) {
+	console.error(spec);
+	var string = spec;
+	string = string.replace(/TEXT/g, input);
+	string = string.replace(/LISTA/g, numToLetter('A',number));
+	string = string.replace(/LISTa/g, numToLetter('a',number));
+	string = string.replace(/LIST1/g, number);
+	string = string.replace(/LISTI/g, numToRoman('I', number));
+	string = string.replace(/LISTi/g, numToRoman('i', number));
+	console.error(string);
+	return string;
+}
+function numToLetter(capy, number) {
+	var cap = ["A", "B", "C"];
+	//TODO Complete Letter Set
+	var low = ["a", "b", "c"];
+	console.error(capy,number);
+	if(capy == "A")
+		return cap[number-1];
+	else
+		return low[number-1];
+}
+function numToRoman(capy, number) {
+	var cap = ["I", "II", "III"];
+	//TODO Complete set
+	var low = ["i", "ii", "iii"];
+	if(capy == "I") 
+		return cap[number-1];
+	else
+		return low[number-1];
+}
 function post_content_formatting(object) {
 	//Duplicate paper
 	var cont = $('.content_textarea').html();
@@ -174,6 +205,7 @@ function post_content_formatting(object) {
 	var h2 = 1;
 	var h3 = 1;
 	$('.draft > .heading').each(function() {
+		//$(this).css('display','inline');
 		if($(this).attr('class').indexOf('heading1') > -1) {
 			$(this).html(headingFormatted(object.heading1,$(this).html(),h1));
 			h1++;
@@ -183,7 +215,7 @@ function post_content_formatting(object) {
 			$(this).html(headingFormatted(object.heading2,$(this).html(),h2));
 			h2++;
 			h3 = 1;	
-		} else if($(this).attr('class').indexOf('heading-3') > -1) {
+		} else if($(this).attr('class').indexOf('heading3') > -1) {
 			$(this).html(headingFormatted(object.heading3,$(this).html(),h3));
 			h3++;
 		}
@@ -228,7 +260,7 @@ function post_bibliography(object) {
 	for(i in citationSorted) {
 		var str = "";
 		if(false) {
-			
+			//different types of citations are going to be here
 		} else if(false) {
 			
 		} else {
