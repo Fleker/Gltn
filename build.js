@@ -222,7 +222,14 @@ function post_content_formatting(object) {
 	});
 	
 	//Now all formatting is complete. We shall port the content over to the actual paper
-	cont = $('.draft').text();
+	//Prevent divs from registering a split, replicate for spans so parent is kept
+	console.warn($('.draft').html());
+	$('.draft > span > div').each(function() {
+		$(this).html($(this).html().replace(/ /g,'==='));
+	})
+	console.warn($('.draft').html());
+	cont = $('.draft').html();
+	cont = cont.replace(/<span[^<]+?>/g, "");
 	ca =  cont.split(' ');
 	
 	var maxh = $('.scale').height()*6.5;
@@ -241,6 +248,7 @@ function post_content_formatting(object) {
 		add_to_page(ca[j]+' ');
 
 	}
+	$('.build').html($('.build').html().replace(/===/g,' '));
 }	
 function post_bibliography(object) {
 	//Get all citations, limit only to those used in the paper
