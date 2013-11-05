@@ -15,11 +15,13 @@
 <script src="file.js"></script>
 <script src="build.js"></script>
 
-<script src="apa.js"></script>
+<!--<script src="apa.js"></script>-->
 
 <script src="rangy-1.3alpha.772\rangy-core.js"></script>
 <script src="rangy-1.3alpha.772\rangy-cssclassapplier.js"></script>
 <script src="rangy-1.3alpha.772\rangy-textrange.js"></script>
+<script src="json2xml.js"></script>
+<script src="xmlToJson.js"></script>
 <script src="IntroJS/intro.js"></script>
 </head>
 <body>
@@ -120,7 +122,7 @@ LOREM IPS/um o
 <script>
 	function new_gluten_formats() {
 		//In the future, arrange a way to programitically grab all values.
-		formats = [{name: "APA", type: "Essay"}, {name: "MLA", "type": "Essay"}];	
+		formats = [{name: "APA", type: "Essay"}, {name: "MLA", "type": "Essay"}, {name:"IEEE", type:"Report"}];	
 		
 		//Now, let's put them into an HTML based format.
 		var out = "";
@@ -147,7 +149,7 @@ LOREM IPS/um o
 	new_gluten_formats();
 	new_gluten_languages();
 	
-	onInitFormat();
+
 	
 	
 	
@@ -178,25 +180,6 @@ window.onload = function() {
                     	//id: "citation"+0,						
                     }
              });
-			 
-			 //Set up selection parameters
-			 document.getElementsByClassName("content_textarea")[0].onmouseup = function() {
-				 	if($('.content_textarea').html().length > 1) {				 
-						rangy.getSelection().expand("word", {
-						wordOptions: {
-							includeTrailingSpace: false,
-							wordRegex: /[a-z0-9]+(['\-][a-z0-9]+)*/gi
-						}
-                		});
-					}
-					postRange('click and select');
-			}
-			document.getElementsByClassName("content_textarea")[0].oninput = function() {
-				postRange('oninput');
-			}	
-			document.getElementsByClassName("content_textarea")[0].onkeyup = function() {
-				postRange('onkeyup');
-			}	
 }
 
 content_textarea_var = null;
@@ -456,17 +439,32 @@ function citationHovertag() {
 	$('.citation').on('mouseleave', function() {
 		//hideHovertag();
 	});
+	hovertagRegistry('citationHovertag()');
 }
-function formatHovertag(classname, textcode, action) {
+//'
+function formatHovertag(classname, textcode, action, recall) {
 	$('.'+classname).off('mouseenter');
 	$('.'+classname).off('mouseleave');
 	
 	$('.'+classname).on('mouseenter', function() {
 		displayHovertag(eval(textcode), {ypos: $(this).offset().top}, eval(action));
+		//hovertagRegistry(\'displayHovertag(eval(textcode), {ypos: $(this).offset().top}, eval(action));\');
 	});
+	//'
 	$('.'+classname).on('mouseleave', function() {
 		//hideHovertag();
 	});
+	if(recall == undefined) 
+		hovertagRegistry(classname, textcode, action);
+}
+function hovertagRegistry(c, t, a) {
+	hovertagRegistrar.push({classname: c, textcode: t, action: a});
+	saveFile();
+}
+function recallHovertags() {
+	for(i in hovertagRegistrar) {
+		eval("formatHovertag('"+hovertagRegistrar[i].classname+"', '"+hovertagRegistrar[i].textcode+"', '"+hovertagRegistrar[i].action+"', true)");
+	}
 }
 
 function toggleItalics() {
@@ -667,6 +665,10 @@ function displayHovertag(text, data, fnc) {
 			$('.hovertag').html(text);	
 		});
 	$('.hovertag').off('click');
+	$('.hovertag').off('mouseleave');
+	$('.hovertag').on('mouseleave', function() {
+		hideHovertag();
+	});
 	if(fnc != undefined) {
 		$('.hovertag').on('click', function() {
 			eval(fnc);
@@ -800,6 +802,7 @@ document.onkeydown = function(e) {
 		case 32: /* Space */
 			//Word filtering
 			//Save
+			saveFile();
 			//Check beginning and ends of div
 			contentValidate();
 		break;

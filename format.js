@@ -6,6 +6,7 @@ format_js_index = 0;
 function new_format() {
 	format_js_index = -1;
 	window.metadata = [{blank: 0}];	
+	$('#file_metadata').empty();
 }
 function new_format_item(type, ops) {
 	format_js_index++;
@@ -66,6 +67,26 @@ function post_format() {
 		}
 	}
 	onInitToolbar();
+	
+	//Set up selection parameters
+			 document.getElementsByClassName("content_textarea")[0].onmouseup = function() {
+				 	if($('.content_textarea').html().length > 1) {				 
+						rangy.getSelection().expand("word", {
+						wordOptions: {
+							includeTrailingSpace: false,
+							wordRegex: /[a-z0-9]+(['\-][a-z0-9]+)*/gi
+						}
+                		});
+					}
+					postRange('click and select');
+			}
+			document.getElementsByClassName("content_textarea")[0].oninput = function() {
+				postRange('oninput');
+				saveFile();
+			}	
+			document.getElementsByClassName("content_textarea")[0].onkeyup = function() {
+				postRange('onkeyup');
+			}	
 }
 
 function format_check_count(i) {
@@ -132,7 +153,7 @@ function post_format_content(m) {
 	var out = "";
 	out = "<div class='content toolbar'></div>";
 	out = out + "<div contenteditable='true' class='content content_textarea' onfocus='postRange()' onclick='postRange()' onmouseleave='/*hideHovertag()*/ '></div>";
-	out = out + "<div class='content_wordcount'></div>";
+	out = out + "<div class='content_wordcount'><div class='content_word'></div><div class='content_character'></div><div class='content_save'>saved</div></div>";
 	return out;	
 }
 function post_toolbar(tools) {
@@ -156,17 +177,17 @@ function post_toolbar(tools) {
 			
 			case "heading1":
 				contentAddSpan({node:"span", class:"heading1 heading"});
-				formatHovertag('heading1', '"Heading-1"', 'null');
+				formatHovertag("heading1", '"Heading-1"', 'null');
 			break;
 			
 			case "heading2":
 				contentAddSpan({node:"span", class:"heading2 heading"});
-				formatHovertag('heading2', '"Heading-2"', 'null');
+				formatHovertag("heading2", '"Heading-2"', 'null');
 			break;
 			
 			case "heading3":
 				contentAddSpan({node:"span", class:"heading3 heading"});
-				formatHovertag('heading3', '"Heading-3"', 'null');
+				formatHovertag("heading3", '"Heading-3"', 'null');
 			break;
 		}
 	});

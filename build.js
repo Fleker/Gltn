@@ -162,23 +162,20 @@ function headingFormatted(spec,input,number) {
 	return string;
 }
 function numToLetter(capy, number) {
-	var cap = ["A", "B", "C"];
+	var cap = ["A", "B", "C","D","E","F","G"];
 	//TODO Complete Letter Set
-	var low = ["a", "b", "c"];
-	console.error(capy,number);
 	if(capy == "A")
 		return cap[number-1];
 	else
-		return low[number-1];
+		return cap[number-1].toLowerCase();
 }
 function numToRoman(capy, number) {
-	var cap = ["I", "II", "III"];
+	var cap = ["I", "II", "III","IV","V","VI","VII","VIII","IX","X"];
 	//TODO Complete set
-	var low = ["i", "ii", "iii"];
 	if(capy == "I") 
 		return cap[number-1];
 	else
-		return low[number-1];
+		return cap[number-1].toLowerCase();
 }
 function post_content_formatting(object) {
 	//Duplicate paper
@@ -204,7 +201,7 @@ function post_content_formatting(object) {
 	var h1 = 1;
 	var h2 = 1;
 	var h3 = 1;
-	$('.draft > .heading').each(function() {
+	$('.draft > div > .heading').each(function() {
 		//$(this).css('display','inline');
 		if($(this).attr('class').indexOf('heading1') > -1) {
 			$(this).html(headingFormatted(object.heading1,$(this).html(),h1));
@@ -224,13 +221,69 @@ function post_content_formatting(object) {
 	//Now all formatting is complete. We shall port the content over to the actual paper
 	//Prevent divs from registering a split, replicate for spans so parent is kept
 	console.warn($('.draft').html());
+	/*var erray = new Array ('i','b','u','sup','sub');
+	for(ele in erray) {
+		$('.draft > span > '+erray[ele]).each(function() {
+			var s = $(this).attr('style');
+			$(this).html($(this).html().replace(/ /g,'</'+erray[ele]+'>&nbsp;<'+erray[ele]+' style="'+s+'">'));
+		});
+	}*/
 	$('.draft > span > div').each(function() {
 		$(this).html($(this).html().replace(/ /g,'==='));
 	})
 	console.warn($('.draft').html());
 	cont = $('.draft').html();
 	cont = cont.replace(/<span[^<]+?>/g, "");
-	ca =  cont.split(' ');
+	cont = cont.replace("</span>", "",'g');
+	//NEED TO FIX SPLITTER TO BE MORE LENIENT, NOT HACK HTML INTO IT
+	
+	//ca =  cont.split(' ');
+	cont = cont.replace(/&nbsp;/g, " ");
+	console.log(cont);
+	caa = cont.split('');
+	ca = new Array();
+	var intag = false;
+	var word = "";
+	var tag = "";
+	var element = "";
+	for(j in caa) {	
+		console.log("---"+caa[j]+"-"+tag+"-"+word+"-/"+element);
+		if(caa[j] == " " || caa[j] == "<") {
+			console.warn("--"+tag+"-"+word+"-/"+element);
+			if(!intag || caa[j] == "<") {
+				if(element.length && element != "br>") {
+					if(element.substr(-1) != ">")
+						element += ">";
+					ca.push(tag+word+"</"+element+"");
+				} else if(element == "br>")
+					ca.push("<br>");
+				else
+					ca.push(word);
+				word = "";
+			} else if(!element.length) {
+				element = tag.substring(1);	
+			}
+			if(intag)
+				tag += " ";
+		} else if(caa[j]!=">") {
+			if(intag) 
+				tag += caa[j];
+			else
+				word += caa[j];	
+		}
+		
+		if(caa[j] == "<") {
+			tag = "<";
+			element = "";
+			intag = true;	
+		} else if(caa[j] == ">") {
+			tag += caa[j];
+			if(!element.length)
+				element = tag.substring(1);
+			intag = false;	
+		} 
+	}
+	console.warn(ca);
 	
 	var maxh = $('.scale').height()*6.5;
 	for(j in ca) {

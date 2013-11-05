@@ -39,8 +39,11 @@ function onGetFormats() {
 	obj = {};
 	obj.citation = "(AUTHOR_LAST PAGE)";
 	obj.heading1 = '<div>LISTA. TEXT</div>';
-	obj.heading2 = '<div><i>LIST1. TEXT</i></div>';
-	obj.heading3 = '<div>LISTI. TEXT</div>';
+	//obj.heading2 = '<div><i>LIST1. TEXT</i></div>';
+	obj.heading2 = '<i>LIST1. TEXT</i><br>';
+	//obj.heading3 = '<div>LISTI. TEXT</div>';
+	obj.heading3 = '<b style="color:blue">LISTa: TEXT</b><br>';
+	obj.paragraph_indent = "text-indent:0.5in";
 	post_content_formatting(obj);	
 }
 function onBuildBibliography() {
