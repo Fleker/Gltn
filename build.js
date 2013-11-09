@@ -201,7 +201,7 @@ function post_content_formatting(object) {
 	var h1 = 1;
 	var h2 = 1;
 	var h3 = 1;
-	$('.draft > div > .heading').each(function() {
+	$('.draft > .heading').each(function() {
 		//$(this).css('display','inline');
 		if($(this).attr('class').indexOf('heading1') > -1) {
 			$(this).html(headingFormatted(object.heading1,$(this).html(),h1));
@@ -220,7 +220,7 @@ function post_content_formatting(object) {
 	
 	//Now all formatting is complete. We shall port the content over to the actual paper
 	//Prevent divs from registering a split, replicate for spans so parent is kept
-	console.warn($('.draft').html());
+	//console.warn($('.draft').html());
 	/*var erray = new Array ('i','b','u','sup','sub');
 	for(ele in erray) {
 		$('.draft > span > '+erray[ele]).each(function() {
@@ -230,66 +230,150 @@ function post_content_formatting(object) {
 	}*/
 	$('.draft > span > div').each(function() {
 		$(this).html($(this).html().replace(/ /g,'==='));
-	})
-	console.warn($('.draft').html());
+	});
+	//div joiner
+	$('.draft > div').each(function() {
+		$(this).html( $(this).html().replace(/ /g, '==='));
+	});
+	//console.warn($('.draft').html());
 	cont = $('.draft').html();
-	cont = cont.replace(/<span[^<]+?>/g, "");
-	cont = cont.replace("</span>", "",'g');
+	//cont = cont.replace(/<span[^<]+?>/g, "");
+	//cont = cont.replace("</span>", "",'g');
 	//NEED TO FIX SPLITTER TO BE MORE LENIENT, NOT HACK HTML INTO IT
 	
 	//ca =  cont.split(' ');
 	cont = cont.replace(/&nbsp;/g, " ");
-	console.log(cont);
-	caa = cont.split('');
-	ca = new Array();
-	var intag = false;
-	var word = "";
-	var tag = "";
-	var element = "";
-	for(j in caa) {	
-		console.log("---"+caa[j]+"-"+tag+"-"+word+"-/"+element);
-		if(caa[j] == " " || caa[j] == "<") {
-			console.warn("--"+tag+"-"+word+"-/"+element);
-			if(!intag || caa[j] == "<") {
-				if(element.length && element != "br>") {
-					if(element.substr(-1) != ">")
-						element += ">";
-					ca.push(tag+word+"</"+element+"");
-				} else if(element == "br>")
-					ca.push("<br>");
-				else
-					ca.push(word);
-				word = "";
-			} else if(!element.length) {
-				element = tag.substring(1);	
-			}
-			if(intag)
-				tag += " ";
-		} else if(caa[j]!=">") {
-			if(intag) 
-				tag += caa[j];
-			else
-				word += caa[j];	
+	
+	/*** Replace output function so that it places every item into an array instead of just outputting ***/
+function c(s) {
+	console.log(s);	
+	//s = s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+	//$('body').append(s+"<br>");
+}
+function output(e, tag, w) {
+	var out = "";
+	if(e.substr(-1) != ">")
+		e = e+">";
+	if(w.length) {
+		if(tag.length) {
+			c("Output: "+tag+w+"</"+e.substr(1)+" ");
+			out = tag+w+"</"+e.substr(1)+" ";
+			//return tag+w+"</"+e.substr(1)+" ";
+		} else {
+			c("Output: "+w+" ");
+			out = w+" ";
+			//return w+" ";
+		}
+	} else {
+		//return "";
+	}
+	if(out.length)
+		d.push(out);
+	return out;
+	
+}
+
+
+//var a = document.getElementById('a').innerHTML;
+var a = cont;
+var b = a.split('');
+d = new Array();
+var e = '';
+var w = '';
+var tag = '';
+var intag = false;
+var inend = false;
+var ine = false;
+var out = "";
+var breakk = false;
+$('body').append("<hr>");
+for(i in b) {
+	var b1 = (parseInt(i)+1);
+	c(": "+b[i]);
+	breakk = false;
+    if(b[i] == "<") {
+        if(b[b1] == "/") {
+			 /***/
+			 out = out + output(e, tag, w);
+            //$('body').append(tag+",<br>"+e+"; "+w+"<br>");
+			c(tag+", "+e+"; "+w);
+            w = '';
+			
+            inend = true;  
+			intag = false;
+			ine = false;
+            tag = "";
+			c("End of tag");
+        } else {
+             /***/
+			 out = out + output(e,  tag, w);
+            //$('body').append(tag+",<br>"+e+"; "+w+"<br>");
+			c(tag+", "+e+"; "+w);
+            w = '';
+			
+			 intag = true;
+             ine = true;
+			 inend = false;
+			 tag = "";
+			 e = "";
+			
+        }
+		c("<"+b[b1]+" !");
+    }
+    if(b[i] == " ") {
+        if(ine) {
+            ine = false; 
+			c("ine "+e);  
+        }
+        if(!intag) {
+            out = out + output(e, tag, w);
+            //$('body').append(tag+",<br>"+e+"; "+w+"<br>");
+			c("___"+tag+", "+e+"; "+w);
+            w = '';
+            breakk = true;
+        }
+    }
+	if(!breakk) {
+		if(intag) {
+			tag = tag + b[i]; 
+			c("tag "+tag);
+		} else if(!inend) {
+			 w = w + b[i];
+			 c("w "+w);
+		}
+		if(ine) {
+			e = e + b[i];
+			c("E "+e);
 		}
 		
-		if(caa[j] == "<") {
-			tag = "<";
-			element = "";
-			intag = true;	
-		} else if(caa[j] == ">") {
-			tag += caa[j];
-			if(!element.length)
-				element = tag.substring(1);
-			intag = false;	
-		} 
+		if(b[i] == ">") {
+			intag = false;
+			c("Intag is off");
+			c(object.paragraph_indent+", "+inend + ", " + e);
+			if((e.indexOf('div') > -1 || e.indexOf('br') > -1) && e.length && inend && object.paragraph_indent != undefined) { /** OR if some other type of break is detected*/
+				out = out + output('', '', object.paragraph_indent);
+			}
+			if(inend) 
+				 e = "";
+			 inend = false;
+			 ine = false;
+		}
 	}
-	console.warn(ca);
-	
+}
+ /***/
+	 /*out = out + output(e, tag, w);
+		//$('body').append(tag+",<br>"+e+"; "+w+"<br>");
+		c(tag+", "+e+"; "+w);
+		w = '';
+	//div splitter
+	out = out.replace(/---/g, ' ');*/
+
+	/*** *** Now implement the project **/
 	var maxh = $('.scale').height()*6.5;
-	for(j in ca) {
+	for(j in d) {
 		//TODO - Find a way to grab the current page, not necessarily the last one. This will be handy for things that are added after content
 		p = $('.page').length-1;
-		add_to_page("<span class='hideme'>"+ca[j]+" "+"</span>");
+		add_to_page("<span class='hideme'>"+d[j]+" "+"</span>");
 		if($('.page'+p+'body').height() > maxh) {
 			add_new_page();
 			/*hm = $('.hideme').length;
@@ -298,10 +382,10 @@ function post_content_formatting(object) {
 		} 
 		$('.hideme').remove();
 		//$('.pasteContent').append(ca[j]+" ");	
-		add_to_page(ca[j]+' ');
+		add_to_page(d[j]+' ');
 
 	}
-	$('.build').html($('.build').html().replace(/===/g,' '));
+	$('.build').html($('.build').html().replace(/===/g,' ').replace(/<span[^<]+?>/g, ""));
 }	
 function post_bibliography(object) {
 	//Get all citations, limit only to those used in the paper
