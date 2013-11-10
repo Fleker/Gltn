@@ -8,6 +8,11 @@ idea = new Array();
 ideadefault = "";
 fileid = "4xW";
 
+min_char = 0;
+max_char = 0;
+min_word = 0;
+max_word = 0;
+
 hovertagRegistrar = new Array();
 document.ready = function() {
 	restoreFile();
@@ -27,6 +32,10 @@ function saveFile() {
 	obj['file']['format'] = $('#file_format').val();
 	obj['file']['language'] = $('#file_language').val();
 	obj['file']['tags'] = $('#file_tags').val();
+	obj['file']['min_char'] = 0;
+	obj['file']['max_char'] = 0;
+	obj['file']['min_word'] = 0;
+	obj['file']['max_word'] = 0;
 	console.log(obj);
 	obj.metadata = new Array();
 	for(i in window.metadata) {
@@ -62,13 +71,26 @@ function restoreFile() {
 		
 		$('#file_language').val(x.file.language);
 		$('#file_tags').val(x.file.tags);
+		min_char = x.file.min_char;
+		max_char = x.file.max_char;
+		min_word = x.file.min_word;
+		max_word = x.file.max_word;
+
+		if(x.citation == undefined) {
+			
+		} else if(x.citation.length == undefined && x.citation != undefined) {
+			citation.push(x.citation);
+		} else if(x.citation.length > 1) {
+			for(i in x.citation) {
+					citation.push(x.citation[i]);	
+				}
+		}
+		citationi = x.citationi;
 		
-		if(x.citation != undefined) 	
-			citation = x.citation;
-		citationi = x.citationi
 		if(x.idea != undefined)	
 			idea = x.idea;
 		ideadefault = x.ideadefault;
+		
 		if(x.hovertagRegistrar == undefined) {
 			
 		} else if(x.hovertagRegistrar.length == undefined && x.hovertagRegistrar != undefined) {
@@ -95,10 +117,12 @@ function finishRestore(x, xc) {
 			$('#format_item_'+i).val(x.metadata[i]['value'])
 		}	
 		//console.log(3);
-		$('.content_textarea').html(xc);
+		//Do a little more cleaning up
+		$('.content_textarea').html(xc.replace(/<span class="searchResult">/g, ""));
 	}
 		//console.log(2);
 	recallHovertags();
+	postWordCount();
 	$("#file_format").on("input", function() {
 		console.log($(this).val());
 		formatShift();

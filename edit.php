@@ -28,7 +28,7 @@
 
 <div class="header" style="text-align:center">
 <font size="4" id="temp_header" >Welcome to Gluten!</font><br>
-<button onclick="introJsStart()">Start the Tour!</button> 
+<button onclick="introJsStart();window.introdisabled = true;">Start the Tour!</button> 
 </div>
 
 <div class="body">
@@ -403,7 +403,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 					
 					//Support for theater
 					if(citeAttributes[i] == 'Page')
-						$('#citationEditorIPage').val($('#citation'+0).attr('data-page'));
+						$('#citationEditorIPage').val($('#citation'+citei).attr('data-page'));
 					else {
 						//get attribute citation[id][citeAttributes[i]]
 						//store in $('#citationEditorI'+citeAttributes[i]).val(citation[id][citeAttributes[i]]);
@@ -421,7 +421,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 			initiatePopup({title: "Citations", border: "#09f", ht: ht, fnc: fnc});
 }
 
-function citationHovertag() {
+function citationHovertag(recall) {
 	/*$('.citation').off('hover');
 	$('.citation').on('hover', function() {
 		alert(5);
@@ -439,7 +439,10 @@ function citationHovertag() {
 	$('.citation').on('mouseleave', function() {
 		//hideHovertag();
 	});
-	hovertagRegistry('citationHovertag()');
+	console.log("CitationHovertag(Recall): "+recall+(recall == undefined));
+	if(recall == undefined)	{
+		hovertagRegistry('citationHovertag(true)');
+	}
 }
 //'
 function formatHovertag(classname, textcode, action, recall) {
@@ -463,7 +466,10 @@ function hovertagRegistry(c, t, a) {
 }
 function recallHovertags() {
 	for(i in hovertagRegistrar) {
-		eval("formatHovertag('"+hovertagRegistrar[i].classname+"', '"+hovertagRegistrar[i].textcode+"', '"+hovertagRegistrar[i].action+"', true)");
+		if(hovertagRegistrar[i].textcode != undefined)
+			eval("formatHovertag('"+hovertagRegistrar[i].classname+"', '"+hovertagRegistrar[i].textcode+"', '"+hovertagRegistrar[i].action+"', true)"); 
+		else 
+			eval(hovertagRegistrar[i].classname);
 	}
 }
 
@@ -694,8 +700,10 @@ function fullscreen() {
 			top: "-.1%",
 			left:"-.1%",
 			width:"95%",
-			width:window.innerWidth-50+"px",
-			height:"100.2%",
+			width:window.innerWidth-80+"px",
+			/*width:"calc(100%-80px)",*/
+			height:window.innerHeight-35+"px",
+			/*height:"calc(100%-35px)",*/
 			fontSize:"16pt",
 			paddingLeft:"50px",
 			paddingRight:"30px",
@@ -716,7 +724,7 @@ function normalscreen() {
 			paddingRight:"0px",
 			paddingTop:"0px",
 			lineHeight:"1em"
-		},300);
+		},1000);
 		nightscreen(1);
 		$('.fullscreenui').fadeOut(100);
 }
@@ -768,6 +776,7 @@ function nightscreen(option) {
 };
 setInterval("reintro()", 100);
 */
+window.introdisabled = false;
 function introJsStart(id) {
 	if(id == undefined)
 		id = 1;
@@ -798,6 +807,9 @@ function contentValidate() {
 document.onkeydown = function(e) {
 	//e.ctrlKey - altKey shiftKey metaKey
 	//TODO - Add key events to {format}.js and panel.js so panels can receive the same events natively; Also this means moving events to respective functions; Doing so would complete the character panel code
+	
+	//Word counting - Place in Space only?
+	postWordCount();
 	switch(e.keyCode) {
 		case 32: /* Space */
 			//Word filtering
@@ -805,6 +817,7 @@ document.onkeydown = function(e) {
 			saveFile();
 			//Check beginning and ends of div
 			contentValidate();
+			
 		break;
 		case 67: /*C*/
 			if(e.altKey) {
@@ -825,6 +838,74 @@ document.onkeydown = function(e) {
 		console.log($(".PanelKeyEvent").attr('data-keycode'))
 	}
 };
+function postWordCount() {
+	//Right now, this only does the words in the content_textarea; it should get the build count
+	//Get input - Right now the text
+	var a = $('.content_textarea').text();
+	var char = a.length;
+	var word = 0;
+	for(i in a.split(' ')) {
+		if(a[i] != ' ' && a[i].length) {
+			word++;	
+		}
+	}
+	//Interpret
+		//Get min/max inputs
+	$('.content_character').css('width', '100px').html('<div style="height:3px;" class="content_character_bar"></div><span class="content_character_mark">'+char+'c</span>');
+	$('.content_word').css('width','100px').html('<div style="height:3px;" class="content_word_bar"></div><span class="content_word_mark">'+word+'w</span>');
+
+	if(min_char <= 0 && max_char <= 0) {
+		$('.content_character_bar').css('background-color', '#00AC39').css('width', '100px');
+	} else if(min_char > 0 && max_char <= 0) {
+		if(char - min_char < -100) 
+			$('.content_character_bar').css('background-color','#f44').css('width', (100*(char/min_char))+"px");
+		else if(char - min_char < 0)
+			$('.content_character_bar').css('background-color','#D0B605').css('width', (100*(char/min_char))+"px");
+		else
+			$('.content_character_bar').css('background-color','#00AC39').css('width', (100*(min_char/char))+"px");
+	} else if(min_char <= 0 && max_char > 0) {
+		if(char - max_char > 100) 
+			$('.content_character_bar').css('background-color','#f44').css('width', (100*(max_char/char))+"px");
+		else if(char - max_char > 0)
+			$('.content_character_bar').css('background-color','#D0B605').css('width', (100*(max_char/char))+"px");
+		else
+			$('.content_character_bar').css('background-color','#00AC39').css('width', (100*(char/max_char))+"px");
+	} else {
+		if(char < min_char) {
+			$('.content_character_bar').css('background-color','#f44').css('width', (100*(char/min_char))+"px");
+		} else if(char > max_char) {
+			$('.content_character_bar').css('background-color','#f44').css('width', (100*(max_char/char))+"px");
+		} else {
+			$('.content_character_bar').css('background-color','#00AC39').css('width', (100*(char/max_char))+"px");
+		}
+	}
+	
+	if(min_word <= 0 && max_word <= 0) {
+		$('.content_word_bar').css('background-color', '#00AC39').css('width', '100px');
+	} else if(min_word > 0 && max_word <= 0) {
+		if(word - min_word < -100) 
+			$('.content_word_bar').css('background-color','#f44').css('width', (100*(word/min_word))+"px");
+		else if(word - min_word < 0)
+			$('.content_word_bar').css('background-color','#D0B605').css('width', (100*(word/min_word))+"px");
+		else
+			$('.content_word_bar').css('background-color','#00AC39').css('width', (100*(min_word/word))+"px");
+	} else if(min_word <= 0 && max_word > 0) {
+		if(word - max_word > 100) 
+			$('.content_word_bar').css('background-color','#f44').css('width', (100*(max_word/word))+"px");
+		else if(word - max_word > 0)
+			$('.content_word_bar').css('background-color','#D0B605').css('width', (100*(max_word/word))+"px");
+		else
+			$('.content_word_bar').css('background-color','#00AC39').css('width', (100*(word/max_word))+"px");
+	} else {
+		if(word < min_word) {
+			$('.content_word_bar').css('background-color','#f44').css('width', (100*(word/min_word))+"px");
+		} else if(word > max_word) {
+			$('.content_word_bar').css('background-color','#f44').css('width', (100*(max_word/word))+"px");
+		} else {
+			$('.content_word_bar').css('background-color','#00AC39').css('width', (100*(word/max_word))+"px");
+		}
+	}
+}
 </script>
 
 </body>

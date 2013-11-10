@@ -1,11 +1,17 @@
 function startBuild() {
 	//initiate the build code, show the progress indicator, and start sending stuff to different functions to do different stuff.
+	console.warn('start');
+	$('.page').css('width','8.5in');
 	window.section_name = "";
-	$('.build').empty();
+	$('#searching').val('');
+	$('.build').html('<button onclick="exitBuild()" class="noprint">Exit Document Builder</button>');
 		//$('.build_progress').css('display', 'block').css('position', 'fixed').css('width', '50%').css('height', '50%').css('top','25%').css('left','25%').css('background-color', 'rgba(0,0,0,0.3)').css('font-size','16pt').css('margin-top','10%');
 	initiatePopup({title:"Build Progress",bordercolor:"#8f6",ht:"<div class='build_progress'></div>"});
 	updateBuildProgress('Initiating Build...');
-	
+	setTimeout('continueBuild()',500);
+}
+
+function continueBuild() {
 	//To {format}.js
 	try {
 		onStylePaper();	
@@ -17,7 +23,7 @@ function startBuild() {
 		updateBuildProgress('Setting Headers...');	
 	onGetFormats();
 		updateBuildProgress('Formatting Content...');
-	if($('.body > .citation').length) {
+	if($('.content_textarea > .citation').length) {
 		onBuildBibliography();
 			updateBuildProgress('Building Bibliography...');
 	}
@@ -29,6 +35,8 @@ function startBuild() {
 		$('.body').fadeOut(500);
 		$('.build').fadeIn(500);
 	finishBuild();
+	scrollTo(0,0);
+	console.warn('finish');
 	//$('.build').css('display', 'block');
 }
 function updateBuildProgress(text) {
@@ -38,6 +46,7 @@ function finishBuild() {
 	//$('.build_progress').css('display', 'none');
 	closePopup();
 	$('.header').hide(1000);
+	$('.page').css('width','70%');
 }
 function exitBuild() {
 	$('.header').show(1000);

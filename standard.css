@@ -108,6 +108,7 @@ body {
 }
 .content_textarea {
 	background-color:white;	
+	overflow-y:auto;
 }
 
 .fullscreen {
@@ -205,14 +206,26 @@ box-shadow:         0px -2px 1px rgba(0, 0, 0, 1);*/
 .fullscreenexit {
 	cursor: pointer;	
 }
+.content_wordcount {
+	font-size:9pt;	
+}
 
 /* Colors */
 .gluten_gray {
 	color: #999;	
 }
 .gluten_red {
+	/*Ref in Word Count*/
 	color: #f44;
 }	
+.gluten_green {
+	/*Ref in Word Count*/
+	color:#00AC39;
+}
+.gluten_yellow {
+	/*Ref in Word Count*/
+	color:#D0B605;	
+}
 
 button {
 	cursor:pointer;	
@@ -250,8 +263,10 @@ button {
 	.page {
 		box-shadow: none;
 		-webkit-box-shadow: none;	
+		width:8.5in;
+		height:13in;
 	}
-	hr {
-		display:hidden;	
+	hr, .noprint {
+		display:none;	
 	}
 }

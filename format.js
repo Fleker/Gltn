@@ -153,7 +153,7 @@ function post_format_content(m) {
 	var out = "";
 	out = "<div class='content toolbar'></div>";
 	out = out + "<div contenteditable='true' class='content content_textarea' onfocus='postRange()' onclick='postRange()' onmouseleave='/*hideHovertag()*/ '></div>";
-	out = out + "<div class='content_wordcount'><div class='content_word'></div><div class='content_character'></div><div class='content_save'>saved</div></div>";
+	out = out + "<table class='content_wordcount'><tr><td class='content_word'></td><td class='content_character'></td><td class='content_save'>&emsp;saved</td></tr></table>";
 	return out;	
 }
 function post_toolbar(tools) {
