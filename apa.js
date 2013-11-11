@@ -20,6 +20,7 @@ function onInitToolbar() {
 }
 function onStylePaper() {
 	enable_format('double space');	
+	enable_format('2 columns');
 }
 function onBuildFormat() {
 	//Cover Page

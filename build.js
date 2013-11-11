@@ -46,7 +46,7 @@ function finishBuild() {
 	//$('.build_progress').css('display', 'none');
 	closePopup();
 	$('.header').hide(1000);
-	$('.page').css('width','70%');
+	//$('.page').css('width','70%');
 }
 function exitBuild() {
 	$('.header').show(1000);
@@ -81,10 +81,17 @@ function sizeText(text, size) {
 	return '<span style="font-size:'+size+'">'+text+'</span>';	
 }
 //Set up universal paper style guidelines
+column = 0;
 function enable_format(setting) {
 	switch(setting) {
 		case 'double space': 
 			$('.build').css('line-height', '2em');
+		break;
+		case '2 columns':
+			column = 2;
+		break;
+		case '3 columns':
+			column = 3;
 		break;
 	}	
 }
@@ -111,14 +118,20 @@ function newline() {
 function find_page(pagename) {
 	return $('.'+pagename).attr('data-p');
 }
-function add_to_page(text, i, name) {
+function add_to_page(text, i, name, col) {
+	//console.error("add_to_page("+text+", "+i+", "+name+", "+column+");");
 	if(i != undefined) {
 		$('.page'+i+'body').append(text);		
 	} else if(name != undefined) {
 		$('.'+pagename+'body').append(text);	
 	} else {
 		p = $('.page').length-1;
-		$('.page'+p+'body').append(text);	
+		if(col != undefined && col != 0) {
+			$('.page'+p+'col'+(col-1)).append(text);
+			//console.error("$('.page"+p+"col"+(column-1)+"').append(text);");
+		} else {
+			$('.page'+p+'body').append(text);		
+		}
 	}
 }	
 function paste_content() {
@@ -255,7 +268,7 @@ function post_content_formatting(object) {
 	
 	/*** Replace output function so that it places every item into an array instead of just outputting ***/
 function c(s) {
-	console.log(s);	
+	//console.log(s);	
 	//s = s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 	//$('body').append(s+"<br>");
 }
@@ -378,21 +391,50 @@ for(i in b) {
 	out = out.replace(/---/g, ' ');*/
 
 	/*** *** Now implement the project **/
-	var maxh = $('.scale').height()*6.5;
+	var maxh = $('.scale').height()*11; //Add 9+2 for body margins just because it works. Don't question it. (It probably has to do with the 1 in padding on the top and bottom, making total height 13 and body 11.
+	/* @TODO Improve the column features by allowing it to work with standard CSS (somehow, I don't know how to implement it only for the body), maybe if you set it up as a two column you can add things that bridge? That would definitely ease up the codebase */
+	function getColumnOut(p) {
+		cout = "<table style='width:100%'><tr>";
+		for(i = 0;i<column;i++) {
+			cout += "<td style='width:"+(100/column)+"%; vertical-align:top;'><div class='page"+p+"col"+i+"' style='width:100%'></div></td>";		
+			////'"	//'"
+		}
+		cout += "</tr></table>";
+		console.warn("getColumnOut("+p+")");
+		return cout;
+	}
+	add_to_page(getColumnOut($('.page').length-1));
+	if(column == 0)
+		col_count = 0;
+	else
+		col_count = 1;
 	for(j in d) {
 		//TODO - Find a way to grab the current page, not necessarily the last one. This will be handy for things that are added after content
 		p = $('.page').length-1;
-		add_to_page("<span class='hideme'>"+d[j]+" "+"</span>");
-		if($('.page'+p+'body').height() > maxh) {
-			add_new_page();
-			/*hm = $('.hideme').length;
-			he = $('.hideme')[hm-1]
-			$(he).css('display','none');*/
-		} 
+		add_to_page("<span class='hideme'>"+d[j]+" "+"</span>", undefined, undefined, col_count);
+		if(column == 0) {
+			if($('.page'+p+'body').height() > maxh) {
+				add_new_page();
+				/*hm = $('.hideme').length;
+				he = $('.hideme')[hm-1]
+				$(he).css('display','none');*/
+			} 
+		} else {
+			console.warn(('.page'+p+'col'+(col_count-1)), $('.page'+p+'col'+(col_count-1)).height(), maxh);
+			//console.log($('.page'+p+'col'+(col_count-1)));
+			if($('.page'+p+'col'+(col_count-1)).height() > maxh) {
+				col_count++;
+				console.error(column, col_count, (col_count-1), (column <= (col_count-1)));
+				if(column <= (col_count-1)) {
+					add_new_page();
+					add_to_page(getColumnOut($('.page').length-1));
+					col_count =  1;
+				}
+			}
+		}
 		$('.hideme').remove();
 		//$('.pasteContent').append(ca[j]+" ");	
-		add_to_page(d[j]+' ');
-
+		add_to_page(d[j]+' ', undefined, undefined, col_count);
 	}
 	$('.build').html($('.build').html().replace(/===/g,' ').replace(/<span[^<]+?>/g, ""));
 }	

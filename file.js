@@ -6,7 +6,7 @@ citationi = 0;
 
 idea = new Array();
 ideadefault = "";
-fileid = "4xW";
+fileid = window.location.search.substr(6);
 
 min_char = 0;
 max_char = 0;
@@ -19,6 +19,7 @@ document.ready = function() {
 };
 
 function saveFile() {
+	fileid = $('#file_name').val();
 	$('.content_save').animate({
 		opacity: 0.01
 	},100);
@@ -36,7 +37,7 @@ function saveFile() {
 	obj['file']['max_char'] = 0;
 	obj['file']['min_word'] = 0;
 	obj['file']['max_word'] = 0;
-	console.log(obj);
+	//console.log(obj);
 	obj.metadata = new Array();
 	for(i in window.metadata) {
 		//console.log(obj.metadata);
@@ -62,7 +63,7 @@ function restoreFile() {
 	x = jQuery.xml2json(localStorage[fileid]);
 	//$.xml2json(xml);
 	xc = localStorage[fileid+"_c"];
-	if(x != undefined) {
+	if(x.file != undefined) {
 		//Load Script
 		$('#file_format').val(x.file.format);
 		docformat = x.file.format;
@@ -103,13 +104,15 @@ function restoreFile() {
 		setTimeout("finishRestore(x,xc);", 250);		
 	} else {
 		//New document - most things initialize at the top of this file
-		$('#file_format').val("APA");
+		//$('#file_format').val("APA");
+		loadjscssfile("APA.js", "js");
+		setTimeout("finishRestore(x,xc);", 250);
 	}
 }
 function finishRestore(x, xc) {
 	onInitFormat();
 	//console.log(5);
-	if(x != undefined) {
+	if(x.file != undefined) {
 		for(i in x['metadata']) {
 			//window.metadata[i] = x['metadata'][i];	
 			//console.log(4);
@@ -119,6 +122,10 @@ function finishRestore(x, xc) {
 		//console.log(3);
 		//Do a little more cleaning up
 		$('.content_textarea').html(xc.replace(/<span class="searchResult">/g, ""));
+		$('#file_name').val(fileid);
+	} else {
+		$('#file_format').val("APA");
+		$('#file_name').val(fileid);
 	}
 		//console.log(2);
 	recallHovertags();

@@ -35,7 +35,8 @@
 	<table style="width:100%"><tr><td id="panel_content" class="panel">
         <div>
             <i>What Kind of Document do You Want to Create?</i><br>
-            Format:<input type="text" id="file_format" list="gluten_formats" value="APA">&emsp;&emsp;Language:<input id="file_language" list="gluten_languages" value="English (US)"><br>
+            File Name: <input type="text" id="file_name"><br><span style="font-size:9pt">Your file will be available at edit.php?file={file_name}. This is for the alpha version testing. To access a document, go to that URL. This WILL overwrite existing files so please be careful. Do not use spaces.</span><br>
+            Format:<input type="text" id="file_format" list="gluten_formats" value="">&emsp;&emsp;Language:<input id="file_language" list="gluten_languages" value="English (US)"><br>
             Tags:<input id="file_tags" placeholder="Space Separated Tags">
             
             <div id="file_metadata">

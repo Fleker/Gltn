@@ -196,6 +196,7 @@ function post_toolbar(tools) {
 	setInterval("update_toolbar_style()", 10);
 }
 window.fullscreenOn = false;
+/*$(window).resize(function () {*/
 function update_toolbar_style() {
 	if(window.fullscreenOn == false) {
 		tw = $('.toolbar').width();

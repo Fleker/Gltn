@@ -5,6 +5,10 @@ body {
 	color: #000;
 	overflow-x:hidden;
 }
+span, div, body {
+	column-span: all;
+	-webkit-column-span:all;
+}
 .header{
 	height: 100px;
 }
@@ -63,6 +67,8 @@ body {
 	width:98%;
 	margin-right: -4px;	
 	height: 100%;
+	overflow-x:hidden;
+	overflow-y:auto
 }
 .toolbar {
 	background-color: #aaa;
