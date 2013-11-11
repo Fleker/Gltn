@@ -80,6 +80,9 @@ function boldText(text) {
 function sizeText(text, size) {
 	return '<span style="font-size:'+size+'">'+text+'</span>';	
 }
+function oneColumnText(text) {
+	return '<div>'+text+'</div>';	
+}
 //Set up universal paper style guidelines
 column = 0;
 function enable_format(setting) {
@@ -126,7 +129,7 @@ function add_to_page(text, i, name, col) {
 		$('.'+pagename+'body').append(text);	
 	} else {
 		p = $('.page').length-1;
-		if(col != undefined && col != 0) {
+		if(col != undefined && col != 0 && false) {
 			$('.page'+p+'col'+(col-1)).append(text);
 			//console.error("$('.page"+p+"col"+(column-1)+"').append(text);");
 		} else {
@@ -401,10 +404,10 @@ for(i in b) {
 		}
 		cout += "</tr></table>";
 		console.warn("getColumnOut("+p+")");
-		return cout;
+		//return cout;
 	}
 	add_to_page(getColumnOut($('.page').length-1));
-	if(column == 0)
+	if(column == 0 || true)
 		col_count = 0;
 	else
 		col_count = 1;
@@ -412,7 +415,7 @@ for(i in b) {
 		//TODO - Find a way to grab the current page, not necessarily the last one. This will be handy for things that are added after content
 		p = $('.page').length-1;
 		add_to_page("<span class='hideme'>"+d[j]+" "+"</span>", undefined, undefined, col_count);
-		if(column == 0) {
+		if(column == 0 || true) {
 			if($('.page'+p+'body').height() > maxh) {
 				add_new_page();
 				/*hm = $('.hideme').length;
@@ -437,6 +440,9 @@ for(i in b) {
 		add_to_page(d[j]+' ', undefined, undefined, col_count);
 	}
 	$('.build').html($('.build').html().replace(/===/g,' ').replace(/<span[^<]+?>/g, ""));
+	if(column > 0) {
+		$('.pagebody').css('column-count', column).css('-webkit-column-count', column).css('-moz-column-count');	
+	}
 }	
 function post_bibliography(object) {
 	//Get all citations, limit only to those used in the paper
