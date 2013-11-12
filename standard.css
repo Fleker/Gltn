@@ -183,7 +183,7 @@ width: 90%;
 box-shadow:         0px -2px 1px rgba(0, 0, 0, 1);*/
 }
 .build {
-	display:hidden;	
+	display:none;	
 	width:100%;
 }
 .build_progress {
@@ -257,7 +257,7 @@ button {
 	height:1in;
 }
 .pagebody {
-	max-height:6.5in;	
+	max-height:11in;	
 }
 .pagefooter {
 	height: 1in;	

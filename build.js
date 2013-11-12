@@ -1,10 +1,11 @@
 function startBuild() {
 	//initiate the build code, show the progress indicator, and start sending stuff to different functions to do different stuff.
 	console.warn('start');
-	$('.page').css('width','8.5in');
+		$('.build').fadeIn(500);
+	//$('.page').css('width','8.5in');
 	window.section_name = "";
 	$('#searching').val('');
-	$('.build').html('<button onclick="exitBuild()" class="noprint">Exit Document Builder</button>');
+	$('.build').html('<button onclick="exitBuild()" class="noprint">Return to Editor</button>');
 		//$('.build_progress').css('display', 'block').css('position', 'fixed').css('width', '50%').css('height', '50%').css('top','25%').css('left','25%').css('background-color', 'rgba(0,0,0,0.3)').css('font-size','16pt').css('margin-top','10%');
 	initiatePopup({title:"Build Progress",bordercolor:"#8f6",ht:"<div class='build_progress'></div>"});
 	updateBuildProgress('Initiating Build...');
@@ -33,7 +34,6 @@ function continueBuild() {
 	//To stuff
 		//$('.body').css('display', 'none');
 		$('.body').fadeOut(500);
-		$('.build').fadeIn(500);
 	finishBuild();
 	scrollTo(0,0);
 	console.warn('finish');
@@ -46,12 +46,13 @@ function finishBuild() {
 	//$('.build_progress').css('display', 'none');
 	closePopup();
 	$('.header').hide(1000);
+		//stopgf;
 	//$('.page').css('width','70%');
 }
 function exitBuild() {
 	$('.header').show(1000);
 	$('.body').show(500);
-	$('.build').hide(2000);
+	$('.build').hide(350);
 }
 //Integration into format.js files
 function grabMetadata(i) {
@@ -129,9 +130,9 @@ function add_to_page(text, i, name, col) {
 		$('.'+pagename+'body').append(text);	
 	} else {
 		p = $('.page').length-1;
-		if(col != undefined && col != 0 && false) {
+		if(col != undefined && col != 0) {
 			$('.page'+p+'col'+(col-1)).append(text);
-			//console.error("$('.page"+p+"col"+(column-1)+"').append(text);");
+			//console.error("$('.page"+p+"col"+(col-1)+"').append(text);");
 		} else {
 			$('.page'+p+'body').append(text);		
 		}
@@ -404,10 +405,10 @@ for(i in b) {
 		}
 		cout += "</tr></table>";
 		console.warn("getColumnOut("+p+")");
-		//return cout;
+		return cout;
 	}
 	add_to_page(getColumnOut($('.page').length-1));
-	if(column == 0 || true)
+	if(column == 0)
 		col_count = 0;
 	else
 		col_count = 1;
@@ -415,7 +416,10 @@ for(i in b) {
 		//TODO - Find a way to grab the current page, not necessarily the last one. This will be handy for things that are added after content
 		p = $('.page').length-1;
 		add_to_page("<span class='hideme'>"+d[j]+" "+"</span>", undefined, undefined, col_count);
-		if(column == 0 || true) {
+		//console.warn($('.page'+p+'body').height(), maxh);
+		//console.warn(('.page'+p+'col'+(col_count-1)), $('.page'+p+'col'+(col_count-1)).height(), maxh, $('.page'+p+'col'+(col_count-1)).html().length);
+		//console.warn(('.page'+p+'col'+(col_count-1)), $('.page'+p+'col'+(col_count-1)).html().length, $('.page'+p+'col'+(col_count-1)).height());
+		if(column == 0) {
 			if($('.page'+p+'body').height() > maxh) {
 				add_new_page();
 				/*hm = $('.hideme').length;
@@ -423,11 +427,10 @@ for(i in b) {
 				$(he).css('display','none');*/
 			} 
 		} else {
-			console.warn(('.page'+p+'col'+(col_count-1)), $('.page'+p+'col'+(col_count-1)).height(), maxh);
 			//console.log($('.page'+p+'col'+(col_count-1)));
 			if($('.page'+p+'col'+(col_count-1)).height() > maxh) {
 				col_count++;
-				console.error(column, col_count, (col_count-1), (column <= (col_count-1)));
+				//console.error(column, col_count, (col_count-1), (column <= (col_count-1)));
 				if(column <= (col_count-1)) {
 					add_new_page();
 					add_to_page(getColumnOut($('.page').length-1));
@@ -439,10 +442,10 @@ for(i in b) {
 		//$('.pasteContent').append(ca[j]+" ");	
 		add_to_page(d[j]+' ', undefined, undefined, col_count);
 	}
-	$('.build').html($('.build').html().replace(/===/g,' ').replace(/<span[^<]+?>/g, ""));
-	if(column > 0) {
+	$('.build').html($('.build').html().replace(/===/g,' ')/*.replace(/<span[^<]+?>/g, "")*/);
+	/*if(column > 0) {
 		$('.pagebody').css('column-count', column).css('-webkit-column-count', column).css('-moz-column-count');	
-	}
+	}*/
 }	
 function post_bibliography(object) {
 	//Get all citations, limit only to those used in the paper
