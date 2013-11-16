@@ -10,7 +10,7 @@ function onInitFormat() {
 	new_format_item("mltext", {label: "Abstract", description: "A short summary explaining the essay's main points", mtype:"w", min:150, max:250, id:"Abstract"});
 	
 	new_format_item("content");
-	set_up_format("word count", "xxx");
+	set_up_format("word count", {min:0, max:1000});
 	post_format();
 }
 
@@ -20,7 +20,7 @@ function onInitToolbar() {
 }
 function onStylePaper() {
 	enable_format('double space');	
-	enable_format('2 columns');
+	//enable_format('2 columns');
 }
 function onBuildFormat() {
 	//Cover Page

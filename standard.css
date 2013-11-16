@@ -105,6 +105,9 @@ span, div, body {
 	text-decoration: none;
 	border-bottom: solid 1px #000000;
 }
+.inline {
+	display:inline;	
+}
 .searchResult {
 		font-weight: bold;
 		background-color: yellow;

@@ -29,8 +29,8 @@ function initiatePopup(data) {
 		$('.popupbody').html(data.value);
 	else
 		$('.popupbody').css('display','none');
-	if(data.border != undefined) {
-		$('.popuptop').css('border-color', data.border).css('border-width', '2px');	
+	if(data.bordercolor != undefined) {
+		$('.popuptop').css('border-color', data.bordercolor).css('border-width', '2px');	
 	} else
 		$('.popuptop').css('border-width', '1px');
 		

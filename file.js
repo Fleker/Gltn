@@ -50,7 +50,7 @@ function saveFile() {
 	o = {};
 	o.gluten_doc = obj;
 	//console.log(o);
-	xo = json2xml(o, "  ");
+	xo = json2xml(o, "");
 	localStorage[fileid] = xo;
 	localStorage[fileid+"_c"] = content;
 	$('.content_save').animate({
@@ -135,6 +135,17 @@ function finishRestore(x, xc) {
 		formatShift();
 	});
 }
+function exportFile() {
+	window.section_name = "";
+	$('.build').fadeIn(500);
+	$('.body').fadeOut(500);
+	$('.header').fadeOut(500);
+	$('.build').html('<button onclick="exitBuild()">Return to Editor</button>');
+	add_new_page();	
+	add_to_page("File XML:<br><textarea style='width:95%;height:200px;'>"+localStorage[fileid]+"</textarea><br>");
+	add_to_page("Content HTML:<br><textarea style='width:95%;height:200px;'>"+localStorage[fileid+'_c']+"</textarea><br>");
+	add_to_page('Execute this code in a web console to transfer the files over to a different computer:<br><textarea style="width:95%;height:200px;">localStorage["'+fileid+'5"] = \042'+localStorage[fileid].replace(/"/g, '\\"')+'\042;localStorage["'+fileid+'5_c"] = \042'+localStorage[fileid+"_c"].replace(/"/g, '\\"')+'\042;</textarea>');
+}
 //Formatting Script Launcher
 function createjscssfile(filename, filetype){
  if (filetype=="js"){ //if filename is a external JavaScript file
@@ -199,7 +210,7 @@ function formatShift() {
 			//replacejscssfile('formats/'+docformat+'/format.js', 'formats/'+format2+'/format.js', 'js');
 			replacejscssfile(docformat+".js", format2+".js", "js");
 			docformat = format2;
-			alert("Shift formats");
+			//alert("Shift formats");
 			//setTimeout("save();$('#body').empty();input();save();", 500);
 			setTimeout("onInitFormat();$('.content_textarea').html(xc);", 500);
 		}

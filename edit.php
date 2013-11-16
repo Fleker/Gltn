@@ -61,6 +61,7 @@
                 <button onclick="runPanel('main_Citation')" id="CITATIONPANEL">Citation Panel</button>
                 <button onclick="runPanel('main_Idea')" id="IDEAPANEL">Idea Panel</button>
                 <button onclick="startBuild();setTimeout('exitintro();', 1000);" id="BUILDBUTTON">Build Paper</button>
+                <button onclick="exportFile();">Export Paper</button>
            </div>
         </div>
       </td>
@@ -419,7 +420,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 			}
 		};
 	
-			initiatePopup({title: "Citations", border: "#09f", ht: ht, fnc: fnc});
+			initiatePopup({title: "Citations", bordercolor: "#09f", ht: ht, fnc: fnc});
 }
 
 function citationHovertag(recall) {
@@ -450,14 +451,17 @@ function formatHovertag(classname, textcode, action, recall) {
 	$('.'+classname).off('mouseenter');
 	$('.'+classname).off('mouseleave');
 	
-	$('.'+classname).on('mouseenter', function() {
-		displayHovertag(eval(textcode), {ypos: $(this).offset().top}, eval(action));
-		//hovertagRegistry(\'displayHovertag(eval(textcode), {ypos: $(this).offset().top}, eval(action));\');
-	});
+	$('.'+classname).each(function(index, element) {
+        $(this).on('mouseenter', function() {
+			console.log(textcode);
+			console.log(eval("'"+textcode+"'"));
+			console.log( eval("'"+action+'"'));
+			displayHovertag(eval("'"+textcode+"'"), {ypos: $(this).offset().top}, eval("'"+action+"'"));
+			//hovertagRegistry(\'displayHovertag(eval(textcode), {ypos: $(this).offset().top}, eval(action));\');
+		});
+    });
 	//'
-	$('.'+classname).on('mouseleave', function() {
-		//hideHovertag();
-	});
+
 	if(recall == undefined) 
 		hovertagRegistry(classname, textcode, action);
 }
@@ -655,6 +659,7 @@ function mouseY() {
 	return mousey-scrollY;
 }
 function displayHovertag(text, data, fnc) {
+	console.log(text, fnc);
 	ypos = data.ypos;
 	if(data.ypos == undefined) 
 		ypos = mouseY()-scrollY;
@@ -797,11 +802,11 @@ function exitintro() {
 function contentValidate() {
 	if($('.content_textarea').html().substr(0,1) == "<") {
 		$('.content_textarea').prepend("&nbsp;");
-		console.log('"'+$('.content_textarea').html()+'"');
+		//console.log('"'+$('.content_textarea').html()+'"');
 	}
 	if($('.content_textarea').html().substr(-1) != ";") {
 		$('.content_textarea').append("&nbsp;");
-		console.log('"'+$('.content_textarea').html()+'"');
+		//console.log('"'+$('.content_textarea').html()+'"');
 	}	
 }
 /** KEY EVENTS **/
@@ -845,6 +850,8 @@ function postWordCount() {
 	var a = $('.content_textarea').text();
 	var char = a.length;
 	var word = 0;
+	if(char == 0)
+		return;
 	for(i in a.split(' ')) {
 		if(a[i] != ' ' && a[i].length) {
 			word++;	
@@ -906,6 +913,38 @@ function postWordCount() {
 			$('.content_word_bar').css('background-color','#00AC39').css('width', (100*(word/max_word))+"px");
 		}
 	}
+}
+function imgDetails(pid) {
+	var ht = "&emsp;Image URL: <input type='url' id='image_url'><br>";
+	ht += "&emsp;Description: <input id='image_des' style='width:75%'><br>";
+	ht += "<button id='image_save'>Save</button><div style='margin-left:50px' id='image_preview'></div>";
+	ht += "&emsp;<input type='hidden' id='image_pid' value='"+pid+"'>";
+	//console.log("pid" + pid);
+	fnc = function x() {
+		var pid = $('#image_pid').val();
+		if($('.img'+pid).attr('data-src') != undefined) {
+			$('#image_url').val($('.img'+pid).attr('data-src'));
+			$('#image_des').val($('.img'+pid).attr('data-des'));
+			previewImg();
+			//$('#image_preview').html('<img src="'+$('.img'+pid).attr('src')+'">');	
+		}
+		function previewImg() {
+			var url = $('#image_url').val()
+			$('#image_preview').html('<img src="'+url+'">');
+		}
+		$('#image_url').on('input', function() {
+			previewImg();
+		});
+		$('#image_save').on('click', function() {
+			$('.img'+pid).attr('data-id', pid);
+			$('.img'+pid).attr('data-des', $('#image_des').val());
+			$('.img'+pid).attr('data-src', $('#image_url').val());
+			$('.img'+pid).html("<img src='"+$('#image_url').val()+"' style='width:10%'>");
+			closePopup();
+			saveFile();
+		});	
+	};
+	initiatePopup({title:"Image Details", bordercolor:'#B54E7C', ht: ht, fnc: fnc});
 }
 </script>
 

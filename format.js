@@ -7,6 +7,10 @@ function new_format() {
 	format_js_index = -1;
 	window.metadata = [{blank: 0}];	
 	$('#file_metadata').empty();
+	min_word = 0;
+	max_word = 0;
+	min_char = 0;
+	max_char = 0;
 }
 function new_format_item(type, ops) {
 	format_js_index++;
@@ -30,7 +34,16 @@ function new_format_nl() {
 	new_format_item("nl");
 }
 function set_up_format(name, property) {
-	
+	switch(name) {
+		case 'word count':
+			min_word = property.min;
+			max_word = property.max;
+		break;
+		case 'character count':
+			min_char = property.min;
+			max_char = property.max;
+		break;	
+	}
 }
 function post_format() {
 	var out = ""
@@ -47,6 +60,8 @@ function post_format() {
 			out = out + "<br>";
 		} else if(type == "mltext") { 
 			out = out + post_format_mltext(window.metadata[i]);
+		} else if(type == "label") {
+			out = out + "<div style='font-weight:bold;border-bottom:solid 1px #888;width:90%;margin-left:5%;'>"+window.metadata[i].label+"</div>";
 		} else {
 			out = out + post_format_text(window.metadata[i]);
 		}		
@@ -160,7 +175,25 @@ function post_toolbar(tools) {
 	out = "&emsp;<span class='toolbar_button' data-t='character' id='CHARACTERPANEL'>Character</span>&emsp;|&emsp;";
 	//TODO - Use labels to make prettier, maybe "new_toolbar/new_toolbar_item"
 	for(i=0;i<tools.length;i++) {
-		out = out + "<span class='toolbar_button' data-t='"+tools[i]+"'>"+tools[i]+"</span>&emsp;|&emsp;";
+		var tool_pretty = tools[i];
+		switch(tool_pretty) {
+			case "heading1":
+				tool_pretty = "Heading-1";
+			break;
+			case "heading2":
+				tool_pretty = "Heading-2";
+			break;
+			case "heading3":
+				tool_pretty = "Heading-3";
+			break;
+			case "image":
+				tool_pretty = "Image";
+			break;
+			case "citation":
+				tool_pretty = "Citation";
+			break;	
+		}
+		out = out + "<span class='toolbar_button' data-t='"+tools[i]+"'>"+tool_pretty+"</span>&emsp;|&emsp;";
 	}
 	out = out + "<span class='toolbar_button' data-t='fullscreen'>[^]</span>&emsp;|&emsp;";
 	
@@ -177,17 +210,23 @@ function post_toolbar(tools) {
 			
 			case "heading1":
 				contentAddSpan({node:"span", class:"heading1 heading"});
-				formatHovertag("heading1", '"Heading-1"', 'null');
+				formatHovertag("heading1", "'Heading-1'", 'null');
 			break;
 			
 			case "heading2":
 				contentAddSpan({node:"span", class:"heading2 heading"});
-				formatHovertag("heading2", '"Heading-2"', 'null');
+				formatHovertag("heading2", "'Heading-2'", 'null');
 			break;
 			
 			case "heading3":
 				contentAddSpan({node:"span", class:"heading3 heading"});
-				formatHovertag("heading3", '"Heading-3"', 'null');
+				formatHovertag("heading3", "'Heading-3'", 'null');
+			break;
+			case "image":
+				var imid = $('.img').length;
+				contentAddSpan({node:"div", class:"img inline img"+imid});
+				imgDetails(imid);
+				formatHovertag("img", "Image Details", "imgDetails('+$(this).attr('data-id')+');");
 			break;
 		}
 	});

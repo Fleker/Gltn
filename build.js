@@ -7,12 +7,17 @@ function startBuild() {
 	$('#searching').val('');
 	$('.build').html('<button onclick="exitBuild()" class="noprint">Return to Editor</button>');
 		//$('.build_progress').css('display', 'block').css('position', 'fixed').css('width', '50%').css('height', '50%').css('top','25%').css('left','25%').css('background-color', 'rgba(0,0,0,0.3)').css('font-size','16pt').css('margin-top','10%');
-	initiatePopup({title:"Build Progress",bordercolor:"#8f6",ht:"<div class='build_progress'></div>"});
+	initiatePopup({title:"Build Progress",bordercolor:"rgb(44, 145, 16)",ht:"<div class='build_progress'></div>"});
 	updateBuildProgress('Initiating Build...');
 	setTimeout('continueBuild()',500);
 }
 
 function continueBuild() {
+	//Duplicate paper
+	var cont = $('.content_textarea').html();
+	$('.draft').html(cont);
+	
+	
 	//To {format}.js
 	try {
 		onStylePaper();	
@@ -22,13 +27,18 @@ function continueBuild() {
 	updateBuildProgress('Building Text...');
 	onBuildFormat();
 		updateBuildProgress('Setting Headers...');	
+			
 	onGetFormats();
 		updateBuildProgress('Formatting Content...');
 	if($('.content_textarea > .citation').length) {
 		onBuildBibliography();
 			updateBuildProgress('Building Bibliography...');
 	}
-	onSetHeader();
+	try {
+		onSetHeader();
+	} catch(e) {
+		
+	}
 		updateBuildProgress('Setting up display...');
 		
 	//To stuff
@@ -57,6 +67,7 @@ function exitBuild() {
 //Integration into format.js files
 function grabMetadata(i) {
 	o = window.metadata[i];
+	console.log(i);
 	o.value = $('#format_item_'+i).val();
 	return o;	
 }
@@ -69,24 +80,40 @@ function searchMetadata(request) {
 function valMetadata(label) {
 	return grabMetadata(searchMetadata(label)).value;	
 }
+function fileMetadata(name) {
+	return $('#file_'+name).val();	
+}
 function valAuthor() {
 	searchMetadata('Author');	
 }
-function centerText(text) {
-	return '<div style="text-align:center">'+text+'</div>';
+function centerText(text,size) {
+	return '<div style="text-align:center;font-size:'+size+'pt;border:none;">'+text+'</div>';
 }
-function boldText(text) {
-	return '<span style="font-weight:bold">'+text+'</span>';	
+function boldText(text,size) {
+	return '<span style="font-weight:bold;font-size:'+size+'pt">'+text+'</span>';	
+}
+function italicizeText(text,size) {
+	return '<span style="font-style:italic;font-size:'+size+'pt">'+text+'</span>';	
+}
+function boldItalicizeText(text,size) {
+	return '<span style="font-style:italic;font-weight:bold;font-size:'+size+'pt">'+text+'</span>';	
 }
 function sizeText(text, size) {
-	return '<span style="font-size:'+size+'">'+text+'</span>';	
+	return '<span style="font-size:'+size+'pt">'+text+'</span>';	
 }
 function oneColumnText(text) {
 	return '<div>'+text+'</div>';	
 }
+function twoColumnText(t1, t2) {
+	return "<table style='width:100%'><tr><td style='width:50%'>"+t1+"</td><td style='width:50%'>"+t2+"</td></tr></table>";	
+}
+function threeColumnText(t1, t2, t3) {
+	return "<table style='width:100%'><tr><td style='width:33%'>"+t1+"</td><td style='width:33%'>"+t2+"</td><td style='width:33%'>"+t3+"</td></tr></table>";	
+}
 //Set up universal paper style guidelines
 column = 0;
-function enable_format(setting) {
+nptfont = 12;
+function enable_format(setting, param1) {
 	switch(setting) {
 		case 'double space': 
 			$('.build').css('line-height', '2em');
@@ -96,6 +123,14 @@ function enable_format(setting) {
 		break;
 		case '3 columns':
 			column = 3;
+		break;
+		case 'font pt':
+			nptfont = param1;
+			$('.page').css('font-size', param1+"pt");
+		break;
+		case '12pt font':
+			nptfont = 12;
+			$('.page').css('font-size', "12pt");
 		break;
 	}	
 }
@@ -138,6 +173,10 @@ function add_to_page(text, i, name, col) {
 		}
 	}
 }	
+function push_to_body(text) {
+	$('.draft').prepend(text);
+	console.log(text, $('.draft').html());
+}	
 function paste_content() {
 	add_to_page("<div class='pasteContent'></div>");	
 }
@@ -160,8 +199,8 @@ function lcr_split(left, center, right) {
 //Content Formatting
 function citationFormatted(string, i, id, page) {
 	//Insert a citation content_formatted object and return it with properties filled in
-	console.log(string, id);
-	console.warn(citation[id]);
+	//console.log(string, id);
+	//console.warn(citation[id]);
 	string = string.replace(/AUTHOR_FIRST_I/g, citation[id].AuthorFirst.substr(0,1));
 	string = string.replace(/AUTHOR_FIRST/g, citation[id].AuthorFirst);
 	string = string.replace(/AUTHOR_LAST/g, citation[id].AuthorLast);
@@ -176,8 +215,9 @@ function citationFormatted(string, i, id, page) {
 	return string;	
 }
 function headingFormatted(spec,input,number) {
-	console.error(spec);
+	//console.error(spec);
 	var string = spec;
+	string = string.replace(/TEXT%sc/g, smallcaps(input));
 	string = string.replace(/TEXT/g, input);
 	string = string.replace(/LISTA/g, numToLetter('A',number));
 	string = string.replace(/LISTa/g, numToLetter('a',number));
@@ -186,6 +226,21 @@ function headingFormatted(spec,input,number) {
 	string = string.replace(/LISTi/g, numToRoman('i', number));
 	console.error(string);
 	return string;
+}
+function imageFormatted(spec,input,fig) {
+	var string = spec;	
+	string = string.replace(/IMG/g, "<img src='"+input.attr('data-src')+"' style='width:100%'>");
+	string = string.replace(/TEXT/g, input.attr('data-des'));
+	string = string.replace(/FIGN/g, fig);
+	return string;
+}
+function smallcaps(inp) {
+	//console.warn(inp);
+	var out = "";
+	for(i=0;i<inp.length;i++) {
+		out += inp[i].replace(/[a-z]/g, "<span style='font-size:"+(nptfont-3)+"pt'>"+inp[i]+"</span>");	
+	}
+	return out;
 }
 function numToLetter(capy, number) {
 	var cap = ["A", "B", "C","D","E","F","G"];
@@ -204,10 +259,6 @@ function numToRoman(capy, number) {
 		return cap[number-1].toLowerCase();
 }
 function post_content_formatting(object) {
-	//Duplicate paper
-	var cont = $('.content_textarea').html();
-	$('.draft').html(cont);
-	
 	//Format Citations
 	$('.draft > .citation').each(function() {
 		i = $(this).attr('data-i');
@@ -227,20 +278,33 @@ function post_content_formatting(object) {
 	var h1 = 1;
 	var h2 = 1;
 	var h3 = 1;
-	$('.draft > .heading').each(function() {
+	$('.draft  .heading').each(function() {
 		//$(this).css('display','inline');
+		$(this).css('border','none');
 		if($(this).attr('class').indexOf('heading1') > -1) {
-			$(this).html(headingFormatted(object.heading1,$(this).html(),h1));
+			$(this).html(headingFormatted(object.heading1,$(this).text(),h1));
 			h1++;
 			h2 = 1;
 			h3 = 1;	
 		} else if($(this).attr('class').indexOf('heading2') > -1) {
-			$(this).html(headingFormatted(object.heading2,$(this).html(),h2));
+			$(this).html(headingFormatted(object.heading2,$(this).text(),h2));
 			h2++;
 			h3 = 1;	
 		} else if($(this).attr('class').indexOf('heading3') > -1) {
-			$(this).html(headingFormatted(object.heading3,$(this).html(),h3));
+			$(this).html(headingFormatted(object.heading3,$(this).text(),h3));
 			h3++;
+		}
+	});
+	
+	//Figure numbers
+	if(object.figure != undefined)	
+		eval(object.figure+";x();");
+	
+	//Images
+	$('.draft .img').each(function() {
+		$(this).html(imageFormatted(object.img,$(this),$(this).attr('data-figure-number')));
+		for(i=0;i<object.imgstyle.length;i+=2) {
+			$(this).css(object.imgstyle[i], object.imgstyle[i+1]);	
 		}
 	});
 	
@@ -254,25 +318,24 @@ function post_content_formatting(object) {
 			$(this).html($(this).html().replace(/ /g,'</'+erray[ele]+'>&nbsp;<'+erray[ele]+' style="'+s+'">'));
 		});
 	}*/
-	$('.draft > span > div').each(function() {
-		$(this).html($(this).html().replace(/ /g,'==='));
+	console.warn($('.draft').html());
+	/*$('.draft > span > div').each(function() {
+		$(this).html($(this).html().replace(/ /g,'===').replace(/ /g,"~~~"));
 	});
 	//div joiner
 	$('.draft > div').each(function() {
-		$(this).html( $(this).html().replace(/ /g, '==='));
-	});
-	//console.warn($('.draft').html());
-	cont = $('.draft').html();
+		$(this).html( $(this).html().replace(/ /g, '===').replace(/ /g,"~~~"));
+	});*/
+	cont = $('.draft').html().replace(/&nbsp;/g, " ");
+	console.log(cont);
 	//cont = cont.replace(/<span[^<]+?>/g, "");
 	//cont = cont.replace("</span>", "",'g');
-	//NEED TO FIX SPLITTER TO BE MORE LENIENT, NOT HACK HTML INTO IT
 	
 	//ca =  cont.split(' ');
-	cont = cont.replace(/&nbsp;/g, " ");
 	
 	/*** Replace output function so that it places every item into an array instead of just outputting ***/
 function c(s) {
-	//console.log(s);	
+	console.log(s);	
 	//s = s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 	//$('body').append(s+"<br>");
 }
@@ -310,6 +373,7 @@ var tag = '';
 var intag = false;
 var inend = false;
 var ine = false;
+var parsingdiv = false;
 var out = "";
 var breakk = false;
 $('body').append("<hr>");
@@ -318,7 +382,7 @@ for(i in b) {
 	c(": "+b[i]);
 	breakk = false;
     if(b[i] == "<") {
-        if(b[b1] == "/") {
+        if((b[b1] == "/" && !parsingdiv) || (b[b1] == "/" && b[ (parseInt(i)+2) ] == e.substr(1,1) && parsingdiv)) {
 			 /***/
 			 out = out + output(e, tag, w);
             //$('body').append(tag+",<br>"+e+"; "+w+"<br>");
@@ -329,24 +393,28 @@ for(i in b) {
 			intag = false;
 			ine = false;
             tag = "";
+			parsingdiv = false;
 			c("End of tag");
-        } else {
+        } else if(b[i] == "<") {
              /***/
-			 out = out + output(e,  tag, w);
             //$('body').append(tag+",<br>"+e+"; "+w+"<br>");
-			c(tag+", "+e+"; "+w);
-            w = '';
+			c(tag+", "+e+"; "+w+"  "+parsingdiv);
 			
 			 intag = true;
              ine = true;
 			 inend = false;
-			 tag = "";
-			 e = "";
-			
+			 if(!parsingdiv) {
+				 c("Outputting from last tag");
+				 out = out + output(e,  tag, w);
+				 tag = "";
+				 e = "";
+				 w = '';
+			 }		
+			 	
         }
-		c("<"+b[b1]+" !");
+		c("<"+b[b1]+" !  "+b[ (parseInt(i)+2) ]+"=?"+e.substr(1,1)+";"+parsingdiv);
     }
-    if(b[i] == " ") {
+    if(b[i] == " " && e.substr(0,4) != "<div") {
         if(ine) {
             ine = false; 
 			c("ine "+e);  
@@ -369,6 +437,10 @@ for(i in b) {
 		}
 		if(ine) {
 			e = e + b[i];
+			if(e == "<div") {
+				parsingdiv = true;
+				c(e+" "+parsingdiv);
+			}
 			c("E "+e);
 		}
 		
@@ -376,8 +448,11 @@ for(i in b) {
 			intag = false;
 			c("Intag is off");
 			c(object.paragraph_indent+", "+inend + ", " + e);
-			if((e.indexOf('div') > -1 || e.indexOf('br') > -1) && e.length && inend && object.paragraph_indent != undefined) { /** OR if some other type of break is detected*/
+			if((e.indexOf('div') > -1 || e.indexOf('br') > -1) && e.length && inend && object.paragraph_indent != undefined && !parsingelement) { /** OR if some other type of break is detected*/
 				out = out + output('', '', object.paragraph_indent);
+			}
+			if(e.indexOf('br') > -1) {
+				out = out + output('','','<br>');	
 			}
 			if(inend) 
 				 e = "";
@@ -442,7 +517,8 @@ for(i in b) {
 		//$('.pasteContent').append(ca[j]+" ");	
 		add_to_page(d[j]+' ', undefined, undefined, col_count);
 	}
-	$('.build').html($('.build').html().replace(/===/g,' ')/*.replace(/<span[^<]+?>/g, "")*/);
+	$('.build').html($('.build').html().replace(/===/g,' ').replace(/~~~/g, ' ')/*.replace(/<span[^<]+?>/g, "")*/);
+	$('.build > div > span').css('border', 'none');
 	/*if(column > 0) {
 		$('.pagebody').css('column-count', column).css('-webkit-column-count', column).css('-moz-column-count');	
 	}*/
