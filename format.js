@@ -178,13 +178,13 @@ function post_toolbar(tools) {
 		var tool_pretty = tools[i];
 		switch(tool_pretty) {
 			case "heading1":
-				tool_pretty = "Heading-1";
+				tool_pretty = "H1";
 			break;
 			case "heading2":
-				tool_pretty = "Heading-2";
+				tool_pretty = "H2";
 			break;
 			case "heading3":
-				tool_pretty = "Heading-3";
+				tool_pretty = "H3";
 			break;
 			case "image":
 				tool_pretty = "Image";
@@ -226,7 +226,7 @@ function post_toolbar(tools) {
 				var imid = $('.img').length;
 				contentAddSpan({node:"div", class:"img inline img"+imid});
 				imgDetails(imid);
-				formatHovertag("img", "Image Details", "imgDetails('+$(this).attr('data-id')+');");
+				formatHovertag("img", "Image Details", "'imgDetails('+$(this).attr('data-id')+');'");
 			break;
 		}
 	});

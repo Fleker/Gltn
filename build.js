@@ -16,7 +16,7 @@ function continueBuild() {
 	//Duplicate paper
 	var cont = $('.content_textarea').html();
 	$('.draft').html(cont);
-	
+	$('.draft span').css('border','none');
 	
 	//To {format}.js
 	try {
@@ -229,7 +229,7 @@ function headingFormatted(spec,input,number) {
 }
 function imageFormatted(spec,input,fig) {
 	var string = spec;	
-	string = string.replace(/IMG/g, "<img src='"+input.attr('data-src')+"' style='width:100%'>");
+	string = string.replace(/IMG/g, "<img src='"+input.attr('data-src')+"' style='width:100%'></img>");
 	string = string.replace(/TEXT/g, input.attr('data-des'));
 	string = string.replace(/FIGN/g, fig);
 	return string;
@@ -306,6 +306,12 @@ function post_content_formatting(object) {
 		for(i=0;i<object.imgstyle.length;i+=2) {
 			$(this).css(object.imgstyle[i], object.imgstyle[i+1]);	
 		}
+	});
+	
+	//Tables 
+	$('.draft .table').each(function() {
+		//use XML to encode table into rows and columns? Place into data-table and then decode in a preview in the div.
+		$(this).html(eval(object.table+";x("+5+","+5+","+5+");"));
 	});
 	
 	//Now all formatting is complete. We shall port the content over to the actual paper
@@ -414,12 +420,12 @@ for(i in b) {
         }
 		c("<"+b[b1]+" !  "+b[ (parseInt(i)+2) ]+"=?"+e.substr(1,1)+";"+parsingdiv);
     }
-    if(b[i] == " " && e.substr(0,4) != "<div") {
+    if(b[i] == " ") {
         if(ine) {
             ine = false; 
 			c("ine "+e);  
         }
-        if(!intag) {
+        if(!intag  && e.substr(0,4) != "<div") {
             out = out + output(e, tag, w);
             //$('body').append(tag+",<br>"+e+"; "+w+"<br>");
 			c("___"+tag+", "+e+"; "+w);
@@ -448,7 +454,7 @@ for(i in b) {
 			intag = false;
 			c("Intag is off");
 			c(object.paragraph_indent+", "+inend + ", " + e);
-			if((e.indexOf('div') > -1 || e.indexOf('br') > -1) && e.length && inend && object.paragraph_indent != undefined && !parsingelement) { /** OR if some other type of break is detected*/
+			if((e.indexOf('div') > -1 || e.indexOf('br') > -1) && e.length && inend && object.paragraph_indent != undefined && !parsingdiv) { /** OR if some other type of break is detected*/
 				out = out + output('', '', object.paragraph_indent);
 			}
 			if(e.indexOf('br') > -1) {
@@ -518,7 +524,6 @@ for(i in b) {
 		add_to_page(d[j]+' ', undefined, undefined, col_count);
 	}
 	$('.build').html($('.build').html().replace(/===/g,' ').replace(/~~~/g, ' ')/*.replace(/<span[^<]+?>/g, "")*/);
-	$('.build > div > span').css('border', 'none');
 	/*if(column > 0) {
 		$('.pagebody').css('column-count', column).css('-webkit-column-count', column).css('-moz-column-count');	
 	}*/

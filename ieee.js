@@ -56,7 +56,11 @@ function onGetFormats() {
 		});
 	};
 	obj.img = "IMG<br>Fig. FIGN. TEXT";
-	obj.imgstyle = new Array('width','100%','text-align','center','font-size','8pt');
+	obj.imgstyle = new Array('width','100%','text-align','center','font-size','8pt','display','block');
+	obj.table = function x(table,row,col) {
+		
+		return 0;
+	};
 	//obj.table = 
 	post_content_formatting(obj);
 	enable_format("font pt",10);
