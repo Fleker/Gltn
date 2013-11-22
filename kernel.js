@@ -64,7 +64,7 @@ window.onload = function() {
 content_textarea_var = null;
 function postRange(origin) {
 	var sel = rangy.getSelection();
-	//console.warn(origin);
+//	console.error(origin);
 	content_textarea_var = sel.rangeCount ? sel.getRangeAt(0) : null;	
 	return sel.rangeCount ? sel.getRangeAt(0) : null;	
 }
@@ -330,10 +330,20 @@ function formatHovertag(classname, textcode, action, recall) {
 	
 	$('.'+classname).each(function(index, element) {
         $(this).on('mouseenter', function() {
+			try {
 			console.log(textcode, action);
-			console.log(eval("'"+textcode+"'"));
-			console.log( eval("'"+action+'"'));
-			displayHovertag(eval("'"+textcode+"'"), {ypos: $(this).offset().top}, eval("'"+action+"'"));
+			console.log('"'+eval(textcode)+'"');
+			} catch(e) {
+				textcode = "'Item'";	
+				console.error(e);
+			}
+			try {
+			console.log('"'+eval(action)+'"');
+			} catch(e) {
+				console.error(e);
+				action = null;	
+			}
+			displayHovertag(eval(textcode), {ypos: $(this).offset().top}, '"'+eval(action)+'"');
 			//hovertagRegistry(\'displayHovertag(eval(textcode), {ypos: $(this).offset().top}, eval(action));\');
 		});
     });
@@ -349,7 +359,11 @@ function hovertagRegistry(c, t, a) {
 function recallHovertags() {
 	for(i in hovertagRegistrar) {
 		if(hovertagRegistrar[i].textcode != undefined)
-			eval("formatHovertag('"+hovertagRegistrar[i].classname+"', '"+hovertagRegistrar[i].textcode+"', '"+hovertagRegistrar[i].action+"', true)"); 
+			try {
+			eval('formatHovertag("'+hovertagRegistrar[i].classname+'", "'+hovertagRegistrar[i].textcode+'", "'+hovertagRegistrar[i].action+'", true)'); 
+			} catch(e) {
+			eval("formatHovertag('"+hovertagRegistrar[i].classname+"', 'Item', null, true)"); 	
+			}
 		else 
 			eval(hovertagRegistrar[i].classname);
 	}
@@ -418,9 +432,9 @@ function contentAddSpan(t) {
 		/*var range = getRange();
 		*/
 		
-		rangy.getSelection().setSingleRange(range);
+		//rangy.getSelection().setSingleRange(range);
 		//Move forward one to keep typing.
-		moveCarat("character", -2-3);
+		//moveCarat("character", -2-3);
 		contentValidate();
 		
 	}
@@ -543,7 +557,7 @@ function displayHovertag(text, data, fnc) {
 	else
 		ypos = ypos - scrollY;
 	if(text == undefined)
-		text = "object";
+		text = "Object";
 		
 	if(mousex-($('.hovertag').width()/2) < 0)
 		xpos = 0;
@@ -558,16 +572,18 @@ function displayHovertag(text, data, fnc) {
 	$('.hovertag').on('mouseleave', function() {
 		hideHovertag();
 	});
+	$('.hovertag').on('click', function() {
+		if(fnc != undefined) {
+			eval(fnc.substring(1,fnc.length-1));
+			console.warn(fnc);
+		}
+	});
+	
 	if(fnc != undefined) {
-		$('.hovertag').on('click', function() {
-			eval(fnc);
-		});
-		console.warn(fnc);
 		$('.hovertag').css('cursor', 'pointer');
 	} else {
 		$('.hovertag').css('cursor', 'initial');
-	}
-				
+	}	
 }
 function hideHovertag() {
 	$('.hovertag').animate({
@@ -664,20 +680,21 @@ function contentValidate() {
 	}	
 }
 /** KEY EVENTS **/
+
 document.onkeydown = function(e) {
 	//e.ctrlKey - altKey shiftKey metaKey
 	//TODO - Add key events to {format}.js and panel.js so panels can receive the same events natively; Also this means moving events to respective functions; Doing so would complete the character panel code
 	
 	//Word counting - Place in Space only?
-	postWordCount();
+		postWordCount();
+	//Check beginning and ends of div
+		contentValidate();
+		//saveFile();
 	switch(e.keyCode) {
 		case 32: /* Space */
 			//Word filtering
 			//Save
-			saveFile();
-			//Check beginning and ends of div
-			contentValidate();
-			
+			//saveFile();			
 		break;
 		case 67: /*C*/
 			if(e.altKey) {
@@ -702,15 +719,16 @@ function postWordCount() {
 	//Right now, this only does the words in the content_textarea; it should get the build count
 	//Get input - Right now the text
 	var a = $('.content_textarea').text();
-	var char = a.length;
+	var char = a.replace(/ /g, '').length;
 	var word = 0;
 	if(char == 0)
 		return;
-	for(i in a.split(' ')) {
+	/*for(i in a.split(' ')) {
 		if(a[i] != ' ' && a[i].length) {
 			word++;	
 		}
-	}
+	}*/
+	word = a.split(' ').length;
 	//Interpret
 		//Get min/max inputs
 	$('.content_character').css('width', '100px').html('<div style="height:3px;" class="content_character_bar"></div><span class="content_character_mark">'+char+'c</span>');
@@ -773,14 +791,12 @@ function imgDetails(pid) {
 	ht += "&emsp;Description: <input id='image_des' style='width:75%'><br>";
 	ht += "<button id='image_save'>Save</button><div style='margin-left:50px' id='image_preview'></div>";
 	ht += "&emsp;<input type='hidden' id='image_pid' value='"+pid+"'>";
-	//console.log("pid" + pid);
 	fnc = function x() {
 		var pid = $('#image_pid').val();
 		if($('.img'+pid).attr('data-src') != undefined) {
 			$('#image_url').val($('.img'+pid).attr('data-src'));
 			$('#image_des').val($('.img'+pid).attr('data-des'));
-			previewImg();
-			//$('#image_preview').html('<img src="'+$('.img'+pid).attr('src')+'">');	
+			previewImg();	
 		}
 		function previewImg() {
 			var url = $('#image_url').val()
@@ -800,3 +816,131 @@ function imgDetails(pid) {
 	};
 	initiatePopup({title:"Image Details", bordercolor:'#B54E7C', ht: ht, fnc: fnc});
 }
+function tableDetails(tableid) {
+	var ht = "&emsp;Title: <input id='table_name'>&emsp;Col:<input type='number' style='width:5em' id='table_c'>&nbsp;&nbsp;Row:<input type='number' style='width:5em' id='table_r'><br><button id='table_save'>Save</button><table id='tablep' style='margin-left:30px'></table>"
+	ht += "<input type='hidden' id='tableid' value='"+tableid+"'>";
+	fnc = function x() {
+		var r = 1;
+		var c = 1;
+		var data = new Array();
+		var datax = '';
+		var id = $('#tableid').val();
+		$('.table'+id).attr('data-id', id);
+		if($('.table'+id).attr('data-xml') != undefined) {
+			$('#table_name').val($('.table'+id).attr('data-title'));
+			$('#table_r').val($('.table'+id).attr('data-row'));
+			$('#table_c').val($('.table'+id).attr('data-col'));
+			datax = $('.table'+id).attr('data-xml');
+			restore();	
+		}
+		$('#table_r, #table_c').on('input', function() {
+			r = $('#table_r').val();
+			c = $('#table_c').val();
+			if(r > 0 && c > 0)
+				preview();
+			else
+				$('#tablep').html('Please change table dimensions.');
+		});
+		$('#table_save').on('click', function() {
+			save();
+		});
+		
+		function preview() {
+			out = '<table style="width:90%">';
+			xml = '<table>';
+			for(i=0;i<r;i++) {
+				out += '<tr>';
+				xml += '<row>';
+				for(j=0;j<c;j++) {
+					if(i == 0 || j == 0)
+						var bg = '#ddd';
+					else
+						var bg = '#fff';
+					try {
+						if(r == 1 && c == 1)
+							value = data['row']['cell'];
+						else if(r == 1)
+							value = data['row']['cell'][j];
+						else
+							value = data['row'][i]['cell'][j];
+					} catch(e) {
+						value = ''	
+					}
+					if($('#tablecell_'+i+'_'+j).html() != undefined && $('#tablecell_'+i+'_'+j).html().length > 0)
+						value = $('#tablecell_'+i+'_'+j).html();
+					if(value == undefined)
+						value = " ";
+					out += '<td class="tablecell" id="tablecell_'+i+'_'+j+'" contenteditable style="background-color:'+bg+';min-width:5em;">'+value+'</td>';
+					xml += '<cell>'+value+'</cell>';	
+				}
+				xml += '</row>';
+				out += '</tr>';
+			}
+			out += '</table>'
+			xml += '</table>'
+			$('#tablep').html(out);	
+			datax = xml;
+		}
+		$('.tablecell').on('input', function() {
+			preview();
+		});
+		function save() {
+			restore();
+			$('.table'+id).attr('data-xml', datax);
+			$('.table'+id).attr('data-row', r);
+			$('.table'+id).attr('data-col', c);
+			var title = $('#table_name').val();
+			if(title.length == 0)
+				title = " ";
+			$('.table'+id).attr('data-title', title);
+			$('.table'+id).css('background-color', '#555');
+			closePopup();
+		}
+		function restore() {
+			data = $.xml2json(datax);
+			preview();
+		}
+	};
+	initiatePopup({title:"Table Editor", bordercolor:'#111', ht: ht, fnc: fnc});
+	
+}
+/*** HOLORIBBON ***/
+/*newRibbon('.header', {
+       'File': new Array(
+			   {'text': 'Back', 'img': '', 'action': 'returnHome();'},
+               {'text': 'Download', 'img': '', 'action': "convertToPreview();pdf.save(o.title+'.pdf');"}
+           
+       ),
+	   'View': new Array(
+			   {'text': 'Edit', 'img': '', 'action': 'convertToInput()'},
+               {'text': 'View XML', 'img': '', 'action': 'convertToXML()'},
+			   {'text': 'Preview', 'img': '', 'action': 'convertToPreview()'},
+			   {'text': 'Print', 'img': '', 'action': 'print();'}
+
+		),
+       'Options': new Array(
+                {'group': 'Words', 'value': 'Min: <input type="number" id="count_words_min" value="0" oninput="wordCount()" min="0" class="countinput"><br>Max: <input type="number" id="count_words_max" value="0" oninput="wordCount()" min="0" class="countinput">'},
+                {'group': 'Timer', 'value': 'Minutes: <input type="number" id="timer_minutes" value="0" min="0">'}
+           
+       ),
+	   'Panels': new Array (
+			   {'text': 'Citations', 'img': '', 'action': 'panelCitation()'},
+			   {'text': 'Ideas', 'img': '', 'action': 'panelIdea()'}
+	   )
+    });*/
+function setHeader() {
+	newRibbon('.header', {
+		Home: new Array(
+			{group: '', value: '<font size="4" id="temp_header" >Welcome to Gluten!</font><br><button onclick="introJsStart();window.introdisabled = true;">Start the Tour!</button> '}
+		),
+		File: new Array(
+			{text: 'Build', img: '<span style="font-size:18pt">B</span>', action: "startBuild();setTimeout('exitintro();', 1000);"},
+			{text: 'Export', img: '<span style="font-size:18pt">E</span>', action: "exportFile();"}
+		),
+		Panels: new Array(
+			{text: 'Citations', img: '<span style="font-size:18pt">C</span>', action: "runPanel('main_Citation');"},
+			{text: 'Ideas', img: '<span style="font-size:18pt">I</span>', action: "runPanel('main_Idea');"}
+		)
+	});
+}
+setTimeout("setHeader()",100);

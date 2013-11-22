@@ -20,9 +20,6 @@ document.ready = function() {
 
 function saveFile() {
 	fileid = $('#file_name').val();
-	$('.content_save').animate({
-		opacity: 0.01
-	},100);
 	obj = {};
 	obj.citation = citation;
 	obj.citationi = citationi;
@@ -53,9 +50,7 @@ function saveFile() {
 	xo = json2xml(o, "");
 	localStorage[fileid] = xo;
 	localStorage[fileid+"_c"] = content;
-	$('.content_save').animate({
-		opacity: 1
-	},100);
+	
 }
 docformat = '';
 function restoreFile() {

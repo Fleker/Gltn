@@ -63,11 +63,12 @@ function exitBuild() {
 	$('.header').show(1000);
 	$('.body').show(500);
 	$('.build').hide(350);
+	setTimeout("ribbonSwitch(ribbon_index, false);",1025);
 }
 //Integration into format.js files
 function grabMetadata(i) {
 	o = window.metadata[i];
-	console.log(i);
+//	console.log(i);
 	o.value = $('#format_item_'+i).val();
 	return o;	
 }
@@ -234,11 +235,18 @@ function imageFormatted(spec,input,fig) {
 	string = string.replace(/FIGN/g, fig);
 	return string;
 }
+function tableFormatted(input,fig,title) {
+	var string = input;
+	string = string.replace(/FIGN/g, fig);
+	string = string.replace(/TEXT%sc/g, smallcaps(title));
+	string = string.replace(/TEXT/g, title);
+	return string;
+}
 function smallcaps(inp) {
 	//console.warn(inp);
 	var out = "";
 	for(i=0;i<inp.length;i++) {
-		out += inp[i].replace(/[a-z]/g, "<span style='font-size:"+(nptfont-3)+"pt'>"+inp[i]+"</span>");	
+		out += inp[i].replace(/[a-z]/g, "<span style='font-size:"+(nptfont-3)+"pt'>"+inp[i].toUpperCase()+"</span>");	
 	}
 	return out;
 }
@@ -310,8 +318,16 @@ function post_content_formatting(object) {
 	
 	//Tables 
 	$('.draft .table').each(function() {
+		$(this).css('background-color','white');
+		//var table = $.xml2json($(this).attr('data-xml'));
+		table = $(this).attr('data-xml');
+		var r = $(this).attr('data-row');
+		var c = $(this).attr('data-col');
 		//use XML to encode table into rows and columns? Place into data-table and then decode in a preview in the div.
-		$(this).html(eval(object.table+";x("+5+","+5+","+5+");"));
+		console.log("x("+table+","+r+","+c+");");
+		$(this).html(eval(object.table+';x("'+table+'",'+r+','+c+');'));
+		$(this).attr('data-xml', "");
+		$(this).html(tableFormatted($(this).html(),$(this).attr('data-figure-number'),$(this).attr('data-title')));
 	});
 	
 	//Now all formatting is complete. We shall port the content over to the actual paper
@@ -406,10 +422,10 @@ for(i in b) {
             //$('body').append(tag+",<br>"+e+"; "+w+"<br>");
 			c(tag+", "+e+"; "+w+"  "+parsingdiv);
 			
-			 intag = true;
-             ine = true;
 			 inend = false;
 			 if(!parsingdiv) {
+				 intag = true;
+	             ine = true;
 				 c("Outputting from last tag");
 				 out = out + output(e,  tag, w);
 				 tag = "";

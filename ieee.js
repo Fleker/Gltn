@@ -33,6 +33,7 @@ function onInitToolbar() {
 
 function onStylePaper() {
 	enable_format("2 columns");	
+	enable_format("font pt", 10);
 }
 
 function onBuildFormat() {
@@ -55,11 +56,20 @@ function onGetFormats() {
 			i++;
 		});
 	};
-	obj.img = "IMG<br>Fig. FIGN. TEXT";
+	obj.img = "IMG Fig. FIGN. TEXT";
 	obj.imgstyle = new Array('width','100%','text-align','center','font-size','8pt','display','block');
 	obj.table = function x(table,row,col) {
-		
-		return 0;
+		table = $.xml2json(table);
+		out = "<br><span style='display:block;text-align:center'>"+smallcaps("Table")+" FIGN. TEXT%sc</span><table style='border-collapse:collapse;border:solid 1px black;width:100%;'>";
+		for(i in table) {
+			out += "<tr>"
+			for(j in table[i]) {
+				out += "<td style='border:solid 1px black'>"+table[i][j]['cell']+"</td>";	
+			}
+			out += "</tr>";
+		}
+		out += "</table>";
+		return out;
 	};
 	//obj.table = 
 	post_content_formatting(obj);

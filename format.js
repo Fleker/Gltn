@@ -93,10 +93,10 @@ function post_format() {
 						}
                 		});
 					}
-					postRange('click and select');
+					//postRange('click and select');
 			}
 			document.getElementsByClassName("content_textarea")[0].oninput = function() {
-				postRange('oninput');
+				//postRange('oninput');
 				saveFile();
 			}	
 			document.getElementsByClassName("content_textarea")[0].onkeyup = function() {
@@ -167,13 +167,14 @@ function post_format_mltext(m) {
 function post_format_content(m) {
 	var out = "";
 	out = "<div class='content toolbar'></div>";
-	out = out + "<div contenteditable='true' class='content content_textarea' onfocus='postRange()' onclick='postRange()' onmouseleave='/*hideHovertag()*/ '></div>";
+	out = out + "<div contenteditable='true' class='content content_textarea' onmouseleave='/*hideHovertag()*/ '></div>";
 	out = out + "<table class='content_wordcount'><tr><td class='content_word'></td><td class='content_character'></td><td class='content_save'>&emsp;saved</td></tr></table>";
 	return out;	
 }
 function post_toolbar(tools) {
 	out = "&emsp;<span class='toolbar_button' data-t='character' id='CHARACTERPANEL'>Character</span>&emsp;|&emsp;";
 	//TODO - Use labels to make prettier, maybe "new_toolbar/new_toolbar_item"
+	//TODO - Use JSON objects to enable more powerful, third-party tools
 	for(i=0;i<tools.length;i++) {
 		var tool_pretty = tools[i];
 		switch(tool_pretty) {
@@ -192,6 +193,9 @@ function post_toolbar(tools) {
 			case "citation":
 				tool_pretty = "Citation";
 			break;	
+			case "table":
+				tool_pretty = "Table";
+			break;
 		}
 		out = out + "<span class='toolbar_button' data-t='"+tools[i]+"'>"+tool_pretty+"</span>&emsp;|&emsp;";
 	}
@@ -226,7 +230,13 @@ function post_toolbar(tools) {
 				var imid = $('.img').length;
 				contentAddSpan({node:"div", class:"img inline img"+imid});
 				imgDetails(imid);
-				formatHovertag("img", "Image Details", "'imgDetails('+$(this).attr('data-id')+');'");
+				formatHovertag("img", "'Image Details'", "'imgDetails('+$(this).attr('data-id')+');'");
+			break;
+			case "table":
+			var tid = $('.table').length;
+				contentAddSpan({node:"div", class:"table inline table"+tid});
+				tableDetails(tid);
+				formatHovertag("table", "'Edit Table'", "'tableDetails('+$(this).attr('data-id')+');'");
 			break;
 		}
 	});
@@ -236,24 +246,32 @@ function post_toolbar(tools) {
 }
 window.fullscreenOn = false;
 /*$(window).resize(function () {*/
+toolbar_width = 0;
 function update_toolbar_style() {
-	if(window.fullscreenOn == false) {
-		tw = $('.toolbar').width();
-		$('.content_textarea').width(tw);
-		bh = window.innerHeight;
-		$('.content_textarea').height(2*bh/3);
-		$('.content_textarea').css('z-index', 0).css('position', 'inherit');
-		/*$('.content_textarea').animate({
-			top: -.1%,
-			left:-.1%;
-			width:100.2%;
-			height:100.2%;
-		});*/
-	} else {
-		$('.content_textarea').css('z-index', 3).css('position', 'fixed')/*.css('background-color', 'white')*/;
+	saveFile();
+	if(toolbar_width != $('.toolbar').width()) {
+		toolbar_width = $('.toolbar').width();
+		//console.log(toolbar_width+" ",$('.toolbar').width());
+		if(window.fullscreenOn == false) {
+			tw = $('.toolbar').width();
+			$('.content_textarea').width(tw);
+			bh = window.innerHeight;
+			$('.content_textarea').height(2*bh/3);
+			$('.content_textarea').css('z-index', 0).css('position', 'inherit');
+			/*$('.content_textarea').animate({
+				top: -.1%,
+				left:-.1%;
+				width:100.2%;
+				height:100.2%;
+			});*/
+		} else {
+			$('.content_textarea').css('z-index', 3).css('position', 'fixed')/*.css('background-color', 'white')*/;
+		}	
 		
+		//Update Header
+		ribbonSwitch(ribbon_index, true);
 	}
-	
+
 	//Use this for other dynamic styling stuff
 	
 	var sy = scrollY-110;

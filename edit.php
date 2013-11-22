@@ -14,6 +14,8 @@
 <script src="popup.js"></script>
 <script src="file.js"></script>
 <script src="build.js"></script>
+<script src="hammer.js"></script>
+<script src="holoribbon.js"></script>
 <script src="kernel.js"></script>
 
 <!--<script src="apa.js"></script>-->
@@ -28,8 +30,7 @@
 <body>
 
 <div class="header" style="text-align:center">
-<font size="4" id="temp_header" >Welcome to Gluten!</font><br>
-<button onclick="introJsStart();window.introdisabled = true;">Start the Tour!</button> 
+
 </div>
 
 <div class="body">
@@ -43,7 +44,7 @@
             <div id="file_metadata">
             
             </div>
-            <div class="content_buttons" style="display:block"> 
+            <div class="content_buttons" style="display:none"> 
                 <button onclick="alert(getRange().collapsed)">Is Collapsed?</button>
                 <button onclick="rangy.getSelection().collapseToStart()">Collapse Range</button>
                 <button onclick="alert(rangy.getSelection().toHtml())">Return HTML</button>
