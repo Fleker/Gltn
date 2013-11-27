@@ -60,11 +60,12 @@ function onGetFormats() {
 	obj.imgstyle = new Array('width','100%','text-align','center','font-size','8pt','display','block');
 	obj.table = function x(table,row,col) {
 		table = $.xml2json(table);
+		console.log(table);
 		out = "<br><span style='display:block;text-align:center'>"+smallcaps("Table")+" FIGN. TEXT%sc</span><table style='border-collapse:collapse;border:solid 1px black;width:100%;'>";
-		for(i in table) {
-			out += "<tr>"
-			for(j in table[i]) {
-				out += "<td style='border:solid 1px black'>"+table[i][j]['cell']+"</td>";	
+		for(i=0;i<row;i++) {
+			out += "<tr>";
+			for(j=0;j<col;j++) {
+				out += "<td style='border:solid 1px black'>"+table['row'][i]['cell'][j]+"</td>";	
 			}
 			out += "</tr>";
 		}

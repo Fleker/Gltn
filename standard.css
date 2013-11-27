@@ -1,10 +1,25 @@
 @charset "utf-8";
-/* CSS Document */
+@import url(http://weloveiconfonts.com/api/?family=fontawesome);
+
+/* fontawesome */
+[class*="fontawesome-"]:before {
+  font-family: 'FontAwesome', sans-serif;
+}
+
 body {
 	background-color: #ddd;
 	color: #000;
 	overflow-x:hidden;
 }
+.body {
+	padding-top:100px;	
+}
+.header {
+	position:fixed;
+	background-color:#ddd;
+	top:0px;
+	border-bottom:solid 1px #bbb;
+}	
 span, div, body {
 	column-span: all;
 	-webkit-column-span:all;
@@ -23,8 +38,8 @@ span, div, body {
 	padding-left: 10px;
 	padding-top: 1em;
 	
-	-webkit-box-shadow:  0px 0px 3px 1px rgba(0, 0, 0, 1);
-	box-shadow:  0px 0px 3px 1px rgba(0, 0, 0, 1);
+	-webkit-box-shadow:  0px 0px 0px 1px rgba(0, 0, 0, 1);
+	box-shadow:  0px 0px 0px 1px rgba(0, 0, 0, 1);
 }
 #panel_plugin {
 	width: 0%;	

@@ -53,8 +53,26 @@ window.onload = function() {
                     	//id: "citation"+0,						
                     }
              });
-			 surroundItalics = rangy.createCssClassApplier("", {
+			 window.surroundItalics = rangy.createCssClassApplier("", {
                     elementTagName: "i",
+                    elementProperties: {
+                    	//id: "citation"+0,						
+                    }
+             });
+			 window.surroundBold = rangy.createCssClassApplier("", {
+                    elementTagName: "b",
+                    elementProperties: {
+                    	//id: "citation"+0,						
+                    }
+             });
+			 window.surroundUnder = rangy.createCssClassApplier("", {
+                    elementTagName: "u",
+                    elementProperties: {
+                    	//id: "citation"+0,						
+                    }
+             });
+			 window.surroundStrike = rangy.createCssClassApplier("", {
+                    elementTagName: "del",
                     elementProperties: {
                     	//id: "citation"+0,						
                     }
@@ -71,7 +89,7 @@ function postRange(origin) {
 function getRange() {
 		//gets first range
 		if(content_textarea_var) {
-			//console.warn('gr-0');
+			console.warn('gr-0');
 			moveCarat("word", 1);
 			return content_textarea_var;
 		}
@@ -373,7 +391,15 @@ function toggleItalics() {
 	//instead of using the surroundContents function, this will use the CSS Toggle function. This function will allow an individual to remove an element just as easily as applying one.	
 	surroundItalics.toggleSelection();
 }
-
+function toggleBold() {
+	surroundBold.toggleSelection();
+}
+function toggleUnder() {
+	surroundUnder.toggleSelection();
+} 
+function toggleStrike() {
+	surroundStrike.toggleSelection();
+}
 function appendQuote() {
 	var range = getRange();
 	if (range) {
@@ -830,6 +856,8 @@ function tableDetails(tableid) {
 			$('#table_name').val($('.table'+id).attr('data-title'));
 			$('#table_r').val($('.table'+id).attr('data-row'));
 			$('#table_c').val($('.table'+id).attr('data-col'));
+			r = parseInt($('.table'+id).attr('data-row'));
+			c = parseInt($('.table'+id).attr('data-col'));
 			datax = $('.table'+id).attr('data-xml');
 			restore();	
 		}
@@ -852,6 +880,7 @@ function tableDetails(tableid) {
 				out += '<tr>';
 				xml += '<row>';
 				for(j=0;j<c;j++) {
+					//console.log(i+"x"+j,r,c);
 					if(i == 0 || j == 0)
 						var bg = '#ddd';
 					else
@@ -929,18 +958,32 @@ function tableDetails(tableid) {
 	   )
     });*/
 function setHeader() {
-	newRibbon('.header', {
+	window.holoribbon_std =  {
 		Home: new Array(
 			{group: '', value: '<font size="4" id="temp_header" >Welcome to Gluten!</font><br><button onclick="introJsStart();window.introdisabled = true;">Start the Tour!</button> '}
 		),
 		File: new Array(
-			{text: 'Build', img: '<span style="font-size:18pt">B</span>', action: "startBuild();setTimeout('exitintro();', 1000);"},
-			{text: 'Export', img: '<span style="font-size:18pt">E</span>', action: "exportFile();"}
+			{text: 'Build', img: '<span style="font-size:18pt" class="fontawesome-file"></span>', action: "startBuild();setTimeout('exitintro();', 1000);", key:"Ctrl+Shift+B"},
+			{text: 'Export', img: '<span style="font-size:18pt" class="fontawesome-share-alt"></span>', action: "exportFile();"}
 		),
 		Panels: new Array(
-			{text: 'Citations', img: '<span style="font-size:18pt">C</span>', action: "runPanel('main_Citation');"},
-			{text: 'Ideas', img: '<span style="font-size:18pt">I</span>', action: "runPanel('main_Idea');"}
+			{text: 'Citations', img: '<span style="font-size:18pt" class="fontawesome-book"></span>', action: "runPanel('main_Citation');"},
+			{text: 'Ideas', img: '<span style="font-size:18pt" class="fontawesome-lightbulb"></span>', action: "runPanel('main_Idea');"}
 		)
-	});
+	};
+	newRibbon('.header', holoribbon_std);
+	ribbonSwitch(0,false);
+}
+function appendHoloSelection() {
+	var selection = {
+		Selection: new Array(
+			{text: '', img: '<span style="font-size:18pt" class="fontawesome-bold"></span>', action: "toggleBold()"},
+			{text: '', img: '<span style="font-size:18pt" class="fontawesome-italic"></span>', action: "toggleItalics()"},
+			{text: '', img: '<span style="font-size:18pt" class="fontawesome-underline"></span>', action: "toggleUnder()"},
+			{text: '', img: '<span style="font-size:18pt" class="fontawesome-strikethrough"></span>', action: "toggleStrike()"}
+		)
+	};
+	newRibbon('.header', $.extend({}, holoribbon_std, selection));
+	ribbonSwitch(ribbon_index, false);
 }
 setTimeout("setHeader()",100);

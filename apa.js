@@ -15,7 +15,7 @@ function onInitFormat() {
 }
 
 function onInitToolbar() {
-	var toolbar = ["citation", "heading1", "heading2", "heading3", "image", "longquote", "closetag"];	
+	var toolbar = ["citation", "heading1", "heading2", "heading3", "image"];	
 	post_toolbar(toolbar);
 }
 function onStylePaper() {
@@ -44,6 +44,8 @@ function onGetFormats() {
 	obj.heading2 = '<div style="font-style:italic">LIST1. TEXT</div>';
 	//obj.heading3 = '<div>LISTI. TEXT</div>';
 	obj.heading3 = '<b style="color:blue">LISTa: TEXT</b><br>';
+	obj.img = "IMG";
+	obj.imgstyle = "";
 	obj.paragraph_indent = "&emsp;";
 	post_content_formatting(obj);	
 }
@@ -52,8 +54,20 @@ function onBuildBibliography() {
 		add_to_page(centerText('Works Cited'));
 	
 	obj = {};
-	obj.def = "AUTHOR_LAST, AUTHOR_FIRST_I. (YEAR). TITLE. (Ed EDITION., Vol. VOLUME, p. PAGE). PUBCITY: PUBCOMP. DOI: URL";
+	cob = {};
+	cob.author = "AUTHOR_LAST, AUTHOR_FIRST_I.";
+	cob.year = "(YEAR).";
+	cob.title = "TITLE.";
+	cob.edition = "Ed EDITION.,";
+	cob.volume = "Vol. VOLUME,";
+	cob.page = "p. PAGE";
+	cob.pubcity = "PUBCITY: ";
+	cob.pubcomp = "PUBCOMP.";
+	cob.doi = "DOI:";
+	cob.url = "URL";
+	obj.def = "cAUTHOR cYEAR cTITLE (cEDITION cVOLUME cPAGE). cPUBCITY cPUBCOMP cDOI cURL";
+	//obj.def = "AUTHOR_LAST, AUTHOR_FIRST_I. (YEAR). TITLE. (Ed EDITION., Vol. VOLUME, p. PAGE). PUBCITY: PUBCOMP. DOI: URL";
 	obj.style = "text-indent:-.5in;margin-left:.5in";
-	post_bibliography(obj);		
+	post_bibliography(obj, cob);		
 }
 

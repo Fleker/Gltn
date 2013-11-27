@@ -113,7 +113,7 @@ LOREM IPS/um o
 <div class="hovertag">
 
 </div>
-<div class="fullscreenui" style="display:none; opacity:.1" onMouseOver="$('.fullscreenui').css('background-color', fsuo).css('opacity',1)" onMouseOut="$('.fullscreenui').css('background-color', fsuo).css('opacity', '.1');"><div class="fullscreenexit" onclick="normalscreen()"><br>X<br><br><br></div><div class="fullscreennight" onclick="nightscreen()"><br>-O-<br><br><br></div> <div class="fullscreencount"></div></div>
+<div class="fullscreenui" style="display:none; opacity:.1" onMouseOver="$('.fullscreenui').css('background-color', fsuo).css('opacity',1)" onMouseOut="$('.fullscreenui').css('background-color', fsuo).css('opacity', '.1');"><div class="fullscreenexit" onclick="normalscreen()"><br>X<br><br><br></div><div class="fullscreennight fontawesome-adjust" onclick="nightscreen()"><br><br><br><br></div> <div class="fullscreencount"></div></div>
 
 <div class="footer">
 

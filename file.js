@@ -76,6 +76,8 @@ function restoreFile() {
 			
 		} else if(x.citation.length == undefined && x.citation != undefined) {
 			citation.push(x.citation);
+		} else if(x.citation.length == 1) {
+			citation.push(x.citation);
 		} else if(x.citation.length > 1) {
 			for(i in x.citation) {
 					citation.push(x.citation[i]);	

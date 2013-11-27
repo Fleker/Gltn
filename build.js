@@ -5,7 +5,7 @@ function startBuild() {
 	//$('.page').css('width','8.5in');
 	window.section_name = "";
 	$('#searching').val('');
-	$('.build').html('<button onclick="exitBuild()" class="noprint">Return to Editor</button>');
+	$('.build').html('<button onclick="exitBuild()" class="noprint">Return to Editor</button><button onclick="window.print()" class="noprint fontawesome-print">&nbsp;Print</button>');
 		//$('.build_progress').css('display', 'block').css('position', 'fixed').css('width', '50%').css('height', '50%').css('top','25%').css('left','25%').css('background-color', 'rgba(0,0,0,0.3)').css('font-size','16pt').css('margin-top','10%');
 	initiatePopup({title:"Build Progress",bordercolor:"rgb(44, 145, 16)",ht:"<div class='build_progress'></div>"});
 	updateBuildProgress('Initiating Build...');
@@ -198,10 +198,48 @@ function lcr_split(left, center, right) {
 }
 
 //Content Formatting
-function citationFormatted(string, i, id, page) {
+function citationFormatted(string, i, id, page, cob) {
 	//Insert a citation content_formatted object and return it with properties filled in
 	//console.log(string, id);
 	//console.warn(citation[id]);
+	if(cob != undefined) {
+		if(citation[id].AuthorFirst.length || citation[id].AuthorLast.length)
+			string = string.replace(/cAUTHOR/, cob.author.replace(/AUTHOR_FIRST/, citation[id].AuthorFirst).replace(/AUTHOR_FIRST_I/, citation[id].AuthorFirst.substr(0,1)).replace(/AUTHOR_LAST/, citation[id].AuthorLast));
+		else
+			string = string.replace(/cAUTHOR/g, "");
+		if(citation[id].Edition.length)
+			string = string.replace(/cEDITION/, cob.edition.replace(/EDITION/, citation[id].Edition));
+		else
+			string = string.replace(/cEDITION/g, "");
+		if(citation[id].City.length)
+			string = string.replace(/cPUBCITY/, cob.pubcity.replace(/PUBCITY/, citation[id].City));
+		else
+			string = string.replace(/cPUBCITY/g, "");
+		if(citation[id].Publisher.length)
+			string = string.replace(/cPUBCOMP/, cob.pubcomp.replace(/PUBCOMP/, citation[id].Publisher));
+		else
+			string = string.replace(/cPUBCOMP/g, "");
+		if(citation[id].Title.length)
+			string = string.replace(/cTITLE/, cob.title.replace(/TITLE/, citation[id].Title));
+		else
+			string = string.replace(/cTITLE/g, "");
+		if(citation[id].Volume.length)
+			string = string.replace(/cVOLUME/g, cob.volume.replace(/VOLUME/, citation[id].Volume));
+		else
+			string = string.replace(/cVOLUME/g, "");
+		if(citation[id].Url.length)
+			string = string.replace(/cURL/g, cob.url.replace(/URL/g, citation[id].Url));
+		else
+			string = string.replace(/cURL/g, "");
+		if(citation[id].Year.length)
+			string = string.replace(/cYEAR/g, cob.year.replace(/YEAR/g, citation[id].Year));
+		else
+			string = string.replace(/cYEAR/g, "");
+		if(page.length)
+			string = string.replace(/cPAGE/g, cob.page.replace(/PAGE/g, page));
+		else
+			string = string.replace(/cPAGE/g, "");
+	}
 	string = string.replace(/AUTHOR_FIRST_I/g, citation[id].AuthorFirst.substr(0,1));
 	string = string.replace(/AUTHOR_FIRST/g, citation[id].AuthorFirst);
 	string = string.replace(/AUTHOR_LAST/g, citation[id].AuthorLast);
@@ -268,12 +306,13 @@ function numToRoman(capy, number) {
 }
 function post_content_formatting(object) {
 	//Format Citations
-	$('.draft > .citation').each(function() {
+	$('.draft .citation').each(function() {
 		i = $(this).attr('data-i');
 		id = $(this).attr('data-id');
 		page = $(this).attr('data-page');
 		
 		//List various types of citations
+		console.log("Cid", id, citation[id]);
 		if(citation[id].Main == "on" && object.citation_main != undefined) {
 			$(this).html($(this).html()+" "+citationFormatted(object.citation_main, i, id, page));
 		} else {
@@ -357,7 +396,7 @@ function post_content_formatting(object) {
 	
 	/*** Replace output function so that it places every item into an array instead of just outputting ***/
 function c(s) {
-	console.log(s);	
+	//console.log(s);	
 	//s = s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 	//$('body').append(s+"<br>");
 }
@@ -544,7 +583,7 @@ for(i in b) {
 		$('.pagebody').css('column-count', column).css('-webkit-column-count', column).css('-moz-column-count');	
 	}*/
 }	
-function post_bibliography(object) {
+function post_bibliography(object, cob) {
 	//Get all citations, limit only to those used in the paper
 	citationSorted = new Array();
 	//for(i in citation) {
@@ -568,7 +607,7 @@ function post_bibliography(object) {
 		} else {
 			var f = findCitation(citationSorted[i]);
 			console.log("--"+f.id);
-			str = citationFormatted(object.def, f.i, f.id, f.page); 
+			str = citationFormatted(object.def, f.i, f.id, f.page, cob); 
 			//(findCitation(citationSorted[i]).id)
 		}
 				

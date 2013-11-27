@@ -1,6 +1,7 @@
 ribbonobj = {'index': 0};			
 ribbon_index = -1;				
 ribbon_count = 0;	
+ribbonsave = {};
 function newRibbon(element, ribbon) {
     var out = '<table class="ribbonhead" style="width:100%;text-align:center;"></table><div class="ribbonstreamer" style=""><div class="ribbonstreameritem" style="background-color:#09f;height:2px;"></div></div><div class="ribbonbody" style="text-align:center"></div>'
     $(element).html(out);
@@ -29,7 +30,9 @@ function newRibbon(element, ribbon) {
 			
             if(k.img != undefined) {
                 //standard button
-                out = out + '<td class="ribbonbutton" style="width:100px;" onclick="'+k.action+'"><div style="/*height:76px*/cursor:pointer;">' + k.img + '</div><br><div style="text-align:center;">' + k.text + '</div></td>';
+				if(k.key == undefined)
+					k.key = "";
+                out = out + '<td class="ribbonbutton" style="width:100px;" onclick="'+k.action+'"><div style="/*height:76px*/cursor:pointer;">' + k.img + '</div><div style="text-align:center;">' + k.text + '</div><span style="font-size:9pt">'+ k.key +'</span></td>';
             } 
             else if(k.group != undefined) {
                 //group button
@@ -44,7 +47,7 @@ function newRibbon(element, ribbon) {
 	ribbonGesture();
 	$('.ribbongroup').css('margin-left','102%').css('display', 'inline-table').css('opacity', 0);
 	ribbonobj.index = -1;
-	ribbonSwitch(0,false);
+	//ribbonSwitch(0,false);
 }
 function ribbonSwitch(index, bool) {
 	ribbon_index = index;

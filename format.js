@@ -196,10 +196,16 @@ function post_toolbar(tools) {
 			case "table":
 				tool_pretty = "Table";
 			break;
+			case "bold":
+				tool_pretty = "<button class='fontawesome-bold'></button>";
+			break;
+			case "italics":
+				tool_pretty = "<button class='fontawesome-italics'></button>";
+			break;
 		}
 		out = out + "<span class='toolbar_button' data-t='"+tools[i]+"'>"+tool_pretty+"</span>&emsp;|&emsp;";
 	}
-	out = out + "<span class='toolbar_button' data-t='fullscreen'>[^]</span>&emsp;|&emsp;";
+	out = out + "<span class='toolbar_button fontawesome-resize-full' data-t='fullscreen'></span>&emsp;|&emsp;";
 	
 	$('.toolbar').html(out);
 	
@@ -211,7 +217,9 @@ function post_toolbar(tools) {
 			case "fullscreen":
 				fullscreen();
 			break;
-			
+			case "citation":
+				initiateCitationEditor();
+			break;
 			case "heading1":
 				contentAddSpan({node:"span", class:"heading1 heading"});
 				formatHovertag("heading1", "'Heading-1'", 'null');
@@ -238,6 +246,13 @@ function post_toolbar(tools) {
 				tableDetails(tid);
 				formatHovertag("table", "'Edit Table'", "'tableDetails('+$(this).attr('data-id')+');'");
 			break;
+			case "bold":
+				console.warn("bold");
+				toggleBold();	
+			break;
+			case "italics":
+				toggleItalics();
+			break;
 		}
 	});
 	
@@ -249,6 +264,9 @@ window.fullscreenOn = false;
 toolbar_width = 0;
 function update_toolbar_style() {
 	saveFile();
+	/*if(getRange().collapsed == false) {
+		appendHoloSelection();	
+	}*/
 	if(toolbar_width != $('.toolbar').width()) {
 		toolbar_width = $('.toolbar').width();
 		//console.log(toolbar_width+" ",$('.toolbar').width());
