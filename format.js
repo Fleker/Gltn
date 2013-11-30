@@ -33,6 +33,7 @@ function new_format_block() {
 function new_format_nl() {
 	new_format_item("nl");
 }
+window.annotated_bib = false;
 function set_up_format(name, property) {
 	switch(name) {
 		case 'word count':
@@ -43,6 +44,9 @@ function set_up_format(name, property) {
 			min_char = property.min;
 			max_char = property.max;
 		break;	
+		case 'annotated bilbiography':
+			window.annotated_bib = true;
+		break;
 	}
 }
 function post_format() {
@@ -59,9 +63,11 @@ function post_format() {
 		} else if(type == "nl") {
 			out = out + "<br>";
 		} else if(type == "mltext") { 
-			out = out + post_format_mltext(window.metadata[i]);
+			out += post_format_mltext(window.metadata[i]);
 		} else if(type == "label") {
-			out = out + "<div style='font-weight:bold;border-bottom:solid 1px #888;width:90%;margin-left:5%;'>"+window.metadata[i].label+"</div>";
+			out += "<div style='font-weight:bold;border-bottom:solid 1px #888;width:90%;margin-left:5%;'>"+window.metadata[i].label+"</div>";
+		} else if(type == "date") {
+			out += post_format_date(window.metadata[i]);
 		} else {
 			out = out + post_format_text(window.metadata[i]);
 		}		
@@ -152,7 +158,23 @@ function post_format_text(m, inv) {
 	}
 	return out;
 }
-
+function post_format_date(m, inv) {
+	var out = "";
+	
+	var ind = m.index;
+	if(inv != undefined && inv != 0)
+		ind = (m.index-inv)+"_2";
+	else {
+		out = out + m.label;
+		if(m.description.length)
+			out = out + "<br><span class='format_description'>"+m.description+"</span><br>";
+	}
+	out = out + "<input type='date' id='format_item_"+m.index+"' placeholder='"+m.placeholder+"' onmouseenter='hideHovertag()'>";
+	if(m.min.length != 0 || m.max.length != 0) {
+		out = out + "<br><div class='format_count' id='format_count_"+m.index+"'></div>";	
+	}
+	return out;
+}
 function post_format_mltext(m) {
 	var out = "";
 	out = out + m.label + "<br>";
@@ -205,7 +227,7 @@ function post_toolbar(tools) {
 		}
 		out = out + "<span class='toolbar_button' data-t='"+tools[i]+"'>"+tool_pretty+"</span>&emsp;|&emsp;";
 	}
-	out = out + "<span class='toolbar_button fontawesome-resize-full' data-t='fullscreen'></span>&emsp;|&emsp;";
+	out = out + "<span class='toolbar_button fa fa-expand' data-t='fullscreen'></span>&emsp;|&emsp;";
 	
 	$('.toolbar').html(out);
 	

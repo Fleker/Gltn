@@ -206,7 +206,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 			ht = ht + "<div class='citationEditorDescription citationInput'><input type='text' style='width:35em' placeholder='If no official title, please describe' id='citationEditorIDescription'></div>";
 			ht = ht + "<div class='citationEditorPlay citationInput'>Act: <input id='citationEditorIAct' style='width:4em'>&nbsp;Scene:<input type='citationEditorIScene' style='width:4em'>&nbsp;Line(s): <input id='citationEditorILines' style='width:10em'></div>";
 			ht = ht + "<div class='citationEditorBookpub citationInput'><input type='text' placeholder='Page #' style='width:4em' id='citationEditorIPage'>&nbsp;<input placeholder='Volume' style='width:5em' id='citationEditorIVolume'>&nbsp;<input type='text' placeholder='Edition' style='width:6em' id='citationEditorIEdition'>&nbsp;<input type='text' placeholder='Series' id='citationEditorISeries'>Main Title?<input type='checkbox' id='citationEditorIMain' value='off'></div>";
-			ht = ht + "<div class='citationEditorAuthor citationInput'>Author: <input placeholder='First' id='citationEditorIAuthorFirst'>&nbsp;<input placeholder='M' style='width:2em' id='citationEditorIAuthorMiddle'>&nbsp;<input placeholder='Last' id='citationEditorIAuthorLast'></div>";
+			ht = ht + "<div class='citationEditorAuthor citationInput'>Author: <input placeholder='First' class='citationEditorIAuthorFirst' id='citationEditorIAuthorFirst'>&nbsp;<input placeholder='M' style='width:2em' class='citationEditorIAuthorMiddle'' id='citationEditorIAuthorMiddle'>&nbsp;<input placeholder='Last' class='citationEditorIAuthorLast' id='citationEditorIAuthorLast'><span class='fa fa-plus-circle button' id='citationAddContributor'></span></div>";
 			ht = ht + "<div class='citationEditorPublication citationInput'>Publication: <input placeholder='Publisher' id='citationEditorIPublisher'>&nbsp;<input placeholder='City' id='citationEditorICity'>&nbsp;<input placeholder='Year' style='width:4em' id='citationEditorIYear'></div>";
 			ht = ht + "<div class='citationEditorWebsite citationInput'> Website:<input placeholder='Website Title' id='citationEditorIWebsite'>&nbsp;<input placeholder='Website Publisher' id='citationEditorIWebPublisher'><br>&emsp;&emsp;<input type='url' placeholder='URL' id='citationEditorIUrl'></div>";
 			ht = ht + "<div class='citationEditorPubdate citationInput'> Published On: <input type='date' id='citationEditorIPubdate'></div>";
@@ -214,6 +214,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 			ht = ht + "<div class='citationEditorDatabase citationInput'> Database:<input placeholder='Database Name' id='citationEditorIDatabse'>&nbsp;<input type='URL' placeholder='url' style='width:30em' id='citationEdtiorIDbUrl'></div>";
 			ht = ht + "<div class='citationEditorMedium citationInput'> <input placeholder='Medium' id='citationEditorIMedium'></div>";
 			ht = ht + "<div class='citationEditorAbstract citationInput'>Type a summary of this work and how you used it in writing your document.<br><textarea id='citationEditorIAbstract'></textarea></div>";
+			ht = ht + "<datalist id='citationContributorTypes'><option>Author</option></datalist>"
 			ht = ht + "<button style='' id='citationEditorSave'>Save</button>";
 		
 		var fnc = function x() {
@@ -223,6 +224,10 @@ function initiateCitationEditor(q, hovertag, h2) {
 			});
 			$('#citationEditorSave').on('click', function() {
 				citationSave();
+			});
+			$('#citationAddContributor').on('click', function() {
+				var out = "<br><input placeholder='Contribution' class='citationEditorIAuthorType' list='citationContributorTypes'><input placeholder='First' class='citationEditorIAuthorFirst'>&nbsp;<input placeholder='M' style='width:2em' class='citationEditorIAuthorMiddle'>&nbsp;<input placeholder='Last' class='citationEditorIAuthorLast'>";
+				$('#citationEditorAuthor').html(out);
 			});
 			function citationReformat() {
 				for(i=0;i<citetypes.length;i++) {
@@ -266,7 +271,8 @@ function initiateCitationEditor(q, hovertag, h2) {
 					$('.citationEditor'+stra[i]).css('display', 'block');	
 				}
 				//if abstracts for citations are turned on,
-				//$('.citationEditorAbstract').css('display', 'block');
+				if(annotated_bib)
+					$('.citationEditorAbstract').css('display', 'block');
 			}
 			var citeAttributes = new Array('Type', 'Title','Description','Page','Volume','Edition','Main','AuthorFirst','AuthorMiddle','AuthorLast','Publisher','City','Year','Website','WebPublisher','Url','Pubdate','Accdate','Database','DbUrl','Medium','Abstract');	
 			function citationSave() {
@@ -289,6 +295,11 @@ function initiateCitationEditor(q, hovertag, h2) {
 					
 					//citation[citeid]['type'] = $('#citationEditorIType');	
 				}
+				//Save contributors
+					citation[citeid]['Contributors'] = $('.citationEditorIAuthorType').val();
+					citation[citeid]['ContributorsFirst'] = $('.citationEditorIAuthorFirst').val();
+					citation[citeid]['ContributorsMiddle'] = $('.citationEditorIAuthorMiddle').val();
+					citation[citeid]['ContributorsLast'] = $('.citationEditorIAuthorLast').val();
 				$('#citation'+citei).attr('data-id', citeid);
 				$('#citation'+citei).attr('data-i', citei);
 				citationHovertag();
@@ -963,12 +974,12 @@ function setHeader() {
 			{group: '', value: '<font size="4" id="temp_header" >Welcome to Gluten!</font><br><button onclick="introJsStart();window.introdisabled = true;">Start the Tour!</button> '}
 		),
 		File: new Array(
-			{text: 'Build', img: '<span style="font-size:18pt" class="fontawesome-file"></span>', action: "startBuild();setTimeout('exitintro();', 1000);", key:"Ctrl+Shift+B"},
-			{text: 'Export', img: '<span style="font-size:18pt" class="fontawesome-share-alt"></span>', action: "exportFile();"}
+			{text: 'Build', img: '<span style="font-size:18pt" class="fa fa-file"></span>', action: "startBuild();setTimeout('exitintro();', 1000);", key:"Ctrl+Shift+B"},
+			{text: 'Export', img: '<span style="font-size:18pt" class="fa fa-download"></span>', action: "exportFile();"}
 		),
 		Panels: new Array(
-			{text: 'Citations', img: '<span style="font-size:18pt" class="fontawesome-book"></span>', action: "runPanel('main_Citation');"},
-			{text: 'Ideas', img: '<span style="font-size:18pt" class="fontawesome-lightbulb"></span>', action: "runPanel('main_Idea');"}
+			{text: 'Citations', img: '<span style="font-size:18pt" class="fa fa-book"></span>', action: "runPanel('main_Citation');"},
+			{text: 'Ideas', img: '<span style="font-size:18pt" class="fa fa-lightbulb-o"></span>', action: "runPanel('main_Idea');"}
 		)
 	};
 	newRibbon('.header', holoribbon_std);
@@ -977,10 +988,10 @@ function setHeader() {
 function appendHoloSelection() {
 	var selection = {
 		Selection: new Array(
-			{text: '', img: '<span style="font-size:18pt" class="fontawesome-bold"></span>', action: "toggleBold()"},
-			{text: '', img: '<span style="font-size:18pt" class="fontawesome-italic"></span>', action: "toggleItalics()"},
-			{text: '', img: '<span style="font-size:18pt" class="fontawesome-underline"></span>', action: "toggleUnder()"},
-			{text: '', img: '<span style="font-size:18pt" class="fontawesome-strikethrough"></span>', action: "toggleStrike()"}
+			{text: '', img: '<span style="font-size:18pt" class="fa fa-bold"></span>', action: "toggleBold()"},
+			{text: '', img: '<span style="font-size:18pt" class="fa fa-italic"></span>', action: "toggleItalics()"},
+			{text: '', img: '<span style="font-size:18pt" class="fa fa-underline"></span>', action: "toggleUnder()"},
+			{text: '', img: '<span style="font-size:18pt" class="fa fa-strikethrough"></span>', action: "toggleStrike()"}
 		)
 	};
 	newRibbon('.header', $.extend({}, holoribbon_std, selection));

@@ -5,7 +5,7 @@ function startBuild() {
 	//$('.page').css('width','8.5in');
 	window.section_name = "";
 	$('#searching').val('');
-	$('.build').html('<button onclick="exitBuild()" class="noprint">Return to Editor</button><button onclick="window.print()" class="noprint fontawesome-print">&nbsp;Print</button>');
+	$('.build').html('<button onclick="exitBuild()" class="noprint">Return to Editor</button><button onclick="window.print()" class="noprint fa fa-print" style="font-size:12pt;">&nbsp;Print</button>');
 		//$('.build_progress').css('display', 'block').css('position', 'fixed').css('width', '50%').css('height', '50%').css('top','25%').css('left','25%').css('background-color', 'rgba(0,0,0,0.3)').css('font-size','16pt').css('margin-top','10%');
 	initiatePopup({title:"Build Progress",bordercolor:"rgb(44, 145, 16)",ht:"<div class='build_progress'></div>"});
 	updateBuildProgress('Initiating Build...');

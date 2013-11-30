@@ -5,6 +5,7 @@
 <title>Editing Document</title>
 <link rel="stylesheet" type="text/css" href="standard.css">
 <link rel="stylesheet" type="text/css" href="IntroJS/introjs.min.css">
+<link href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 
 <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
 <script src="http://code.jquery.com/color/jquery.color-2.1.2.min.js"></script>
@@ -113,7 +114,7 @@ LOREM IPS/um o
 <div class="hovertag">
 
 </div>
-<div class="fullscreenui" style="display:none; opacity:.1" onMouseOver="$('.fullscreenui').css('background-color', fsuo).css('opacity',1)" onMouseOut="$('.fullscreenui').css('background-color', fsuo).css('opacity', '.1');"><div class="fullscreenexit" onclick="normalscreen()"><br>X<br><br><br></div><div class="fullscreennight fontawesome-adjust" onclick="nightscreen()"><br><br><br><br></div> <div class="fullscreencount"></div></div>
+<div class="fullscreenui" style="display:none; opacity:.1" onMouseOver="$('.fullscreenui').css('background-color', fsuo).css('opacity',1)" onMouseOut="$('.fullscreenui').css('background-color', fsuo).css('opacity', '.1');"><div class="fullscreenexit" onclick="normalscreen()"><br>X<br><br><br></div><div class="fullscreennight fa fa-adjust" onclick="nightscreen()"><br><br><br><br></div> <div class="fullscreencount"></div></div>
 
 <div class="footer">
 
