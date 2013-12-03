@@ -1,11 +1,13 @@
+builddate = 0;
 function startBuild() {
 	//initiate the build code, show the progress indicator, and start sending stuff to different functions to do different stuff.
+	builddate = new Date().getTime()
 	console.warn('start');
 		$('.build').fadeIn(500);
 	//$('.page').css('width','8.5in');
 	window.section_name = "";
 	$('#searching').val('');
-	$('.build').html('<button onclick="exitBuild()" class="noprint">Return to Editor</button><button onclick="window.print()" class="noprint fa fa-print" style="font-size:12pt;">&nbsp;Print</button>');
+	$('.build').html('<button onclick="exitBuild()" class="noprint">Return to Editor</button><button onclick="window.print()" class="noprint fa fa-print" style="font-size:12pt;"></button><span class="buildtime noprint" style="font-size:9pt"></span>');
 		//$('.build_progress').css('display', 'block').css('position', 'fixed').css('width', '50%').css('height', '50%').css('top','25%').css('left','25%').css('background-color', 'rgba(0,0,0,0.3)').css('font-size','16pt').css('margin-top','10%');
 	initiatePopup({title:"Build Progress",bordercolor:"rgb(44, 145, 16)",ht:"<div class='build_progress'></div>"});
 	updateBuildProgress('Initiating Build...');
@@ -47,6 +49,9 @@ function continueBuild() {
 	finishBuild();
 	scrollTo(0,0);
 	console.warn('finish');
+	var finishdate = new Date().getTime();
+	//console.log(finishdate, builddate);
+	$('.buildtime').html('&emsp;Built in '+(finishdate - builddate)/1000+' seconds.');
 	//$('.build').css('display', 'block');
 }
 function updateBuildProgress(text) {
@@ -202,6 +207,8 @@ function citationFormatted(string, i, id, page, cob) {
 	//Insert a citation content_formatted object and return it with properties filled in
 	//console.log(string, id);
 	//console.warn(citation[id]);
+	console.error(string, id);
+	try {
 	if(cob != undefined) {
 		if(citation[id].AuthorFirst.length || citation[id].AuthorLast.length)
 			string = string.replace(/cAUTHOR/, cob.author.replace(/AUTHOR_FIRST/, citation[id].AuthorFirst).replace(/AUTHOR_FIRST_I/, citation[id].AuthorFirst.substr(0,1)).replace(/AUTHOR_LAST/, citation[id].AuthorLast));
@@ -240,9 +247,14 @@ function citationFormatted(string, i, id, page, cob) {
 		else
 			string = string.replace(/cPAGE/g, "");
 	}
-	string = string.replace(/AUTHOR_FIRST_I/g, citation[id].AuthorFirst.substr(0,1));
-	string = string.replace(/AUTHOR_FIRST/g, citation[id].AuthorFirst);
-	string = string.replace(/AUTHOR_LAST/g, citation[id].AuthorLast);
+	for(i=0;i<citation[id].Contributors.length;i++) {
+		string = string.replace(/AUTHOR_FIRST_I/, citation[id].AuthorFirst.substr(0,1));
+		string = string.replace(/AUTHOR_FIRST/, citation[id].AuthorFirst);
+		string = string.replace(/AUTHOR_LAST/, citation[id].AuthorLast);
+	}
+	string = string.replace(/BIBLEBOOK/g, citation[id].Biblebook);
+	string = string.replace(/BIBLECHAPTER/g, citation[id].Biblechapter);
+	string = string.replace(/BIBLEVERSE/g, citation[id].Bibleverse);
 	string = string.replace(/EDITION/g, citation[id].Edition);
 	string = string.replace(/PUBCITY/g, citation[id].City);
 	string = string.replace(/PUBCOMP/g, citation[id].Publisher);
@@ -252,6 +264,9 @@ function citationFormatted(string, i, id, page, cob) {
 	string = string.replace(/YEAR/g, citation[id].Year);
 	string = string.replace(/PAGE/g, page);	
 	return string;	
+	} catch(e) {
+			
+	}
 }
 function headingFormatted(spec,input,number) {
 	//console.error(spec);
@@ -306,15 +321,67 @@ function numToRoman(capy, number) {
 }
 function post_content_formatting(object) {
 	//Format Citations
+	//First, find all authors who have the same last names
+	var ln = new Array();
+	var fn = new Array();
+	var volumes = new Array();
+	for(i=0;i<citation.length;i++) {
+		for(j=0;j<citation.length;j++) {
+			if(i != j) {
+				try {
+					if(citation[i].AuthorLast == citation[j].AuthorLast && citation[i].AuthorLast.length > 0)
+						ln.push(citation[i].AuthorLast);
+					if(citation[i].AuthorFirst == citation[j].AuthorFirst && citation[i].AuthorLast == citation[j].AuthorLast && citation[i].AuthorLast.length > 0)
+						fn.push(citation[i].AuthorFirst);
+					if(citation[i].Title == citation[j].Title && citation[i].Title.length > 0 && citation[i].AuthorLast == citation[j].AuthorLast)
+						volumes.push(citation[i].Title);
+				} catch(e) {
+					
+				}
+			}
+		}
+	}
+	console.warn(ln, fn, volumes);
 	$('.draft .citation').each(function() {
 		i = $(this).attr('data-i');
 		id = $(this).attr('data-id');
 		page = $(this).attr('data-page');
 		
+		//Get the number of authors for this source
+			var sourceauthors = 0;
+			for(j=0;j<citation[id].Contributors.length;j++) {
+				if(citation[id].Contributors[j] == "Author") {
+					sourceauthors++;
+				}	
+			}
+		
 		//List various types of citations
 		console.log("Cid", id, citation[id]);
-		if(citation[id].Main == "on" && object.citation_main != undefined) {
+		if(citation[id].Type == "Bible") {
+			//console.log("B "+object.citation_bible);
+			$(this).html($(this).html()+" "+citationFormatted(object.citation_bible, i, id, page));
+		} else if(citation[id].Main == "on" && fn.indexOf(citation[id].AuthorLast > -1) && ln.indexOf(citation[id].AuthorLast > -1) && citation[id].Type == "Book") {
+			$(this).html($(this).html()+" "+citationFormatted(object.citation_sameauthorbook_main, i, id, page));
+		} else if(citation[id].Main == "on" && fn.indexOf(citation[id].AuthorLast > -1) && ln.indexOf(citation[id].AuthorLast > -1) && citation[id].Type != "Book") {
+			$(this).html($(this).html()+" "+citationFormatted(object.citation_sameauthorbook_main, i, id, page));
+		} else if(fn.indexOf(citation[id].AuthorLast > -1) && ln.indexOf(citation[id].AuthorLast > -1) && citation[id].Type == "Book") {
+			$(this).html($(this).html()+" "+citationFormatted(object.citation_sameauthorbook_main, i, id, page));
+		} else if(fn.indexOf(citation[id].AuthorLast > -1) && ln.indexOf(citation[id].AuthorLast > -1) && citation[id].Type != "Book") {
+			$(this).html($(this).html()+" "+citationFormatted(object.citation_sameauthorbook_main, i, id, page));
+		} else if(citation[id].Main == "on" && object.citation_main != undefined) {
 			$(this).html($(this).html()+" "+citationFormatted(object.citation_main, i, id, page));
+		} else if(citation[id].AuthorLast.length == 0) {
+			$(this).html($(this).html()+" "+citationFormatted(object.citation_noauthor, i, id, page));
+		} else if(ln.indexOf(citation[id].AuthorLast > -1)) {
+			$(this).html($(this).html()+" "+citationFormatted(object.citation_twolastnames, i, id, page));
+		} else if(sourceauthors == 2) {
+			$(this).html($(this).html()+" "+citationFormatted(object.citation_twoauthors, i, id, page));
+		} else if(sourceauthors == 3) {
+			$(this).html($(this).html()+" "+citationFormatted(object.citation_threeauthors, i, id, page));
+		} else if(sourceauthors > 3) {
+			$(this).html($(this).html()+" "+citationFormatted(object.citation_manyauthors, i, id, page));
+		} else if(volumes.indexOf(citation[id].Title)) {
+			$(this).html($(this).html()+" "+citationFormatted(object.citation_multivolume, i, id, page));
 		} else {
 			$(this).html($(this).html()+" "+citationFormatted(object.citation, i, id, page));
 		}

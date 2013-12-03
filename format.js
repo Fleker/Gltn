@@ -44,7 +44,7 @@ function set_up_format(name, property) {
 			min_char = property.min;
 			max_char = property.max;
 		break;	
-		case 'annotated bilbiography':
+		case 'annotated bibliography':
 			window.annotated_bib = true;
 		break;
 	}

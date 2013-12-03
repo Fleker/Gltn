@@ -24,14 +24,6 @@ function new_gluten_formats() {
 		$('#gluten_languages').html(out);
 	}
 	
-	//Now call these functions when the system sets up:
-	new_gluten_formats();
-	new_gluten_languages();
-	
-
-	
-	
-	
 	
 	
 	/*** RANGY ***/
@@ -41,6 +33,8 @@ function debug_buttons() {
 	$('.content_buttons').toggle(500);	
 }
 window.onload = function() {
+	new_gluten_formats();
+	new_gluten_languages();
             rangy.init();
 			range = rangy.createRange();
 			cssClassApplierModule = rangy.modules.CssClassApplier;
@@ -191,7 +185,7 @@ function initiateCitationEditor(q, hovertag, h2) {
                 }
             }
 			
-			window.citetypes = new Array({val: 'Article Online', format:'online'},{val:'Book', format:'print'}, {val:'Book - Online', format:'ebook'}, {val:'Play', format:'theater'}, {val:'Musical', format:'theater'}, /*{val:'eBook', format:'digital book'}, */{val:'Blog', format:'online'}, {val:'Image - Online', format:'eimage'},{val:'Photo - Online', format:'eimage'});
+			window.citetypes = new Array({val: 'Article Online', format:'online'},{val:'Book', format:'print'}, {val:'Book - Online', format:'ebook'}, {val:'Play', format:'theater'}, {val:'Musical', format:'theater'}, /*{val:'eBook', format:'digital book'}, */{val:'Blog', format:'online'}, {val:'Image - Online', format:'eimage'},{val:'Photo - Online', format:'eimage'},{val:'Bible', format:'bible'});
 			var today =  new Date();
 			today = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
 			new Array('Article Online', 'Book - Print', 'Book - Online', 'Book - eBook Reader', 'Book - Database', 'Dictionary', 'eBook', 'Encyclopedia', 'Musical', 'Online Article', 'Newspaper', 'Play', 'Podcast', 'Website - Blog', 'Website - Book','Website - Image');
@@ -205,15 +199,17 @@ function initiateCitationEditor(q, hovertag, h2) {
 			ht = ht + "<div class='citationEditorTitle citationInput'><input type='text' placeholder='Title of the work' list='citetitlelist' style='width: 30em' id='citationEditorITitle'></div>";
 			ht = ht + "<div class='citationEditorDescription citationInput'><input type='text' style='width:35em' placeholder='If no official title, please describe' id='citationEditorIDescription'></div>";
 			ht = ht + "<div class='citationEditorPlay citationInput'>Act: <input id='citationEditorIAct' style='width:4em'>&nbsp;Scene:<input type='citationEditorIScene' style='width:4em'>&nbsp;Line(s): <input id='citationEditorILines' style='width:10em'></div>";
-			ht = ht + "<div class='citationEditorBookpub citationInput'><input type='text' placeholder='Page #' style='width:4em' id='citationEditorIPage'>&nbsp;<input placeholder='Volume' style='width:5em' id='citationEditorIVolume'>&nbsp;<input type='text' placeholder='Edition' style='width:6em' id='citationEditorIEdition'>&nbsp;<input type='text' placeholder='Series' id='citationEditorISeries'>Main Title?<input type='checkbox' id='citationEditorIMain' value='off'></div>";
+			ht = ht + "<div class='citationEditorBookpub citationInput'><input type='text' placeholder='Page #' style='width:4em' id='citationEditorIPage'>&nbsp;<input placeholder='Volume' style='width:5em' id='citationEditorIVolume'>&nbsp;<input type='text' placeholder='Edition' style='width:6em' id='citationEditorIEdition'>&nbsp;<input type='text' placeholder='Series' id='citationEditorISeries'>Referenced author?<input type='checkbox' id='citationEditorIMain' value='off'></div>";
 			ht = ht + "<div class='citationEditorAuthor citationInput'>Author: <input placeholder='First' class='citationEditorIAuthorFirst' id='citationEditorIAuthorFirst'>&nbsp;<input placeholder='M' style='width:2em' class='citationEditorIAuthorMiddle'' id='citationEditorIAuthorMiddle'>&nbsp;<input placeholder='Last' class='citationEditorIAuthorLast' id='citationEditorIAuthorLast'><span class='fa fa-plus-circle button' id='citationAddContributor'></span></div>";
 			ht = ht + "<div class='citationEditorPublication citationInput'>Publication: <input placeholder='Publisher' id='citationEditorIPublisher'>&nbsp;<input placeholder='City' id='citationEditorICity'>&nbsp;<input placeholder='Year' style='width:4em' id='citationEditorIYear'></div>";
 			ht = ht + "<div class='citationEditorWebsite citationInput'> Website:<input placeholder='Website Title' id='citationEditorIWebsite'>&nbsp;<input placeholder='Website Publisher' id='citationEditorIWebPublisher'><br>&emsp;&emsp;<input type='url' placeholder='URL' id='citationEditorIUrl'></div>";
 			ht = ht + "<div class='citationEditorPubdate citationInput'> Published On: <input type='date' id='citationEditorIPubdate'></div>";
 			ht = ht + "<div class='citationEditorAccdate citationInput'> Accessed On: &nbsp;<input type='date' id='citationEditorIAccdate'></div>";
 			ht = ht + "<div class='citationEditorDatabase citationInput'> Database:<input placeholder='Database Name' id='citationEditorIDatabse'>&nbsp;<input type='URL' placeholder='url' style='width:30em' id='citationEdtiorIDbUrl'></div>";
+			
+			ht = ht + "<div class='citationEditorBible citationInput'> <input placeholder='Book' id='citationEditorIBiblebook'><input placeholder='Chapter' id='citationEditorIBiblechapter'><input placeholder='Verse' id='citationEditorIBibleverse'></div>";
 			ht = ht + "<div class='citationEditorMedium citationInput'> <input placeholder='Medium' id='citationEditorIMedium'></div>";
-			ht = ht + "<div class='citationEditorAbstract citationInput'>Type a summary of this work and how you used it in writing your document.<br><textarea id='citationEditorIAbstract'></textarea></div>";
+			ht = ht + "<div class='citationEditorAbstract citationInput'>Type a summary of this work and how you used it in writing your document.<br><div contenteditable id='citationEditorIAbstract' style='background-color:white;height:3em;border:solid 1px #999;'></div></div>";
 			ht = ht + "<datalist id='citationContributorTypes'><option>Author</option></datalist>"
 			ht = ht + "<button style='' id='citationEditorSave'>Save</button>";
 		
@@ -226,8 +222,8 @@ function initiateCitationEditor(q, hovertag, h2) {
 				citationSave();
 			});
 			$('#citationAddContributor').on('click', function() {
-				var out = "<br><input placeholder='Contribution' class='citationEditorIAuthorType' list='citationContributorTypes'><input placeholder='First' class='citationEditorIAuthorFirst'>&nbsp;<input placeholder='M' style='width:2em' class='citationEditorIAuthorMiddle'>&nbsp;<input placeholder='Last' class='citationEditorIAuthorLast'>";
-				$('#citationEditorAuthor').html(out);
+				var out = "<br><input placeholder='Contribution' class='citationEditorIAuthorType' list='citationContributorTypes' style='width:3.5em'><input placeholder='First' class='citationEditorIAuthorFirst'>&nbsp;<input placeholder='M' style='width:2em' class='citationEditorIAuthorMiddle'>&nbsp;<input placeholder='Last' class='citationEditorIAuthorLast'>";
+				$('.citationEditorAuthor').append(out);
 			});
 			function citationReformat() {
 				for(i=0;i<citetypes.length;i++) {
@@ -257,6 +253,9 @@ function initiateCitationEditor(q, hovertag, h2) {
 								//IDK
 								citationShow('Description');
 							break;
+							case 'bible':
+								citationShow('Title Bible');
+							break;
 						}
 						return;
 					}
@@ -274,7 +273,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 				if(annotated_bib)
 					$('.citationEditorAbstract').css('display', 'block');
 			}
-			var citeAttributes = new Array('Type', 'Title','Description','Page','Volume','Edition','Main','AuthorFirst','AuthorMiddle','AuthorLast','Publisher','City','Year','Website','WebPublisher','Url','Pubdate','Accdate','Database','DbUrl','Medium','Abstract');	
+			var citeAttributes = new Array('Type', 'Title','Description','Page','Volume','Edition','Main','AuthorFirst','AuthorMiddle','AuthorLast','Publisher','City','Year','Website','WebPublisher','Url','Pubdate','Accdate','Database','DbUrl','Medium','Abstract','Biblebook','Biblechapter','Bibleverse');	
 			function citationSave() {
 				citation[citeid] = {};
 				for(i in citeAttributes) {
@@ -287,6 +286,8 @@ function initiateCitationEditor(q, hovertag, h2) {
 					
 					if(citeAttributes[i] == 'Page')
 						$('#citation'+citei).attr('data-page', cattr);
+					else if(citeAttributes[i] == 'Abstract')
+						citation[citeid][citeAttributes[i]] = $('#citationEditorIAbstract').html();
 					else if(cattr != undefined)
 						citation[citeid][citeAttributes[i]] = cattr;
 					else	
@@ -296,10 +297,21 @@ function initiateCitationEditor(q, hovertag, h2) {
 					//citation[citeid]['type'] = $('#citationEditorIType');	
 				}
 				//Save contributors
-					citation[citeid]['Contributors'] = $('.citationEditorIAuthorType').val();
-					citation[citeid]['ContributorsFirst'] = $('.citationEditorIAuthorFirst').val();
-					citation[citeid]['ContributorsMiddle'] = $('.citationEditorIAuthorMiddle').val();
-					citation[citeid]['ContributorsLast'] = $('.citationEditorIAuthorLast').val();
+					citation[citeid]['Contributors'] = new Array("Author");
+					citation[citeid]['ContributorsFirst'] = new Array();
+					citation[citeid]['ContributorsMiddle'] = new Array();;
+					citation[citeid]['ContributorsLast'] = new Array();
+					for(i=0;i<$('.citationEditorIAuthorFirst').length;i++) {
+						console.warn(i, $('.citationEditorIAuthorType').length);
+						var c = $('.citationEditorIAuthorType')[i];
+						var cf = $('.citationEditorIAuthorFirst')[i];
+						var cm = $('.citationEditorIAuthorMiddle')[i];
+						var cl = $('.citationEditorIAuthorLast')[i];
+						citation[citeid]['Contributors'].push($(c).val());
+						citation[citeid]['ContributorsFirst'].push($(cf).val());
+						citation[citeid]['ContributorsMiddle'].push($(cm).val());
+						citation[citeid]['ContributorsLast'].push($(cl).val());
+					}
 				$('#citation'+citei).attr('data-id', citeid);
 				$('#citation'+citei).attr('data-i', citei);
 				citationHovertag();
@@ -342,12 +354,12 @@ function citationHovertag(recall) {
 	$('.citation').off('mouseleave');
 	
 	$('.citation').on('mouseenter', function() {
-		displayHovertag(citation[$(this).attr('data-id')].Title, {ypos: $(this).offset().top}, "initiateCitationEditor(undefined,"+$(this).attr('data-i')+")");
+		displayHovertag(citation[$(this).attr('data-id')].Title, {ypos: $(this).offset().top}, "'initiateCitationEditor(undefined,"+$(this).attr('data-i')+")'");
 	});
 	$('.citation').on('mouseleave', function() {
 		//hideHovertag();
 	});
-	console.log("CitationHovertag(Recall): "+recall+(recall == undefined));
+//	console.log("CitationHovertag(Recall): "+recall+(recall == undefined));
 	if(recall == undefined)	{
 		hovertagRegistry('citationHovertag(true)');
 	}
@@ -611,6 +623,7 @@ function displayHovertag(text, data, fnc) {
 	});
 	$('.hovertag').on('click', function() {
 		if(fnc != undefined) {
+			console.log("Hovertag "+fnc);
 			eval(fnc.substring(1,fnc.length-1));
 			console.warn(fnc);
 		}
@@ -980,6 +993,9 @@ function setHeader() {
 		Panels: new Array(
 			{text: 'Citations', img: '<span style="font-size:18pt" class="fa fa-book"></span>', action: "runPanel('main_Citation');"},
 			{text: 'Ideas', img: '<span style="font-size:18pt" class="fa fa-lightbulb-o"></span>', action: "runPanel('main_Idea');"}
+		),
+		About: new Array(
+			{text: 'GitHub', img: '<span style="font-size:18pt" class="fa fa-github-alt"></span>', action: "window.location='http://www.github.com/fleker/gluten'"}
 		)
 	};
 	newRibbon('.header', holoribbon_std);

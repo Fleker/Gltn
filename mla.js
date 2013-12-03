@@ -44,6 +44,29 @@ function onGetFormats() {
 	obj.heading4 = "<div style='font-style:italics;text-align:center'>LIST1. TEXT</div>";
 	obj.heading5 = "<div style='text-decoration:underline'>LIST1. TEXT</div>";
 	
+	obj.citation = "(AUTHOR_LAST PAGE)";
+	obj.citation_main = "(PAGE)";
+	obj.citation_noauthor = '("TITLE" PAGE)';
+	obj.citation_twolastnames = '(AUTHOR_FIRST_I. AUTHOR_LAST PAGE)';
+	obj.citation_twoauthors = '(AUTHOR_LAST and AUTHOR_LAST PAGE)';
+	obj.citation_threeauthors = '(AUTHOR_LAST, AUTHOR_LAST, and AUTHOR_LAST PAGE)';
+	obj.citation_manyauthors = '(AUTHOR_LAST et al. PAGE)';
+	obj.citation_sameauthorarticle_main = '("TITLE" PAGE)';
+	obj.citation_sameauthorbook_main = '(<i>TITLE</i> PAGE)';
+	obj.citation_sameauthorarticle = '(AUTHOR_LAST, "TITLE" PAGE)';
+	obj.citation_sameauthorbook = '(AUTHOR_LAST, <i>TITLE</i> PAGE)';
+	obj.citation_multivolume = '(VOLUME: PAGE)';
+	obj.citation_bible = '(<i>TITLE,</i> BIBLEBOOK. BIBLECHAPTER.BIBLEVERSE)';
+	obj.citation_editions = "";
+	post_content_formatting(obj);
+} 
+function onBuildBibliography() {
+	add_new_section('bibliography');
+		add_to_page(centerText('Works Cited'));
 	
-		
+	obj = {};
+	cob = {};
+	
+	obj.style = "text-indent:-.5in;margin-left:.5in";
+	post_bibliography(obj, cob);	
 }

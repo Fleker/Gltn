@@ -20,7 +20,12 @@ document.ready = function() {
 
 function saveFile() {
 	fileid = $('#file_name').val();
+	$('.content_save').hide();
 	obj = {};
+	for(i=0;i<citation.length;i++) {
+		if(citation[i] == undefined)
+			citation[i] = "undefined";
+	}
 	obj.citation = citation;
 	obj.citationi = citationi;
 	obj.idea = idea;
@@ -50,7 +55,7 @@ function saveFile() {
 	xo = json2xml(o, "");
 	localStorage[fileid] = xo;
 	localStorage[fileid+"_c"] = content;
-	
+	$('.content_save').show();
 }
 docformat = '';
 function restoreFile() {
@@ -71,17 +76,16 @@ function restoreFile() {
 		max_char = x.file.max_char;
 		min_word = x.file.min_word;
 		max_word = x.file.max_word;
-
+		//console.error(x.citation);
 		if(x.citation == undefined) {
-			
-		} else if(x.citation.length == undefined && x.citation != undefined) {
-			citation.push(x.citation);
-		} else if(x.citation.length == 1) {
-			citation.push(x.citation);
-		} else if(x.citation.length > 1) {
+			//do nothing
+		} else {
 			for(i in x.citation) {
+				if(x.citation[i] == "undefined")
+					citation.push(undefined);
+				else 
 					citation.push(x.citation[i]);	
-				}
+			}
 		}
 		citationi = x.citationi;
 		
