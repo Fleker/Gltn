@@ -196,8 +196,8 @@ function initiateCitationEditor(q, hovertag, h2) {
 			}
 			var ht = out+"</datalist>";
 			
-			ht = ht + "<div class='citationEditorTitle citationInput'><input type='text' placeholder='Title of the work' list='citetitlelist' style='width: 30em' id='citationEditorITitle'></div>";
-			ht = ht + "<div class='citationEditorDescription citationInput'><input type='text' style='width:35em' placeholder='If no official title, please describe' id='citationEditorIDescription'></div>";
+			ht = ht + "<div class='citationEditorTitle citationInput'><input type='text' placeholder='Main title of the work' list='citetitlelist' style='width: 30em' id='citationEditorITitle'></div>";
+			ht = ht + "<div class='citationEditorDescription citationInput'><input type='text' style='width:35em' placeholder='Description/Individual Work Title' id='citationEditorIDescription'></div>";
 			ht = ht + "<div class='citationEditorPlay citationInput'>Act: <input id='citationEditorIAct' style='width:4em'>&nbsp;Scene:<input type='citationEditorIScene' style='width:4em'>&nbsp;Line(s): <input id='citationEditorILines' style='width:10em'></div>";
 			ht = ht + "<div class='citationEditorBookpub citationInput'><input type='text' placeholder='Page #' style='width:4em' id='citationEditorIPage'>&nbsp;<input placeholder='Volume' style='width:5em' id='citationEditorIVolume'>&nbsp;<input type='text' placeholder='Edition' style='width:6em' id='citationEditorIEdition'>&nbsp;<input type='text' placeholder='Series' id='citationEditorISeries'>Referenced author?<input type='checkbox' id='citationEditorIMain' value='off'></div>";
 			ht = ht + "<div class='citationEditorAuthor citationInput'>Author: <input placeholder='First' class='citationEditorIAuthorFirst' id='citationEditorIAuthorFirst'>&nbsp;<input placeholder='M' style='width:2em' class='citationEditorIAuthorMiddle'' id='citationEditorIAuthorMiddle'>&nbsp;<input placeholder='Last' class='citationEditorIAuthorLast' id='citationEditorIAuthorLast'><span class='fa fa-plus-circle button' id='citationAddContributor'></span></div>";
@@ -210,7 +210,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 			ht = ht + "<div class='citationEditorBible citationInput'> <input placeholder='Book' id='citationEditorIBiblebook'><input placeholder='Chapter' id='citationEditorIBiblechapter'><input placeholder='Verse' id='citationEditorIBibleverse'></div>";
 			ht = ht + "<div class='citationEditorMedium citationInput'> <input placeholder='Medium' id='citationEditorIMedium'></div>";
 			ht = ht + "<div class='citationEditorAbstract citationInput'>Type a summary of this work and how you used it in writing your document.<br><div contenteditable id='citationEditorIAbstract' style='background-color:white;height:3em;border:solid 1px #999;'></div></div>";
-			ht = ht + "<datalist id='citationContributorTypes'><option>Author</option></datalist>"
+			ht = ht + "<datalist id='citationContributorTypes'><option>Author</option><option>Editor</option><option>Translator</option></datalist>"
 			ht = ht + "<button style='' id='citationEditorSave'>Save</button>";
 		
 		var fnc = function x() {
@@ -230,6 +230,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 					//console.log('-'+citetypes[i].val);
 					if(citetypes[i].val == $('#citationEditorIType').val()) {
 						//console.log('--'+citetypes[i].format);
+						window.selectedmedium = citetypes[i].format;
 						introJsStart(10);
 						switch(citetypes[i].format) {
 							case 'online':
@@ -255,6 +256,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 							break;
 							case 'bible':
 								citationShow('Title Bible');
+								selectedmedium = "print";
 							break;
 						}
 						return;
@@ -273,7 +275,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 				if(annotated_bib)
 					$('.citationEditorAbstract').css('display', 'block');
 			}
-			var citeAttributes = new Array('Type', 'Title','Description','Page','Volume','Edition','Main','AuthorFirst','AuthorMiddle','AuthorLast','Publisher','City','Year','Website','WebPublisher','Url','Pubdate','Accdate','Database','DbUrl','Medium','Abstract','Biblebook','Biblechapter','Bibleverse');	
+			var citeAttributes = new Array('Type', 'Title','Description','Page','Volume','Edition','Main','AuthorFirst','AuthorMiddle','AuthorLast','Publisher','City','Year','Website','WebPublisher','Url','Pubdate','Accdate','Database','DbUrl','Medium','Abstract','Biblebook','Biblechapter','Bibleverse', 'MediumFormat');	
 			function citationSave() {
 				citation[citeid] = {};
 				for(i in citeAttributes) {
@@ -288,6 +290,8 @@ function initiateCitationEditor(q, hovertag, h2) {
 						$('#citation'+citei).attr('data-page', cattr);
 					else if(citeAttributes[i] == 'Abstract')
 						citation[citeid][citeAttributes[i]] = $('#citationEditorIAbstract').html();
+					else if(citeAttributes[i] == "MediumFormat")
+						citation[citeid][citeAttributes[i]] = window.selectedmedium;
 					else if(cattr != undefined)
 						citation[citeid][citeAttributes[i]] = cattr;
 					else	
@@ -301,7 +305,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 					citation[citeid]['ContributorsFirst'] = new Array();
 					citation[citeid]['ContributorsMiddle'] = new Array();;
 					citation[citeid]['ContributorsLast'] = new Array();
-					for(i=0;i<$('.citationEditorIAuthorFirst').length;i++) {
+					for(i=0;i<$('.citationEditorIAuthorType').length;i++) {
 						console.warn(i, $('.citationEditorIAuthorType').length);
 						var c = $('.citationEditorIAuthorType')[i];
 						var cf = $('.citationEditorIAuthorFirst')[i];
@@ -473,6 +477,8 @@ function contentAddSpan(t) {
 		//Because both quotes must be the ending and closing of a citation, we must add to the text content.anchor(
 		if(t.class == 'citation')
 			el.textContent += ' "';
+		else if(t.class.split(" ")[0] == "table")
+			el.textContent += "<span class='fa fa-table'></span>";
 		else
 			el.textContent += t.class.split(" ")[0];
 			//range.insertNode(document.createTextNode('"'));

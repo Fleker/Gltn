@@ -52,11 +52,12 @@ function onGetFormats() {
 	obj.citation_threeauthors = '(AUTHOR_LAST, AUTHOR_LAST, and AUTHOR_LAST PAGE)';
 	obj.citation_manyauthors = '(AUTHOR_LAST et al. PAGE)';
 	obj.citation_sameauthorarticle_main = '("TITLE" PAGE)';
-	obj.citation_sameauthorbook_main = '(<i>TITLE</i> PAGE)';
+	obj.citation_sameauthorbook_main = '<div style="display:inline">(<i>TITLE</i> PAGE)';
 	obj.citation_sameauthorarticle = '(AUTHOR_LAST, "TITLE" PAGE)';
 	obj.citation_sameauthorbook = '(AUTHOR_LAST, <i>TITLE</i> PAGE)';
 	obj.citation_multivolume = '(VOLUME: PAGE)';
-	obj.citation_bible = '(<i>TITLE,</i> BIBLEBOOK. BIBLECHAPTER.BIBLEVERSE)';
+	obj.citation_bible = '<div style="display:inline">(<i>TITLE,</i> BIBLEBOOK. BIBLECHAPTER.BIBLEVERSE)</div>';
+	obj.citation_bible_main = '(BIBLEBOOK. BIBLECHAPTER.BIBLEVERSE)';
 	obj.citation_editions = "";
 	post_content_formatting(obj);
 } 
@@ -66,6 +67,25 @@ function onBuildBibliography() {
 	
 	obj = {};
 	cob = {};
+	cob.author = "AUTHOR_LAST, AUTHOR_FIRST.";
+	cob.twoauthors = "AUTHOR_LAST, AUTHOR_FIRST, and AUTHOR_FIRST AUTHOR_LAST.";
+	cob.threeauthors = "AUTHOR_LAST, AUTHOR_FIRST, AUTHOR_FIRST AUTHOR_LAST, and AUTHOR_FIRST AUTHOR_LAST.";
+	cob.manyauthors = "AUTHOR_LAST, AUTHOR_FIRST, et al.";
+	cob.sameauthor = "---.";
+	cob.firstonlyauthor = "AUTHOR_FIRST.";
+	cob.medium = "MEDIUM.";
+	cob.pubcity = "PUBCITY:";
+	cob.publisher = "PUBCOMP,";
+	cob.year = "YEAR.";
+	cob.translator = "Trans. AUTHOR_FIRST AUTHOR_LAST.";
+	cob.editor = "Ed. AUTHOR_FIRST AUTHOR_LAST.";
+	cob.edition = "EDITION_c ed.";
+	cob.title = "<i>TITLE.</i>";
+	cob.description = '"DESCRIPTION"';
+	//The New Jerusalem Bible. Ed. Susan Jones. New York: Doubleday, 1985. Print.	
+	obj.book = "cAUTHOR cTITLE cEDITOR cTRANSLATOR cEDITION cPUBCITY cPUBCOMP cYEAR cMEDIUM";
+	obj.bible = "cTITLE cEDITOR cTRANSLATOR cPUBCITY cPUBCOMP cYEAR cMEDIUM";
+	obj.def = "cAUTHOR cTITLE cEDITOR cTRANSLATOR cEDITION cPUBCITY cPUBCOMP cYEAR cMEDIUM";
 	
 	obj.style = "text-indent:-.5in;margin-left:.5in";
 	post_bibliography(obj, cob);	

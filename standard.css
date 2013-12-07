@@ -275,7 +275,7 @@ button {
 	text-decoration: none;
 }
 .pageheader {
-	height:1in;
+	height:0.5in;
 }
 .pagebody {
 	max-height:11in;	
@@ -293,7 +293,8 @@ button {
 		width:8.5in;
 		height:13in;
 	}
-	hr, .noprint {
-		display:none;	
+	hr, button, .fa, .noprint {
+		display:none;
+		opacity:0;	
 	}
 }
