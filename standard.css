@@ -260,7 +260,9 @@ button {
 .ribbongroup {
 		
 }
-
+.ribbonstreamer {
+	border-bottom:solid 1px rgba(0,0,0,.05);
+}	
 /* Build Templates */
 .page {
 	width:8.5in;
@@ -289,7 +291,7 @@ button {
 	}
 	.page {
 		box-shadow: none;
-		-webkit-box-shadow: none;	
+		-webkit-box-shadow: none;
 		width:8.5in;
 		height:13in;
 	}
@@ -297,4 +299,7 @@ button {
 		display:none;
 		opacity:0;	
 	}
+}
+.panel_plugin {
+	overflow-y:auto;	
 }

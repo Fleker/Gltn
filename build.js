@@ -1,4 +1,11 @@
 builddate = 0;
+function falseBuild() {
+	window.section_name = "";
+	$('.build').fadeIn(500);
+	$('.body').fadeOut(500);
+	$('.header').fadeOut(500);
+	$('.build').html('<button onclick="exitBuild()">Return to Editor</button><button onclick="window.print()" class="fa fa-print noprint" style="font-size:12pt;"></button>');	
+}
 function startBuild() {
 	//initiate the build code, show the progress indicator, and start sending stuff to different functions to do different stuff.
 	builddate = new Date().getTime()

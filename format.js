@@ -314,11 +314,15 @@ function update_toolbar_style() {
 
 	//Use this for other dynamic styling stuff
 	
-	var sy = scrollY-110;
+	
+	
+	var sy = scrollY/*-110*/;
 	if(sy <= 0)
 		sy = 0;
 
 	$('#panel_plugin').css('margin-top', sy);
+	
+	
 	//$('#panel_plugin').css('height', window.innerHeight);
 	
 }

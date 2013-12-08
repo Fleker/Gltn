@@ -39,6 +39,15 @@ function saveFile() {
 	obj['file']['max_char'] = 0;
 	obj['file']['min_word'] = 0;
 	obj['file']['max_word'] = 0;
+	
+	//Integrated saves
+	if(window.saved != undefined) {	
+		obj.saved = {};
+		for(i in window.saved) {
+			writeToSaved(i, window.saved[i]);
+			obj.saved[i] = window.saved[i];
+		}
+	}
 	//console.log(obj);
 	obj.metadata = new Array();
 	for(i in window.metadata) {
@@ -93,6 +102,13 @@ function restoreFile() {
 			idea = x.idea;
 		ideadefault = x.ideadefault;
 		
+		if(x.saved != undefined) {
+			window.saved = {};
+			for(i in x.saved) {
+				window.saved[i] = x.saved[i].replace(/&gt;/g, ">").replace(/&lt;/g, "<");	
+			}
+		}
+		
 		if(x.hovertagRegistrar == undefined) {
 			
 		} else if(x.hovertagRegistrar.length == undefined && x.hovertagRegistrar != undefined) {
@@ -137,16 +153,25 @@ function finishRestore(x, xc) {
 	});
 }
 function exportFile() {
-	window.section_name = "";
-	$('.build').fadeIn(500);
-	$('.body').fadeOut(500);
-	$('.header').fadeOut(500);
-	$('.build').html('<button onclick="exitBuild()">Return to Editor</button>');
 	add_new_page();	
 	add_to_page("File XML:<br><textarea style='width:95%;height:200px;'>"+localStorage[fileid]+"</textarea><br>");
 	add_to_page("Content HTML:<br><textarea style='width:95%;height:200px;'>"+localStorage[fileid+'_c']+"</textarea><br>");
 	add_to_page('Execute this code in a web console to transfer the files over to a different computer:<br><textarea style="width:95%;height:200px;">localStorage["'+fileid+'5"] = \042'+localStorage[fileid].replace(/"/g, '\\"')+'\042;localStorage["'+fileid+'5_c"] = \042'+localStorage[fileid+"_c"].replace(/"/g, '\\"')+'\042;</textarea>');
 }
+
+function writeToSaved(att, val) {
+	if(val != undefined && att != undefined) {
+		val = val.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/&nbsp;/g, " ");
+		//console.log(val);
+		if(window.saved != undefined)
+			window.saved[att] = val;
+		else {
+			window.saved = {};
+			window.saved[att] = val;
+		}		
+	}
+}
+
 //Formatting Script Launcher
 function createjscssfile(filename, filetype){
  if (filetype=="js"){ //if filename is a external JavaScript file

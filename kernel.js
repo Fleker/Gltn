@@ -146,7 +146,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 			citei = citationi;
 			citeid = citation.length+1;
 			window.citationrestore = false;
-			if(range.toHtml().length == 0 && hovertag == undefined) {
+			if(range.toHtml().length == 0 && hovertag == undefined && q != "panelonly") {
 				citationi++;
 				//Add quote and citation stuff
 				contentAddText('  ');
@@ -163,6 +163,8 @@ function initiateCitationEditor(q, hovertag, h2) {
 				citei = -1;
 				citeid = h2;
 				window.citationrestore = true;	
+			} else if(q == "panelonly") {
+				citationi++;	
 			}
             else { //if you're selecting a bunch of text
 				citationi++;
@@ -768,7 +770,9 @@ document.onkeydown = function(e) {
 		$(el).attr('data-ctrl',e.ctrlKey);
 		$(el).attr('data-shift',e.shiftKey);
 		$('.PanelKeyEvent').click();	
-		console.log($(".PanelKeyEvent").attr('data-keycode'))
+		//console.log($(".PanelKeyEvent").attr('data-keycode'));
+		if(e.keyCode == 9)
+			e.preventDefault();
 	}
 };
 function postWordCount() {
@@ -997,6 +1001,7 @@ function setHeader() {
 			{text: 'Export', img: '<span style="font-size:18pt" class="fa fa-download"></span>', action: "exportFile();"}
 		),
 		Panels: new Array(
+			{text: 'Outline', img: '<span style="font-size:18pt" class="fa fa-list"></span>', action: "runPanel('main_Outline');"},
 			{text: 'Citations', img: '<span style="font-size:18pt" class="fa fa-book"></span>', action: "runPanel('main_Citation');"},
 			{text: 'Ideas', img: '<span style="font-size:18pt" class="fa fa-lightbulb-o"></span>', action: "runPanel('main_Idea');"}
 		),
