@@ -180,7 +180,7 @@ function post_format_mltext(m) {
 	out = out + m.label + "<br>";
 	if(m.description.length)
 		out = out + "<span class='format_description'>"+m.description+"</span><br>";	
-	out = out + "<textarea id='format_item_"+m.index+"' onmouseenter='hideHovertag()'></textarea>";
+	out = out + "<div class='post_format_mltext' contenteditable id='format_item_"+m.index+"' onmouseenter='hideHovertag()'></div>";
 	if(m.min.length != 0 || m.max.length != 0) {
 		out = out + "<br><div class='format_count' id='format_count_"+m.index+"'></div>";	
 	}

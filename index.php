@@ -25,9 +25,9 @@
       <li><a href="#open">Open Source</a></li>
       </ul></div>
 <div class="container center-block row">
-	<h1><span class="fa fa-file"></span>&nbsp;Gltn <br><small>Don't Live Gluten Free Any Longer!</small></h1>
+	<h1><span class="fa fa-file"></span>&nbsp;Gltn <br><small>Don't Live Gltn-Free Any Longer!</small></h1>
 	<button type="button" class="btn btn-success btn-large" onclick="window.location='edit.php?file=abc'">Check it Out</button>
-    <table><tr><td style="text-align:justify"><h5>Gluten is an end-to-end document editor made for students, businessmen, and anyone else who wastes time with fomrats. With a simple GUI, it automatically generates a paper that is completely formatted. Come on, that's pretty awesome.<br><br><br><span style="font-size:9pt">Gltn is still in development. Some parts of it may drastically change as it continues to grow and add more features. This is a beta version. Not everything may work all the time. Alert <a href="mailto:handnf+gluten@gmail.com">the developer</a> or message me <a href="http://twitter.com/handnf" target="_blank">@HandNF</a> (preferrably with a console output) if there is a bug or feature you want.</span></h5></td>
+    <table><tr><td style="text-align:justify"><h5>Gluten is an end-to-end document editor made for students, businessmen, and anyone else who wastes time with formats. With a simple interface, it generates a paper that is completely formatted. Come on, that's pretty awesome.<br><br><br><span style="font-size:7pt">Gltn is still in development. Some parts of it may drastically change as it continues to grow and add more features. This is a beta version. Not everything may work all the time. Alert <a href="mailto:handnf+gluten@gmail.com">the developer</a> or message me <a href="http://twitter.com/handnf" target="_blank">@HandNF</a> (preferrably with a console output) if there is a bug or feature you want.</span></h5></td>
     
     <td style="padding-left:10px"><div class="center"><iframe width="560" height="315" src="//www.youtube.com/embed/u8pWw-RAQEk" frameborder="0" allowfullscreen></iframe></td></tr></table>  
     </div>
@@ -60,12 +60,12 @@
         <h4>Create a Panel</h4>
         <pre>
         function getPanel{name}() {
-            	return {title: "Document Notes", bordercolor: "#f1c40f", width: 40};	
-            }
-            function runPanel{name}() {
-            	postPanelOutput("Hello World");
-            	//code here
-            }	
+            return {title: "Document Notes", bordercolor: "#f1c40f", width: 40};	
+        }
+        function runPanel{name}() {
+            postPanelOutput("Hello World");
+            //code here
+        }	
         </pre>
         <h4>Design a Format</h4>
         <pre>

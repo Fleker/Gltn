@@ -81,12 +81,28 @@ function onBuildBibliography() {
 	cob.editor = "Ed. AUTHOR_FIRST AUTHOR_LAST.";
 	cob.edition = "EDITION_c ed.";
 	cob.title = "<i>TITLE.</i>";
-	cob.description = '"DESCRIPTION"';
-	//The New Jerusalem Bible. Ed. Susan Jones. New York: Doubleday, 1985. Print.	
+	cob.description = '"DESCRIPTION"';	
+	cob.govnation = "GOVNATION.";
+	cob.govbranch = "GOVBRANCH.";
+	cob.govcomm = "GOVCOMM.";
+	cob.govsess = "GOVSESS.";
+	cob.university = "UNIVERSITY,";
+	cob.universityyear = "UNIVERSITYYEAR.";
+	cob.pubdate = "PUBDATE:";
+	
 	obj.book = "cAUTHOR cTITLE cEDITOR cTRANSLATOR cEDITION cPUBCITY cPUBCOMP cYEAR cMEDIUM";
 	obj.bible = "cTITLE cEDITOR cTRANSLATOR cPUBCITY cPUBCOMP cYEAR cMEDIUM";
+	obj.government = "cAUTHOR cGOVNATION cGOVBRANCH cGOVCOMM cTITLE cGOVSESS cPUBCITY cPUBCOMP cYEAR cMEDIUM";
+	obj.pamphlet = "cTITLE cPUBCITY cPUBCOMP cYEAR cMEDIUM";
+	obj.dissertation = "cAUTHOR cTITLE Diss. cUNIVERSITY cUNIVERSITYYEAR cPUBCITY cYEAR cMEDIUM";
+	obj.msthesis = "cAUTHOR cTITLE MS thesis. cUNIVERSITY cUNIVERSITYYEAR cPUBCITY cYEAR cMEDIUM";
+	obj.mathesis = "cAUTHOR cTITLE MA thesis. cUNIVERSITY cUNIVERSITYYEAR cPUBCITY cYEAR cMEDIUM";
+	obj.magazine = "cAUTHOR cDESCRIPTION cTITLE cPUBDATE cMEDIUM";
+	obj.newspaper = "cAUTHOR cDESCRIPTION cTITLE cPUBDATE cMEDIUM";
+	obj.editorial = "cDESCRIPTION Editorial. cTITLE cPUBDATE cMEDIUM";
+	obj.lettertoeditor = "cAUTHOR Letter. cTITLE cPUBDATE cMEDIUM";
+	obj.journal = "cAUTHOR cDESCRIPTION cTITLE cVOLUMEEDITION (YEAR): cMEDIUM";
 	obj.def = "cAUTHOR cTITLE cEDITOR cTRANSLATOR cEDITION cPUBCITY cPUBCOMP cYEAR cMEDIUM";
-	
 	obj.style = "text-indent:-.5in;margin-left:.5in";
 	post_bibliography(obj, cob);	
 }

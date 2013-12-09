@@ -187,7 +187,7 @@ function initiateCitationEditor(q, hovertag, h2) {
                 }
             }
 			
-			window.citetypes = new Array({val: 'Article Online', format:'online'},{val:'Book', format:'print'}, {val:'Book - Online', format:'ebook'}, {val:'Play', format:'theater'}, {val:'Musical', format:'theater'}, /*{val:'eBook', format:'digital book'}, */{val:'Blog', format:'online'}, {val:'Image - Online', format:'eimage'},{val:'Photo - Online', format:'eimage'},{val:'Bible', format:'bible'});
+			window.citetypes = new Array({val: 'Article - Online', format:'online'},{val:'Book', format:'print'}, {val:'Book - Online', format:'ebook'}, {val:'Play', format:'theater'}, {val:'Musical', format:'theater'}, /*{val:'eBook', format:'digital book'}, */{val:'Blog', format:'online'}, {val:'Image - Online', format:'eimage'},{val:'Photo - Online', format:'eimage'},{val:'Bible', format:'bible'},{val:'Government', format:'government'},{val:'Pamphlet',format:'pamphlet'},{val:'Dissertation',format:'dissertation'},{val:"MA Thesis", format:"dissertation"},{val:"MS Thesis", format:"dissertation"},{val: "Magazine Article", format:"periodical"},{val:"Article - Print", format:"periodical"},{val:"Editorial",format:"periodical"},{val:"Letter to the Editor", format:"periodical"},{val:"Article - Journal", format:'journal'});
 			var today =  new Date();
 			today = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
 			new Array('Article Online', 'Book - Print', 'Book - Online', 'Book - eBook Reader', 'Book - Database', 'Dictionary', 'eBook', 'Encyclopedia', 'Musical', 'Online Article', 'Newspaper', 'Play', 'Podcast', 'Website - Blog', 'Website - Book','Website - Image');
@@ -205,6 +205,8 @@ function initiateCitationEditor(q, hovertag, h2) {
 			ht = ht + "<div class='citationEditorAuthor citationInput'>Author: <input placeholder='First' class='citationEditorIAuthorFirst' id='citationEditorIAuthorFirst'>&nbsp;<input placeholder='M' style='width:2em' class='citationEditorIAuthorMiddle'' id='citationEditorIAuthorMiddle'>&nbsp;<input placeholder='Last' class='citationEditorIAuthorLast' id='citationEditorIAuthorLast'><span class='fa fa-plus-circle button' id='citationAddContributor'></span></div>";
 			ht = ht + "<div class='citationEditorPublication citationInput'>Publication: <input placeholder='Publisher' id='citationEditorIPublisher'>&nbsp;<input placeholder='City' id='citationEditorICity'>&nbsp;<input placeholder='Year' style='width:4em' id='citationEditorIYear'></div>";
 			ht = ht + "<div class='citationEditorWebsite citationInput'> Website:<input placeholder='Website Title' id='citationEditorIWebsite'>&nbsp;<input placeholder='Website Publisher' id='citationEditorIWebPublisher'><br>&emsp;&emsp;<input type='url' placeholder='URL' id='citationEditorIUrl'></div>";
+			ht = ht + "<div class='citationEditorGovernment citatonInput'><input placeholder='Nation' id='citationEditorIGovnation'><input placeholder='Branch of Government' id='citationEditorIGovbranch' list='branches'><input placeholder='Committee' id='citationEditorIGovcomm'><input placeholder='Session, eg. 110th Cong., 1st sess' id='citationEditorIGovsess'></div><datalist id='branches'><option>Cong. Senate</option><option>Cong. Reps</option><option>Supreme Court</option><option>Pres</option></datalist>";
+			ht += "<div class='citationEditorUniversity citationInput'><input placeholder='Degree-granting University' id='citationEditorIUniversity'><input placeholder='Year degree was awarded' id='citationEditorIUniversityyear'></div>";
 			ht = ht + "<div class='citationEditorPubdate citationInput'> Published On: <input type='date' id='citationEditorIPubdate'></div>";
 			ht = ht + "<div class='citationEditorAccdate citationInput'> Accessed On: &nbsp;<input type='date' id='citationEditorIAccdate'></div>";
 			ht = ht + "<div class='citationEditorDatabase citationInput'> Database:<input placeholder='Database Name' id='citationEditorIDatabse'>&nbsp;<input type='URL' placeholder='url' style='width:30em' id='citationEdtiorIDbUrl'></div>";
@@ -260,6 +262,32 @@ function initiateCitationEditor(q, hovertag, h2) {
 								citationShow('Title Bible');
 								selectedmedium = "print";
 							break;
+							case 'government':
+								citationShow('Title Author Publication Government');
+								$('#citationEditorICity').val("Washington");
+								$('#citationEditorIPublisher').val("GPO");
+								selectedmedium = "print";
+							break;
+							case 'pamphlet':
+								citationShow('Title Publication');
+								selectedmedium = "print";
+							break;
+							case 'dissertation':
+								citationShow('Title Author Publication University');
+								selectedmedium = "print";
+							break;
+							case 'periodical':
+								citationShow('Title Description Author Pubdate Publication');
+								selectedmedium = "print";
+								$('#citationEditorITitle').attr('placeholder', "Title of Periodical");
+								$('#citationEditorIDescription').attr('placeholder', "Title of Article");
+							break;
+							case 'journal':
+								citationShow('Title Bookpub Author Publication');
+								$('#citationEditorIEdition').attr('placeholder', "Issue #");
+								$('#citationEditorITitle').attr('placeholder', "Title of Journal");
+								$('#citationEditorIDescription').attr('placeholder', "Title of Article");
+								selectedmedium = "print";
 						}
 						return;
 					}
@@ -277,7 +305,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 				if(annotated_bib)
 					$('.citationEditorAbstract').css('display', 'block');
 			}
-			var citeAttributes = new Array('Type', 'Title','Description','Page','Volume','Edition','Main','AuthorFirst','AuthorMiddle','AuthorLast','Publisher','City','Year','Website','WebPublisher','Url','Pubdate','Accdate','Database','DbUrl','Medium','Abstract','Biblebook','Biblechapter','Bibleverse', 'MediumFormat');	
+			var citeAttributes = new Array('Type', 'Title','Description','Page','Volume','Edition','Main','AuthorFirst','AuthorMiddle','AuthorLast','Publisher','City','Year','Website','WebPublisher','Url','Pubdate','Accdate','Database','DbUrl','Medium','Abstract','Biblebook','Biblechapter','Bibleverse', 'MediumFormat', 'Govnation', 'Govbranch', 'Govcomm', 'Govsess','University','Universityyear');	
 			function citationSave() {
 				citation[citeid] = {};
 				for(i in citeAttributes) {

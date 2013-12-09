@@ -285,6 +285,15 @@ button {
 .pagefooter {
 	height: 1in;	
 }	
+.post_format_mltext {
+	width: 55%;
+height: 3em;
+margin-left: 1em;
+border: solid 1px #999;
+padding-left: 2px;	
+-webkit-box-shadow: inset 0px 0px 1px 0px rgba(0, 0, 0, 1);
+	box-shadow: inset 0px 0px 1px 0px rgba(0, 0,0, 1);
+}
 @media print {
 	body {
 		background-color:white;	

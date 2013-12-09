@@ -134,7 +134,8 @@ function finishRestore(x, xc) {
 			//window.metadata[i] = x['metadata'][i];	
 			//console.log(4);
 			//$('#format_item_'+i).val(window.metadata[i]['value']);
-			$('#format_item_'+i).val(x.metadata[i]['value'])
+			$('#format_item_'+i).val(x.metadata[i]['value']);
+			$('#format_item_'+i).html(x.metadata[i]['value']);
 		}	
 		//console.log(3);
 		//Do a little more cleaning up

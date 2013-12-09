@@ -82,6 +82,8 @@ function grabMetadata(i) {
 	o = window.metadata[i];
 //	console.log(i);
 	o.value = $('#format_item_'+i).val();
+	if(o.value == undefined)
+		o.value = $('#format_item_'+i).html();
 	return o;	
 }
 function searchMetadata(request) {
@@ -328,6 +330,38 @@ function citationFormatted(string, i, id, page, cob) {
 			string = string.replace(/cDESCRIPTION/g, cob.description.replace(/DESCRIPTION/g, citation[id].Description));
 		else
 			string = string.replace(/cDESCRIPTION/g, "");
+		if(citation[id].Govnation.length)
+			string = string.replace(/cGOVNATION/g, cob.govnation.replace(/GOVNATION/g, citation[id].Govnation));
+		else
+			string = string.replace(/cGOVNATION/g, "");
+		if(citation[id].Govbranch.length)
+			string = string.replace(/cGOVBRANCH/g, cob.govbranch.replace(/GOVBRANCH/g, citation[id].Govbranch));
+		else
+			string = string.replace(/cGOVBRANCH/g, "");
+		if(citation[id].Govcomm.length)
+			string = string.replace(/cGOVCOMM/g, cob.govcomm.replace(/GOVCOMM/g, citation[id].Govcomm));
+		else
+			string = string.replace(/cGOVCOMM/g, "");
+		if(citation[id].Govsess.length)
+			string = string.replace(/cGOVSESS/g, cob.description.replace(/GOVSESS/g, citation[id].Description));
+		else
+			string = string.replace(/cGOVSESS/g, "");
+		if(citation[id].University.length)
+			string = string.replace(/cUNIVERSITY/g, cob.university.replace(/UNIVERSITY/g, citation[id].University));
+		else
+			string = string.replace(/cUNIVERSITY/g, "");
+		if(citation[id].Universityyeaer.length)
+			string = string.replace(/cUNIVERSITYYEAR/g, cob.universityyear.replace(/UNIVERSITYYEAR/g, citation[id].Universityyear));
+		else
+			string = string.replace(/cUNIVERSITYYEAR/g, "");
+		if(citation[id].Pubdate.length) {
+			var duedate = Date.parse(citation[id].Pubdate);
+			var duedate = new Date(duedate);
+			var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+			var dueout = (duedate.getDate()+1) + " " + months[duedate.getMonth()] + " " + duedate.getFullYear();
+			string = string.replace(/cPUBDATE/g, cob.pubdate.replace(/PUBDATE/g, dueout));
+		} else
+			string = string.replace(/cPUBDATE/g, "<i>n.d.</i>");
 		if(page.length)
 			string = string.replace(/cPAGE/g, cob.page.replace(/PAGE/g, page));
 		else
@@ -760,10 +794,28 @@ function post_bibliography(object, cob) {
 	for(i in citationSorted) {
 		var str = "";
 		var f = findCitation(citationSorted[i]);
-		if(citation[f.id].Type == "Bible") {
+		if(citation[f.id].Type == "Bible" && object.bible != undefined) {
 			str = citationFormatted(object.bible, f.i, f.id, f.page, cob); 
-		} else if(citation[f.id].Type == "Book" || citation[f.id].Type == "Book - Online") {
+		} else if((citation[f.id].Type == "Book" || citation[f.id].Type == "Book - Online") && object.book != undefined) {
 			str = citationFormatted(object.book, f.i, f.id, f.page, cob); 
+		} else if(citation[f.id].Type == "Pamphlet" && object.pamphlet != undefined) {
+			str = citationFormatted(object.pamphlet, f.i, f.id, f.page, cob); 
+		} else if(citation[f.id].Type == "Government" && object.government != undefined) {
+			str = citationFormatted(object.government, f.i, f.id, f.page, cob); 
+		} else if(citation[f.id].Type == "Dissertation" && object.dissertation != undefined) {
+			str = citationFormatted(object.dissertation, f.i, f.id, f.page, cob);
+		} else if(citation[f.id].Type == "MA Thesis" && object.mathesis != undefined) {
+			str = citationFormatted(object.mathesis, f.i, f.id, f.page, cob);
+		} else if(citation[f.id].Type == "MS Thesis" && object.msthesis != undefined) {
+			str = citationFormatted(object.msthesis, f.i, f.id, f.page, cob);
+		} else if(citation[f.id].Type == "Article - Print" && object.newspaper != undefined) {
+			str = citationFormatted(object.newspaper, f.i, f.id, f.page, cob);
+		} else if(citation[f.id].Type == "Editorial" && object.editorial != undefined) {
+			str = citationFormatted(object.editorial, f.i, f.id, f.page, cob);
+		} else if(citation[f.id].Type == "Letter to the Editor" && object.lettertoeditor != undefined) {
+			str = citationFormatted(object.lettertoeditor, f.i, f.id, f.page, cob);
+		} else if(citation[f.id].Type == "Article - Journal" && object.journal != undefined) {
+			str = citationFormatted(object.journal, f.i, f.id, f.page, cob);
 		} else {
 			console.log("--"+f.id);
 			str = citationFormatted(object.def, f.i, f.id, f.page, cob); 
