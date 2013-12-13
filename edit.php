@@ -27,6 +27,7 @@
 <script src="json2xml.js"></script>
 <script src="xmlToJson.js"></script>
 <script src="IntroJS/intro.js"></script>
+<script src="http://fgnass.github.io/spin.js/dist/spin.min.js"></script>
 </head>
 <body>
 

@@ -23,7 +23,7 @@ function newRibbon(element, ribbon) {
     
 	out = '';
     for(i in keys) {
-        out = out + '<table class="ribbongroup" style="width:100%;text-align:center">'
+        out = out + '<table class="ribbongroup" style="width:106%;text-align:center">'
         for(j in ribbon[keys[i]]) {
             var k = ribbon[keys[i]][j];
 			
@@ -48,6 +48,12 @@ function newRibbon(element, ribbon) {
 	$('.ribbongroup').css('margin-left','102%').css('display', 'inline-table').css('opacity', 0);
 	ribbonobj.index = -1;
 	//ribbonSwitch(0,false);
+	$('.ribbonbutton').mouseenter(function() {
+		highlight(this);
+	});
+	$('.ribbonbutton').mouseleave(function() {
+		unlight(this);
+	});
 }
 function ribbonSwitch(index, bool) {
 	ribbon_index = index;
@@ -110,4 +116,15 @@ function ribbonGesture() {
 					ribbonSwitch(ribbonobj.index +1);
 				}
 			});
+}
+function highlight(el) {
+	//console.log(jQuery(el).attr('class'));
+	jQuery(el).animate({
+		backgroundColor: '#9999ff',
+	}, 175);
+}
+function unlight(el) {
+	jQuery(el).animate({
+		backgroundColor: 'rgba(0,0,0,0)'	
+	}, 175);
 }

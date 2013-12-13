@@ -17,7 +17,7 @@ function runPanel(panel_id_name) {
 	openPanelPlugin(p.width, min, panel_id_name);
 }
 function openPanelPlugin(percent, min, panel_id_name) {
-	$('#panel_plugin').css('display', 'block').css('opacity', 0);
+	$('#panel_plugin').css('display', 'block').css('opacity', 0.01);
 	$('#panel_plugin').animate({
 		/*width: percent+"%",*/
 		width:'95%',
@@ -356,6 +356,8 @@ function RunPanelmain_Outline() {
 		range = sel.rangeCount ? sel.getRangeAt(0) : null;
 	});
 	$('#outlineBuild').on('click', function() {
+		$('.draft').html(valMetadata('Author')+"<br>"+"<ul style='line-height:1.8em'>"+$('.Outline').html()+"</ul>");
+		//startBuild('.draft');
 		falseBuild();
 		add_new_page();
 			add_to_page(valMetadata('Author')+"<br>");

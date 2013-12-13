@@ -29,7 +29,10 @@ span, div, body {
 }
 .panel {
 
-}	
+}
+.toolbar_button {
+	cursor:pointer;	
+}
 
 /* Initiate */
 #panel_content {
@@ -90,6 +93,11 @@ span, div, body {
 	margin-bottom: -4px;
 	width:98%;
 }	
+.overflow {
+	background-color: #aaa;
+	margin-bottom: -4px;
+	width:98%;
+}
 .popup_character {
 	position: fixed;
 	left: 5%;
@@ -293,16 +301,19 @@ border: solid 1px #999;
 padding-left: 2px;	
 -webkit-box-shadow: inset 0px 0px 1px 0px rgba(0, 0, 0, 1);
 	box-shadow: inset 0px 0px 1px 0px rgba(0, 0,0, 1);
+	font-family: sans-serif;
+font-size: 10pt;
 }
 @media print {
 	body {
 		background-color:white;	
+		margin-top:-0.1in;
 	}
 	.page {
 		box-shadow: none;
 		-webkit-box-shadow: none;
 		width:8.5in;
-		height:13in;
+		height:12.68in;
 	}
 	hr, button, .fa, .noprint {
 		display:none;

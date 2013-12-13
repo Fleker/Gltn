@@ -71,6 +71,7 @@ window.onload = function() {
                     	//id: "citation"+0,						
                     }
              });
+			setInterval("update_toolbar_style()", 20);
 }
 
 content_textarea_var = null;
@@ -149,7 +150,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 			if(range.toHtml().length == 0 && hovertag == undefined && q != "panelonly") {
 				citationi++;
 				//Add quote and citation stuff
-				contentAddText('  ');
+				//contentAddText('  ');
 				contentAddSpan({class: 'citation', id:'citation'+citei, node:'span', leading_quote:(q.length>0)});
 				contentAddText('  ');
 				//contentAddSpan({node:'span'});
@@ -187,7 +188,7 @@ function initiateCitationEditor(q, hovertag, h2) {
                 }
             }
 			
-			window.citetypes = new Array({val: 'Article - Online', format:'online'},{val:'Book', format:'print'}, {val:'Book - Online', format:'ebook'}, {val:'Play', format:'theater'}, {val:'Musical', format:'theater'}, /*{val:'eBook', format:'digital book'}, */{val:'Blog', format:'online'}, {val:'Image - Online', format:'eimage'},{val:'Photo - Online', format:'eimage'},{val:'Bible', format:'bible'},{val:'Government', format:'government'},{val:'Pamphlet',format:'pamphlet'},{val:'Dissertation',format:'dissertation'},{val:"MA Thesis", format:"dissertation"},{val:"MS Thesis", format:"dissertation"},{val: "Magazine Article", format:"periodical"},{val:"Article - Print", format:"periodical"},{val:"Editorial",format:"periodical"},{val:"Letter to the Editor", format:"periodical"},{val:"Article - Journal", format:'journal'});
+			window.citetypes = new Array({val: 'Article - Online', format:'web'},{val:'Book', format:'print'}, {val:'Book - Online', format:'ebook'}, {val:'Play', format:'theater'}, {val:'Musical', format:'theater'}, /*{val:'eBook', format:'digital book'}, */{val:'Blog', format:'web'}, {val:'Image - Online', format:'eimage'},{val:'Photo - Online', format:'eimage'},{val:'Bible', format:'bible'},{val:'Government', format:'government'},{val:'Pamphlet',format:'pamphlet'},{val:'Dissertation',format:'dissertation'},{val:"MA Thesis", format:"dissertation"},{val:"MS Thesis", format:"dissertation"},{val: "Magazine Article", format:"periodical"},{val:"Article - Print", format:"periodical"},{val:"Editorial",format:"periodical"},{val:"Letter to the Editor", format:"periodical"},{val:"Article - Journal", format:'journal'});
 			var today =  new Date();
 			today = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
 			new Array('Article Online', 'Book - Print', 'Book - Online', 'Book - eBook Reader', 'Book - Database', 'Dictionary', 'eBook', 'Encyclopedia', 'Musical', 'Online Article', 'Newspaper', 'Play', 'Podcast', 'Website - Blog', 'Website - Book','Website - Image');
@@ -198,14 +199,14 @@ function initiateCitationEditor(q, hovertag, h2) {
 			}
 			var ht = out+"</datalist>";
 			
-			ht = ht + "<div class='citationEditorTitle citationInput'><input type='text' placeholder='Main title of the work' list='citetitlelist' style='width: 30em' id='citationEditorITitle'></div>";
+			ht = ht + "<div class='citationEditorTitle citationInput'><input type='text' placeholder='Main title of the work' style='width: 30em' id='citationEditorITitle' list='citationAutoTitle'></div>";
 			ht = ht + "<div class='citationEditorDescription citationInput'><input type='text' style='width:35em' placeholder='Description/Individual Work Title' id='citationEditorIDescription'></div>";
 			ht = ht + "<div class='citationEditorPlay citationInput'>Act: <input id='citationEditorIAct' style='width:4em'>&nbsp;Scene:<input type='citationEditorIScene' style='width:4em'>&nbsp;Line(s): <input id='citationEditorILines' style='width:10em'></div>";
 			ht = ht + "<div class='citationEditorBookpub citationInput'><input type='text' placeholder='Page #' style='width:4em' id='citationEditorIPage'>&nbsp;<input placeholder='Volume' style='width:5em' id='citationEditorIVolume'>&nbsp;<input type='text' placeholder='Edition' style='width:6em' id='citationEditorIEdition'>&nbsp;<input type='text' placeholder='Series' id='citationEditorISeries'>Referenced author?<input type='checkbox' id='citationEditorIMain' value='off'></div>";
 			ht = ht + "<div class='citationEditorAuthor citationInput'>Author: <input placeholder='First' class='citationEditorIAuthorFirst' id='citationEditorIAuthorFirst'>&nbsp;<input placeholder='M' style='width:2em' class='citationEditorIAuthorMiddle'' id='citationEditorIAuthorMiddle'>&nbsp;<input placeholder='Last' class='citationEditorIAuthorLast' id='citationEditorIAuthorLast'><span class='fa fa-plus-circle button' id='citationAddContributor'></span></div>";
 			ht = ht + "<div class='citationEditorPublication citationInput'>Publication: <input placeholder='Publisher' id='citationEditorIPublisher'>&nbsp;<input placeholder='City' id='citationEditorICity'>&nbsp;<input placeholder='Year' style='width:4em' id='citationEditorIYear'></div>";
 			ht = ht + "<div class='citationEditorWebsite citationInput'> Website:<input placeholder='Website Title' id='citationEditorIWebsite'>&nbsp;<input placeholder='Website Publisher' id='citationEditorIWebPublisher'><br>&emsp;&emsp;<input type='url' placeholder='URL' id='citationEditorIUrl'></div>";
-			ht = ht + "<div class='citationEditorGovernment citatonInput'><input placeholder='Nation' id='citationEditorIGovnation'><input placeholder='Branch of Government' id='citationEditorIGovbranch' list='branches'><input placeholder='Committee' id='citationEditorIGovcomm'><input placeholder='Session, eg. 110th Cong., 1st sess' id='citationEditorIGovsess'></div><datalist id='branches'><option>Cong. Senate</option><option>Cong. Reps</option><option>Supreme Court</option><option>Pres</option></datalist>";
+			ht = ht + "<div class='citationEditorGovernment citationInput'><input placeholder='Nation' id='citationEditorIGovnation'><input placeholder='Branch of Government' id='citationEditorIGovbranch' list='branches'><input placeholder='Committee' id='citationEditorIGovcomm'><input placeholder='Session, eg. 110th Cong., 1st sess' id='citationEditorIGovsess'></div><datalist id='branches'><option>Cong. Senate</option><option>Cong. Reps</option><option>Supreme Court</option><option>Pres</option></datalist>";
 			ht += "<div class='citationEditorUniversity citationInput'><input placeholder='Degree-granting University' id='citationEditorIUniversity'><input placeholder='Year degree was awarded' id='citationEditorIUniversityyear'></div>";
 			ht = ht + "<div class='citationEditorPubdate citationInput'> Published On: <input type='date' id='citationEditorIPubdate'></div>";
 			ht = ht + "<div class='citationEditorAccdate citationInput'> Accessed On: &nbsp;<input type='date' id='citationEditorIAccdate'></div>";
@@ -214,7 +215,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 			ht = ht + "<div class='citationEditorBible citationInput'> <input placeholder='Book' id='citationEditorIBiblebook'><input placeholder='Chapter' id='citationEditorIBiblechapter'><input placeholder='Verse' id='citationEditorIBibleverse'></div>";
 			ht = ht + "<div class='citationEditorMedium citationInput'> <input placeholder='Medium' id='citationEditorIMedium'></div>";
 			ht = ht + "<div class='citationEditorAbstract citationInput'>Type a summary of this work and how you used it in writing your document.<br><div contenteditable id='citationEditorIAbstract' style='background-color:white;height:3em;border:solid 1px #999;'></div></div>";
-			ht = ht + "<datalist id='citationContributorTypes'><option>Author</option><option>Editor</option><option>Translator</option></datalist>"
+			ht = ht + "<datalist id='citationContributorTypes'><option>Author</option><option>Editor</option><option>Translator</option></datalist><datalist id='citationAutoTitle'></datalist>"			
 			ht = ht + "<button style='' id='citationEditorSave'>Save</button>";
 		
 		var fnc = function x() {
@@ -229,7 +230,39 @@ function initiateCitationEditor(q, hovertag, h2) {
 				var out = "<br><input placeholder='Contribution' class='citationEditorIAuthorType' list='citationContributorTypes' style='width:3.5em'><input placeholder='First' class='citationEditorIAuthorFirst'>&nbsp;<input placeholder='M' style='width:2em' class='citationEditorIAuthorMiddle'>&nbsp;<input placeholder='Last' class='citationEditorIAuthorLast'>";
 				$('.citationEditorAuthor').append(out);
 			});
+			$('#citationEditorITitle, #citationEditorIEdition, #citationEditorIAuthorLast').on('input', function() {
+				var t = $('#citationEditorITitle').val();
+				var e = $('#citationEditorIEdition').val();
+				var a = $('#citationEditorIAuthorLast').first().val();
+				var y = $('#citationEditorIType').val();
+				
+				for(i in citation) {
+					if(citation[i] != undefined && citation[i] != "undefined") {
+						if(citation[i].Title == t && citation[i].AuthorLast == a && citation[i].Edition == e && citation[i].Type == y) {
+							$('#citation'+citei).attr('data-id', i);
+							$('#citation'+citei).attr('data-i', citei);
+							getCitationI(i);
+						}
+						else if(citation[i].Title == t) {
+							//console.log(i+" is almost there");
+							$('#citationEditorIAuthorLast').first().attr('placeholder', citation[i].AuthorLast).css('border-color','#d35400');
+							$('#citationEditorIEdition').attr('placeholder', citation[i].Edition).css('border-color', '#d35400');
+						}
+					}
+				}
+			});	
+			function getCitationI(index) {
+				initiateCitationEditor(undefined, -1, index);	
+			}
 			function citationReformat() {
+				ht = "";
+				for(i in citation) {
+					if(citation[i] != undefined && citation[i] != "undefined") {
+						if(citation[i].Type == $('#citationEditorIType').val())
+							ht += "<option>"+citation[i].Title+"</option>";
+					}
+				}
+				$('#citationAutoTitle').html(ht);
 				for(i=0;i<citetypes.length;i++) {
 					//console.log('-'+citetypes[i].val);
 					if(citetypes[i].val == $('#citationEditorIType').val()) {
@@ -237,7 +270,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 						window.selectedmedium = citetypes[i].format;
 						introJsStart(10);
 						switch(citetypes[i].format) {
-							case 'online':
+							case 'web':
 								citationShow('Title Author Website Pubdate Accdate');
 							break;
 							case 'print':
@@ -1052,4 +1085,3 @@ function appendHoloSelection() {
 	newRibbon('.header', $.extend({}, holoribbon_std, selection));
 	ribbonSwitch(ribbon_index, false);
 }
-setTimeout("setHeader()",100);

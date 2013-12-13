@@ -188,13 +188,17 @@ function post_format_mltext(m) {
 }
 function post_format_content(m) {
 	var out = "";
-	out = "<div class='content toolbar'></div>";
+	out = "<div class='content overflow'></div>";
+	out += "<div class='content toolbar'></div>";
 	out = out + "<div contenteditable='true' class='content content_textarea' onmouseleave='/*hideHovertag()*/ '></div>";
 	out = out + "<table class='content_wordcount'><tr><td class='content_word'></td><td class='content_character'></td><td class='content_save'>&emsp;saved</td></tr></table>";
 	return out;	
 }
 function post_toolbar(tools) {
-	out = "&emsp;<span class='toolbar_button' data-t='character' id='CHARACTERPANEL'>Character</span>&emsp;|&emsp;";
+	var overflow = false;
+	$('.toolbar').empty();
+	$('.overflow').empty();
+	$('.toolbar').append("<div class='toolbar_options' style='display:inline'>&emsp;<span class='toolbar_button' data-t='character' id='CHARACTERPANEL'>Character</span>&emsp;|&emsp;");
 	//TODO - Use labels to make prettier, maybe "new_toolbar/new_toolbar_item"
 	//TODO - Use JSON objects to enable more powerful, third-party tools
 	for(i=0;i<tools.length;i++) {
@@ -225,12 +229,38 @@ function post_toolbar(tools) {
 				tool_pretty = "<button class='fontawesome-italics'></button>";
 			break;
 		}
-		out = out + "<span class='toolbar_button' data-t='"+tools[i]+"'>"+tool_pretty+"</span>&emsp;|&emsp;";
+		var sum = 0;
+		var index = 0;
+		$('.toolbar_button').each(function(){ 
+			if($(this).width() > sum)
+			sum = $(this).width();
+		});
+		sum += 35;
+		//console.log("Tool",i,$('.toolbar_options').width() + sum >= $('.toolbar').width(),$('.toolbar_options').width() + sum,$('.toolbar').width());
+		if($('.toolbar_options').width() + sum >= $('.toolbar').width() & overflow == false) {
+			overflow = true;
+			$('.toolbar_options').append("<div class='toolbar_button' data-t='overflow' style='display:inline-block'>&nbsp;&nbsp;&nbsp;<span class='fa fa-ellipsis-v'></span>&nbsp;&nbsp;&nbsp;</div>|&emsp;");
+		}	
+		if(overflow)
+			$('.overflow').append("<span class='toolbar_button' data-t='"+tools[i]+"'>"+tool_pretty+"</span>&emsp;|&emsp;");
+		else
+			$('.toolbar_options').append("<span class='toolbar_button' data-t='"+tools[i]+"'>"+tool_pretty+"</span>&emsp;|&emsp;");
 	}
-	out = out + "<span class='toolbar_button fa fa-expand' data-t='fullscreen'></span>&emsp;|&emsp;";
+	if(overflow)
+		$('.overflow').prepend("&emsp;<span class='toolbar_button fa fa-expand' data-t='fullscreen'></span>&emsp;|&emsp;</div>");
+	else
+		$('.toolbar_options').append("<span class='toolbar_button fa fa-expand' data-t='fullscreen'></span>&emsp;|&emsp;</div>");
+	//if(overflow) 
+		//out += "</span></div>";
 	
-	$('.toolbar').html(out);
-	
+	//$('.toolbar').html(out);
+	$('.overflow').hide();
+	$('.toolbar_button').on('mouseenter', function() {
+		highlight_tool(this);
+	});
+	$('.toolbar_button').on('mouseleave', function() {
+		unlight_tool(this);
+	});
 	$('.toolbar_button').on("click", function() {
 		switch ($(this).attr('data-t')) {
 			case "character":
@@ -275,29 +305,45 @@ function post_toolbar(tools) {
 			case "italics":
 				toggleItalics();
 			break;
+			case 'overflow':
+				$('.overflow').toggle(150);
+			break;
 		}
 	});
 	
-	
-	setInterval("update_toolbar_style()", 10);
+}
+function highlight_tool(el) {
+	//console.log(jQuery(el).attr('class'));
+	jQuery(el).animate({
+		backgroundColor: '#33f',
+	}, 175);
+}
+function unlight_tool(el) {
+	jQuery(el).animate({
+		backgroundColor: 'rgba(0,0,0,0)'	
+	}, 175);
 }
 window.fullscreenOn = false;
 /*$(window).resize(function () {*/
 toolbar_width = 0;
 function update_toolbar_style() {
-	saveFile();
+	//saveFile();
 	/*if(getRange().collapsed == false) {
 		appendHoloSelection();	
 	}*/
+	//$('.toolbar').width(.94*window.innerWidth);
 	if(toolbar_width != $('.toolbar').width()) {
+		//$('.toolbar').width(.94*window.innerWidth);
 		toolbar_width = $('.toolbar').width();
 		//console.log(toolbar_width+" ",$('.toolbar').width());
 		if(window.fullscreenOn == false) {
 			tw = $('.toolbar').width();
 			$('.content_textarea').width(tw);
+			$('.overflow').width(tw);
 			bh = window.innerHeight;
 			$('.content_textarea').height(2*bh/3);
 			$('.content_textarea').css('z-index', 0).css('position', 'inherit');
+			onInitToolbar();
 			/*$('.content_textarea').animate({
 				top: -.1%,
 				left:-.1%;

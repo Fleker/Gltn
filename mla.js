@@ -43,6 +43,7 @@ function onGetFormats() {
 	obj.heading3 = "<div style='font-weight:bold;text-align:center'>LIST1. TEXT</div>";
 	obj.heading4 = "<div style='font-style:italics;text-align:center'>LIST1. TEXT</div>";
 	obj.heading5 = "<div style='text-decoration:underline'>LIST1. TEXT</div>";
+	obj.paragraph_indent = "&emsp;";
 	
 	obj.citation = "(AUTHOR_LAST PAGE)";
 	obj.citation_main = "(PAGE)";
@@ -52,7 +53,7 @@ function onGetFormats() {
 	obj.citation_threeauthors = '(AUTHOR_LAST, AUTHOR_LAST, and AUTHOR_LAST PAGE)';
 	obj.citation_manyauthors = '(AUTHOR_LAST et al. PAGE)';
 	obj.citation_sameauthorarticle_main = '("TITLE" PAGE)';
-	obj.citation_sameauthorbook_main = '<div style="display:inline">(<i>TITLE</i> PAGE)';
+	obj.citation_sameauthorbook_main = '<div style="display:inline">(<i>TITLE</i> PAGE)</div>';
 	obj.citation_sameauthorarticle = '(AUTHOR_LAST, "TITLE" PAGE)';
 	obj.citation_sameauthorbook = '(AUTHOR_LAST, <i>TITLE</i> PAGE)';
 	obj.citation_multivolume = '(VOLUME: PAGE)';
@@ -89,6 +90,9 @@ function onBuildBibliography() {
 	cob.university = "UNIVERSITY,";
 	cob.universityyear = "UNIVERSITYYEAR.";
 	cob.pubdate = "PUBDATE:";
+	cob.accdate = "ACCDATE.";
+	cob.website = "WEBSITE.";
+	cob.webpub = "WEBPUB.";
 	
 	obj.book = "cAUTHOR cTITLE cEDITOR cTRANSLATOR cEDITION cPUBCITY cPUBCOMP cYEAR cMEDIUM";
 	obj.bible = "cTITLE cEDITOR cTRANSLATOR cPUBCITY cPUBCOMP cYEAR cMEDIUM";
@@ -102,6 +106,8 @@ function onBuildBibliography() {
 	obj.editorial = "cDESCRIPTION Editorial. cTITLE cPUBDATE cMEDIUM";
 	obj.lettertoeditor = "cAUTHOR Letter. cTITLE cPUBDATE cMEDIUM";
 	obj.journal = "cAUTHOR cDESCRIPTION cTITLE cVOLUMEEDITION (YEAR): cMEDIUM";
+	//Editor, author, or compiler name (if available). Name of Site. Version number. Name of institution/organization affiliated with the site (sponsor or publisher), date of resource creation (if available). Medium of publication. Date of access.
+	obj.web = "cAUTHOR cTITLE cWEBSITE cWEBPUB cPUBDATE cMEDIUM cACCDATE";
 	obj.def = "cAUTHOR cTITLE cEDITOR cTRANSLATOR cEDITION cPUBCITY cPUBCOMP cYEAR cMEDIUM";
 	obj.style = "text-indent:-.5in;margin-left:.5in";
 	post_bibliography(obj, cob);	

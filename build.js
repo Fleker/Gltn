@@ -6,9 +6,9 @@ function falseBuild() {
 	$('.header').fadeOut(500);
 	$('.build').html('<button onclick="exitBuild()">Return to Editor</button><button onclick="window.print()" class="fa fa-print noprint" style="font-size:12pt;"></button>');	
 }
-function startBuild() {
+function startBuild(el) {
 	//initiate the build code, show the progress indicator, and start sending stuff to different functions to do different stuff.
-	builddate = new Date().getTime()
+	builddate = new Date().getTime();
 	console.warn('start');
 		$('.build').fadeIn(500);
 	//$('.page').css('width','8.5in');
@@ -16,37 +16,50 @@ function startBuild() {
 	$('#searching').val('');
 	$('.build').html('<button onclick="exitBuild()" class="noprint">Return to Editor</button><button onclick="window.print()" class="fa fa-print noprint" style="font-size:12pt;"></button><span class="buildtime noprint" style="font-size:9pt"></span>');
 		//$('.build_progress').css('display', 'block').css('position', 'fixed').css('width', '50%').css('height', '50%').css('top','25%').css('left','25%').css('background-color', 'rgba(0,0,0,0.3)').css('font-size','16pt').css('margin-top','10%');
-	initiatePopup({title:"Build Progress",bordercolor:"rgb(44, 145, 16)",ht:"<div class='build_progress'></div>"});
+	initiatePopup({title:"Build Progress",bordercolor:"rgb(44, 145, 16)",ht:"<div id='build_progress' class='build_progress' style='height:150px'></div>"});
 	updateBuildProgress('Initiating Build...');
-	setTimeout('continueBuild()',500);
+	setTimeout('continueBuild("'+el+'")',500);
 }
 
-function continueBuild() {
+function continueBuild(el) {
 	//Duplicate paper
-	var cont = $('.content_textarea').html();
+	var cta = false;
+	console.log(el, el == 'undefined');
+	if(el == 'undefined') {
+		el = '.content_textarea';
+		cta = true;
+	}
+	//el = '.content_textarea';
+	var cont = $(el).html();
+	//console.log(cont);
 	$('.draft').html(cont);
 	$('.draft span').css('border','none');
 	
 	//To {format}.js
-	try {
-		onStylePaper();	
-	} catch(e) {
-		
-	}
-	updateBuildProgress('Building Text...');
-	onBuildFormat();
-		updateBuildProgress('Setting Headers...');	
+	if(cta) {
+		try {
+			onStylePaper();	
+		} catch(e) {
 			
-	onGetFormats();
-		updateBuildProgress('Formatting Content...');
-	if($('.content_textarea > .citation').length) {
-		onBuildBibliography();
-			updateBuildProgress('Building Bibliography...');
-	}
-	try {
-		onSetHeader();
-	} catch(e) {
-		
+		}
+		updateBuildProgress('Building Text...');
+		onBuildFormat();
+			updateBuildProgress('Setting Headers...');	
+				
+		onGetFormats();
+			updateBuildProgress('Formatting Content...');
+		if($('.content_textarea > .citation').length) {
+			onBuildBibliography();
+				updateBuildProgress('Building Bibliography...');
+		}
+		try {
+			onSetHeader();
+		} catch(e) {
+			
+		}
+	} else {
+		add_new_page();
+		post_content_formatting({});	
 	}
 		updateBuildProgress('Setting up display...');
 		
@@ -62,7 +75,30 @@ function continueBuild() {
 	//$('.build').css('display', 'block');
 }
 function updateBuildProgress(text) {
-	$('.build_progress').html(text);	
+var opts = {
+  lines: 7, // The number of lines to draw
+  length: 10, // The length of each line
+  width: 3, // The line thickness
+  radius: 13, // The radius of the inner circle
+  corners: 1, // Corner roundness (0..1)
+  rotate: 0, // The rotation offset
+  direction: 1, // 1: clockwise, -1: counterclockwise
+  color: '#000', // #rgb or #rrggbb or array of colors
+  speed: 0.7, // Rounds per second
+  trail: 20, // Afterglow percentage
+  shadow: false, // Whether to render a shadow
+  hwaccel: false, // Whether to use hardware acceleration
+  className: 'spinner', // The CSS class to assign to the spinner
+  zIndex: 2e9, // The z-index (defaults to 2000000000)
+  top: '30px', // Top position relative to parent in px
+  left: '50%' // Left position relative to parent in px
+};
+var target = document.getElementById('build_progress');
+var spinner = new Spinner(opts).spin(target);
+$('.build_progress').append(text);
+$('.spinner').css('top','55px').css('left','50%');
+;	
+//target.appendChild(spinner.el);
 }
 function finishBuild() {
 	//$('.build_progress').css('display', 'none');
@@ -318,7 +354,7 @@ function citationFormatted(string, i, id, page, cob) {
 			string = string.replace(/cVOLUME/g, cob.volume.replace(/VOLUME/, citation[id].Volume));
 		else
 			string = string.replace(/cVOLUME/g, "");
-		if(citation[id].Url.length)
+		if(citation[id].Url.length && cob.url != undefined)
 			string = string.replace(/cURL/g, cob.url.replace(/URL/g, citation[id].Url));
 		else
 			string = string.replace(/cURL/g, "");
@@ -346,11 +382,19 @@ function citationFormatted(string, i, id, page, cob) {
 			string = string.replace(/cGOVSESS/g, cob.description.replace(/GOVSESS/g, citation[id].Description));
 		else
 			string = string.replace(/cGOVSESS/g, "");
+		if(citation[id].Website.length)
+			string = string.replace(/cWEBSITE/g, cob.website.replace(/WEBSITE/g, citation[id].Website));
+		else
+			string = string.replace(/cWEBSITE/g, "");
+		if(citation[id].WebPublisher.length)
+			string = string.replace(/cWEBPUB/g, cob.webpub.replace(/WEBPUB/g, citation[id].WebPublisher));
+		else
+			string = string.replace(/cWEBPUB/g, "");
 		if(citation[id].University.length)
 			string = string.replace(/cUNIVERSITY/g, cob.university.replace(/UNIVERSITY/g, citation[id].University));
 		else
 			string = string.replace(/cUNIVERSITY/g, "");
-		if(citation[id].Universityyeaer.length)
+		if(citation[id].Universityyear.length)
 			string = string.replace(/cUNIVERSITYYEAR/g, cob.universityyear.replace(/UNIVERSITYYEAR/g, citation[id].Universityyear));
 		else
 			string = string.replace(/cUNIVERSITYYEAR/g, "");
@@ -362,7 +406,15 @@ function citationFormatted(string, i, id, page, cob) {
 			string = string.replace(/cPUBDATE/g, cob.pubdate.replace(/PUBDATE/g, dueout));
 		} else
 			string = string.replace(/cPUBDATE/g, "<i>n.d.</i>");
-		if(page.length)
+		if(citation[id].Accdate.length) {
+			var duedate = Date.parse(citation[id].Accdate);
+			var duedate = new Date(duedate);
+			var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+			var dueout = (duedate.getDate()+1) + " " + months[duedate.getMonth()] + " " + duedate.getFullYear();
+			string = string.replace(/cACCDATE/g, cob.accdate.replace(/ACCDATE/g, dueout));
+		} else
+			string = string.replace(/cACCDATE/g, "");
+		if(page != undefined)
 			string = string.replace(/cPAGE/g, cob.page.replace(/PAGE/g, page));
 		else
 			string = string.replace(/cPAGE/g, "");
@@ -382,7 +434,10 @@ function citationFormatted(string, i, id, page, cob) {
 	string = string.replace(/VOLUME/g, citation[id].Volume);
 	string = string.replace(/URL/g, citation[id].Url);
 	string = string.replace(/YEAR/g, citation[id].Year);
-	string = string.replace(/PAGE/g, page);	
+	if(page)	
+		string = string.replace(/PAGE/g, page);	
+	else
+		string = string.replace(/ PAGE/g, "");
 	console.log(string);
 	return string;	
 	} catch(e) {
@@ -482,23 +537,23 @@ function post_content_formatting(object) {
 			}
 		
 		//List various types of citations
-		console.log("Cid", id, citation[id]);
+		//console.log("Cid", id, citation[id], citation[id].AuthorLast.length);
 		if(citation[id].Type == "Bible") {
 			//console.log("B "+object.citation_bible);
 			$(this).html($(this).html()+" "+citationFormatted(object.citation_bible, i, id, page));
-		} else if(citation[id].Main == "on" && fn.indexOf(citation[id].AuthorLast > -1) && ln.indexOf(citation[id].AuthorLast > -1) && citation[id].Type == "Book") {
+		} else if(citation[id].Main == "on" && fn.indexOf(citation[id].AuthorLast) > -1 && ln.indexOf(citation[id].AuthorLast) > -1 && citation[id].Type == "Book") {
 			$(this).html($(this).html()+" "+citationFormatted(object.citation_sameauthorbook_main, i, id, page));
-		} else if(citation[id].Main == "on" && fn.indexOf(citation[id].AuthorLast > -1) && ln.indexOf(citation[id].AuthorLast > -1) && citation[id].Type != "Book") {
-			$(this).html($(this).html()+" "+citationFormatted(object.citation_sameauthorbook_main, i, id, page));
-		} else if(fn.indexOf(citation[id].AuthorLast > -1) && ln.indexOf(citation[id].AuthorLast > -1) && citation[id].Type == "Book") {
-			$(this).html($(this).html()+" "+citationFormatted(object.citation_sameauthorbook_main, i, id, page));
-		} else if(fn.indexOf(citation[id].AuthorLast > -1) && ln.indexOf(citation[id].AuthorLast > -1) && citation[id].Type != "Book") {
-			$(this).html($(this).html()+" "+citationFormatted(object.citation_sameauthorbook_main, i, id, page));
+		} else if(citation[id].Main == "on" && fn.indexOf(citation[id].AuthorLast) > -1 && ln.indexOf(citation[id].AuthorLast) > -1 && citation[id].Type != "Book") {
+			$(this).html($(this).html()+" "+citationFormatted(object.citation_sameauthorarticle_main, i, id, page));
+		} else if(fn.indexOf(citation[id].AuthorLast) > -1 && ln.indexOf(citation[id].AuthorLast) > -1 && citation[id].Type == "Book") {
+			$(this).html($(this).html()+" "+citationFormatted(object.citation_sameauthorbook, i, id, page));
+		} else if(fn.indexOf(citation[id].AuthorLast) > -1 && ln.indexOf(citation[id].AuthorLast) > -1 && citation[id].Type != "Book") {
+			$(this).html($(this).html()+" "+citationFormatted(object.citation_sameauthorarticle, i, id, page));
 		} else if(citation[id].Main == "on" && object.citation_main != undefined) {
 			$(this).html($(this).html()+" "+citationFormatted(object.citation_main, i, id, page));
 		} else if(citation[id].AuthorLast.length == 0) {
 			$(this).html($(this).html()+" "+citationFormatted(object.citation_noauthor, i, id, page));
-		} else if(ln.indexOf(citation[id].AuthorLast > -1)) {
+		} else if(ln.indexOf(citation[id].AuthorLast) > -1) {
 			$(this).html($(this).html()+" "+citationFormatted(object.citation_twolastnames, i, id, page));
 		} else if(sourceauthors == 2) {
 			$(this).html($(this).html()+" "+citationFormatted(object.citation_twoauthors, i, id, page));
@@ -506,7 +561,7 @@ function post_content_formatting(object) {
 			$(this).html($(this).html()+" "+citationFormatted(object.citation_threeauthors, i, id, page));
 		} else if(sourceauthors > 3) {
 			$(this).html($(this).html()+" "+citationFormatted(object.citation_manyauthors, i, id, page));
-		} else if(volumes.indexOf(citation[id].Title)) {
+		} else if(volumes.indexOf(citation[id].Title) > -1) {
 			$(this).html($(this).html()+" "+citationFormatted(object.citation_multivolume, i, id, page));
 		} else {
 			$(this).html($(this).html()+" "+citationFormatted(object.citation, i, id, page));
@@ -580,7 +635,10 @@ function post_content_formatting(object) {
 	$('.draft > div').each(function() {
 		$(this).html( $(this).html().replace(/ /g, '===').replace(/ /g,"~~~"));
 	});*/
-	cont = $('.draft').html().replace(/&nbsp;/g, " ");
+	if(object.paragraph_indent == undefined)
+		object.paragraph_indent = "";
+	window.cont = $('.draft').html().replace(/&nbsp;/g, " ");
+	window.cont = cont.replace(/<div><br><\/div><div>/g, "<br>"+object.paragraph_indent);
 	console.log(cont);
 	//cont = cont.replace(/<span[^<]+?>/g, "");
 	//cont = cont.replace("</span>", "",'g');
@@ -598,7 +656,9 @@ function output(e, tag, w) {
 	if(e.substr(-1) != ">")
 		e = e+">";
 	if(w.length) {
-		if(tag.length) {
+		if(e == "<br>") {
+			out = e+w;
+		} else if(tag.length) {
 			c("Output: "+tag+w+"</"+e.substr(1)+" ");
 			out = tag+w+"</"+e.substr(1)+" ";
 			//return tag+w+"</"+e.substr(1)+" ";
@@ -630,7 +690,9 @@ var ine = false;
 var parsingdiv = false;
 var out = "";
 var breakk = false;
-$('body').append("<hr>");
+console.error(object.paragraph_indent);
+//a.unshift(object.paragraph_indent);
+//$('body').append("<hr>");
 for(i in b) {
 	var b1 = (parseInt(i)+1);
 	c(": "+b[i]);
@@ -638,7 +700,9 @@ for(i in b) {
     if(b[i] == "<") {
         if((b[b1] == "/" && !parsingdiv) || (b[b1] == "/" && b[ (parseInt(i)+2) ] == e.substr(1,1) && parsingdiv)) {
 			 /***/
-			 out = out + output(e, tag, w);
+			 out += output(e, tag, w);
+			 if(e == "<br>")
+			 	e = "";
             //$('body').append(tag+",<br>"+e+"; "+w+"<br>");
 			c(tag+", "+e+"; "+w);
             w = '';
@@ -659,7 +723,7 @@ for(i in b) {
 				 intag = true;
 	             ine = true;
 				 c("Outputting from last tag");
-				 out = out + output(e,  tag, w);
+				 out += output(e,  tag, w);
 				 tag = "";
 				 e = "";
 				 w = '';
@@ -674,9 +738,13 @@ for(i in b) {
 			c("ine "+e);  
         }
         if(!intag  && e.substr(0,4) != "<div") {
-            out = out + output(e, tag, w);
-            //$('body').append(tag+",<br>"+e+"; "+w+"<br>");
+			out = out + output(e, tag, w);
 			c("___"+tag+", "+e+"; "+w);
+			if(e == "<br>") {
+				e = "";
+				tag = "";
+			}
+            //$('body').append(tag+",<br>"+e+"; "+w+"<br>");
             w = '';
             breakk = true;
         }
@@ -706,7 +774,7 @@ for(i in b) {
 				out = out + output('', '', object.paragraph_indent);
 			}
 			if(e.indexOf('br') > -1) {
-				out = out + output('','','<br>');	
+				//out = out + output('','','<br>');	
 			}
 			if(inend) 
 				 e = "";
@@ -724,7 +792,7 @@ for(i in b) {
 	out = out.replace(/---/g, ' ');*/
 
 	/*** *** Now implement the project **/
-	var maxh = $('.scale').height()*11; //Add 9+2 for body margins just because it works. Don't question it. (It probably has to do with the 1 in padding on the top and bottom, making total height 13 and body 11.
+	maxh = $('.scale').height()*10.5; //Add 9+2 for body margins just because it works. Don't question it. (It probably has to do with the 1 in padding on the top and bottom, making total height 13 and body 11.
 	/* @TODO Improve the column features by allowing it to work with standard CSS (somehow, I don't know how to implement it only for the body), maybe if you set it up as a two column you can add things that bridge? That would definitely ease up the codebase */
 	function getColumnOut(p) {
 		cout = "<table style='width:100%'><tr>";
@@ -748,8 +816,10 @@ for(i in b) {
 		//console.warn($('.page'+p+'body').height(), maxh);
 		//console.warn(('.page'+p+'col'+(col_count-1)), $('.page'+p+'col'+(col_count-1)).height(), maxh, $('.page'+p+'col'+(col_count-1)).html().length);
 		//console.warn(('.page'+p+'col'+(col_count-1)), $('.page'+p+'col'+(col_count-1)).html().length, $('.page'+p+'col'+(col_count-1)).height());
-		if(column == 0) {
+		if(column <= 0) {
+			c("|"+$('.page'+p+'body').height()+" "+maxh+";");
 			if($('.page'+p+'body').height() > maxh) {
+				c('page too long');
 				add_new_page();
 				/*hm = $('.hideme').length;
 				he = $('.hideme')[hm-1]
@@ -780,7 +850,7 @@ function post_bibliography(object, cob) {
 	//Get all citations, limit only to those used in the paper
 	citationSorted = new Array();
 	//for(i in citation) {
-		$('.content_textarea > .citation').each(function() {
+		$('.content_textarea .citation').each(function() {
 			if(citationSorted.indexOf(citation[$(this).attr('data-id')]) == -1) {
 				citationSorted.push(citation[$(this).attr('data-id')]);	
 			}
@@ -816,6 +886,8 @@ function post_bibliography(object, cob) {
 			str = citationFormatted(object.lettertoeditor, f.i, f.id, f.page, cob);
 		} else if(citation[f.id].Type == "Article - Journal" && object.journal != undefined) {
 			str = citationFormatted(object.journal, f.i, f.id, f.page, cob);
+		} else if(citation[f.id].MediumFormat == "web") {
+			str = citationFormatted(object.web, f.i, f.id, f.page, cob);
 		} else {
 			console.log("--"+f.id);
 			str = citationFormatted(object.def, f.i, f.id, f.page, cob); 

@@ -75,6 +75,7 @@ function restoreFile() {
 	if(x.file != undefined) {
 		//Load Script
 		$('#file_format').val(x.file.format);
+		$('#file_name').val(fileid);
 		docformat = x.file.format;
 		console.log(docformat);
 		loadjscssfile(docformat+".js", "js");
@@ -118,12 +119,12 @@ function restoreFile() {
 					hovertagRegistrar.push(x.hovertagRegistrar[i]);	
 				}
 		}
-		setTimeout("finishRestore(x,xc);", 250);		
+		setTimeout("finishRestore(x,xc);", 400);		
 	} else {
 		//New document - most things initialize at the top of this file
 		//$('#file_format').val("APA");
 		loadjscssfile("APA.js", "js");
-		setTimeout("finishRestore(x,xc);", 250);
+		setTimeout("finishRestore(x,xc);", 400);
 	}
 }
 function finishRestore(x, xc) {
@@ -148,6 +149,10 @@ function finishRestore(x, xc) {
 		//console.log(2);
 	recallHovertags();
 	postWordCount();
+	setHeader();
+	//start save client because code should all work by this point
+	console.log("Client save initiated; This is a go for launch.");
+	setInterval("saveFile()", 100);
 	$("#file_format").on("input", function() {
 		console.log($(this).val());
 		formatShift();
