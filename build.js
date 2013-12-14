@@ -75,6 +75,7 @@ function continueBuild(el) {
 	//$('.build').css('display', 'block');
 }
 function updateBuildProgress(text) {
+	$('.build_progress').empty();
 var opts = {
   lines: 7, // The number of lines to draw
   length: 10, // The length of each line
@@ -501,6 +502,7 @@ function numOrdered(number) {
 	return number+ord[number];
 }
 function post_content_formatting(object) {
+	updateBuildProgress("Formatting...");
 	//Format Citations
 	//First, find all authors who have the same last names
 	var ln = new Array();
@@ -640,6 +642,7 @@ function post_content_formatting(object) {
 	window.cont = $('.draft').html().replace(/&nbsp;/g, " ");
 	window.cont = cont.replace(/<div><br><\/div><div>/g, "<br>"+object.paragraph_indent);
 	console.log(cont);
+	updateBuildProgress("Generating HTML...");
 	//cont = cont.replace(/<span[^<]+?>/g, "");
 	//cont = cont.replace("</span>", "",'g');
 	
@@ -792,6 +795,7 @@ for(i in b) {
 	out = out.replace(/---/g, ' ');*/
 
 	/*** *** Now implement the project **/
+	updateBuildProgress("Generating pages...");
 	maxh = $('.scale').height()*10.5; //Add 9+2 for body margins just because it works. Don't question it. (It probably has to do with the 1 in padding on the top and bottom, making total height 13 and body 11.
 	/* @TODO Improve the column features by allowing it to work with standard CSS (somehow, I don't know how to implement it only for the body), maybe if you set it up as a two column you can add things that bridge? That would definitely ease up the codebase */
 	function getColumnOut(p) {
@@ -893,7 +897,8 @@ function post_bibliography(object, cob) {
 			str = citationFormatted(object.def, f.i, f.id, f.page, cob); 
 			//(findCitation(citationSorted[i]).id)
 		}
-				
+		if(annotated_bib && citation[f.id].Abstract.length)
+			str += object.annotation + citation[f.id].Abstract;
 		$('.draft').append('<div style="'+object.style+'">'+str+'</div>');	
 	}
 	

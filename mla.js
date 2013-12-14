@@ -17,6 +17,10 @@ function onInitToolbar() {
 function onStylePaper() {
 	enable_format("double space");	
 }
+function onStyleGuide() {
+	out = "<b>MLA Format</b><br>This is a general guide to the best practices for the MLA Format. Unfortunately, it is not populated right now.";
+	return out;	
+}
 function onBuildFormat() {
 	add_new_page();
 		add_to_page(valMetadata("Author")+"<br>");
@@ -110,5 +114,6 @@ function onBuildBibliography() {
 	obj.web = "cAUTHOR cTITLE cWEBSITE cWEBPUB cPUBDATE cMEDIUM cACCDATE";
 	obj.def = "cAUTHOR cTITLE cEDITOR cTRANSLATOR cEDITION cPUBCITY cPUBCOMP cYEAR cMEDIUM";
 	obj.style = "text-indent:-.5in;margin-left:.5in";
+	obj.annotation = "<br>";
 	post_bibliography(obj, cob);	
 }

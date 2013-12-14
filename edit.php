@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Editing Document</title>
+<title>Gltn</title>
 <link rel="stylesheet" type="text/css" href="standard.css">
 <link rel="stylesheet" type="text/css" href="IntroJS/introjs.min.css">
 <link href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
@@ -28,10 +28,13 @@
 <script src="xmlToJson.js"></script>
 <script src="IntroJS/intro.js"></script>
 <script src="http://fgnass.github.io/spin.js/dist/spin.min.js"></script>
+<link rel="icon" 
+      type="image/png" 
+      href="fav.png">
 </head>
 <body>
 
-<div class="header" style="text-align:center">
+<div class="header" id="header" style="text-align:center">
 
 </div>
 
@@ -39,7 +42,7 @@
 	<table style="width:100%"><tr><td id="panel_content" class="panel">
         <div>
             <i>What Kind of Document do You Want to Create?</i><br>
-            File Name: <input type="text" id="file_name"><br><span style="font-size:9pt">Your file will be available at edit.php?file={file_name}. This is for the alpha version testing. To access a document, go to that URL. This WILL overwrite existing files so please be careful. Do not use spaces.</span><br>
+            <!--File Name: <input type="text" id="file_name"><br><span style="font-size:9pt">Your file will be available at edit.php?file={file_name}. This is for the alpha version testing. To access a document, go to that URL. This WILL overwrite existing files so please be careful. Do not use spaces.</span><br>-->
             Format:<input type="text" id="file_format" list="gluten_formats" value="">&emsp;&emsp;Language:<input id="file_language" list="gluten_languages" value="English (US)"><br>
             Tags:<input id="file_tags" placeholder="Space Separated Tags">
             
@@ -115,7 +118,7 @@ LOREM IPS/um o
 <div class="hovertag">
 
 </div>
-<div class="fullscreenui" style="display:none; opacity:.1" onMouseOver="$('.fullscreenui').css('background-color', fsuo).css('opacity',1)" onMouseOut="$('.fullscreenui').css('background-color', fsuo).css('opacity', '.1');"><div class="fullscreenexit" onclick="normalscreen()"><br>X<br><br><br></div><div class="fullscreennight fa fa-adjust" onclick="nightscreen()"><br><br><br><br></div> <div class="fullscreencount"></div></div>
+<div class="fullscreenui" style="display:none; opacity:.1" onMouseOver="$('.fullscreenui').css('background-color', fsuo).css('opacity',1)" onMouseOut="$('.fullscreenui').css('background-color', fsuo).css('opacity', '.1');"><div class="fullscreenexit" onclick="normalscreen()"><br><span class="fa fa-times"/><br><br><br></div><div class="fullscreennight fa fa-adjust" onclick="nightscreen()"><br><br><br><br></div> <div class="fullscreencount"></div></div>
 
 <div class="footer">
 

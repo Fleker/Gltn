@@ -19,7 +19,8 @@ document.ready = function() {
 };
 
 function saveFile() {
-	fileid = $('#file_name').val();
+	window.document.title = "✎"+valMetadata('Title');
+	fileid = $('#file_name_internal').val();
 	$('.content_save').hide();
 	obj = {};
 	for(i=0;i<citation.length;i++) {
@@ -68,6 +69,10 @@ function saveFile() {
 }
 docformat = '';
 function restoreFile() {
+	$("#file_format").on("input", function() {
+		console.log($(this).val());
+		formatShift();
+	});
 	//var x = xml2json(jQuery.parseHTML(localStorage[fileid]),"  ");
 	x = jQuery.xml2json(localStorage[fileid]);
 	//$.xml2json(xml);
@@ -76,6 +81,7 @@ function restoreFile() {
 		//Load Script
 		$('#file_format').val(x.file.format);
 		$('#file_name').val(fileid);
+		$('#file_name_internal').val(fileid);
 		docformat = x.file.format;
 		console.log(docformat);
 		loadjscssfile(docformat+".js", "js");
@@ -119,16 +125,21 @@ function restoreFile() {
 					hovertagRegistrar.push(x.hovertagRegistrar[i]);	
 				}
 		}
-		setTimeout("finishRestore(x,xc);", 400);		
+		setTimeout("finishRestore(x,xc);", 300);		
 	} else {
 		//New document - most things initialize at the top of this file
 		//$('#file_format').val("APA");
 		loadjscssfile("APA.js", "js");
-		setTimeout("finishRestore(x,xc);", 400);
+		setTimeout("finishRestore(x,xc);", 300);
 	}
 }
 function finishRestore(x, xc) {
-	onInitFormat();
+	try {
+		onInitFormat();
+	} catch(e) {
+		console.error(e.message);
+		setTimeout("finishRestore('"+x+"','"+xc+"');",100);
+	}
 	//console.log(5);
 	if(x.file != undefined) {
 		for(i in x['metadata']) {
@@ -153,16 +164,15 @@ function finishRestore(x, xc) {
 	//start save client because code should all work by this point
 	console.log("Client save initiated; This is a go for launch.");
 	setInterval("saveFile()", 100);
-	$("#file_format").on("input", function() {
-		console.log($(this).val());
-		formatShift();
-	});
 }
 function exportFile() {
+	falseBuild();
 	add_new_page();	
 	add_to_page("File XML:<br><textarea style='width:95%;height:200px;'>"+localStorage[fileid]+"</textarea><br>");
 	add_to_page("Content HTML:<br><textarea style='width:95%;height:200px;'>"+localStorage[fileid+'_c']+"</textarea><br>");
-	add_to_page('Execute this code in a web console to transfer the files over to a different computer:<br><textarea style="width:95%;height:200px;">localStorage["'+fileid+'5"] = \042'+localStorage[fileid].replace(/"/g, '\\"')+'\042;localStorage["'+fileid+'5_c"] = \042'+localStorage[fileid+"_c"].replace(/"/g, '\\"')+'\042;</textarea>');
+	//fa fa-save
+	add_to_page("<br><button onclick='downloadXML()' style='font-size:14pt'><span class='fa fa-cloud-download'></span>&nbsp;Download</button><br>");
+	//add_to_page('Execute this code in a web console to transfer the files over to a different computer:<br><textarea style="width:95%;height:200px;">localStorage["'+fileid+'5"] = \042'+localStorage[fileid].replace(/"/g, '\\"')+'\042;localStorage["'+fileid+'5_c"] = \042'+localStorage[fileid+"_c"].replace(/"/g, '\\"')+'\042;</textarea>');
 }
 
 function writeToSaved(att, val) {
@@ -177,7 +187,26 @@ function writeToSaved(att, val) {
 		}		
 	}
 }
-
+function downloadXMLX() {
+	//creates an XML file
+	content = $('.content_textarea').html();
+	title = valMetadata('Title');
+	console.log(xo);
+	var blob = new Blob([xo+content], {type: "text/plain;charset=utf-8"});
+	saveAs(blob, title+".txt");	
+}
+function downloadXML() {
+	filename = valMetadata('Title')+".gltn";
+	filename = fileid+".gltn";
+    var pom = document.createElement('a');
+    pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(xo+content));
+    pom.setAttribute('download', filename);
+    pom.click();
+}
+function deleteFile(id) {
+	localStorage.removeItem(id)
+	localStorage.removeItem(id+"_c");
+}	
 //Formatting Script Launcher
 function createjscssfile(filename, filetype){
  if (filetype=="js"){ //if filename is a external JavaScript file
@@ -238,13 +267,21 @@ function formatShift() {
 	//unload js file
 	format2 = $('#file_format').val();
 	for(i in formats) {
+		if(formats[i].name == docformat && formats[i].uri != undefined)
+			docformat = formats[i].uri;
+		else if(formats[i].name == docformat)
+			docformat = docformat+'.js';
 		if(formats[i].name == format2) {
+			console.log(docformat, formats[i]);
 			//replacejscssfile('formats/'+docformat+'/format.js', 'formats/'+format2+'/format.js', 'js');
-			replacejscssfile(docformat+".js", format2+".js", "js");
+			if(formats[i].uri == undefined)
+				replacejscssfile(docformat, format2+".js", "js");
+			else
+				replacejscssfile(docformat, formats[i].uri, "js");
 			docformat = format2;
 			//alert("Shift formats");
-			//setTimeout("save();$('#body').empty();input();save();", 500);
-			setTimeout("onInitFormat();$('.content_textarea').html(xc);", 500);
+			//setTimeout("save();$('#body').empty();input();save();", 500)
+			setTimeout("onInitFormat();$('.content_textarea').html(xc);setInterval('saveFile()', 100);", 500);
 		}
 	}
 }

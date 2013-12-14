@@ -3,7 +3,7 @@ function runPanel(panel_id_name) {
 	//Get Properties of the Panel First
 	var p = eval("GetPanel"+panel_id_name+"();");
 	$('.panel_plugin_title').html(p.title);
-	$('.panel_plugin_title').append('&emsp;<span class="PanelPopupEvent"></span><span class="PanelKeyEvent" data-keycode="" data-alt="" data-ctrl="" data-shift=""></span><span id="PanelCloseEvent"></span> <button onclick="hidePanelPlugin()" data-step="22" data-intro="Click me to hide the panel.">X</button>');
+	$('.panel_plugin_title').append('&emsp;<span class="PanelPopupEvent"></span><span class="PanelKeyEvent" data-keycode="" data-alt="" data-ctrl="" data-shift=""></span><span id="PanelCloseEvent"></span> <button onclick="hidePanelPlugin()" data-step="22" data-intro="Click me to hide the panel.">'+closeButton()+'</button>');
 	$('#panel_plugin').css("border-color", p.bordercolor);
 	//$('#panel_plugin').css('margin-top');
 	
@@ -24,9 +24,9 @@ function openPanelPlugin(percent, min, panel_id_name) {
 		minWidth: min+"in",
 		opacity: 1,
 		marginLeft: 0
-		}, 500, function() {
+		}, 70, function() {
 			animateContentPanel(100-percent+'%');
-			setTimeout("populatePanelPlugin('"+panel_id_name+"');",450);	
+			setTimeout("populatePanelPlugin('"+panel_id_name+"');",10);	
 		}
 	);
 }
@@ -45,12 +45,12 @@ function stretchContentPanel() {
 function animateContentPanel(p) {
 	$('#panel_content').animate({
 		width: p
-		}, 500
+		}, 250
 	);
 }
 function hidePanelPlugin() {
 	$('#PanelCloseEvent').click();
-	stretchContentPanel();
+	//
 	$('#panel_plugin').animate({
 		width: "0%",
 		minWidth: "0in",
@@ -58,6 +58,7 @@ function hidePanelPlugin() {
 		marginLeft:"100%"
 		}, 500, function() {
 			$('#panel_plugin').css('display', 'none');
+			stretchContentPanel();
 		}
 	);
 	window.paneltitle = undefined;
@@ -68,8 +69,12 @@ function postPanelOutput(text) {
 }
 function populatePanelPlugin(panel_id_name) {
 	eval("RunPanel"+panel_id_name+"();");	
-	eval("StylePanel"+panel_id_name+"();");	
-	$('.panel_plugin_content').css('height', (window.innerHeight-147)+"px").css('overflow-y', 'auto');
+	try {
+		eval("StylePanel"+panel_id_name+"();");	
+	} catch(e) {
+		
+	}
+	$('.panel_plugin_content').css('height', (window.innerHeight-137)+"px").css('overflow-y', 'auto');
 }
 function openPanelResearch() {
 	initResearch();	
@@ -366,4 +371,168 @@ function RunPanelmain_Outline() {
 }
 function StylePanelmain_Outline() {
 	$('.Outline').css('background-color', 'white').css('border', 'solid 1px black').css('width', '85%');
+}
+function GetPanelmain_Filesys() {
+	return {title: '<span class="fa fa-folder-open" style="font-size:13pt"></span>&nbsp;My Documents', bordercolor: '#7f8c8d', width:15};
+}
+function RunPanelmain_Filesys() {
+	function c(i) {
+		//console.log(i);	
+	}
+	function wl(i) {
+		c('?file='+i);
+		window.location = '?file='+i;	
+	}
+	function post(out,term) {
+		postPanelOutput(out);
+		$('.tfile').on('click', function() {
+			wl($(this).attr('data-v'));
+		});
+		$('#filesys_new').on('click', function() {
+			localStorage['untitled'] = "";
+			localStorage['untitled_c'] = "";
+			alert("Please change the filename before continuing.");
+			wl('untitled');
+		});
+		$('#filesys_up').on('click', function() {
+			$('#filesys_u').click();
+			document.getElementById('filesys_u').addEventListener('change', handleFileSelect, false);
+		});
+		$('#filesys_s').on('input', function() {
+			console.log(1);
+			resetFolder($('#filesys_s').val());
+		});
+		$('#filesys_s').focus();
+		$('#filesys_s').val(term);	
+		function handleFileSelect(evt) {
+			//Popup
+			initiatePopup({title:'Importing File',ht:'<div class="progress" style="font-size:14pt;text-align:center;width:100%;"></div>',bordercolor:'#7f8c8d'});
+    		var files = evt.target.files;
+			var file = files[0];
+			var start = 0;
+			var stop = file.size - 1;
+			if(file.name.split('.')[file.name.split('.').length-1] != "gltn") {
+				//Popup false
+				$('.progress').html('<span style="color:red">Error: Not a proper Gltn file</span>');
+				//set timeout close
+				setTimeout('closePopup()', 4000);
+				return null;
+			}
+		
+			var reader = new FileReader();
+			// If we use onloadend, we need to check the readyState.
+			reader.onloadend = function(evt) {
+			  if (evt.target.readyState == FileReader.DONE) { // DONE == 2
+				//console.log(evt.target.result);
+				//Save to localStorage
+				var xmli = evt.target.result.indexOf('</gluten_doc>')+13;
+				var xml = evt.target.result.substring(0,xmli);
+				try {
+					var i = $.xml2json(xml);
+				} catch(e) {
+					$('.progress').html('<span style="color:red">Error: Not a proper Gltn file</span>');
+					setTimeout('closePopup()', 4000);
+					return null;
+				}
+				var ht = evt.target.result.substring(xmli);
+				console.log(xml+";;;;"+ht);
+				//evt.target.result;
+				save = file.name.split(' ')[0];
+				save = save.split('.')[0];
+				localStorage[save] = xml;
+				localStorage[save+"_c"] = ht;
+				console.log(file.name, save);
+				$('.progress').html('<span style="color:green">The file '+save+'.gltn was successfully imported.<br><span style="font-size:10pt">The file will now be accessible on this computer. To use it on another computer you must export the file after editing.</span></span>');
+				setTimeout('closePopup()', 4000);
+				resetFolder(term);
+			  }
+			};
+		
+			var blob = file.slice(start, stop + 1);
+			reader.readAsText(blob);
+		}
+	}
+	function resetFolder(term) {
+		//postPanelOutput("<div id='spin' style='margin-left:25%'></div>");
+		$('.panel_plugin_content').html("<div id='spin' style='margin-left:8%'></div>");
+			var opts = {
+			  lines: 7, // The number of lines to draw
+			  length: 10, // The length of each line
+			  width: 3, // The line thickness
+			  radius: 13, // The radius of the inner circle
+			  corners: 1, // Corner roundness (0..1)
+			  rotate: 0, // The rotation offset
+			  direction: 1, // 1: clockwise, -1: counterclockwise
+			  color: '#000', // #rgb or #rrggbb or array of colors
+			  speed: 0.7, // Rounds per second
+			  trail: 20, // Afterglow percentage
+			  shadow: false, // Whether to render a shadow
+			  hwaccel: false, // Whether to use hardware acceleration
+			  className: 'spinner', // The CSS class to assign to the spinner
+			  zIndex: 2e9, // The z-index (defaults to 2000000000)
+			  top: '30px', // Top position relative to parent in px
+			  left: '50%' // Left position relative to parent in px
+			};
+			var target = document.getElementById('spin');
+			var spinner = new Spinner(opts).spin(target);
+			
+		if(term == undefined)
+			sterm = "";
+		else
+			sterm = term.toLowerCase();
+		out = "<button id='filesys_new'><span class='fa fa-plus'></span>&nbsp;New</button><input type='file' id='filesys_u' style='display:none' name='file[]'><button id='filesys_up'><span class='fa fa-cloud-upload'>&nbsp;Upload</span></button><br><span class='fa fa-search'></span>&nbsp;<input type='search' id='filesys_s' style='width:85%' value='"+sterm+"'><table style='width:100%'>";
+		for(i in localStorage){
+			c(i);
+			if(localStorage[i] != undefined && localStorage[i+"_c"] != undefined) {
+				//We've got something!
+				var title = "";
+				try {
+					var xx = $.xml2json(localStorage[i]);
+					title = localStorage[i].indexOf("<id>Title</id>");
+				} catch(e) {
+					c(e.message);
+					continue;
+				}
+				if(title > -1) {
+					var title2 = localStorage[i].substring(title);
+					var t3 = title2.indexOf("<value>")+7;
+					var t4 = title2.indexOf("</value>");
+					var t5 = title2.substring(t3,t4);
+					c(title2);
+					c(t3);
+					c(t4);
+					c(t5);
+				}
+				if(t5 == undefined)
+					t5 = "";
+				if(i == fileid)
+					bgc = '#2980b9';
+				else
+					bgc = '#ecf0f1';
+				//console.log(xx.file.tags.split(','),sterm)
+				if(sterm == undefined || (sterm != undefined  && (t5.toLowerCase().indexOf(sterm) > -1) || i.toLowerCase().indexOf(sterm) > -1 || xx.file.tags.indexOf(sterm) > -1)) {
+					out += "<tr><td class='tfile' style='background-color:"+bgc+";border:solid 1px #2c3e50;padding-bottom:8px;width:98%;cursor:pointer;' data-v='"+i+"'><span style='font-size:8pt' class='fa fa-file-text'></span>&nbsp;<span style='font-size:7pt;font-family:sans-serif;'>"+i+".gltn</span><br>";
+					if(t5 != undefined)
+						out += "&nbsp;&nbsp;<b>"+t5+"</b>";
+					out += "<br><span style='font-size:8pt'>&emsp;"+xx.file.format+"&nbsp;&nbsp;"+xx.file.language+"</span>";	
+					out += "</td></tr>";	
+				}
+			}	
+		}
+		out += "</table>";
+		post(out,term);
+		//setTimeout("post(out);", 50);
+	}	
+	resetFolder();
+}
+function GetPanelmain_Style() {
+	return {title: '<span class="fa fa-info-circle" style="font-size:13pt"></span>&nbsp;Style Guide', bordercolor: '#7f8c8d', width:30};
+}
+function RunPanelmain_Style() {
+	try {
+		out = onStyleGuide();
+	} catch(e) {
+		out = "<br><br><br><div style='font-size:34pt;text-align:center;width:100%;'>: (</div><br>There is not a Style Guide available for this format. Sorry.";
+	}
+	postPanelOutput(out);	
 }

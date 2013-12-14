@@ -362,7 +362,7 @@ function update_toolbar_style() {
 	
 	
 	
-	var sy = scrollY/*-110*/;
+	var sy = scrollY-10/*-110*/;
 	if(sy <= 0)
 		sy = 0;
 

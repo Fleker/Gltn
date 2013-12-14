@@ -16,7 +16,7 @@ function initiatePopup(data) {
 		//closePopup();
 	});	
 	//Core framework, now populate card with classes
-	$('.popuptop').html('<div style="width:100%;text-align:right"><button onclick="closePopup()">X</button></div><table style="width:100%;vertical-align:top;"><tr><td style="vertical-align:top;width:100%;"><span class="popuptitle"></span><span class="popupsubtitle"></span><div class="popupbody"></div></td><td style="text-align:right"><img id="popupimg" src=""></img></td></tr></table><br><div class="popupcontent" style="margin-left:4px"></div>');
+	$('.popuptop').html('<div style="width:100%;text-align:right"><button onclick="closePopup()">'+closeButton()+'</button></div><table style="width:100%;vertical-align:top;"><tr><td style="vertical-align:top;width:100%;"><span class="popuptitle"></span><span class="popupsubtitle"></span><div class="popupbody"></div></td><td style="text-align:right"><img id="popupimg" src=""></img></td></tr></table><br><div class="popupcontent" style="margin-left:4px"></div>');
 	if(data.title != undefined)
 		$('.popuptitle').html(data.title+"<br>");
 	if(data.subtitle != undefined)

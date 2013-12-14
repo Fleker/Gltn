@@ -1,8 +1,7 @@
 // Misc. stuff from edit.php that shouldn't be in there - clutters up stuff
-function new_gluten_formats() {
-		//In the future, arrange a way to programitically grab all values.
-		formats = [{name: "APA", type: "Essay"}, {name: "MLA", "type": "Essay"}, {name:"IEEE", type:"Report"}];	
-		
+//In the future, arrange a way to programitically grab all values.
+	formats = [{name: "APA", type: "Essay"}, {name: "MLA", "type": "Essay"}, {name:"IEEE", type:"Report"}];	
+function new_gluten_formats() {		
 		//Now, let's put them into an HTML based format.
 		var out = "";
 		for(i=0;i<formats.length;i++) {
@@ -23,7 +22,10 @@ function new_gluten_formats() {
 		
 		$('#gluten_languages').html(out);
 	}
-	
+function install_gluten_format(name, type, uri) {
+	formats.push({name: name, type: type, uri: uri});
+	new_gluten_formats();
+}
 	
 	
 	/*** RANGY ***/
@@ -1055,16 +1057,18 @@ function tableDetails(tableid) {
 function setHeader() {
 	window.holoribbon_std =  {
 		Home: new Array(
-			{group: '', value: '<font size="4" id="temp_header" >Welcome to Gluten!</font><br><button onclick="introJsStart();window.introdisabled = true;">Start the Tour!</button> '}
+			{group: '', value: '<font size="4" id="temp_header" >Welcome to Gluten!</font><br><table style=\'width:40%;margin-left:30%\'><tr><td><button onclick="introJsStart();window.introdisabled = true;"><span class=\'fa fa-home\'></span>&nbsp;Start the Tour!</button></td><td><button onclick="runPanel(\'main_Filesys\')"><span class=\'fa fa-folder-open\'></span>&nbsp;Explore Files</button></td></tr></table>'}
 		),
 		File: new Array(
-			{text: 'Build', img: '<span style="font-size:18pt" class="fa fa-file"></span>', action: "startBuild();setTimeout('exitintro();', 1000);", key:"Ctrl+Shift+B"},
+			{group: "File Name", value:"<input id='file_name' style='width:7em'><button id='file_name_con' disabled='true'>Save As</button><input type='hidden' id='file_name_internal'>"},
+			{text: 'Build', img: '<span style="font-size:18pt" class="fa fa-file"></span>', action: "startBuild();setTimeout('exitintro();', 1000);"},
 			{text: 'Export', img: '<span style="font-size:18pt" class="fa fa-download"></span>', action: "exportFile();"}
 		),
 		Panels: new Array(
 			{text: 'Outline', img: '<span style="font-size:18pt" class="fa fa-list"></span>', action: "runPanel('main_Outline');"},
 			{text: 'Citations', img: '<span style="font-size:18pt" class="fa fa-book"></span>', action: "runPanel('main_Citation');"},
-			{text: 'Ideas', img: '<span style="font-size:18pt" class="fa fa-lightbulb-o"></span>', action: "runPanel('main_Idea');"}
+			{text: 'Ideas', img: '<span style="font-size:18pt" class="fa fa-lightbulb-o"></span>', action: "runPanel('main_Idea');"},
+			{text: 'Style Guide', img: '<span style="font-size:18pt" class="fa fa-info-circle"/>', action: "runPanel('main_Style');"}
 		),
 		About: new Array(
 			{text: 'GitHub', img: '<span style="font-size:18pt" class="fa fa-github-alt"></span>', action: "window.location='http://www.github.com/fleker/gluten'"}
@@ -1072,6 +1076,21 @@ function setHeader() {
 	};
 	newRibbon('.header', holoribbon_std);
 	ribbonSwitch(0,false);
+	
+	$('#file_name').val(fileid);
+	$('#file_name_internal').val(fileid);
+	$('#file_name').on('input', function() {
+		$('#file_name_con').attr('disabled', false);
+	});
+	$('#file_name_con').on('click', function() {
+		var v = $('#file_name').val();
+		v = v.replace(/ /g, "");
+		if(v.substr(-2) == "_c")
+			v = v.substr(0,v.length-2)+"c";
+		$('#file_name_con').attr('disabled', false);
+		$('#file_name_internal').val(v);
+		setTimeout('window.location = "?file="+v;', 250);
+	});
 }
 function appendHoloSelection() {
 	var selection = {
@@ -1084,4 +1103,37 @@ function appendHoloSelection() {
 	};
 	newRibbon('.header', $.extend({}, holoribbon_std, selection));
 	ribbonSwitch(ribbon_index, false);
+}
+function doesThisWork() {
+	var flag = new Array();
+	if (window.File && window.FileReader && window.FileList && window.Blob) {
+	  // Great success! All the File APIs are supported.
+	} else {
+	  alert('The File APIs are not fully supported in this browser.');
+	  flag.push('The File APIs are not fully supported in this browser.')
+	}
+	
+	if(window.localStorage) {
+		
+	} else {
+		alert('Local Storage is not supported in this browser.');
+		flag.push('Local Storage is not supported in this browser.')
+	}	
+	try {
+		$('#header').attr('id');
+	} catch(e) {
+		alert('jQuery does not work');
+		flag.push('jQuery does not work');		
+	}
+	try { var isFileSaverSupported = !!new Blob(); } catch(e){
+		alert('Blobs are not supported');
+		flag.push('Blobs are not supported');	
+	}
+	return !flag.length;
+}
+function closeButton(i) {
+	if(i == 1)
+		return "<span class='fa fa-times'/>"
+	else
+		return '<span class="fa fa-times"/>'	
 }

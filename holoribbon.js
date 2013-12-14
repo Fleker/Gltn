@@ -36,7 +36,7 @@ function newRibbon(element, ribbon) {
             } 
             else if(k.group != undefined) {
                 //group button
-                out = out + '<td class="ribbonbutton"><div style="/*height:76px*/">' + k.value + '</div><br><div style="text-align:center">' + k.group + '</div></td>';
+                out = out + '<td class="ribbonbutton" style="width:100px"><div style="/*height:76px*/">' + k.value + '</div><div style="text-align:center">' + k.group + '</div></td>';
             }
 			
 			

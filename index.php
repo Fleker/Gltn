@@ -14,27 +14,39 @@
 <script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
 <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
 <link href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+<link rel="icon" 
+      type="image/png" 
+      href="fav.png">
 </head>
 
 <body>
  <div class="collapse navbar-collapse naving" id="bs-example-navbar-collapse-1" style="background-color:#ddd">
     <ul class="nav navbar-nav">
+      <li><a href="#intelligence">Intelligence</a></li>
+      <li><a href="#citations">Citations</a></li>
       <li><a href="#panels">Panels</a></li>
       <li><a href="#immersion">Immersion</a></li>
       <li><a href="#intuitiveness">Intuitiveness</a></li>
+      <li><a href="#html">Web App</a></li>
       <li><a href="#open">Open Source</a></li>
       </ul></div>
 <div class="container center-block row">
 	<h1><span class="fa fa-file"></span>&nbsp;Gltn <br><small>Don't Live Gltn-Free Any Longer!</small></h1>
 	<button type="button" class="btn btn-success btn-large" onclick="window.location='edit.php?file=abc'">Check it Out</button>
-    <table><tr><td style="text-align:justify"><h5>Gluten is an end-to-end document editor made for students, businessmen, and anyone else who wastes time with formats. With a simple interface, it generates a paper that is completely formatted. Come on, that's pretty awesome.<br><br><br><span style="font-size:7pt">Gltn is still in development. Some parts of it may drastically change as it continues to grow and add more features. This is a beta version. Not everything may work all the time. Alert <a href="mailto:handnf+gluten@gmail.com">the developer</a> or message me <a href="http://twitter.com/handnf" target="_blank">@HandNF</a> (preferrably with a console output) if there is a bug or feature you want.</span></h5></td>
+    <table><tr><td style="text-align:justify"><h5>Gluten is an end-to-end document editor made for students, businessmen, and anyone else who wastes time with formats. With a simple interface, it generates a paper that is completely formatted. Come on, that's pretty awesome.</h5></td>
     
     <td style="padding-left:10px"><div class="center"><iframe width="560" height="315" src="//www.youtube.com/embed/u8pWw-RAQEk" frameborder="0" allowfullscreen></iframe></td></tr></table>  
     </div>
-     <!-- <div id="citations" style="background-color:#09f;height:100%;">
-    	<h1>Citations<br><small>In-Line Citations and Bibliographies automatically generated</small></h1>
-        <div class="center"><img src="ideapanel.png" style="max-height:85%"></div>
-    </div>-->
+    <div id="intelligence" class="page row" style="background-color:#f1c40f;">
+    	<h1>Intelligence<br></h1><h3>Let's Have the Editor be as Smart as You</h3>
+        <div class="center"><img src="name_collage.png" class="promo"></div>
+        <h4><b>Headers</b>- Spreadsheet software is powerful. It lets you analyze the input and format the output the way you want. Why hasn't this been adapted to word processing? I tell the software my full name. From there, it knows my last name and automatically puts it in the top right of the header. That's the tip of the iceburg. Citation formatting is even smarter.</h4>
+    </div>
+    <div id="citations" class="page row" style="background-color:#09f;">
+    	<h1>Citations<br></h1><h3>Move over RefWorks and EasyBib; It's time for innovation</h3>
+        <div class="center"><img src="citation_pop.png" class="promo"></div>
+        <h4><b>Popups</b>- When you cite a source, you link the source to your citation. This allows the system to intelligently add inline citations as well as a bibliography. Of course, it's all formatted perfectly. It just works. Imagine all the time and effort you will save by not worrying about pointless things like missing a period in a source or not putting the title in quotes.</h4>
+    </div>
     <div id="panels" class="page row" style="background-color:#e7842c;">
     	<h1>Panels<br></h1><h3>Side-by-Side Content; Yep, it's that easy.</h3>
         <div class="center"><img src="ideapanel.png" class="promo"></div>
@@ -50,21 +62,27 @@
         <div class="center"><img src="intuitive.png" class="promo"></div>
         <h4><b>Plug and Play</b>- You know your name. Don't fret the small formatting issues. You focus on writing, and we'll take care of the small stuff.</h4>
     </div>
+    <div id="html" class="page row" style="background-color:#9b59b6;">
+    	<h1>Web App<br></h1><h3>It's HTML5 without the 3d Graphics</h3>
+        <div class="center"><img src="upload_collage.png" class="promo"></div>
+        <h4><b>Cross-Platform</b>- The beauty of the web is being cross-platform; write once, run everywhere. With browsers improving their web technologies constantly, it is actually possible to build and use a full-fledged document editor online. Plus, it takes advantage of many new features such as FileReader, LocalStorage, new form events, along with a few external libraries that are the icing on top of the cake.</h4>
+    </div>
     <div id="open" class="page row" style="background-color:#2ecc71;">
     	<h1>Open Source<br></h1><h3>Let's All Make it Better</h3>
         <!--<div class="center"><img src="intuitive.png" class="promo"></div>-->
         <h4><b>Help Wanted!</b>- I believe in this project, but to get the growth it needs, I'll need your help. Everything is available to use on GitHub. Build panels, design formats, do anything you want. Just contribute your improvements back to the community.</h4><br><br>
         <a href="https://github.com/Fleker/Gluten" target="_blank">Gltn @ GitHub</a>
         <br>
-       	It's very easy to get started! Plus, the Wiki is filled with documentation, so you won't get lost.<br>
+       	It's very easy to get started! Plus, the Wiki is filled with documentation, so you won't get lost. The framework is very extensive and allows developers to do a lot of stuff.<br>
         <h4>Create a Panel</h4>
         <pre>
         function getPanel{name}() {
             return {title: "Document Notes", bordercolor: "#f1c40f", width: 40};	
         }
         function runPanel{name}() {
-            postPanelOutput("Hello World");
-            //code here
+        	//code here
+            var output = "Hello World!"
+            postPanelOutput(output);
         }	
         </pre>
         <h4>Design a Format</h4>
@@ -81,6 +99,7 @@
         }
         </pre>
     </div>
+    <br><br><br><span style="font-size:7pt">Gltn is still in development. Some parts of it may drastically change as it continues to grow and add more features. This is a beta version. Not everything may work all the time. Alert <a href="mailto:handnf+gluten@gmail.com">the developer</a> or message me <a href="http://twitter.com/handnf" target="_blank">@HandNF</a> (preferrably with a console output) if there is a bug or feature you want. Also, there are a few things that may seem weird, like the Font Awesome icon being the logo. This is merely a placeholder, don't worry.</span>
 </div>	
 <style>
 body {
@@ -104,6 +123,9 @@ height:100%;
 .promo {
 	max-width:96%;	
 	max-height:80%;
+}
+h4 {
+	width:90%;	
 }
 </style>
 </body>
