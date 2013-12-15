@@ -30,7 +30,7 @@
 <script src="http://fgnass.github.io/spin.js/dist/spin.min.js"></script>
 <link rel="icon" 
       type="image/png" 
-      href="fav.png">
+      href="gltn_f.png">
 </head>
 <body>
 
