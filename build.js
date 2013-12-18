@@ -813,6 +813,7 @@ for(i in b) {
 		col_count = 0;
 	else
 		col_count = 1;
+	d.unshift(object.paragraph_indent);
 	for(j in d) {
 		//TODO - Find a way to grab the current page, not necessarily the last one. This will be handy for things that are added after content
 		p = $('.page').length-1;

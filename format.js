@@ -191,7 +191,7 @@ function post_format_content(m) {
 	out = "<div class='content overflow'></div>";
 	out += "<div class='content toolbar'></div>";
 	out = out + "<div contenteditable='true' class='content content_textarea' onmouseleave='/*hideHovertag()*/ '></div>";
-	out = out + "<table class='content_wordcount'><tr><td class='content_word'></td><td class='content_character'></td><td class='content_save'>&emsp;saved</td></tr></table>";
+	out = out + "<table class='content_wordcount'><tr><td class='content_word'></td><td class='content_character'></td><td class='content_save '>&emsp;saved</td></tr></table>";
 	return out;	
 }
 function post_toolbar(tools) {
@@ -265,12 +265,14 @@ function post_toolbar(tools) {
 		switch ($(this).attr('data-t')) {
 			case "character":
 				runPanel('main_Character');
+				setTimeout("introJsStart(10);",550);
 			break;
 			case "fullscreen":
 				fullscreen();
 			break;
 			case "citation":
 				initiateCitationEditor();
+				setTimeout("introJsStart(13);",550);
 			break;
 			case "heading1":
 				contentAddSpan({node:"span", class:"heading1 heading"});
@@ -326,6 +328,7 @@ function unlight_tool(el) {
 window.fullscreenOn = false;
 /*$(window).resize(function () {*/
 toolbar_width = 0;
+sy_save = 0;
 function update_toolbar_style() {
 	//saveFile();
 	/*if(getRange().collapsed == false) {
@@ -366,7 +369,14 @@ function update_toolbar_style() {
 	if(sy <= 0)
 		sy = 0;
 
-	$('#panel_plugin').css('margin-top', sy);
+	//$('#panel_plugin').css('margin-top', sy);
+	if(sy != sy_save) {
+		$('#panel_plugin').animate({
+			marginTop: sy
+		},20);
+		sy_save = sy;
+	}
+	$('.introjs-overlay').css('display', 'none');
 	
 	
 	//$('#panel_plugin').css('height', window.innerHeight);

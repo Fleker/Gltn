@@ -6,6 +6,32 @@
 <link rel="stylesheet" type="text/css" href="standard.css">
 <link rel="stylesheet" type="text/css" href="IntroJS/introjs.min.css">
 <link href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+<!--<?php
+/*
+$server=$_SERVER['HTTP_HOST'];
+if(strpos($server, "felkerdigitalmedia") > -1) {
+	echo "<script>";
+	echo file_get_contents("http://code.jquery.com/jquery-2.0.3.min.js");
+	echo file_get_contents("http://code.jquery.com/color/jquery.color-2.1.2.min.js");
+	echo file_get_contents("format.js");
+	echo file_get_contents("panels.js");
+	echo file_get_contents("popup.js");
+	echo file_get_contents("file.js");
+	echo file_get_contents("build.js");
+	echo file_get_contents("hammer.js");
+	echo file_get_contents("holoribbon.js");
+	echo file_get_contents("kernel.js");
+	echo file_get_contents("rangy-1.3alpha.772/rangy-core.js");
+	echo file_get_contents("rangy-1.3alpha.772/rangy-cssclassapplier.js");
+	echo file_get_contents("rangy-1.3alpha.772/rangy-textrange.js");
+	echo file_get_contents("json2xml.js");
+	echo file_get_contents("xmlToJson.js");
+	echo file_get_contents("IntroJS/intro.js");	
+	echo file_get_contents("http://fgnass.github.io/spin.js/dist/spin.min.js");
+	echo "</script>";
+}
+*/
+?>-->
 
 <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
 <script src="http://code.jquery.com/color/jquery.color-2.1.2.min.js"></script>
@@ -19,7 +45,7 @@
 <script src="holoribbon.js"></script>
 <script src="kernel.js"></script>
 
-<!--<script src="apa.js"></script>-->
+
 
 <script src="rangy-1.3alpha.772\rangy-core.js"></script>
 <script src="rangy-1.3alpha.772\rangy-cssclassapplier.js"></script>
@@ -28,6 +54,8 @@
 <script src="xmlToJson.js"></script>
 <script src="IntroJS/intro.js"></script>
 <script src="http://fgnass.github.io/spin.js/dist/spin.min.js"></script>
+
+
 <link rel="icon" 
       type="image/png" 
       href="gltn_f.png">

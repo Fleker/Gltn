@@ -38,7 +38,9 @@
     
     </td>
     
-    <td style="padding-left:10px"><div class="center"><iframe width="560" height="315" src="//www.youtube.com/embed/u8pWw-RAQEk" frameborder="0" allowfullscreen></iframe></td></tr></table>  
+    <!--<td style="padding-left:10px"><div class="center"><iframe width="560" height="315" src="//www.youtube.com/embed/u8pWw-RAQEk" frameborder="0" allowfullscreen></iframe></td>-->
+    
+    </tr></table>  
     </div>
     <div id="intelligence" class="page row" style="background-color:#f1c40f;">
     	<h1>Intelligence<br></h1><h3>Let's Have the Editor be as Smart as You</h3>

@@ -5,6 +5,7 @@ function runPanel(panel_id_name) {
 	$('.panel_plugin_title').html(p.title);
 	$('.panel_plugin_title').append('&emsp;<span class="PanelPopupEvent"></span><span class="PanelKeyEvent" data-keycode="" data-alt="" data-ctrl="" data-shift=""></span><span id="PanelCloseEvent"></span> <button onclick="hidePanelPlugin()" data-step="22" data-intro="Click me to hide the panel.">'+closeButton()+'</button>');
 	$('#panel_plugin').css("border-color", p.bordercolor);
+	window.paneloverride = p.override;
 	//$('#panel_plugin').css('margin-top');
 	
 	//for a phone, do a type of check so that it isn't too small. 
@@ -62,6 +63,7 @@ function hidePanelPlugin() {
 		}
 	);
 	window.paneltitle = undefined;
+	paneloverride = [];
 }
 function postPanelOutput(text) {
 	$('.panel_plugin_content').html(text+"<br><br>");
@@ -100,7 +102,7 @@ function PanelOnPopupClose(title) {
 /*** Character Palette */
 //TODO, use JSON to enable search
 function GetPanelmain_Character() {
-	return {title: "Character Palette", bordercolor: "#000099", width: 25};	
+	return {title: "Character Palette", bordercolor: "#000099", width: 25, override:[13]};	
 }
 function RunPanelmain_Character() {
 	//var main = new Array('', '', '', '', '', '', '', '', '', '—');
@@ -157,6 +159,10 @@ function RunPanelmain_Character() {
 				console.log(character);
 				contentAddText(character);
 				$(this).attr('data-keycode', '');	
+				if(introdisabled) {
+					hidePanelPlugin();	
+					setTimeout('introJsStart(11);', 600);
+				}
 			}
 		});
 	
@@ -253,7 +259,7 @@ function StylePanelmain_Idea() {
 }
 
 function GetPanelmain_Outline() {
-	return {title: "Outline", bordercolor: "#2c3e50", width: 40};	
+	return {title: "Outline", bordercolor: "#2c3e50", width: 40, override:[9]};	
 }
 function RunPanelmain_Outline() {
 	range = null;
@@ -283,7 +289,8 @@ function RunPanelmain_Outline() {
 			return sel.getRangeAt(0);	
 	}
 	function insertTab() {
-		rangy.getSelection().expand("word", {
+		moveCarat("character", -1);
+		rangy.getSelection().expand("character", {
 						wordOptions: {
 							includeTrailingSpace: false,
 							wordRegex: /[a-z0-9]+(['\-][a-z0-9]+)*/gi
@@ -292,7 +299,7 @@ function RunPanelmain_Outline() {
 		if(range == null)
 			range = obtainRange();
 		var uls = rangy.getSelection().toHtml();
-		console.log(uls);
+		console.log(uls, uls.split('<ul>').length);
 		var el = document.createElement("ul");
 		console.log(uls.split('<ul>'));
 		if(uls.split('<ul>').length <= 1)
@@ -306,17 +313,20 @@ function RunPanelmain_Outline() {
 		//moveCarat("character", 0);
 		//
 		//rangy.getSelection().setSingleRange(range);	
-		rangy.getSelection().collapseToStart();
+		//rangy.getSelection().collapseToStart();
+		
 		range.insertNode(el);
 		moveCarat("character", 1);	
 	}
 	function deleteTab() {
-		rangy.getSelection().expand("word", {
+		moveCarat("character", -1);	
+		rangy.getSelection().expand("character", {
 						wordOptions: {
 							includeTrailingSpace: false,
 							wordRegex: /[a-z0-9]+(['\-][a-z0-9]+)*/gi
 						}
                 		});
+		rangy.getSelection().deleteFromDocument();
 		if(range == null)
 			range = obtainRange();
 		var uls = rangy.getSelection().toHtml();
@@ -334,8 +344,7 @@ function RunPanelmain_Outline() {
 		//moveCarat("character", 0);
 		//
 		//rangy.getSelection().setSingleRange(range);	
-		rangy.getSelection().deleteFromDocument();
-		rangy.getSelection().collapseToStart();
+		//rangy.getSelection().collapseToStart();
 		range.insertNode(el);
 		moveCarat("character", 1);	
 	}
@@ -355,7 +364,7 @@ function RunPanelmain_Outline() {
 	//save
 	$('.Outline').on('input', function() {
 		writeToSaved('main_outline', $('.Outline').html());
-		if(!$('.Outline').html().length) 
+		if($('.Outline').html().substring(0,4) != "<li>" || $('.Outline').html().length == 0) 
 			$('.Outline').html("<li></li>");
 		var sel = rangy.getSelection();
 		range = sel.rangeCount ? sel.getRangeAt(0) : null;

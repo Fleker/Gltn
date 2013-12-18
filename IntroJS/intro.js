@@ -55,7 +55,8 @@
   function elementStringToObj(element) {
 		if (typeof(element) === 'string') {
           //grab the element with given selector from the page
-		  var cie = document.querySelector(element);
+		 // var cie = document.querySelector(element);
+		 	var cie = $(element);
 		  return cie;
         } else {
 			return element;	
@@ -405,8 +406,12 @@
       }
 
       //remove old classes
-      var oldShowElement = document.querySelector('.introjs-showElement');
-      oldShowElement.className = oldShowElement.className.replace(/introjs-[a-zA-Z]+/g, '').replace(/^\s+|\s+$/g, '');
+	  var oldShowElement = document.querySelector('.introjs-showElement');
+	  try {
+      	oldShowElement.className = oldShowElement.className.replace(/introjs-[a-zA-Z]+/g, '').replace(/^\s+|\s+$/g, '');
+	  } catch(e) {
+		console.error("I.JS - oldShowElement seems to be invalid.");  
+	  }
       //we should wait until the CSS3 transition is competed (it's 0.3 sec) to prevent incorrect `height` and `width` calculation
       if (self._lastShowElementTimer) {
         clearTimeout(self._lastShowElementTimer);
