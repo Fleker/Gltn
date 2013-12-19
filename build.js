@@ -640,7 +640,9 @@ function post_content_formatting(object) {
 	if(object.paragraph_indent == undefined)
 		object.paragraph_indent = "";
 	window.cont = $('.draft').html().replace(/&nbsp;/g, " ");
+	window.cont = cont.replace(/<\/div><div><br><\/div><div>/g, "<br>"+object.paragraph_indent);
 	window.cont = cont.replace(/<div><br><\/div><div>/g, "<br>"+object.paragraph_indent);
+	window.cont = cont.replace(/<br><\/div>/g, "");
 	console.log(cont);
 	updateBuildProgress("Generating HTML...");
 	//cont = cont.replace(/<span[^<]+?>/g, "");
@@ -796,7 +798,7 @@ for(i in b) {
 
 	/*** *** Now implement the project **/
 	updateBuildProgress("Generating pages...");
-	maxh = $('.scale').height()*10.5; //Add 9+2 for body margins just because it works. Don't question it. (It probably has to do with the 1 in padding on the top and bottom, making total height 13 and body 11.
+	maxh = $('.scale').height()*8.56; //Add 9+2 for body margins just because it works. Don't question it. (It probably has to do with the 1 in padding on the top and bottom, making total height 13 and body 11.
 	/* @TODO Improve the column features by allowing it to work with standard CSS (somehow, I don't know how to implement it only for the body), maybe if you set it up as a two column you can add things that bridge? That would definitely ease up the codebase */
 	function getColumnOut(p) {
 		cout = "<table style='width:100%'><tr>";
@@ -847,6 +849,7 @@ for(i in b) {
 		add_to_page(d[j]+' ', undefined, undefined, col_count);
 	}
 	$('.build').html($('.build').html().replace(/===/g,' ').replace(/~~~/g, ' ')/*.replace(/<span[^<]+?>/g, "")*/);
+	$('.pagebody').css('height', maxh+"px");
 	/*if(column > 0) {
 		$('.pagebody').css('column-count', column).css('-webkit-column-count', column).css('-moz-column-count');	
 	}*/
