@@ -65,6 +65,19 @@ function saveFile() {
 	xo = json2xml(o, "");
 	localStorage[fileid] = xo;
 	localStorage[fileid+"_c"] = content;
+	 
+	//Save global settings - Integrated saves
+	o = {};
+	obj = {};
+	if(window.settings != undefined) {	
+		for(i in window.settings) {
+			writeToSettings(i, window.settings[i]);
+			obj[i] = window.settings[i];
+		}
+	}
+	o.gluten_prefs = obj;
+	xo = json2xml(o, "");
+	localStorage['settings'] = xo;
 	$('.content_save').show();
 }
 docformat = '';
@@ -157,6 +170,14 @@ function finishRestore(x, xc) {
 		$('#file_format').val("APA");
 		$('#file_name').val(fileid);
 	}
+	//Load Global Settings
+	xpref = $.xml2json(localStorage['settings']);
+	if(xpref != undefined) {
+		window.settings = {};
+		for(i in xpref) {
+			window.settings[i] = xpref[i].replace(/&gt;/g, ">").replace(/&lt;/g, "<");	
+		}
+	}
 		//console.log(2);
 	recallHovertags();
 	postWordCount();
@@ -186,6 +207,17 @@ function writeToSaved(att, val) {
 			window.saved[att] = val;
 		}		
 	}
+}
+function writeToFile(att, val) {
+	writeToSaved(att, val);	
+}
+function writeToSettings(att, val) {
+	if(val != undefined && att != undefined) {
+		val = val.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/&nbsp;/g, " ");		
+	}
+	if(window.settings == undefined)
+		window.settings = {};	
+	window.settings[att] = val;
 }
 function downloadXMLX() {
 	//creates an XML file
