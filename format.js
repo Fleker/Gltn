@@ -191,7 +191,7 @@ function post_format_content(m) {
 	out = "<div class='content overflow'></div>";
 	out += "<div class='content toolbar'></div>";
 	out = out + "<div contenteditable='true' class='content content_textarea' onmouseleave='/*hideHovertag()*/ '></div>";
-	out = out + "<table class='content_wordcount'><tr><td class='content_word'></td><td class='content_character'></td><td class='content_save '>&emsp;saved</td></tr></table>";
+	out = out + "<table class='content_wordcount'><tr><td class='content_word'></td><td class='content_character'></td><td class='content_save '>&emsp;<span class='fa fa-file-text' style='color:#222'></span>&nbsp;<span class='fa fa-check' style='color:#222'></span></td></tr></table>";
 	return out;	
 }
 function post_toolbar(tools) {

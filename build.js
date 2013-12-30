@@ -105,6 +105,7 @@ function finishBuild() {
 	//$('.build_progress').css('display', 'none');
 	closePopup();
 	$('.header').hide(1000);
+	window.scrollTo(0,0);
 		//stopgf;
 	//$('.page').css('width','70%');
 }
@@ -112,7 +113,7 @@ function exitBuild() {
 	$('.header').show(1000);
 	$('.body').show(500);
 	$('.build').hide(350);
-	setTimeout("ribbonSwitch(ribbon_index, false);",1025);
+	setTimeout("ribbonSwitch(ribbon_index, false);window.scrollTo(0,0);",1025);
 }
 //Integration into format.js files
 function grabMetadata(i) {
@@ -253,7 +254,11 @@ function citationFormatted(string, i, id, page, cob) {
 	//Insert a citation content_formatted object and return it with properties filled in
 	//console.log(string, id);
 	//console.warn(citation[id]);
-	console.error(string, id);
+	console.error(string, id, page);
+//	if(page != undefined) {
+	//	main = page.split("|")[1];
+		//page = page.split("|")[0];
+	//}
 	try {
 	if(cob != undefined) {
 		var ln = new Array();
@@ -339,7 +344,7 @@ function citationFormatted(string, i, id, page, cob) {
 			string = string.replace(/cPUBCITY/, cob.pubcity.replace(/PUBCITY/, citation[id].City));
 		else
 			string = string.replace(/cPUBCITY/g, "");
-		if(citation[id].MediumFormat.length)
+		if(citation[id].MediumFormat.length && cob.medium != undefined)
 			string = string.replace(/cMEDIUM/g, cob.medium.replace(/MEDIUM/, citation[id].MediumFormat.substring(0,1).toUpperCase()+citation[id].MediumFormat.substring(1)));
 		else
 			string = string.replace(/cMEDIUM/g, "");
@@ -399,6 +404,8 @@ function citationFormatted(string, i, id, page, cob) {
 			string = string.replace(/cUNIVERSITYYEAR/g, cob.universityyear.replace(/UNIVERSITYYEAR/g, citation[id].Universityyear));
 		else
 			string = string.replace(/cUNIVERSITYYEAR/g, "");
+		//removing weird things
+		string = string.replace(/cDOI/g, "");
 		if(citation[id].Pubdate.length) {
 			var duedate = Date.parse(citation[id].Pubdate);
 			var duedate = new Date(duedate);
@@ -497,7 +504,7 @@ function numToRoman(capy, number) {
 	else
 		return cap[number-1].toLowerCase();
 }
-function numOrdered(number) {
+function numToOrdinal(number) {
 	var ord = ["th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th"];
 	return number+ord[number];
 }
@@ -529,6 +536,7 @@ function post_content_formatting(object) {
 		i = $(this).attr('data-i');
 		id = $(this).attr('data-id');
 		page = $(this).attr('data-page');
+		main = $(this).attr('data-main');
 		
 		//Get the number of authors for this source
 			var sourceauthors = 0;
@@ -543,17 +551,17 @@ function post_content_formatting(object) {
 		if(citation[id].Type == "Bible") {
 			//console.log("B "+object.citation_bible);
 			$(this).html($(this).html()+" "+citationFormatted(object.citation_bible, i, id, page));
-		} else if(citation[id].Main == "on" && fn.indexOf(citation[id].AuthorLast) > -1 && ln.indexOf(citation[id].AuthorLast) > -1 && citation[id].Type == "Book") {
+		} else if(main == "on" && fn.indexOf(citation[id].AuthorLast) > -1 && ln.indexOf(citation[id].AuthorLast) > -1 && citation[id].Type == "Book") {
 			$(this).html($(this).html()+" "+citationFormatted(object.citation_sameauthorbook_main, i, id, page));
-		} else if(citation[id].Main == "on" && fn.indexOf(citation[id].AuthorLast) > -1 && ln.indexOf(citation[id].AuthorLast) > -1 && citation[id].Type != "Book") {
+		} else if(main && fn.indexOf(citation[id].AuthorLast) > -1 && ln.indexOf(citation[id].AuthorLast) > -1 && citation[id].Type != "Book") {
 			$(this).html($(this).html()+" "+citationFormatted(object.citation_sameauthorarticle_main, i, id, page));
 		} else if(fn.indexOf(citation[id].AuthorLast) > -1 && ln.indexOf(citation[id].AuthorLast) > -1 && citation[id].Type == "Book") {
 			$(this).html($(this).html()+" "+citationFormatted(object.citation_sameauthorbook, i, id, page));
 		} else if(fn.indexOf(citation[id].AuthorLast) > -1 && ln.indexOf(citation[id].AuthorLast) > -1 && citation[id].Type != "Book") {
 			$(this).html($(this).html()+" "+citationFormatted(object.citation_sameauthorarticle, i, id, page));
-		} else if(citation[id].Main == "on" && object.citation_main != undefined) {
+		} else if(main == "on" && object.citation_main != undefined) {
 			$(this).html($(this).html()+" "+citationFormatted(object.citation_main, i, id, page));
-		} else if(citation[id].AuthorLast.length == 0) {
+		} else if(citation[id].AuthorLast.length == 0 && object.citation_noauthor != undefined) {
 			$(this).html($(this).html()+" "+citationFormatted(object.citation_noauthor, i, id, page));
 		} else if(ln.indexOf(citation[id].AuthorLast) > -1) {
 			$(this).html($(this).html()+" "+citationFormatted(object.citation_twolastnames, i, id, page));

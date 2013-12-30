@@ -59,6 +59,17 @@ if(strpos($server, "felkerdigitalmedia") > -1) {
 <link rel="icon" 
       type="image/png" 
       href="gltn_f.png">
+     
+ <script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-24228980-2', 'felkerdigitalmedia.com');
+ga('send', 'pageview');
+
+</script>
 </head>
 <body>
 
@@ -146,7 +157,7 @@ LOREM IPS/um o
 <div class="hovertag">
 
 </div>
-<div class="fullscreenui" style="display:none; opacity:.1" onMouseOver="$('.fullscreenui').css('background-color', fsuo).css('opacity',1)" onMouseOut="$('.fullscreenui').css('background-color', fsuo).css('opacity', '.1');"><div class="fullscreenexit" onclick="normalscreen()"><br><span class="fa fa-times"/><br><br><br></div><div class="fullscreennight fa fa-adjust" onclick="nightscreen()"><br><br><br><br></div> <div class="fullscreencount"></div></div>
+<div class="fullscreenui" style="display:none; opacity:.1" onMouseOver="$('.fullscreenui').css('background-color', fsuo).css('opacity',1)" onMouseOut="$('.fullscreenui').css('background-color', fsuo).css('opacity', '.1');"><div class="fullscreenexit" onclick="normalscreen()"><br><span class="fa fa-times"/><br><br><br></div><div class="fullscreennight fa fa-adjust" onclick="nightscreen()"><br><br><br><br></div> <div class="fullscreencount" style="position:fixed;bottom:1%;left:0px;text-align:center;font-size:10pt;width:45px;"></div></div>
 
 <div class="footer">
 

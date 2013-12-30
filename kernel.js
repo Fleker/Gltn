@@ -204,9 +204,9 @@ function initiateCitationEditor(q, hovertag, h2) {
 			}
 			var ht = out+"</datalist>";
 			
-			ht = ht + "<div class='citationEditorTitle citationInput'><input type='text' placeholder='Main title of the work' style='width: 30em' id='citationEditorITitle' list='citationAutoTitle'></div>";
+			ht = ht + "<div class='citationEditorTitle citationInput'><input type='text' placeholder='Main title of the work' style='width: 30em' id='citationEditorITitle' list='citationAutoTitle'><input type='hidden' id='citationEditorIMediumFormat'></div>";
 			ht = ht + "<div class='citationEditorDescription citationInput'><input type='text' style='width:35em' placeholder='Description/Individual Work Title' id='citationEditorIDescription'></div>";
-			ht = ht + "<div class='citationEditorPlay citationInput'>Act: <input id='citationEditorIAct' style='width:4em'>&nbsp;Scene:<input type='citationEditorIScene' style='width:4em'>&nbsp;Line(s): <input id='citationEditorILines' style='width:10em'></div>";
+			ht = ht + "<div class='citationEditorPlay citationInput'>Act: <input id='citationEditorIAct' style='width:4em'>&nbsp;Scene:<input id='citationEditorIScene' style='width:4em'>&nbsp;Line(s): <input id='citationEditorILines' style='width:10em'></div>";
 			ht = ht + "<div class='citationEditorBookpub citationInput'><input type='text' placeholder='Page #' style='width:4em' id='citationEditorIPage'>&nbsp;<input placeholder='Volume' style='width:5em' id='citationEditorIVolume'>&nbsp;<input type='text' placeholder='Edition' style='width:6em' id='citationEditorIEdition'>&nbsp;<input type='text' placeholder='Series' id='citationEditorISeries'>Referenced author?<input type='checkbox' id='citationEditorIMain' value='off'></div>";
 			ht = ht + "<div class='citationEditorAuthor citationInput'>Author: <input placeholder='First' class='citationEditorIAuthorFirst' id='citationEditorIAuthorFirst'>&nbsp;<input placeholder='M' style='width:2em' class='citationEditorIAuthorMiddle'' id='citationEditorIAuthorMiddle'>&nbsp;<input placeholder='Last' class='citationEditorIAuthorLast' id='citationEditorIAuthorLast'><span class='fa fa-plus-circle button' id='citationAddContributor'></span></div>";
 			ht = ht + "<div class='citationEditorPublication citationInput'>Publication: <input placeholder='Publisher' id='citationEditorIPublisher'>&nbsp;<input placeholder='City' id='citationEditorICity'>&nbsp;<input placeholder='Year' style='width:4em' id='citationEditorIYear'></div>";
@@ -339,6 +339,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 				for(i in stra) {
 					$('.citationEditor'+stra[i]).css('display', 'block');	
 				}
+				$('#citationEditorIMediumFormat').css('display', 'block');
 				//if abstracts for citations are turned on,
 				if(annotated_bib)
 					$('.citationEditorAbstract').css('display', 'block');
@@ -349,13 +350,23 @@ function initiateCitationEditor(q, hovertag, h2) {
 				for(i in citeAttributes) {
 					//get attributes cattr= $('#citationEditorI'+citeAttributes[i]);
 					var cattr = $('#citationEditorI'+citeAttributes[i]).val();
+					type = $('#citationEditorIMediumFormat').val()
+//					type = 
 					//console.log('#citationEditorI'+citeAttributes[i], cattr);
 					
 					//save attributes to citation[id][citeAttributes[i]]
 					//TODO - ,'Act','Scene','Lines'
+					//Also- bible
 					
-					if(citeAttributes[i] == 'Page')
-						$('#citation'+citei).attr('data-page', cattr);
+					if(citeAttributes[i] == 'Page') {
+						if(type == 'bible') 
+						 	cattr = $('#citationEditorIBiblebook').val() + "." + $('#citationEditorIBiblechapter').val() + "." + $('#citationEditorIBibleverse').val();
+						else if(type == 'theater')
+							cattr = $('#citationEditorIAct').val() + "." + $('#citationEditorIScene').val() + "." + $('#citationEditorILines').val();
+							$('#citation'+citei).attr('data-page', cattr);
+					}
+					else if(citeAttributes[i] == 'Main')
+						$('#citation'+citei).attr('data-main', cattr);
 					else if(citeAttributes[i] == 'Abstract')
 						citation[citeid][citeAttributes[i]] = $('#citationEditorIAbstract').html();
 					else if(citeAttributes[i] == "MediumFormat")
@@ -391,11 +402,27 @@ function initiateCitationEditor(q, hovertag, h2) {
 				introJsStart(16);
 			}
 			function citationRestore() {
+				type = citation[citeid]['MediumFormat'];
 				for(i in citeAttributes) {
-					
 					//Support for theater
-					if(citeAttributes[i] == 'Page')
-						$('#citationEditorIPage').val($('#citation'+citei).attr('data-page'));
+					if(citeAttributes[i] == 'Page') {
+						if(type == 'bible')  {
+							p = $('#citation'+citei).attr('data-page'); 
+							$('#citationEditorIBiblebook').val(p.split('.')[0]);
+							$('#citationEditorIBiblechapter').val(p.split('.')[1]);
+							$('#citationEditorIBibleverse').val(p.split('.')[2]);	
+						}						
+						else if(type == 'theater') {
+							p = $('#citation'+citei).attr('data-page'); 
+							$('#citationEditorIAct').val(p.split('.')[0]);
+							$('#citationEditorIScene').val(p.split('.')[1]);
+							$('#citationEditorILines').val(p.split('.')[2]);
+						}
+						else
+							$('#citationEditorIPage').val($('#citation'+citei).attr('data-page')); 
+					}
+					else if(citeAttributes[i] == 'Main')
+						$('#citationEditorIMain').val($('#citation'+citei).attr('data-main')); 
 					else {
 						//get attribute citation[id][citeAttributes[i]]
 						//store in $('#citationEditorI'+citeAttributes[i]).val(citation[id][citeAttributes[i]]);
@@ -850,13 +877,14 @@ function postWordCount() {
 	var char = a.replace(/ /g, '').length;
 	var word = 0;
 	if(char == 0)
-		return;
+		return
 	/*for(i in a.split(' ')) {
 		if(a[i] != ' ' && a[i].length) {
 			word++;	
 		}
 	}*/
 	word = a.split(' ').length;
+	$('.fullscreencount').html(char+" c<br>"+word+" w");
 	//Interpret
 		//Get min/max inputs
 	$('.content_character').css('width', '100px').html('<div style="height:3px;" class="content_character_bar"></div><span class="content_character_mark">'+char+'c</span>');
