@@ -191,10 +191,11 @@ function post_format_content(m) {
 	out = "<div class='content overflow'></div>";
 	out += "<div class='content toolbar'></div>";
 	out = out + "<div contenteditable='true' class='content content_textarea' onmouseleave='/*hideHovertag()*/ '></div>";
-	out = out + "<table class='content_wordcount'><tr><td class='content_word'></td><td class='content_character'></td><td class='content_save '>&emsp;<span class='fa fa-file-text' style='color:#222'></span>&nbsp;<span class='fa fa-check' style='color:#222'></span></td></tr></table>";
+	out = out + "<table class='content_wordcount'><tr><td class='content_word'></td><td class='content_character'></td><td class='content_save '>&emsp;</td></tr></table>";
 	return out;	
 }
 function post_toolbar(tools) {
+	window.tools = tools;
 	var overflow = false;
 	$('.toolbar').empty();
 	$('.overflow').empty();
@@ -202,32 +203,38 @@ function post_toolbar(tools) {
 	//TODO - Use labels to make prettier, maybe "new_toolbar/new_toolbar_item"
 	//TODO - Use JSON objects to enable more powerful, third-party tools
 	for(i=0;i<tools.length;i++) {
-		var tool_pretty = tools[i];
-		switch(tool_pretty) {
-			case "heading1":
-				tool_pretty = "H1";
-			break;
-			case "heading2":
-				tool_pretty = "H2";
-			break;
-			case "heading3":
-				tool_pretty = "H3";
-			break;
-			case "image":
-				tool_pretty = "Image";
-			break;
-			case "citation":
-				tool_pretty = "Citation";
-			break;	
-			case "table":
-				tool_pretty = "Table";
-			break;
-			case "bold":
-				tool_pretty = "<button class='fontawesome-bold'></button>";
-			break;
-			case "italics":
-				tool_pretty = "<button class='fontawesome-italics'></button>";
-			break;
+		if(typeof(tools[i] == "string")) {
+			var tool_pretty = tools[i];
+			var tool_t = tools[i];
+			switch(tool_pretty) {
+				case "heading1":
+					tool_pretty = "H1";
+				break;
+				case "heading2":
+					tool_pretty = "H2";
+				break;
+				case "heading3":
+					tool_pretty = "H3";
+				break;
+				case "image":
+					tool_pretty = "Image";
+				break;
+				case "citation":
+					tool_pretty = "Citation";
+				break;	
+				case "table":
+					tool_pretty = "Table";
+				break;
+				case "bold":
+					tool_pretty = "<button class='fontawesome-bold'></button>";
+				break;
+				case "italics":
+					tool_pretty = "<button class='fontawesome-italics'></button>";
+				break;
+			}
+		} else {
+			tool_pretty = tools[i].label;
+			tool_t = tools[i].id;
 		}
 		var sum = 0;
 		var index = 0;
@@ -242,9 +249,9 @@ function post_toolbar(tools) {
 			$('.toolbar_options').append("<div class='toolbar_button' data-t='overflow' style='display:inline-block'>&nbsp;&nbsp;&nbsp;<span class='fa fa-ellipsis-v'></span>&nbsp;&nbsp;&nbsp;</div>|&emsp;");
 		}	
 		if(overflow)
-			$('.overflow').append("<span class='toolbar_button' data-t='"+tools[i]+"'>"+tool_pretty+"</span>&emsp;|&emsp;");
+			$('.overflow').append("<span class='toolbar_button' data-t='"+tool_t+"'>"+tool_pretty+"</span>&emsp;|&emsp;");
 		else
-			$('.toolbar_options').append("<span class='toolbar_button' data-t='"+tools[i]+"'>"+tool_pretty+"</span>&emsp;|&emsp;");
+			$('.toolbar_options').append("<span class='toolbar_button' data-t='"+tool_t+"'>"+tool_pretty+"</span>&emsp;|&emsp;");
 	}
 	if(overflow)
 		$('.overflow').prepend("&emsp;<span class='toolbar_button fa fa-expand' data-t='fullscreen'></span>&emsp;|&emsp;</div>");
@@ -309,6 +316,15 @@ function post_toolbar(tools) {
 			break;
 			case 'overflow':
 				$('.overflow').toggle(150);
+			break;
+			default:
+				for(i in tools) {
+					if(typeof(tools[i]) == "object") {
+						if(tools[i].id == $(this).attr('data-t')) {
+							eval(tools[i].fnc);	
+						}
+					}
+				}
 			break;
 		}
 	});

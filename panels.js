@@ -545,3 +545,104 @@ function RunPanelmain_Style() {
 	}
 	postPanelOutput(out);	
 }
+function GetPanelmain_Find() {
+	return {title: '<span class="fa fa-exchange" style="font-size:13pt"></span>&nbsp;Find & Replace', bordercolor: '#e74c3c', width:20};
+}
+function RunPanelmain_Find() {
+	out = "Enter a phrase or a regular expression<br>";
+	out += "<input type='search' id='FindIn' placeholder='Find' style='width:95%'><br>";
+	out += "<input type='search' id='FindOut' placeholder='Replace With' style='width:95%'><br>";
+	out += "<span id='FindNum' style='font-size:10pt'></span><br>";
+	out += "<button id='FindApply'>Replace All</button>";
+	out += "<button id='FindCancel'>Cancel Changes</button>";
+	postPanelOutput(out);
+	window.cta = $('.content_textarea').html();
+	window.cta2 = $('.content_textarea').html();	
+	initFind();
+	$('#FindIn').on('input', function() {
+		
+	})
+	$('#FindOut').on('input', function() {
+		$('.content_textarea').html(window.cta);
+		//$('.content_textarea').html(window.cta.replace(re, $('#FindOut').val()));
+		doTheReplacing();
+	});
+	$('#FindApply').on('click', function() {
+		window.cta = $('.content_textarea').html();
+		$('#FindIn').val($('#FindOut').val());
+		$('#FindOut').val('');
+	});
+	//FindApply saves to cta
+	$('#FindCancel').on('click', function() {
+		window.cta = window.cta2;
+		$('.content_textarea').html(window.cta);
+		ctt = $('.content_textarea').text();
+		$('#FindIn').val('');
+		$('#FindOut').val('');
+		
+	});
+	//Cancel reverts cta to cta2
+	$('#PanelCloseEvent').on('click', function() {
+		$('.content_textarea').html(window.cta);
+		$('#FindIn').val('');
+		$('#FindOut').val('');
+		try {
+			range.selectNodeContents(document.body);
+			searchResultApplier.undoToRange(range);
+		} catch(e) {
+			//No worries, that means there isn't anything to undo.
+		}
+	});
+	function doTheReplacing() {
+		re = new RegExp($('#FindIn').val(),"gi");
+		//console.log(re);
+		ro = $('#FindOut').val();
+	  
+		$('.content_textarea').each(function() {
+		    traverseChildNodes(this);
+		});
+				 
+		function traverseChildNodes(node) {
+			var next;		 
+			if (node.nodeType === 1) {
+		 		// (Element node)
+		 		if (node = node.firstChild) {
+					do {
+						// Recursively call traverseChildNodes
+						// on each child node
+						next = node.nextSibling;
+						traverseChildNodes(node);
+					} while(node = next);
+				}
+			} else if (node.nodeType === 3) {
+				// (Text node
+				if (re.test(node.data)) {
+					wrapMatchesInNode(node);
+				}
+			}
+		}	
+		function wrapMatchesInNode(textNode) {
+			var temp = document.createElement('span');
+			temp.innerHTML = textNode.data.replace(re, ro);
+			// temp.innerHTML is now:
+			// "\n    This order's reference number is <a href="/order/RF83297">RF83297</a>.\n"
+			// |_______________________________________|__________________________________|___|
+			//                     |                                      |                 |
+			//                 TEXT NODE                             ELEMENT NODE       TEXT NODE
+		 
+			// Extract produced nodes and insert them
+			// before original textNode:
+			while (temp.firstChild) {
+				/*console.log(temp.firstChild);
+				console.log(textNode);
+				console.log(textNode.parentNode);
+				console.log(textNode.parentNode.parentNode);
+				console.log(temp.firstChild.nodeType);*/
+				textNode.parentNode.insertBefore(temp.firstChild, textNode);
+			}
+			// Logged: 3,1,3
+		 	// Remove original text-node:
+			textNode.parentNode.removeChild(textNode);
+		}
+	}
+}

@@ -79,6 +79,7 @@ function saveFile() {
 	xo = json2xml(o, "");
 	localStorage['settings'] = xo;
 	$('.content_save').show();
+	$('.content_save').html("<span class='fa fa-file-text' style='color:#222'></span>&nbsp;<span class='fa fa-check' style='color:#222'></span>");
 }
 docformat = '';
 function restoreFile() {
@@ -182,9 +183,10 @@ function finishRestore(x, xc) {
 	recallHovertags();
 	postWordCount();
 	setHeader();
+	initNiftyUI4Saving();
 	//start save client because code should all work by this point
 	console.log("Client save initiated; This is a go for launch.");
-	setInterval("saveFile()", 100);
+	setInterval("saveFile()", 500);
 }
 function exportFile() {
 	falseBuild();
@@ -218,6 +220,12 @@ function writeToSettings(att, val) {
 	if(window.settings == undefined)
 		window.settings = {};	
 	window.settings[att] = val;
+}
+//Nifty UI for saving
+function initNiftyUI4Saving() {
+	$('span, div, input').on('input', function() {
+		$('.content_save').html("<span class='fa fa-file-text' style='color:#222'></span>&nbsp;<span class='fa fa-pencil' style='color:#222'></span>");
+	});	
 }
 function downloadXMLX() {
 	//creates an XML file
