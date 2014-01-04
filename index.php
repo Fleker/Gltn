@@ -41,15 +41,24 @@
       <li><a href="#html">Web App</a></li>
       <li><a href="#open">Open Source</a></li>
       </ul></div>
+      <a style="visibility:collapse" href="https://plus.google.com/110319342351519403865" rel="publisher">Google+</a>
 <div class="container center-block row">
 	<h1><img src='gltn.png' style='height:48px'></span>&nbsp;Gltn <br><small>Don't Live Gltn-Free Any Longer!</small></h1>
 	<button type="button" class="btn btn-success btn-large" onclick="window.location='edit.php?file=abc'">Check it Out</button>
     <table><tr><td style="text-align:justify"><h5>Gltn is an end-to-end document editor made for students, businessmen, and anyone else who wastes time with formats. With a simple interface, it generates a paper that is completely formatted. Come on, that's pretty awesome.</h5>
-    <h5>Made by Nick, <a href="http://twitter.com/handnf" target="_blank">@HandNF</a></h5>
+    <h5>Made by Nick, <a href="http://twitter.com/handnf" target="_blank">@HandNF</a></h5>  
+    
+    <br>
+    <div class="g-follow" data-annotation="bubble" data-height="24" data-href="//plus.google.com/110319342351519403865" data-rel="publisher"></div>
+<br>
+    <div class="fb-like" data-href="http://facebook.com/gltndev" data-layout="standard" data-action="like" data-show-faces="true" data-share="true"></div>
+    
     
     </td>
     
-    <!--<td style="padding-left:10px"><div class="center"><iframe width="560" height="315" src="//www.youtube.com/embed/u8pWw-RAQEk" frameborder="0" allowfullscreen></iframe></td>-->
+    <td style="padding-left:10px"><div class="center"><iframe width="560" height="315" src="//www.youtube.com/embed/C09PcdbR92A" frameborder="0" allowfullscreen></iframe>
+    <br>
+    </td>
     
     </tr></table>  
     </div>
@@ -145,5 +154,22 @@ h4 {
 	width:90%;	
 }
 </style>
+
+<!-- Place this tag after the last widget tag. -->
+<script type="text/javascript">
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/platform.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+</script>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=456653801039439";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
 </body>
 </html>

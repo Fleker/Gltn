@@ -448,12 +448,17 @@ function RunPanelmain_Filesys() {
 				//evt.target.result;
 				save = file.name.split(' ')[0];
 				save = save.split('.')[0];
-				localStorage[save] = xml;
-				localStorage[save+"_c"] = ht;
-				console.log(file.name, save);
-				$('.progress').html('<span style="color:green">The file '+save+'.gltn was successfully imported.<br><span style="font-size:10pt">The file will now be accessible on this computer. To use it on another computer you must export the file after editing.</span></span>');
-				setTimeout('closePopup()', 4000);
-				resetFolder(term);
+				if(localStorage[save] != undefined) {
+					ovr = confirm('This filename already exists: '+save+'; Overwrite the contents of this file?');
+				}
+				if(ovr) {
+					localStorage[save] = xml;
+					localStorage[save+"_c"] = ht;
+					console.log(file.name, save);
+					$('.progress').html('<span style="color:green">The file '+save+'.gltn was successfully imported.<br><span style="font-size:10pt">The file will now be accessible on this computer. To use it on another computer you must export the file after editing.</span></span>');
+					setTimeout('closePopup()', 4000);
+					resetFolder(term);
+				}
 			  }
 			};
 		
@@ -520,9 +525,15 @@ function RunPanelmain_Filesys() {
 					bgc = '#ecf0f1';
 				//console.log(xx.file.tags.split(','),sterm)
 				if(sterm == undefined || (sterm != undefined  && (t5.toLowerCase().indexOf(sterm) > -1) || i.toLowerCase().indexOf(sterm) > -1 || xx.file.tags.indexOf(sterm) > -1)) {
+					try {
+						var y = xx.file.format;
+					} catch(e) {
+						console.error(e.message);
+						continue;
+					}
 					out += "<tr><td class='tfile' style='background-color:"+bgc+";border:solid 1px #2c3e50;padding-bottom:8px;width:98%;cursor:pointer;' data-v='"+i+"'><span style='font-size:8pt' class='fa fa-file-text'></span>&nbsp;<span style='font-size:7pt;font-family:sans-serif;'>"+i+".gltn</span><br>";
 					if(t5 != undefined)
-						out += "&nbsp;&nbsp;<b>"+t5+"</b>";
+						out += "&nbsp;&nbsp;<b>"+t5+"</b>";	
 					out += "<br><span style='font-size:8pt'>&emsp;"+xx.file.format+"&nbsp;&nbsp;"+xx.file.language+"</span>";	
 					out += "</td></tr>";	
 				}

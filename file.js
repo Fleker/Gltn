@@ -14,6 +14,7 @@ min_word = 0;
 max_word = 0;
 
 hovertagRegistrar = new Array();
+obj = {};
 document.ready = function() {
 	restoreFile();
 };
@@ -22,7 +23,12 @@ function saveFile() {
 	window.document.title = "✎"+valMetadata('Title');
 	fileid = $('#file_name_internal').val();
 	$('.content_save').hide();
-	obj = {};
+	//console.log(o.gluten_doc, x, obj);
+	if(window.jsonsave == undefined) 
+		obj = x;
+	else 
+		obj = jsonsave.gluten_doc;
+	//console.log(window.jsonsave, x, obj);
 	for(i=0;i<citation.length;i++) {
 		if(citation[i] == undefined)
 			citation[i] = "undefined";
@@ -54,30 +60,34 @@ function saveFile() {
 	for(i in window.metadata) {
 		//console.log(obj.metadata);
 		//console.warn(i);
-		obj['metadata'][i] = grabMetadata(i);
+		obj['metadata'][window.metadata[i].id] = grabMetadata(i);
 		//console.log(obj.metadata);
 		//console.warn(i);
 	}
 	content = $('.content_textarea').html();
 	o = {};
 	o.gluten_doc = obj;
+	window.jsonsave = o;
 	//console.log(o);
 	xo = json2xml(o, "");
 	localStorage[fileid] = xo;
 	localStorage[fileid+"_c"] = content;
 	 
 	//Save global settings - Integrated saves
-	o = {};
-	obj = {};
+	op = {};
+	opbj = {};
 	if(window.settings != undefined) {	
 		for(i in window.settings) {
+			console.warn("WS "+i);
 			writeToSettings(i, window.settings[i]);
-			obj[i] = window.settings[i];
+			opbj[i] = window.settings[i];
 		}
 	}
-	o.gluten_prefs = obj;
-	xo = json2xml(o, "");
+	op.gluten_prefs = opbj;
+	xo = json2xml(op, "");
 	localStorage['settings'] = xo;
+	
+	
 	$('.content_save').show();
 	$('.content_save').html("<span class='fa fa-file-text' style='color:#222'></span>&nbsp;<span class='fa fa-check' style='color:#222'></span>");
 }
@@ -160,15 +170,19 @@ function finishRestore(x, xc) {
 			//window.metadata[i] = x['metadata'][i];	
 			//console.log(4);
 			//$('#format_item_'+i).val(window.metadata[i]['value']);
-			$('#format_item_'+i).val(x.metadata[i]['value']);
-			$('#format_item_'+i).html(x.metadata[i]['value']);
+			for(j in window.metadata) {
+				if(x.metadata[i].id == window.metadata.id) {
+					$('#format_item_'+i).val(x.metadata[i]['value']);
+					$('#format_item_'+i).html(x.metadata[i]['value']);
+				}
+			}
 		}	
 		//console.log(3);
 		//Do a little more cleaning up
 		$('.content_textarea').html(xc.replace(/<span class="searchResult">/g, ""));
 		$('#file_name').val(fileid);
 	} else {
-		$('#file_format').val("APA");
+		$('#file_format').val("MLA");
 		$('#file_name').val(fileid);
 	}
 	//Load Global Settings
@@ -321,7 +335,26 @@ function formatShift() {
 			docformat = format2;
 			//alert("Shift formats");
 			//setTimeout("save();$('#body').empty();input();save();", 500)
-			setTimeout("onInitFormat();$('.content_textarea').html(xc);setInterval('saveFile()', 100);", 500);
+			setTimeout("onInitFormat();$('.content_textarea').html(xc);", 500);
+			setTimeout('formatShift2()', 510);
 		}
 	}
+}
+function formatShift2() {
+	//Set up parameters	
+	for(i in x['metadata']) {
+			//window.metadata[i] = x['metadata'][i];	
+			//console.log(4);
+			//$('#format_item_'+i).val(window.metadata[i]['value']);
+			for(j in window.metadata) {
+				//console.log("'"+x.metadata[i].id+"'", "'"+window.metadata[j].id+"'");
+				if(x.metadata[i].id == window.metadata[j].id) {
+					//console.log(i,j,x.metadata[i]['value']);
+					$('#format_item_'+j).val(x.metadata[i]['value']);
+					$('#format_item_'+j).html(x.metadata[i]['value']);
+				} else {
+					//console.log('-');	
+				}
+			}
+		}
 }

@@ -1138,8 +1138,10 @@ function setHeader() {
 			{text: 'Find', img: '<span style="font-size:18pt" class="fa fa-search"></span>', action: "runPanel('main_Find');", key: "Alt+F"}
 		),
 		About: new Array(
-			{text: 'GitHub', img: '<span style="font-size:18pt" class="fa fa-github-alt"></span>', action: "window.location='http://www.github.com/fleker/gluten'"},
-			{text: 'Send Feedback', img: '<span style="font-size:18pt" class="fa fa-envelope"></span>', action: "window.location='http://twitter.com/handnf'"}
+			{text: 'Source Code @ GitHub', img: '<span style="font-size:18pt" class="fa fa-github-alt"></span>', action: "window.location='http://www.github.com/fleker/gluten'"},
+			{text: 'Send Feedback', img: '<span style="font-size:18pt" class="fa fa-envelope"></span>', action: "window.location='mailto:handnf+gltn@gmail.com'"},
+			{text: 'Gltn Blog', img: '<span style="font-size:18pt" class="fa fa-bullhorn"></span>', action:"window.location='http://gltndev.wordpress.com/'"},
+			{group: '', value:"©2014 Made by Nick Felker<br>(@HandNF)"}
 		)
 	};
 	newRibbon('.header', holoribbon_std);
@@ -1153,11 +1155,17 @@ function setHeader() {
 	$('#file_name_con').on('click', function() {
 		var v = $('#file_name').val();
 		v = v.replace(/ /g, "");
-		if(v.substr(-2) == "_c")
-			v = v.substr(0,v.length-2)+"c";
-		$('#file_name_con').attr('disabled', false);
-		$('#file_name_internal').val(v);
-		setTimeout('window.location = "?file="+v;', 250);
+		//console.log(v, localStorage[v]);
+		if(localStorage[v] != undefined) {
+			ovr = confirm('This file already exists: '+v+'; Overwrite the contents of this file?');	
+		}
+		if(ovr) {
+			if(v.substr(-2) == "_c")
+				v = v.substr(0,v.length-2)+"c";
+			$('#file_name_con').attr('disabled', true);
+			$('#file_name_internal').val(v);
+			setTimeout('window.location = "?file='+v+'";', 250);
+		}
 	});
 }
 function install_panel(id, name, img, uri) {
