@@ -3,7 +3,7 @@ ribbon_index = -1;
 ribbon_count = 0;	
 ribbonsave = {};
 function newRibbon(element, ribbon) {
-    var out = '<table class="ribbonhead" style="width:100%;text-align:center;"></table><div class="ribbonstreamer" style=""><div class="ribbonstreameritem" style="background-color:#09f;height:2px;"></div></div><div class="ribbonbody" style="text-align:center"></div>'
+    var out = '<table class="ribbonhead" style="text-align:center;"></table><div class="ribbonstreamer" style=""><div class="ribbonstreameritem" style="background-color:#09f;height:2px;"></div></div><div class="ribbonbody" style="text-align:center"></div>'
     $(element).html(out);
     out = '';
     keys = new Array();
@@ -76,7 +76,8 @@ function ribbonSwitch(index, bool) {
 		ml = 100;
 		ml2 = -100;
 	}
-	var wid = $('.ribbonheader').width();
+	var wide = $('.ribbonheader')[index];
+	var wid = $(wide).width()+2;
 	//console.log(wid);
 	$(element).animate({
             marginLeft: ml+'%',

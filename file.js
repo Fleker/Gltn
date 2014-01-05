@@ -16,11 +16,16 @@ max_word = 0;
 hovertagRegistrar = new Array();
 obj = {};
 document.ready = function() {
+	console.log('Gltn has woken up.');
 	restoreFile();
 };
 
 function saveFile() {
-	window.document.title = "✎"+valMetadata('Title');
+	try {
+		window.document.title = "✎"+valMetadata('Title');
+	} catch(e) {
+		window.document.title = 'Editing Document';
+	}	
 	fileid = $('#file_name_internal').val();
 	$('.content_save').hide();
 	//console.log(o.gluten_doc, x, obj);
@@ -56,11 +61,13 @@ function saveFile() {
 		}
 	}
 	//console.log(obj);
-	obj.metadata = new Array();
+	if(obj.metadata == undefined) 
+		obj.metadata = {};
 	for(i in window.metadata) {
-		//console.log(obj.metadata);
+//		console.log(obj.metadata,i,window.metadata[i].id,obj['metadata'][window.metadata[i].id]);
+		var att = window.metadata[i].id.replace(/ /g, '_');
 		//console.warn(i);
-		obj['metadata'][window.metadata[i].id] = grabMetadata(i);
+		obj['metadata'][att] = grabMetadata(i).value;
 		//console.log(obj.metadata);
 		//console.warn(i);
 	}
@@ -78,7 +85,7 @@ function saveFile() {
 	opbj = {};
 	if(window.settings != undefined) {	
 		for(i in window.settings) {
-			console.warn("WS "+i);
+//			console.warn("WS "+i);
 			writeToSettings(i, window.settings[i]);
 			opbj[i] = window.settings[i];
 		}
@@ -97,6 +104,18 @@ function restoreFile() {
 		console.log($(this).val());
 		formatShift();
 	});
+	
+	
+	//Load Global Settings
+	xpref = $.xml2json(localStorage['settings']);
+	if(xpref != undefined) {
+		window.settings = {};
+		for(i in xpref) {
+			window.settings[i] = xpref[i].replace(/&gt;/g, ">").replace(/&lt;/g, "<");	
+		}
+	}
+	
+	
 	//var x = xml2json(jQuery.parseHTML(localStorage[fileid]),"  ");
 	x = jQuery.xml2json(localStorage[fileid]);
 	//$.xml2json(xml);
@@ -153,20 +172,30 @@ function restoreFile() {
 	} else {
 		//New document - most things initialize at the top of this file
 		//$('#file_format').val("APA");
-		loadjscssfile("APA.js", "js");
-		setTimeout("finishRestore(x,xc);", 300);
+		//loadjscssfile("APA.js", "js");
+		//setTimeout("finishRestore(x,xc);", 300);
+		newFile(x,xc);
 	}
 }
 function finishRestore(x, xc) {
 	try {
-		onInitFormat();
+		//if(x == undefined) {
+			//newFile();	
+		//} else {
+			//if(x.file != undefined) {
+				onInitFormat();
+			//}
+			//else
+				//newFile();
+		//}
 	} catch(e) {
 		console.error(e.message);
 		setTimeout("finishRestore('"+x+"','"+xc+"');",100);
+		return;
 	}
 	//console.log(5);
 	if(x.file != undefined) {
-		for(i in x['metadata']) {
+		/*for(i in x['metadata']) {
 			//window.metadata[i] = x['metadata'][i];	
 			//console.log(4);
 			//$('#format_item_'+i).val(window.metadata[i]['value']);
@@ -176,31 +205,48 @@ function finishRestore(x, xc) {
 					$('#format_item_'+i).html(x.metadata[i]['value']);
 				}
 			}
-		}	
+		}	*/
+		formatShift2();
 		//console.log(3);
 		//Do a little more cleaning up
 		$('.content_textarea').html(xc.replace(/<span class="searchResult">/g, ""));
 		$('#file_name').val(fileid);
 	} else {
-		$('#file_format').val("MLA");
-		$('#file_name').val(fileid);
+		//Brand new file - let's do some base stuff here.
+		//newFile(x,xc);
 	}
-	//Load Global Settings
-	xpref = $.xml2json(localStorage['settings']);
-	if(xpref != undefined) {
-		window.settings = {};
-		for(i in xpref) {
-			window.settings[i] = xpref[i].replace(/&gt;/g, ">").replace(/&lt;/g, "<");	
-		}
-	}
-		//console.log(2);
+	
 	recallHovertags();
 	postWordCount();
 	setHeader();
 	initNiftyUI4Saving();
+	initPanels();
 	//start save client because code should all work by this point
 	console.log("Client save initiated; This is a go for launch.");
 	setInterval("saveFile()", 500);
+}
+function newFile(x,xc) {
+	console.log('No file found for this name.');
+	$('#file_format').val("MLA");
+	$('#file_name').val(fileid);
+		x.file = {};
+	formatShift();
+	setTimeout('finishRestore(x,xc);newFile2();', 1000);
+	
+}	
+function newFile2() {
+	console.log('Creating new file...');
+	//Add me data
+	for(i in window.metadata) {
+	//	console.log(window.metadata[i].id, i);
+		if(window.metadata[i].id == "Author") {
+			console.log(i, window.settings.me_name);
+			//console.log($('#f'+i));
+			$('#format_item_'+i).val(window.settings.me_name);
+		}
+	}
+	//Call {format}
+			
 }
 function exportFile() {
 	falseBuild();
@@ -326,7 +372,7 @@ function formatShift() {
 		else if(formats[i].name == docformat)
 			docformat = docformat+'.js';
 		if(formats[i].name == format2) {
-			console.log(docformat, formats[i]);
+//			console.log(docformat, formats[i]);
 			//replacejscssfile('formats/'+docformat+'/format.js', 'formats/'+format2+'/format.js', 'js');
 			if(formats[i].uri == undefined)
 				replacejscssfile(docformat, format2+".js", "js");
@@ -337,6 +383,7 @@ function formatShift() {
 			//setTimeout("save();$('#body').empty();input();save();", 500)
 			setTimeout("onInitFormat();$('.content_textarea').html(xc);", 500);
 			setTimeout('formatShift2()', 510);
+			console.log('The document format is shifting.');
 		}
 	}
 }
@@ -348,13 +395,16 @@ function formatShift2() {
 			//$('#format_item_'+i).val(window.metadata[i]['value']);
 			for(j in window.metadata) {
 				//console.log("'"+x.metadata[i].id+"'", "'"+window.metadata[j].id+"'");
-				if(x.metadata[i].id == window.metadata[j].id) {
-					//console.log(i,j,x.metadata[i]['value']);
-					$('#format_item_'+j).val(x.metadata[i]['value']);
-					$('#format_item_'+j).html(x.metadata[i]['value']);
+//				console.log(i,j);
+				if(i == window.metadata[j].id.replace(/ /g, '_') && $('#format_item_'+j).val().length == 0) {
+//					console.log(i,j,x.metadata[i]);
+					//console.log($('#format_item_'+j).val(), i);
+					$('#format_item_'+j).val(x.metadata[i]);
+					$('#format_item_'+j).html(x.metadata[i]);
 				} else {
 					//console.log('-');	
 				}
 			}
-		}
+	}
+	console.log('The document format has shifted.');
 }

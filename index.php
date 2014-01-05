@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <title>Project Gltn</title>
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="shortcut icon" sizes="196x196" href="gltn_f.png">
+<meta name="viewport" content="width=device-width">
+
 <link href='http://fonts.googleapis.com/css?family=Roboto:400,400italic,700,700italic' rel='stylesheet' type='text/css'>
 <!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">

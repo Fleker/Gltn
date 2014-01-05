@@ -117,7 +117,7 @@ function exitBuild() {
 }
 //Integration into format.js files
 function grabMetadata(i) {
-	o = window.metadata[i];
+	var o = window.metadata[i];
 //	console.log(i);
 	o.value = $('#format_item_'+i).val();
 	if(o.value == undefined)

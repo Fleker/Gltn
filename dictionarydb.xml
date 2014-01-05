@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dictionary>
+<word>
+	<name>Baseball</name>
+	<plural>Baseball</plural>
+</word>
+<word>
+	<name>Overflow</name>
+	<plural>Overflows</plural>
+	<definition><type>Noun</type><text>The spillage resultant from overflow; excess.</text><synonym>spillage;</synonym><antonym>empty;</antonym></definition>
+	<pronunciation><type>Noun</type><text>/ˈəʊvəˌfləʊ/</text><simple>oh-vur-floh</simple></pronunciation>
+	<etymology><text>Latin</text></etymology>
+</word>
+</dictionary>

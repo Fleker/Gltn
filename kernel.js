@@ -873,9 +873,16 @@ document.onkeydown = function(e) {
 				e.preventDefault();	
 			}
 		break;
-		case 67: /*C*/
+		/*case 67: C
 			if(e.altKey) {
 				runPanel('main_Character');	
+			} 
+		break;*/
+		case 68: /*D*/
+		console.log(e.altKey);
+			if(e.altKey) {
+				runPanel('main_Dictionary');	
+				e.preventDefault();	
 			} 
 		break;
 		case 70: /*F*/
@@ -1132,6 +1139,7 @@ function setHeader() {
 			{text: 'Outline', img: '<span style="font-size:18pt" class="fa fa-list"></span>', action: "runPanel('main_Outline');"},
 			{text: 'Citations', img: '<span style="font-size:18pt" class="fa fa-book"></span>', action: "runPanel('main_Citation');"},
 			{text: 'Ideas', img: '<span style="font-size:18pt" class="fa fa-lightbulb-o"></span>', action: "runPanel('main_Idea');"},
+			/*{text: 'Dictionary', img: '<span style="font-size:18pt" class="fa fa-quote-left"></span>', action: "runPanel('main_Dictionary');"},*/
 			{text: 'Style Guide', img: '<span style="font-size:18pt" class="fa fa-info-circle"/>', action: "runPanel('main_Style');"}
 		),
 		Tools: new Array(
@@ -1141,7 +1149,10 @@ function setHeader() {
 			{text: 'Source Code @ GitHub', img: '<span style="font-size:18pt" class="fa fa-github-alt"></span>', action: "window.location='http://www.github.com/fleker/gluten'"},
 			{text: 'Send Feedback', img: '<span style="font-size:18pt" class="fa fa-envelope"></span>', action: "window.location='mailto:handnf+gltn@gmail.com'"},
 			{text: 'Gltn Blog', img: '<span style="font-size:18pt" class="fa fa-bullhorn"></span>', action:"window.location='http://gltndev.wordpress.com/'"},
-			{group: '', value:"©2014 Made by Nick Felker<br>(@HandNF)"}
+			{text: 'Credits', img: '<span style="font-size:18pt" class="fa fa-legal"></span>', action: 'postLegal()'}
+		),
+		Me: new Array(
+			{group: 'Name', value:'<input id="me_name">'}
 		)
 	};
 	newRibbon('.header', holoribbon_std);
@@ -1167,6 +1178,15 @@ function setHeader() {
 			setTimeout('window.location = "?file='+v+'";', 250);
 		}
 	});
+	$('#me_name').val(window.settings.me_name);
+	$('#me_name').on('input', function() {
+		writeToSettings('me_name', $('#me_name').val());		
+	});
+}
+function postLegal() {
+	out = "©2014 Made by Nick Felker<br>(@HandNF)";
+	f = function x() { };
+	initiatePopup({title:'Credits', value: out, fnc: f});
 }
 function install_panel(id, name, img, uri) {
 	holoribbon_std['Panels'].push({text: name, img: img, action: "runPanel('"+id+"')"});

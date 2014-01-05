@@ -1,4 +1,20 @@
 	// JavaScript Document
+mainpanels = "main_Character, main_Idea, main_Citation, main_Find";
+//Other panels are here by default, but don't need to be called on init
+function initPanels() {
+	if(window.settings.panels == undefined) {
+		window.settings.panels = mainpanels;	
+	}
+	var a = window.settings.panels.split(', ');
+	for(i in a) {
+		try {
+			//console.log(a[i]);
+			eval('InitPanel'+a[i]+'();');	
+		} catch(e) {
+			//console.error(e.message);
+		}
+	}
+}
 function runPanel(panel_id_name) {
 	//Get Properties of the Panel First
 	var p = eval("GetPanel"+panel_id_name+"();");
@@ -96,6 +112,11 @@ function PanelOnPopupClose(title) {
 	$('.PanelPopupEvent').attr('data-title', title);
 	$('.PanelPopupEvent').click();		
 }
+function initService(id, title, icon) {
+	//onclick='runPanel(\'"+id+"\')'
+	$('.content'+id).remove(this);
+	$('#content_row').append("<span title='"+title+"' class='content"+id+"' onclick='runPanel(\""+id+"\")'>&emsp;"+icon+"</span>");	
+}
 
 //Default Plugins Here:
 
@@ -168,6 +189,14 @@ function RunPanelmain_Character() {
 	
 	//if I want to hide symbols, I can always put additional main attributes here, maybe call them a different name, like all_ch
 	
+}
+function InitPanelmain_Character() {
+	$(document).on('keydown', function(e) {
+		if(e.keyCode == 67 && e.altKey) {
+			runPanel('main_Character');	
+		}
+	});
+	initService('main_Character', 'Character', 'C');
 }
 function StylePanelmain_Character() {
 
@@ -394,8 +423,26 @@ function RunPanelmain_Filesys() {
 	}
 	function post(out,term) {
 		postPanelOutput(out);
+		$('.Filesys_delete').on('click', function() {
+			$('.Filesys_delete').attr('data-end', true);
+			x = confirm('Delete '+$(this).attr('data-f')+'.gltn? This cannot be undone.');
+			if(x == true) {
+				y = confirm('Are you positive that you want this file to be completely erased?');
+				if(y == true) {
+					deleteFile($(this).attr('data-f'));
+					resetFolder($('#filesys_s').val());
+				}
+			}
+		});
+		$('.Filesys_delete').hover(function() {
+			$(this).css('color', '#fff').css('background-color', '#f44').css('border-radius', 100);
+		}, function() {
+			$(this).css('color', '#000').css('background-color', 'inherit');
+		});
+		
 		$('.tfile').on('click', function() {
-			wl($(this).attr('data-v'));
+			if($('.Filesys_delete').attr('data-end') != "true")
+				wl($(this).attr('data-v'));
 		});
 		$('#filesys_new').on('click', function() {
 			localStorage['untitled'] = "";
@@ -495,6 +542,7 @@ function RunPanelmain_Filesys() {
 		else
 			sterm = term.toLowerCase();
 		out = "<button id='filesys_new'><span class='fa fa-plus'></span>&nbsp;New</button><input type='file' id='filesys_u' style='display:none' name='file[]'><button id='filesys_up'><span class='fa fa-cloud-upload'>&nbsp;Upload</span></button><br><span class='fa fa-search'></span>&nbsp;<input type='search' id='filesys_s' style='width:85%' value='"+sterm+"'><table style='width:100%'>";
+		fstotal = 0;
 		for(i in localStorage){
 			c(i);
 			if(localStorage[i] != undefined && localStorage[i+"_c"] != undefined) {
@@ -523,6 +571,11 @@ function RunPanelmain_Filesys() {
 					bgc = '#2980b9';
 				else
 					bgc = '#ecf0f1';
+				var fsi = localStorage[i].length;
+				var fsci = localStorage[i+"_c"].length;
+				fstotal += fsi;
+				fstotal += fsci;
+				var fsout = Math.round((fsi+fsci)/100)/10+"KB";
 				//console.log(xx.file.tags.split(','),sterm)
 				if(sterm == undefined || (sterm != undefined  && (t5.toLowerCase().indexOf(sterm) > -1) || i.toLowerCase().indexOf(sterm) > -1 || xx.file.tags.indexOf(sterm) > -1)) {
 					try {
@@ -531,15 +584,18 @@ function RunPanelmain_Filesys() {
 						console.error(e.message);
 						continue;
 					}
-					out += "<tr><td class='tfile' style='background-color:"+bgc+";border:solid 1px #2c3e50;padding-bottom:8px;width:98%;cursor:pointer;' data-v='"+i+"'><span style='font-size:8pt' class='fa fa-file-text'></span>&nbsp;<span style='font-size:7pt;font-family:sans-serif;'>"+i+".gltn</span><br>";
+					out += "<tr><td class='tfile' style='background-color:"+bgc+";border:solid 1px #2c3e50;padding-bottom:8px;width:98%;cursor:pointer;' data-v='"+i+"'><table style='font-size:7pt;font-family:sans-serif;width:100%;'><tr><td style='text-align:left'><span style='font-size:8pt' class='fa fa-file-text'></span>&nbsp;"+i+".gltn</td><td style='text-align:center;width:20px' class='Filesys_delete' data-f='"+i+"'>X</td></tr></table>";
 					if(t5 != undefined)
-						out += "&nbsp;&nbsp;<b>"+t5+"</b>";	
-					out += "<br><span style='font-size:8pt'>&emsp;"+xx.file.format+"&nbsp;&nbsp;"+xx.file.language+"</span>";	
+						out += "<div style='margin-left:3px'><b>"+t5+"</b></div>";	
+					out += "<span style='font-size:8pt'>&emsp;"+xx.file.format+"&nbsp;&nbsp;"+xx.file.language+"&nbsp;&nbsp;"+fsout+"</span>";	
 					out += "</td></tr>";	
 				}
 			}	
 		}
 		out += "</table>";
+		fstotal += localStorage['settings'].length;
+		fstotalout = "<span style='font-size:10pt'>&emsp;"+Math.round(fstotal/100)/10+"KB stored</span>"
+		out += fstotalout;
 		post(out,term);
 		//setTimeout("post(out);", 50);
 	}	
@@ -656,4 +712,153 @@ function RunPanelmain_Find() {
 			textNode.parentNode.removeChild(textNode);
 		}
 	}
+}
+function GetPanelmain_Dictionary() {
+	return {title:"Dictionary", bordercolor: "#2980b9", width: 40};	
+}
+function RunPanelmain_Dictionary() {
+	var no_results = "<span style='font-size:16pt'>No Results</span><br>This does not appear in any of your dictionaries. Install a new dictionary or change your search.";
+	var no_connection = "<span style='font-size:16pt'>Sorry</span><br>The dictionary feature is currently broken. Please report this if you feel it should work.";
+	var connect_time = 0;
+	//Check stock dictionaries and 'install' if null
+	if(window.settings.dictionary == undefined) {
+		window.settings.dictionary = 'wikipedia';
+		window.settings.dictionary_wikipedia = 'HTML, http://felkerdigitalmedia.com/gltn/dictionary_wiki.php, Wikipedia, wikipedia, W';
+	}	
+	function openApp() {
+		out = "<input type='search' id='DictionaryIn' style='width:90%'><button class='fa fa-cog' id='DictionarySettings'></button>";
+		out += "<div id='DictionaryOut'><span style='font-size:16pt'>Welcome</span><br>Search for something<br><br><br><div style='text-align:center;width:100%;font-size:30pt;margin-top:25%;' class='fa-stack fa-lg'><span class='fa fa-circle-o fa-stack-2x'></span><span class='fa fa-quote-left fa-stack-1x'></span></div>";
+		out += "</div>";
+		postPanelOutput(out);	
+		$('#DictionaryIn').focus();
+		$('#DictionarySettings').on('click', function() {
+			openSettings();
+		});	
+		$('#DictionaryIn').on('input', function() {
+			var end = false;
+			var opts = {
+				  lines: 7, // The number of lines to draw
+				  length: 10, // The length of each line
+				  width: 3, // The line thickness
+				  radius: 13, // The radius of the inner circle
+				  corners: 1, // Corner roundness (0..1)
+				  rotate: 0, // The rotation offset
+				  direction: 1, // 1: clockwise, -1: counterclockwise
+				  color: '#000', // #rgb or #rrggbb or array of colors
+				  speed: 0.7, // Rounds per second
+				  trail: 20, // Afterglow percentage
+				  shadow: false, // Whether to render a shadow
+				  hwaccel: false, // Whether to use hardware acceleration
+				  className: 'spinner', // The CSS class to assign to the spinner
+				  zIndex: 2e9, // The z-index (defaults to 2000000000)
+				  top: '30px', // Top position relative to parent in px
+				  left: '50' // Left position relative to parent in px
+				};
+				$('#DictionaryOut').empty();
+				var target = document.getElementById('DictionaryOut');
+				var spinner = new Spinner(opts).spin(target);
+			$.get('http://felkerdigitalmedia.com/gltn/dictionary.php', {word: $('#DictionaryIn').val()}, function(data) {
+				//console.log(data);
+				data = $.parseJSON(data);
+				if(data.error != "404") {
+					$('#DictionaryOut').html(xmlDictionaryParse(data));
+					end = true;
+				} else {
+					//Send to all the dictionary packs installed
+					//get window.settings.dictionary which will be an array of objects
+					if(window.settings.dictionary != undefined) {
+						var d = window.settings.dictionary.split(',');
+						for(i in d) {
+							j = window.settings['dictionary_'+d[i]].split(',');
+							if(end)
+								break;
+							if(j[0] == "XML") {
+								$.get(j[1], {word: $('#DictionaryIn').val()}, function(data) {
+									if(data.error != "404") {
+										$('#DictionaryOut').html(xmlDictionaryParse(data));
+										end = true;
+								
+									} 
+								});
+							} else { //HTML
+								$.get(j[1], {word: $('#DictionaryIn').val()}, function(data) {
+									if(data != "404") {
+										console.log(data);
+										$('#DictionaryOut').html('<iframe style="width:100%;height:'+(window.innerHeight-210)+'px" id="DictionaryFrame" seamless></iframe>');
+										//$('#DictionaryFrame').attr('srcdoc', data);
+										$('#DictionaryFrame').attr('src', j[1]+"?word="+$('#DictionaryIn').val());
+										end = true;		
+									}
+								});
+							}
+						}
+						if(!end)
+							$('#DictionaryOut').html(no_results);
+					} else {
+						$('#DictionaryOut').html(no_results);
+					}
+						//dictionary[0] = {format: XML, url: URL, name: TITLE, id: D_TITLE, icon: URL} but using commas instead
+						//If format is XML, then it will get item using same request format and the same parser
+							//Else need to show data.error = 404
+						//If format is HTML, then it will just get item and display output
+							//Else need to show just "404"
+					//TODO - Override default, sort dictionaries for priority
+					//TODO - Simple way to handle failure, and move to next dictionary
+				}
+			})
+			.fail(function() {
+				$('#DictionaryOut').html(no_connection);
+			})
+			.always(function() {
+				if($('#DictionaryIn').val().length == 0) 
+					openApp();
+			});
+		});
+	}
+	function openSettings() {
+		alert('TODO');	
+	}
+	function xmlDictionaryParse(d) {
+		out = "<span style='font-size:17pt'>"+d.name+"</span>";
+		if(d.pronunciation != undefined) {
+			out += "<br><span style='font-size:10pt;font-style:italic'>"+d.pronunciation.text;
+			if(d.pronunciation.simple != undefined)
+				out += "&nbsp;("+d.pronunciation.simple+")</span>";
+		}
+		if(d.definition[0] == undefined) {
+			switch(d.definition.type) {
+				case "Noun":
+					var p = "N";
+					break;
+				case "Verb":
+					var p = "Vb";
+					break;	
+			}
+			out += "<br><br>&emsp;<i>"+p+":</i>&emsp;"+d.definition.text;
+			if(d.definition.synonym != undefined)
+				out += "<br>&emsp;&emsp;<b>S</b>-&nbsp;<span style='font-size:10pt'>"+d.definition.synonym.split(';').join(', ')+"</span>";
+			if(d.definition.antonym != undefined)
+				out += "<br>&emsp;&emsp;<b>A</b>-&nbsp;<span style='font-size:10pt'>"+d.definition.antonym.split(';').join(', ')+"</span>";
+			$('#DictionaryOut').append(out);	
+		} else {
+			for(i in d.definition) {
+				console.warn(i);
+				switch(d.definition[i].type) {
+					case "Noun":
+						var p = "N";
+						break;
+					case "Verb":
+						var p = "Vb";
+						break;	
+				}
+				out = "<i>"+p+"</i>&emsp;"+d.definition[i].text;
+				if(d.definition[i].synonym != undefined)
+					out += "<br><b>S</b><span style='font-size:10pt'>"+d.definition[i].synonym.split(';').join(', ')+"</span>";
+				if(d.definition[i].antonym != undefined)
+					out += "<br><b>A</b><span style='font-size:10pt'>"+d.definition[i].antonym.split(';').join(', ')+"</span>";
+			}
+		}
+		$('#DictionaryOut').html(out);
+	}
+	openApp();
 }
