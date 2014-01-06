@@ -5,6 +5,7 @@ function falseBuild() {
 	$('.body').fadeOut(500);
 	$('.header').fadeOut(500);
 	$('.build').html('<button onclick="exitBuild()">Return to Editor</button><button onclick="window.print()" class="fa fa-print noprint" style="font-size:12pt;"></button>');	
+	console.log('fb');
 }
 function startBuild(el) {
 	//initiate the build code, show the progress indicator, and start sending stuff to different functions to do different stuff.

@@ -1,5 +1,5 @@
 	// JavaScript Document
-mainpanels = "main_Character, main_Idea, main_Citation, main_Find";
+mainpanels = "main_Character, main_Idea, main_Citation, main_Find, main_Filesys";
 //Other panels are here by default, but don't need to be called on init
 function initPanels() {
 	if(window.settings.panels == undefined) {
@@ -7,11 +7,17 @@ function initPanels() {
 	}
 	var a = window.settings.panels.split(', ');
 	for(i in a) {
-		try {
-			//console.log(a[i]);
-			eval('InitPanel'+a[i]+'();');	
-		} catch(e) {
-			//console.error(e.message);
+		if(a[i].indexOf('main') > -1) {
+			try {
+				//console.log(a[i]);
+				eval('InitPanel'+a[i]+'();');	
+			} catch(e) {
+				//console.error(e.message);
+			}
+		} else {
+			//Need to add script
+			var b = a[i].split(', ');
+			install_panel(b[0], b[1], b[2], b[3]);
 		}
 	}
 }
@@ -413,6 +419,13 @@ function StylePanelmain_Outline() {
 function GetPanelmain_Filesys() {
 	return {title: '<span class="fa fa-folder-open" style="font-size:13pt"></span>&nbsp;My Documents', bordercolor: '#7f8c8d', width:15};
 }
+function InitPanelmain_Filesys() {
+	$(document).on('keydown', function(e) {
+		if(e.keyCode == 79 && e.altKey) {
+			runPanel('main_Filesys'); 
+		}
+	});
+}
 function RunPanelmain_Filesys() {
 	function c(i) {
 		//console.log(i);	
@@ -717,12 +730,15 @@ function GetPanelmain_Dictionary() {
 	return {title:"Dictionary", bordercolor: "#2980b9", width: 40};	
 }
 function RunPanelmain_Dictionary() {
-	var no_results = "<span style='font-size:16pt'>No Results</span><br>This does not appear in any of your dictionaries. Install a new dictionary or change your search.";
+	var no_results = "<span style='font-size:16pt'>No Results</span><br>This does not appear in any of your dictionaries. Try to:<ul><li> Install a new dictionary</li>OR<li>Change your search.</li></ul>";
 	var no_connection = "<span style='font-size:16pt'>Sorry</span><br>The dictionary feature is currently broken. Please report this if you feel it should work.";
 	var connect_time = 0;
+	var ajaxrequests = new Array();
 	//Check stock dictionaries and 'install' if null
 	if(window.settings.dictionary == undefined) {
-		window.settings.dictionary = 'wikipedia';
+		window.settings.dictionary = 'gltn, wiktionary, wikipedia';
+		window.settings.dictionary_gltn = 'XML, http://felkerdigitalmedia.com/gltn/dictionary.php, Ouvert Dictionary, gltn, G';
+		window.settings.dictionary_wiktionary = 'HTML, http://felkerdigitalmedia.com/gltn/dictionary_wik.php, Wiktionary, wiktionary, W';
 		window.settings.dictionary_wikipedia = 'HTML, http://felkerdigitalmedia.com/gltn/dictionary_wiki.php, Wikipedia, wikipedia, W';
 	}	
 	function openApp() {
@@ -757,6 +773,69 @@ function RunPanelmain_Dictionary() {
 				$('#DictionaryOut').empty();
 				var target = document.getElementById('DictionaryOut');
 				var spinner = new Spinner(opts).spin(target);
+			for(i in ajaxrequests) {
+				ajaxrequests[i].abort();	
+			}
+			var d = window.settings.dictionary.split(', ');
+			var end = false;
+			ajaxrequests = new Array();
+			index = 0;
+			function tryDictionary(i) {
+				console.log(i, d[i]);
+				j = window.settings['dictionary_'+d[i]].split(', ');
+				console.log(j[2], $('#DictionaryIn').val());
+				$('#DictionaryOut').css('background-color', 'inherit').css('padding-left', '0').css('padding-top', '0').css('padding-bottom', '0').css('border', 'none').css('margin-top', '0').css('width', '100%');
+				var req = $.get(j[1], {word: $('#DictionaryIn').val()}, function (data) {
+					if(j[0] == "XML") {
+						console.log(data);
+						data = $.parseJSON(data);
+						if(data.error != "404") {
+							//style='background-color: white;padding-left: 6px;padding-top: 8px;padding-bottom: 50px;border: solid 1px #999;margin-top: 4px;width: 95%;
+							$('#DictionaryOut').html(xmlDictionaryParse(data)).css('background-color', 'white').css('padding-left', '6px').css('padding-top', '8px').css('border', 'solid 1px #999').css('margin-top', '4px').css('width', '95%');
+							end = true;	
+						} else {
+							if(i == d.length-1)
+								$('#DictionaryOut').html(no_results);
+							else 
+								tryDictionary(i+1);
+						}	
+					} else {
+						if(data != "404") {
+							//console.log(data);
+							$('#DictionaryOut').html('<iframe style="width:100%;height:'+(window.innerHeight-203)+'px" id="DictionaryFrame" seamless></iframe>');
+							//$('#DictionaryFrame').attr('srcdoc', data);
+							$('#DictionaryFrame').attr('src', j[1]+"?word="+$('#DictionaryIn').val());
+							end = true;	
+						} else {
+							if(i == d.length-1)
+								$('#DictionaryOut').html(no_results);
+							else 
+								tryDictionary(i+1);	
+						}
+					}
+				})
+				.fail(function() {
+					//$('#DictionaryOut').html(no_connection);
+				})
+				.always(function() {
+					if($('#DictionaryIn').val().length == 0) 
+						openApp();
+				});
+				ajaxrequests.push(req);
+			}
+			tryDictionary(0);
+			
+			/*for(i in d) {
+				j = window.settings['dictionary_'+d[i]].split(', ');
+				if(end)
+					break;
+				
+			}	
+			if(!end) {
+				$('#DictionaryOut').html(no_results);
+			}
+			
+			
 			$.get('http://felkerdigitalmedia.com/gltn/dictionary.php', {word: $('#DictionaryIn').val()}, function(data) {
 				//console.log(data);
 				data = $.parseJSON(data);
@@ -812,7 +891,7 @@ function RunPanelmain_Dictionary() {
 			.always(function() {
 				if($('#DictionaryIn').val().length == 0) 
 					openApp();
-			});
+			});*/
 		});
 	}
 	function openSettings() {
@@ -858,7 +937,66 @@ function RunPanelmain_Dictionary() {
 					out += "<br><b>A</b><span style='font-size:10pt'>"+d.definition[i].antonym.split(';').join(', ')+"</span>";
 			}
 		}
+		out += "<div style='font-size:8pt;text-align:center;margin-top:50px;height:16px;'>";
+		if(d.credit != undefined)
+			out += d.credit.text;
+		out += "</div>";
 		$('#DictionaryOut').html(out);
 	}
 	openApp();
 }
+//*** Store-Related Code ***/
+function launchStore() {
+	//Grab store data
+	falseBuild();
+	setTimeout('launchStore2()', 250);
+}
+function launchStore2() {
+	console.log('ba');
+	$('.build').append("<div style='background-color: #f9f9f9;width: 94%;margin-left: 3%;margin-top: 10px;padding-top: 10px;padding-bottom: 40px;border: solid 1px #999;box-shadow: black 0px 0px 3px 0px;'><div style='font-size:18pt;color:#222;font-family:sans-serif;text-align:center;'>Gltn Plugin Store</div><div style='text-align:center; width:100% ;font-size:18pt; padding-bottom:20px;' class='fa-stack fa-lg'><span class='fa fa-circle-o fa-stack-2x'></span><span class='fa fa-shopping-cart fa-stack-1x'></span></div><div class='build_inner'></div></div>");
+	
+	$.get('http://felkerdigitalmedia.com/gltn/storefront.php', {}, function(data) {
+		d = $.parseJSON(data);
+		console.log(d)
+		pout = "";
+		dout = "";
+		d = d.app;
+		for(i in d) {
+			out = "";
+			console.log(d[i], d[i].parent);
+			//if(d[i].parent == "app") {
+				if(d[i].icon_fa != undefined) 
+					out += "<span style='padding-left:8px;' class='fa fa-"+d[i].icon_fa+"'></span>";
+				else if(d[i].icon_url != undefined)
+					out += "<img src='"+d[i].icon_url+"'>";
+				else if(d[i].icon_text != undefined)
+					out += "&emsp;"+d[i].icon_text;
+					
+				out += "&emsp;<b>"+d[i].name+"</b>";
+				if((d[i].type == "Panel" && window.settings.panels.indexOf(d[i].id) > -1) || (d[i].type == "Dictionary" && window.settings.dictionary.indexOf(d[i].id) > -1)) {
+					out += "&emsp;<span style='color:green;font-size:8pt' class='fa fa-check'></span><span style='font-size:6pt;color:green'>ADDED</span>";	
+				}
+				out += "<br>&emsp;&emsp;<i style='font-size:10pt'>"+d[i].credit+"</i>";
+				if(d[i].description.length > 100)
+					out += "<div style='font-size:8pt;padding-left:5px;'>"+d[i].description.substring(0,100)+"...</div>";
+				else
+					out += "<div style='font-size:8pt;padding-left:5px;'>"+d[i].description+"...</div>";
+				
+				outt = "<div style='border:solid 1px #222;cursor:pointer;background-color:white;' class='store_item' data-id='"+d[i].id+"'>"+out+"</div>";
+				console.log(i, outt);
+				if(d[i].type == "Panel")
+					pout += outt;
+				else
+					dout += outt;
+			//}
+		}
+		$('.build_inner').html("<table style='width:80%;margin-left:10%;'><tr><td style='width:50%'><u>Panels</u>"+pout+"</td><td style='width:50%'><u>Dictionaries</u>"+dout+"</td></tr></table>");
+		$('.store_item').on('click', function() {
+			alert('Popup '+$(this).attr('data-id'));	
+		});
+	})	
+	.fail(function() {
+		out = "<span style='font-size:20pt'>Sorry</span><br>The store is not available right now. Please try later.";
+		$('.build_inner').html(out);
+	});
+}	

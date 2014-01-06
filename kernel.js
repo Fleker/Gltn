@@ -879,7 +879,6 @@ document.onkeydown = function(e) {
 			} 
 		break;*/
 		case 68: /*D*/
-		console.log(e.altKey);
 			if(e.altKey) {
 				runPanel('main_Dictionary');	
 				e.preventDefault();	
@@ -1193,6 +1192,12 @@ function install_panel(id, name, img, uri) {
 	newRibbon('.header', holoribbon_std);
 	ribbonSwitch(2,false);
 	createjscssfile(uri, "js");
+	console.log("eval('InitPanel"+id+"();');");
+	setTimeout("eval('InitPanel"+id+"();');", 500);
+	if(window.settings.panels.indexOf(id) == -1) {
+		window.settings.panels += ", "+id;
+		window.settings['panels_'+id] = id+", "+name+", "+img+", "+uri;
+	}
 }
 function appendHoloSelection() {
 	var selection = {

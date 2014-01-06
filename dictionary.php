@@ -16,6 +16,7 @@
 	foreach($jsond->word as $i) {
 		//echo "<br>is it $i->name ?";
 		if(strtolower($i->name) == strtolower($word)) {
+			$i->credit = $jsond->credit;
 			echo json_encode($i);	
 			die();
 		}
