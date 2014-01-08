@@ -16,7 +16,7 @@ max_word = 0;
 hovertagRegistrar = new Array();
 obj = {};
 document.ready = function() {
-	console.log('Gltn has woken up.');
+	console.log('Gltn has woken up: v 1.0.1.1');
 	restoreFile();
 };
 
@@ -222,6 +222,7 @@ function finishRestore(x, xc) {
 	initNiftyUI4Saving();
 	initPanels();
 	//start save client because code should all work by this point
+	hideHovertag();
 	console.log("Client save initiated; This is a go for launch.");
 	setInterval("saveFile()", 500);
 }

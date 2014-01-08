@@ -1,10 +1,12 @@
 builddate = 0;
-function falseBuild() {
+function falseBuild(printr) {
 	window.section_name = "";
 	$('.build').fadeIn(500);
 	$('.body').fadeOut(500);
 	$('.header').fadeOut(500);
-	$('.build').html('<button onclick="exitBuild()">Return to Editor</button><button onclick="window.print()" class="fa fa-print noprint" style="font-size:12pt;"></button>');	
+	$('.build').html('<button onclick="exitBuild()">Return to Editor</button>');
+	if(printr != true)
+		$('.build').append('<button onclick="window.print()" class="fa fa-print noprint" style="font-size:12pt;"></button>');	
 	console.log('fb');
 }
 function startBuild(el) {

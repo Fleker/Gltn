@@ -726,6 +726,15 @@ function RunPanelmain_Find() {
 		}
 	}
 }
+function install_dictionary(format, url, name, id, icon) {
+	//window.settings.dictionary = 'gltn, wiktionary, wikipedia';
+	//window.settings.dictionary_gltn = 'XML, http://felkerdigitalmedia.com/gltn/dictionary.php, Ouvert Dictionary, gltn, G';
+	if(window.settings.dictionary.indexOf(id) == -1) {
+		window.settings.dictionary += ", "+id;
+		window.settings['dictionary_'+id] = format+', '+url+', '+name+', '+id+', '+icon;
+	} else
+		console.error("You've already installed "+id); 	
+}	
 function GetPanelmain_Dictionary() {
 	return {title:"Dictionary", bordercolor: "#2980b9", width: 40};	
 }
@@ -948,32 +957,71 @@ function RunPanelmain_Dictionary() {
 //*** Store-Related Code ***/
 function launchStore() {
 	//Grab store data
-	falseBuild();
+	falseBuild(true);
 	setTimeout('launchStore2()', 250);
 }
 function launchStore2() {
 	console.log('ba');
-	$('.build').append("<div style='background-color: #f9f9f9;width: 94%;margin-left: 3%;margin-top: 10px;padding-top: 10px;padding-bottom: 40px;border: solid 1px #999;box-shadow: black 0px 0px 3px 0px;'><div style='font-size:18pt;color:#222;font-family:sans-serif;text-align:center;'>Gltn Plugin Store</div><div style='text-align:center; width:100% ;font-size:18pt; padding-bottom:20px;' class='fa-stack fa-lg'><span class='fa fa-circle-o fa-stack-2x'></span><span class='fa fa-shopping-cart fa-stack-1x'></span></div><div class='build_inner'></div></div>");
+	$('.build').append("<div style='background-color: #f9f9f9;width: 94%;margin-left: 3%;margin-top: 10px;padding-top: 10px;padding-bottom: 40px;border: solid 1px #999;box-shadow: black 0px 0px 3px 0px;'><div style='font-size:18pt;color:#222;font-family:sans-serif;text-align:center;'>Gltn Plugin Store</div><div style='text-align:center; width:100% ;font-size:18pt; padding-bottom:20px;' class='fa-stack fa-lg'><span class='fa fa-circle-o fa-stack-2x'></span><span class='fa fa-shopping-cart fa-stack-1x'></span></div><input type='search' placeholder='Search for something...' style='width:75%;margin-left:15%;' id='store_search'><div id='build_inner' class='build_inner'></div></div>");
+	function getIcon(datum) {
+		if(datum.icon_fa != undefined) 
+			return "<span style='padding-left:8px;' class='fa fa-"+datum.icon_fa+"'></span>";
+		else if(datum.icon_url != undefined)
+			return "<img src='"+datum.icon_url+"'>";
+		else if(datum.icon_text != undefined)
+			return "&emsp;"+datum.icon_text;
+		return "";
+	}
+	function isInstalled(datum) {
+		return (datum.type == "Panel" && window.settings.panels.indexOf(datum.id) > -1) || (datum.type == "Dictionary" && window.settings.dictionary.indexOf(datum.id) > -1)
+	}
+	function searchTermed(datum) {
+		n = $('#store_search').val();
+		if(datum.name.indexOf(n) > -1)
+			return true;
+		else if(datum.credit.indexOf(n) > -1)
+			return true;
+		
+		return false;
+	}
 	
+			var opts = {
+				  lines: 7, // The number of lines to draw
+				  length: 10, // The length of each line
+				  width: 3, // The line thickness
+				  radius: 13, // The radius of the inner circle
+				  corners: 1, // Corner roundness (0..1)
+				  rotate: 0, // The rotation offset
+				  direction: 1, // 1: clockwise, -1: counterclockwise
+				  color: '#000', // #rgb or #rrggbb or array of colors
+				  speed: 0.7, // Rounds per second
+				  trail: 20, // Afterglow percentage
+				  shadow: false, // Whether to render a shadow
+				  hwaccel: false, // Whether to use hardware acceleration
+				  className: 'spinner', // The CSS class to assign to the spinner
+				  zIndex: 2e9, // The z-index (defaults to 2000000000)
+				  top: '30px', // Top position relative to parent in px
+				  left: '50' // Left position relative to parent in px
+				};
+				var target = document.getElementById('build_inner');
+				var spinner = new Spinner(opts).spin(target);
+	function grabStore() {	
 	$.get('http://felkerdigitalmedia.com/gltn/storefront.php', {}, function(data) {
 		d = $.parseJSON(data);
-		console.log(d)
+		//console.log(d)
 		pout = "";
 		dout = "";
+		tout = "";
 		d = d.app;
+		window.store = d;
 		for(i in d) {
 			out = "";
-			console.log(d[i], d[i].parent);
+			//console.log(d[i], d[i].parent);
 			//if(d[i].parent == "app") {
-				if(d[i].icon_fa != undefined) 
-					out += "<span style='padding-left:8px;' class='fa fa-"+d[i].icon_fa+"'></span>";
-				else if(d[i].icon_url != undefined)
-					out += "<img src='"+d[i].icon_url+"'>";
-				else if(d[i].icon_text != undefined)
-					out += "&emsp;"+d[i].icon_text;
-					
+				if(searchTermed(d[i])) {
+				out += getIcon(d[i]);
 				out += "&emsp;<b>"+d[i].name+"</b>";
-				if((d[i].type == "Panel" && window.settings.panels.indexOf(d[i].id) > -1) || (d[i].type == "Dictionary" && window.settings.dictionary.indexOf(d[i].id) > -1)) {
+				if(isInstalled(d[i])) {
 					out += "&emsp;<span style='color:green;font-size:8pt' class='fa fa-check'></span><span style='font-size:6pt;color:green'>ADDED</span>";	
 				}
 				out += "<br>&emsp;&emsp;<i style='font-size:10pt'>"+d[i].credit+"</i>";
@@ -982,21 +1030,70 @@ function launchStore2() {
 				else
 					out += "<div style='font-size:8pt;padding-left:5px;'>"+d[i].description+"...</div>";
 				
-				outt = "<div style='border:solid 1px #222;cursor:pointer;background-color:white;' class='store_item' data-id='"+d[i].id+"'>"+out+"</div>";
-				console.log(i, outt);
+				outt = "<div style='border:solid 1px #222;cursor:pointer;background-color:white;' class='store_item' data-id='"+i+"'>"+out+"</div>";
+				//console.log(i, outt);
 				if(d[i].type == "Panel")
 					pout += outt;
-				else
+				else if(d[i].type == "Dictionary")
 					dout += outt;
+				else	
+					tout += outt;
+				}
 			//}
 		}
-		$('.build_inner').html("<table style='width:80%;margin-left:10%;'><tr><td style='width:50%'><u>Panels</u>"+pout+"</td><td style='width:50%'><u>Dictionaries</u>"+dout+"</td></tr></table>");
+		var nosearch = "<div style='text-align:center'>No results</div>";;
+		if(pout.length == 0 && dout.length == 0 && tout.length == 0)
+			dout = "<br><br><b>Sorry. No results for that search were found.</b>";
+		else {
+			if(pout.length == 0)
+				pout = nosearch;
+			if(dout.length == 0)
+				dout = nosearch;
+			if(tout.length == 0)
+				tout = nosearch;
+		}
+		
+		$('.build_inner').html("<table style='width:80%;margin-left:10%;'><tr><td style='width:33%;vertical-align:top;'><u class='centerOfAttention'>Panels/Services</u>"+pout+"</td><td style='width:33%;vertical-align:top;'><u class='centerOfAttention'>Dictionaries</u>"+dout+"</td><td style='width:33%;vertical-align:top;'><u class='centerOfAttention'>Themes</u>"+tout+"</td></tr></table><br><br><br><div class='store_submit' style='text-align:center; font-size:10pt; text-decoration:underline; cursor:pointer;'>Submit a Project</div>");
 		$('.store_item').on('click', function() {
-			alert('Popup '+$(this).attr('data-id'));	
+			var i = store[$(this).attr('data-id')];
+			title = getIcon(i)+"&emsp;"+i.name;
+			subtitle = i.type+"<br><i>&emsp;&emsp;"+i.credit+"</i>";
+			ht = "<div style='margin-left:10%;width:80%;font-size:12pt;'>"+i.description+"</div>";
+			if(isInstalled(i)) 
+				ht += "<br><br><br>&emsp;<span style='color:green;font-size:12pt' class='fa fa-check'></span><span style='font-size:10pt;color:green'>&nbsp;You've already installed this.</span>";	
+			else
+				ht += "<br><br><br>&emsp;<button class='store_install' data-id='"+$(this).attr('data-id')+"'>Install Now</button>";
+			initiatePopup({title: title, subtitle: subtitle, ht: ht, bordercolor: '#222'});
+			$('.store_install').on('click', function() {
+				var i = store[$(this).attr('data-id')];
+				if(i.type == "Panel") {
+					install_panel(i.id, i.name, getIcon(i), i.url);
+					alert('Install panel');
+				}
+				else if(i.type == "Dictionary") {
+					install_dictionary(i.type_d, iurl, i.name, i.id, getIcon(i));	
+					alert('Install dictionary')
+				}
+				else if(i.type == "Theme")
+					alert('Install theme');
+				else
+					alert('Unknown data');
+				grabStore();
+			});
+		});
+		$('.store_submit').on('click', function() {
+			//alert('Open rules');
+			out = "<div style='margin-left:5%'>The project you submit must be uncondensed javascript so it may be reviewed. Your project must meet the following guidelines. Keep in mind that they may seem vague, and there is room to compromise.<br><ul><li><b>1. Integration</b> Your project may not secretly manipulate user data. This includes but isn't limited to deleting settings and files as well as adding settings and files without the user's consent or knowledge.</li><li><b>2. Function</b> Your project must meet its specified function and not secretly run other code. This includes but isn't limited to attacking servers, running malicious code, or interfering with the user in a malicious way.</li><li><b>3. Classiness</b> Your project must be tastefully presented. This includes but isn't limited to showing pornography, insulting the user or any other individual, and presenting information in a tasteful manner.</li></ul></div><br>If your project meets these guidelines, <a href='mailto:handnf+gltn@gmail.com?subject=Gltn%20Store%20Submission&body=Please%20fill%20out%20the%20following%20information%20for%20appearing%20in%20the%20store%3A%0A%0AProject%20Name%3A%0AProject%20ID%3A%0ADeveloper%20Name%3A%0AIcon%20(Font-Awesome%2C%20IMG%2C%20or%20Text)%3A%0AGive%20a%20brief%20description%20of%20the%20project%3A'> Send an email</a> with the code attached for review.";
+			initiatePopup({title: "Submit to Store", ht: out, bordercolor: '#222'});
 		});
 	})	
 	.fail(function() {
 		out = "<span style='font-size:20pt'>Sorry</span><br>The store is not available right now. Please try later.";
 		$('.build_inner').html(out);
 	});
+	}
+	grabStore();
+	$('#store_search').on('input', function() {
+		grabStore();
+	});	
 }	

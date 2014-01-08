@@ -355,3 +355,7 @@ text-decoration: none;
 .panel_plugin {
 	overflow-y:auto;	
 }
+.centerOfAttention {
+	display:block;
+	text-align:center;	
+}

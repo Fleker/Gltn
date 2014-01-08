@@ -889,6 +889,13 @@ document.onkeydown = function(e) {
 				runPanel('main_Find');
 				e.preventDefault();		
 			} 
+		break;
+		case 83:
+			if(e.altKey) {
+				launchStore();
+				e.preventDefault();	
+			}
+		break;
 		case 13: /* Enter */
 		
 		break;
