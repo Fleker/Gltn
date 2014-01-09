@@ -1,6 +1,28 @@
 // Misc. stuff from edit.php that shouldn't be in there - clutters up stuff
 //In the future, arrange a way to programitically grab all values.
 	formats = [{name: "APA", type: "Essay"}, {name: "MLA", "type": "Essay"}, {name:"IEEE", type:"Report"}];	
+	
+/*(function(){
+    //saving the original console.log function
+    var preservedConsoleLog = console.log;
+ 
+    //overriding console.log function
+    console.log = function() {
+ 
+        //we can't just call to `preservedConsoleLog` function,
+        //that will throw an error (TypeError: Illegal invocation)
+        //because we need the function to be inside the
+        //scope of the `console` object so we going to use the
+        //`apply` function
+        preservedConsoleLog.apply(console, arguments);
+ 
+        //and lastly, my addition to the `console.log` function
+        //if(application.socket){
+        //    application.socket.emit('console.log', arguments);
+        //}
+		alert(JSON.stringify(arguments));
+    }
+})()*/
 function new_gluten_formats() {		
 		//Now, let's put them into an HTML based format.
 		var out = "";
@@ -1145,14 +1167,14 @@ function setHeader() {
 			{text: 'Outline', img: '<span style="font-size:18pt" class="fa fa-list"></span>', action: "runPanel('main_Outline');"},
 			{text: 'Citations', img: '<span style="font-size:18pt" class="fa fa-book"></span>', action: "runPanel('main_Citation');"},
 			{text: 'Ideas', img: '<span style="font-size:18pt" class="fa fa-lightbulb-o"></span>', action: "runPanel('main_Idea');"},
-			/*{text: 'Dictionary', img: '<span style="font-size:18pt" class="fa fa-quote-left"></span>', action: "runPanel('main_Dictionary');"},*/
 			{text: 'Style Guide', img: '<span style="font-size:18pt" class="fa fa-info-circle"/>', action: "runPanel('main_Style');"}
 		),
 		Tools: new Array(
 			{text: 'Find', img: '<span style="font-size:18pt" class="fa fa-search"></span>', action: "runPanel('main_Find');", key: "Alt+F"}
+			/*{text: 'Dictionary', img: '<span style="font-size:18pt" class="fa fa-quote-left"></span>', action: "runPanel('main_Dictionary');"},*/
 		),
 		About: new Array(
-			{text: 'Source Code @ GitHub', img: '<span style="font-size:18pt" class="fa fa-github-alt"></span>', action: "window.location='http://www.github.com/fleker/gluten'"},
+			{text: 'Open Source', img: '<span style="font-size:18pt" class="fa fa-github-alt"></span>', action: "window.location='http://www.github.com/fleker/gluten'"},
 			{text: 'Send Feedback', img: '<span style="font-size:18pt" class="fa fa-envelope"></span>', action: "window.location='mailto:handnf+gltn@gmail.com'"},
 			{text: 'Gltn Blog', img: '<span style="font-size:18pt" class="fa fa-bullhorn"></span>', action:"window.location='http://gltndev.wordpress.com/'"},
 			{text: 'Credits', img: '<span style="font-size:18pt" class="fa fa-legal"></span>', action: 'postLegal()'}
@@ -1194,10 +1216,12 @@ function postLegal() {
 	f = function x() { };
 	initiatePopup({title:'Credits', value: out, fnc: f});
 }
-function install_panel(id, name, img, uri) {
-	holoribbon_std['Panels'].push({text: name, img: img, action: "runPanel('"+id+"')"});
-	newRibbon('.header', holoribbon_std);
-	ribbonSwitch(2,false);
+function install_panel(id, name, img, uri, service) {
+	if(service != true) {
+		holoribbon_std['Panels'].push({text: name, img: img, action: "runPanel('"+id+"')"});
+		newRibbon('.header', holoribbon_std);
+		ribbonSwitch(2,false);
+	}
 	createjscssfile(uri, "js");
 	console.log("eval('InitPanel"+id+"();');");
 	setTimeout("eval('InitPanel"+id+"();');", 500);
@@ -1205,6 +1229,36 @@ function install_panel(id, name, img, uri) {
 		window.settings.panels += ", "+id;
 		window.settings['panels_'+id] = id+", "+name+", "+img+", "+uri;
 	}
+}
+function uninstall_panel(id) {
+	//alert('Fix ribbon');
+	//For removing the ribbon, need to compare the name of the ribbon with the name of the panel
+	var a = window.settings['panels_'+id].split(', ');
+	var b = new Array();
+	for(i in holoribbon_std['Panels']) {
+		var j = holoribbon_std['Panels'][i];
+		//console.log(a[1],i, j);
+		if(j.text != a[1]) {
+			b.push(j);
+			//console.log('Found '+j.text+' as '+id);	
+			
+		}
+	}
+	holoribbon_std['Panels'] = b;
+	newRibbon('.header', holoribbon_std);
+
+	//Now we can set up a way for panels to turn off stuff
+	//We set a short timer so that if it doesn't exist, it doesn't ruin the flow of the function
+	setTimeout("eval('RemovePanel"+id+"();');", 1);
+	var a = window.settings.panels.split(', ');
+	var b = new Array();
+	for(i in a) {
+		if(a[i] != id) {
+			b.push(a[i])
+		}	
+	}	
+	window.settings.panels = b.join(', ');
+	window.settings['panels_'+id] = undefined;	
 }
 function appendHoloSelection() {
 	var selection = {

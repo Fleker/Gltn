@@ -16,7 +16,7 @@ max_word = 0;
 hovertagRegistrar = new Array();
 obj = {};
 document.ready = function() {
-	console.log('Gltn has woken up: v 1.0.1.1');
+	console.log('Gltn has woken up: v 1.0.1.3');
 	restoreFile();
 };
 
@@ -56,8 +56,10 @@ function saveFile() {
 	if(window.saved != undefined) {	
 		obj.saved = {};
 		for(i in window.saved) {
-			writeToSaved(i, window.saved[i]);
-			obj.saved[i] = window.saved[i];
+			if(window.saved[i] != undefined) {
+				writeToSaved(i, window.saved[i]);
+				obj.saved[i] = window.saved[i];
+			}
 		}
 	}
 	//console.log(obj);
@@ -107,6 +109,7 @@ function restoreFile() {
 	
 	
 	//Load Global Settings
+	try {
 	xpref = $.xml2json(localStorage['settings']);
 	if(xpref != undefined) {
 		window.settings = {};
@@ -114,10 +117,31 @@ function restoreFile() {
 			window.settings[i] = xpref[i].replace(/&gt;/g, ">").replace(/&lt;/g, "<");	
 		}
 	}
+	} catch(e) {
+		console.error(e.message);
+		var y=confirm("You'll need to reset your settings. Click okay to clear settings.");
+		if(y == true)
+			localStorage.removeItem("settings");
+		var z=confirm("Your settings file isn't working. Click okay to send a bug report.");
+		if(z == true) {
+			window.location = "mailto:handnf+gltn@gmail.com?subject=Settings%20Error&body="+encodeURIComponent(localStorage['settings']);
+		}
+	}
 	
 	
 	//var x = xml2json(jQuery.parseHTML(localStorage[fileid]),"  ");
+	try {
 	x = jQuery.xml2json(localStorage[fileid]);
+	} catch(e) {
+		console.error(e.message);
+		var z = confirm("This document has improper XML. Click okay to send a bug report.");
+		var y = confirm("Click okay to delete all metadata. This removes citations, but keeps the main content.");
+		if(y == true) 
+			localStorage.removeItem(fileid);	
+		if(z == true)
+			window.location = "mailto:handnf+gltn@gmail.com?subject=File%20"+fileid+"%20Broken&body="+encodeURIComponent(localStorage[fileid]);
+		
+	}
 	//$.xml2json(xml);
 	xc = localStorage[fileid+"_c"];
 	if(x.file != undefined) {
@@ -209,7 +233,11 @@ function finishRestore(x, xc) {
 		formatShift2();
 		//console.log(3);
 		//Do a little more cleaning up
-		$('.content_textarea').html(xc.replace(/<span class="searchResult">/g, ""));
+		try {
+			$('.content_textarea').html(xc.replace(/<span class="searchResult">/g, ""));
+		} catch(e) {
+			console.error("*"+e.message);
+		}	
 		$('#file_name').val(fileid);
 	} else {
 		//Brand new file - let's do some base stuff here.
@@ -261,7 +289,7 @@ function exportFile() {
 
 function writeToSaved(att, val) {
 	if(val != undefined && att != undefined) {
-		val = val.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/&nbsp;/g, " ");
+		val = val.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/&nbsp;/g, " ").replace(/&emsp;/g, ' ');
 		//console.log(val);
 		if(window.saved != undefined)
 			window.saved[att] = val;
@@ -276,7 +304,7 @@ function writeToFile(att, val) {
 }
 function writeToSettings(att, val) {
 	if(val != undefined && att != undefined) {
-		val = val.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/&nbsp;/g, " ");		
+		val = val.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/&nbsp;/g, " ").replace(/&emsp;/g, ' ');		
 	}
 	if(window.settings == undefined)
 		window.settings = {};	

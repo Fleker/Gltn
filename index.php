@@ -5,7 +5,7 @@
 <title>Project Gltn</title>
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="shortcut icon" sizes="196x196" href="gltn_f.png">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 
 <link href='http://fonts.googleapis.com/css?family=Roboto:400,400italic,700,700italic' rel='stylesheet' type='text/css'>
 <!-- Latest compiled and minified CSS -->
@@ -49,7 +49,7 @@
 <div class="container center-block row">
 	<h1><img src='gltn.png' style='height:48px'></span>&nbsp;Gltn <br><small>Don't Live Gltn-Free Any Longer!</small></h1>
 	<button type="button" class="btn btn-success btn-large" onclick="window.location='edit.php?file=abc'">Check it Out</button>
-    <table><tr><td style="text-align:justify"><h5>Gltn is an end-to-end document editor made for students, businessmen, and anyone else who wastes time with formats. With a simple interface, it generates a paper that is completely formatted. Come on, that's pretty awesome.</h5>
+    <div class=''><table class=''><tr><td style="text-align:justify"><h5>Gltn is an end-to-end document editor made for students, businessmen, and anyone else who wastes time with formats. With a simple interface, it generates a paper that is completely formatted. Come on, that's pretty awesome.</h5>
     <h5>Made by Nick, <a href="http://twitter.com/handnf" target="_blank">@HandNF</a></h5>  
     
     <br>
@@ -58,13 +58,13 @@
     <div class="fb-like" data-href="http://facebook.com/gltndev" data-layout="standard" data-action="like" data-show-faces="true" data-share="true"></div>
     
     
-    </td>
+    </td></tr><tr>
     
-    <td style="padding-left:10px"><div class="center"><iframe width="560" height="315" src="//www.youtube.com/embed/C09PcdbR92A" frameborder="0" allowfullscreen></iframe>
+    <td style="padding-left:10px"><div class="center"><iframe src="//www.youtube.com/embed/C09PcdbR92A" frameborder="0" allowfullscreen></iframe>
     <br>
     </td>
     
-    </tr></table>  
+    </tr></table> </div>
     </div>
     <div id="intelligence" class="page row" style="background-color:#f1c40f;">
     	<h1>Intelligence<br></h1><h3>Let's Have the Editor be as Smart as You</h3>
@@ -132,9 +132,6 @@
     <span style="font-size:7pt;display:none;">Gltn is still in development. Some parts of it may drastically change as it continues to grow and add more features. This is a beta version. Not everything may work all the time. Alert <a href="mailto:handnf+gluten@gmail.com">the developer</a> or message me <a href="http://twitter.com/handnf" target="_blank">@HandNF</a> (preferrably with a console output) if there is a bug or feature you want. Also, there are a few things that may seem weird, like the Font Awesome icon being the logo. This is merely a placeholder, don't worry.</span>
 </div>	
 <style>
-body {
-	overflow-x:hidden;	
-}
 pre {
 	width:95%;	
 }

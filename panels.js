@@ -732,9 +732,31 @@ function install_dictionary(format, url, name, id, icon) {
 	if(window.settings.dictionary.indexOf(id) == -1) {
 		window.settings.dictionary += ", "+id;
 		window.settings['dictionary_'+id] = format+', '+url+', '+name+', '+id+', '+icon;
+		window.settings.dictionarysort += ", "+id;
 	} else
 		console.error("You've already installed "+id); 	
 }	
+function uninstall_dictionary(id) {
+	var a = window.settings.dictionary.split(', ');
+	var b = new Array();
+	for(i in a) {
+		if(a[i] != id) {
+			b.push(a[i])
+		}	
+	}	
+	window.settings.dictionary = b.join(', ');
+	window.settings['dictionary_'+id] = undefined;
+	
+	var a = window.settings.dictionarysort.split(', ');
+	var b = new Array();
+	for(i in a) {
+		if(a[i] != id) {
+			b.push(a[i])
+		}	
+	}	
+	window.settings.dictionarysort = b.join(', ');
+	
+}
 function GetPanelmain_Dictionary() {
 	return {title:"Dictionary", bordercolor: "#2980b9", width: 40};	
 }
@@ -746,13 +768,15 @@ function RunPanelmain_Dictionary() {
 	//Check stock dictionaries and 'install' if null
 	if(window.settings.dictionary == undefined) {
 		window.settings.dictionary = 'gltn, wiktionary, wikipedia';
-		window.settings.dictionary_gltn = 'XML, http://felkerdigitalmedia.com/gltn/dictionary.php, Ouvert Dictionary, gltn, G';
-		window.settings.dictionary_wiktionary = 'HTML, http://felkerdigitalmedia.com/gltn/dictionary_wik.php, Wiktionary, wiktionary, W';
-		window.settings.dictionary_wikipedia = 'HTML, http://felkerdigitalmedia.com/gltn/dictionary_wiki.php, Wikipedia, wikipedia, W';
+		window.settings.dictionary_gltn = 'XML, http://felkerdigitalmedia.com/gltn/dictionary.php, Ouvert Dictionary, gltn, <span style="padding-left:8px;" class="fa fa-leaf"></span>';
+		window.settings.dictionary_wiktionary = 'HTML, http://felkerdigitalmedia.com/gltn/dictionary_wik.php, Wiktionary, wiktionary, W&nbsp;';
+		window.settings.dictionary_wikipedia = 'HTML, http://felkerdigitalmedia.com/gltn/dictionary_wiki.php, Wikipedia, wikipedia, W&nbsp;';
 	}	
+	if(window.settings.dictionarysort == undefined || window.settings.dictionarysort == "undefined")
+		window.settings.dictionarysort = window.settings.dictionary;
 	function openApp() {
 		out = "<input type='search' id='DictionaryIn' style='width:90%'><button class='fa fa-cog' id='DictionarySettings'></button>";
-		out += "<div id='DictionaryOut'><span style='font-size:16pt'>Welcome</span><br>Search for something<br><br><br><div style='text-align:center;width:100%;font-size:30pt;margin-top:25%;' class='fa-stack fa-lg'><span class='fa fa-circle-o fa-stack-2x'></span><span class='fa fa-quote-left fa-stack-1x'></span></div>";
+		out += "<div id='DictionaryOut'><span style='font-size:16pt'>Welcome</span><br>Search for something<br><br><br><div style='text-align:center;padding-left:80%;font-size:30pt;margin-top:25%;' class='fa-stack fa-lg'><span class='fa fa-circle-o fa-stack-2x'></span><span class='fa fa-quote-left fa-stack-1x'></span></div>";
 		out += "</div>";
 		postPanelOutput(out);	
 		$('#DictionaryIn').focus();
@@ -785,7 +809,7 @@ function RunPanelmain_Dictionary() {
 			for(i in ajaxrequests) {
 				ajaxrequests[i].abort();	
 			}
-			var d = window.settings.dictionary.split(', ');
+			var d = window.settings.dictionarysort.split(', ');
 			var end = false;
 			ajaxrequests = new Array();
 			index = 0;
@@ -833,78 +857,35 @@ function RunPanelmain_Dictionary() {
 				ajaxrequests.push(req);
 			}
 			tryDictionary(0);
-			
-			/*for(i in d) {
-				j = window.settings['dictionary_'+d[i]].split(', ');
-				if(end)
-					break;
-				
-			}	
-			if(!end) {
-				$('#DictionaryOut').html(no_results);
-			}
-			
-			
-			$.get('http://felkerdigitalmedia.com/gltn/dictionary.php', {word: $('#DictionaryIn').val()}, function(data) {
-				//console.log(data);
-				data = $.parseJSON(data);
-				if(data.error != "404") {
-					$('#DictionaryOut').html(xmlDictionaryParse(data));
-					end = true;
-				} else {
-					//Send to all the dictionary packs installed
-					//get window.settings.dictionary which will be an array of objects
-					if(window.settings.dictionary != undefined) {
-						var d = window.settings.dictionary.split(',');
-						for(i in d) {
-							j = window.settings['dictionary_'+d[i]].split(',');
-							if(end)
-								break;
-							if(j[0] == "XML") {
-								$.get(j[1], {word: $('#DictionaryIn').val()}, function(data) {
-									if(data.error != "404") {
-										$('#DictionaryOut').html(xmlDictionaryParse(data));
-										end = true;
-								
-									} 
-								});
-							} else { //HTML
-								$.get(j[1], {word: $('#DictionaryIn').val()}, function(data) {
-									if(data != "404") {
-										console.log(data);
-										$('#DictionaryOut').html('<iframe style="width:100%;height:'+(window.innerHeight-210)+'px" id="DictionaryFrame" seamless></iframe>');
-										//$('#DictionaryFrame').attr('srcdoc', data);
-										$('#DictionaryFrame').attr('src', j[1]+"?word="+$('#DictionaryIn').val());
-										end = true;		
-									}
-								});
-							}
-						}
-						if(!end)
-							$('#DictionaryOut').html(no_results);
-					} else {
-						$('#DictionaryOut').html(no_results);
-					}
-						//dictionary[0] = {format: XML, url: URL, name: TITLE, id: D_TITLE, icon: URL} but using commas instead
-						//If format is XML, then it will get item using same request format and the same parser
-							//Else need to show data.error = 404
-						//If format is HTML, then it will just get item and display output
-							//Else need to show just "404"
-					//TODO - Override default, sort dictionaries for priority
-					//TODO - Simple way to handle failure, and move to next dictionary
-				}
-			})
-			.fail(function() {
-				$('#DictionaryOut').html(no_connection);
-			})
-			.always(function() {
-				if($('#DictionaryIn').val().length == 0) 
-					openApp();
-			});*/
 		});
 	}
 	function openSettings() {
-		alert('TODO');	
+		out = "<button class='fa fa-angle-left' id='DictionaryBack'></button><br>";
+		out += "Sort the dictionaries that you want to access, separated by a comma then a space.<br>";
+		out += "<input id='DictionarySort' value='"+window.settings.dictionarysort+"' style='width:95%'>";
+		out += "<button id='DictionarySortSave'>Save Order</button>";
+		out += "<br><br><u>Accessible Dictionaries</u><ul style='margin-left:-20px;margin-top:0px;'>";
+		var a = window.settings.dictionary.split(', ');
+		for(i in a) {
+			console.log('dictionary_'+a[i]);
+			var b = window.settings['dictionary_'+a[i]].split(', ');
+			//"<span class='fa fa-circle-o' style='font-size:9pt'></span>"+	
+			b[4] = b[4].replace(/&gt;/g, ">").replace(/&lt;/g, "<");
+			out += b[4]+" "+a[i]+"<br>";
+			console.log(b);
+		}	
+		out += "</ul><button id='DictionaryStore' onclick='launchStore()'>Download More Dictionaries</button>";
+		postPanelOutput(out);
+		$('#DictionaryBack').on('click', function() {
+			openApp();
+		});
+		$('#DictionarySort').on('input', function() {
+			$('#DictionarySortSave').attr('disabled', false);
+		});
+		$('#DictionarySortSave').on('click', function() {
+			window.settings['dictionarysort'] = $('#DictionarySort').val();
+			$('#DictionarySortSave').attr('disabled', true);
+		});
 	}
 	function xmlDictionaryParse(d) {
 		out = "<span style='font-size:17pt'>"+d.name+"</span>";
@@ -969,7 +950,7 @@ function launchStore2() {
 		else if(datum.icon_url != undefined)
 			return "<img src='"+datum.icon_url+"'>";
 		else if(datum.icon_text != undefined)
-			return "&emsp;"+datum.icon_text;
+			return "&emsp;"+datum.icon_text+"&nbsp;";
 		return "";
 	}
 	function isInstalled(datum) {
@@ -1032,7 +1013,7 @@ function launchStore2() {
 				
 				outt = "<div style='border:solid 1px #222;cursor:pointer;background-color:white;' class='store_item' data-id='"+i+"'>"+out+"</div>";
 				//console.log(i, outt);
-				if(d[i].type == "Panel")
+				if(d[i].type == "Panel" || d[i].type == "Service")
 					pout += outt;
 				else if(d[i].type == "Dictionary")
 					dout += outt;
@@ -1060,30 +1041,55 @@ function launchStore2() {
 			subtitle = i.type+"<br><i>&emsp;&emsp;"+i.credit+"</i>";
 			ht = "<div style='margin-left:10%;width:80%;font-size:12pt;'>"+i.description+"</div>";
 			if(isInstalled(i)) 
-				ht += "<br><br><br>&emsp;<span style='color:green;font-size:12pt' class='fa fa-check'></span><span style='font-size:10pt;color:green'>&nbsp;You've already installed this.</span>";	
+				ht += "<br><br><br>&emsp;<span style='color:green;font-size:12pt' class='fa fa-check'></span><span style='font-size:10pt;color:green'>&nbsp;You've already installed this.</span><br><button class='store_uninstall' data-id='"+$(this).attr('data-id')+"'>Uninstall</button>";	
 			else
 				ht += "<br><br><br>&emsp;<button class='store_install' data-id='"+$(this).attr('data-id')+"'>Install Now</button>";
 			initiatePopup({title: title, subtitle: subtitle, ht: ht, bordercolor: '#222'});
 			$('.store_install').on('click', function() {
 				var i = store[$(this).attr('data-id')];
-				if(i.type == "Panel") {
-					install_panel(i.id, i.name, getIcon(i), i.url);
-					alert('Install panel');
+				y = confirm("Install "+i.name+"?");
+				if(y == true) {
+					if(i.type == "Panel" || i.type == "Service") {
+						install_panel(i.id, i.name, getIcon(i), i.url, (i.type == "Service"));
+						alert('Panel installed');
+					}
+					else if(i.type == "Dictionary") {
+						install_dictionary(i.type_d, i.url, i.name, i.id, getIcon(i));	
+						alert('Dictionary added')
+					}
+					else if(i.type == "Theme")
+						alert('Install theme');
+					else
+						alert('Unknown data');
+					closePopup();
+					grabStore();
 				}
-				else if(i.type == "Dictionary") {
-					install_dictionary(i.type_d, iurl, i.name, i.id, getIcon(i));	
-					alert('Install dictionary')
+			});
+			$('.store_uninstall').on('click', function() {
+				var i = store[$(this).attr('data-id')];
+				y = confirm("Are you sure that you wish to uninstall "+i.name+"?");
+				if(y == true) {
+					if(i.type == "Panel" || i.type == "Service") {
+						//install_panel(i.id, i.name, getIcon(i), i.url);
+						uninstall_panel(i.id);
+						alert('The panel was uninstalled.');
+					}
+					else if(i.type == "Dictionary") {
+						uninstall_dictionary(i.id);	
+						alert('UnInstall dictionary')
+					}
+					else if(i.type == "Theme")
+						alert('Install theme');
+					else
+						alert('Unknown data');
+					closePopup();
+					grabStore();
 				}
-				else if(i.type == "Theme")
-					alert('Install theme');
-				else
-					alert('Unknown data');
-				grabStore();
 			});
 		});
 		$('.store_submit').on('click', function() {
 			//alert('Open rules');
-			out = "<div style='margin-left:5%'>The project you submit must be uncondensed javascript so it may be reviewed. Your project must meet the following guidelines. Keep in mind that they may seem vague, and there is room to compromise.<br><ul><li><b>1. Integration</b> Your project may not secretly manipulate user data. This includes but isn't limited to deleting settings and files as well as adding settings and files without the user's consent or knowledge.</li><li><b>2. Function</b> Your project must meet its specified function and not secretly run other code. This includes but isn't limited to attacking servers, running malicious code, or interfering with the user in a malicious way.</li><li><b>3. Classiness</b> Your project must be tastefully presented. This includes but isn't limited to showing pornography, insulting the user or any other individual, and presenting information in a tasteful manner.</li></ul></div><br>If your project meets these guidelines, <a href='mailto:handnf+gltn@gmail.com?subject=Gltn%20Store%20Submission&body=Please%20fill%20out%20the%20following%20information%20for%20appearing%20in%20the%20store%3A%0A%0AProject%20Name%3A%0AProject%20ID%3A%0ADeveloper%20Name%3A%0AIcon%20(Font-Awesome%2C%20IMG%2C%20or%20Text)%3A%0AGive%20a%20brief%20description%20of%20the%20project%3A'> Send an email</a> with the code attached for review.";
+			out = "<div style='margin-left:5%'>The project you submit must be uncondensed javascript so it may be reviewed. Your project must meet the following guidelines. Keep in mind that they may seem vague, and there is room to compromise.<br><ul><li><b>1. Integration</b> Your project may not secretly manipulate user data. This includes but isn't limited to deleting settings and files as well as adding settings and files without the user's consent or knowledge. Also, your project should use the APIs and procedures recommened.</li><li><b>2. Function</b> Your project must meet its specified function and not secretly run other code. This includes but isn't limited to attacking servers, running malicious code, or interfering with the user in a malicious way.</li><li><b>3. Classiness</b> Your project must be tastefully presented. This includes but isn't limited to showing pornography, insulting the user or any other individual, and presenting information in a tasteful manner.</li></ul></div><br>If your project meets these guidelines, <a href='mailto:handnf+gltn@gmail.com?subject=Gltn%20Store%20Submission&body=Please%20fill%20out%20the%20following%20information%20for%20appearing%20in%20the%20store%3A%0A%0AProject%20Name%3A%0AProject%20ID%3A%0ADeveloper%20Name%3A%0AIcon%20(Font-Awesome%2C%20IMG%2C%20or%20Text)%3A%0AGive%20a%20brief%20description%20of%20the%20project%3A'> Send an email</a> with the code attached for review.";
 			initiatePopup({title: "Submit to Store", ht: out, bordercolor: '#222'});
 		});
 	})	

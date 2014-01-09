@@ -9,16 +9,24 @@
 	<type>Panel</type>
 	<description>Handy panel to quickly find a word or item. Developers can extend this application by writing HTML or XML plugins. By default it checks Ouvert Dictionary, Wiktionary, and Wikipedia and chooses the result based on priority and if that item exists.</description>
 	<credit>Nick Felker</credit>
+	<updated_last>1389163700</updated_last>
+	<updated_meta>1389163700</updated_meta>
+	<version>1.0</version>
 </app>
 <app>
 	<parent>app</parent>
 	<name>Ouvert Dictionary</name>
-	<icon_text>OD</icon_text>
+	<icon_fa>leaf</icon_fa>
 	<id>gltn</id>
 	<url>dictionary.php</url>
 	<type>Dictionary</type>
 	<type_d>XML</type_d>
+	<updated_last>1389163700</updated_last>
+	<updated_meta>1389163700</updated_meta>
 	<description>Gltn's stock Dictionary: it integrates into the Gltn Dictionary panel and is the first dictionary to use the Ouvert Dictionary format - a simple, open standard for dictionary data</description>
 	<credit>Nick Felker</credit> 
+	<updated_last>1389163700</updated_last>
+	<updated_meta>1389163700</updated_meta>
+	<version>1.0</version>
 </app>
 </gltn_store>

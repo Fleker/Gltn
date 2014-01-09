@@ -8,7 +8,7 @@ function initiatePopup(data) {
 	popupFocus = false;
 	//JSON data containing border color, title
 	//Opens popup, designs framework
-	var html = "<div class='fullscreen popupbg' style='z-index:0' onclick='if(!popupFocus) closePopup()'><div onclick='popupFocus = true;' class='popuptop' style='z-index:1'></div></div>";
+	var html = "<div class='fullscreen popupbg' style='z-index:0' onclick='if(!popupFocus) closePopup()'><div onclick='popupFocus = true;' class='popuptop' style='z-index:1;'></div></div>";
 	$('.popup').html(html);
 	$('.popup').css('opacity', 0).css('display', 'block');
 	$('.popuptop').css('left', '30%').css('width', '0%').css('top', '40%').css('height', '0%');
@@ -16,7 +16,7 @@ function initiatePopup(data) {
 		//closePopup();
 	});	
 	//Core framework, now populate card with classes
-	$('.popuptop').html('<div style="width:100%;text-align:right"><button onclick="closePopup()">'+closeButton()+'</button></div><table style="width:100%;vertical-align:top;"><tr><td style="vertical-align:top;width:100%;"><span class="popuptitle"></span><span class="popupsubtitle"></span><div class="popupbody"></div></td><td style="text-align:right"><img id="popupimg" src=""></img></td></tr></table><br><div class="popupcontent" style="margin-left:4px"></div>');
+	$('.popuptop').html('<div style="width:100%;text-align:right"><button onclick="closePopup()">'+closeButton()+'</button></div><table style="width:100%;vertical-align:top;" class="popupstatic"><tr><td style="vertical-align:top;width:100%;"><span class="popuptitle"></span><span class="popupsubtitle"></span><div class="popupbody"></div></td><td style="text-align:right"><img id="popupimg" src=""></img></td></tr></table><div class="popupcontent2" style="margin-left:4px;height:100px"><div class="popupcontent"></div></div>');
 	if(data.title != undefined)
 		$('.popuptitle').html(data.title+"<br>");
 	if(data.subtitle != undefined)
@@ -44,9 +44,17 @@ function initiatePopup(data) {
 	if(data.fnc == undefined)
 		data.fnc = function x() {/*alert(0)*/};
 	populatePopup(data.ht, data.fnc);
+	setTimeout('reheight()', 600);
 	
 	//initiatePopup({title: 'Hello', subtitle: 'World', img: 'https://fbcdn-profile-a.akamaihd.net/hprofile-ak-frc1/c43.27.338.338/s160x160/397165_10150559002575832_1521489086_n.jpg', value: '<b>Hello world.</b>'})
 }
+function reheight() {
+	var a = $('.popuptop').height();
+	var b = $('.popupstatic').height();
+	var c = a - b - 25;
+	$('.popupcontent2').height(c);	
+}
+	
 function populatePopup(ht, fnc) {
 	//HT - Hypertext - the tags and output
 	//Fnc - Function - this is code that starts to run when initiated, if valid

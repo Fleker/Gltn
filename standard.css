@@ -11,7 +11,7 @@
 body {
 	background-color: #ddd;
 	color: #000;
-	overflow-x:hidden;
+	/*overflow-x:hidden;*/
 }
 .body {
 	padding-top:100px;	

@@ -5,7 +5,7 @@
 <title>Gltn</title>
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="shortcut icon" sizes="196x196" href="gltn_f.png">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 
 <link rel="stylesheet" type="text/css" href="standard.css">
 <link rel="stylesheet" type="text/css" href="IntroJS/introjs.min.css">
