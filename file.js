@@ -98,7 +98,9 @@ function saveFile() {
 	
 	
 	$('.content_save').show();
-	$('.content_save').html("<span class='fa fa-file-text' style='color:#222'></span>&nbsp;<span class='fa fa-check' style='color:#222'></span>");
+	$('.content_save').html("<span class='fa fa-file-text' style='color:"+window.theme.coloralt+"'></span>&nbsp;<span class='fa fa-check' style='color:"+window.theme.coloralt+"'></span>");
+	//Also, we will redo all the CSS rules just to make sure they're applied to all the new content
+	initTheme();
 }
 docformat = '';
 function restoreFile() {
@@ -117,6 +119,7 @@ function restoreFile() {
 			window.settings[i] = xpref[i].replace(/&gt;/g, ">").replace(/&lt;/g, "<");	
 		}
 	}
+	startThemer();
 	} catch(e) {
 		console.error(e.message);
 		var y=confirm("You'll need to reset your settings. Click okay to clear settings.");

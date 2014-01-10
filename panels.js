@@ -768,9 +768,9 @@ function RunPanelmain_Dictionary() {
 	//Check stock dictionaries and 'install' if null
 	if(window.settings.dictionary == undefined) {
 		window.settings.dictionary = 'gltn, wiktionary, wikipedia';
-		window.settings.dictionary_gltn = 'XML, http://felkerdigitalmedia.com/gltn/dictionary.php, Ouvert Dictionary, gltn, <span style="padding-left:8px;" class="fa fa-leaf"></span>';
-		window.settings.dictionary_wiktionary = 'HTML, http://felkerdigitalmedia.com/gltn/dictionary_wik.php, Wiktionary, wiktionary, W&nbsp;';
-		window.settings.dictionary_wikipedia = 'HTML, http://felkerdigitalmedia.com/gltn/dictionary_wiki.php, Wikipedia, wikipedia, W&nbsp;';
+		window.settings.dictionary_gltn = 'XML, http://felkerdigitalmedia.com/gltn/dictionary.php, Ouvert Dictionary, gltn, <span class="fa fa-leaf"></span>';
+		window.settings.dictionary_wiktionary = 'HTML, http://felkerdigitalmedia.com/gltn/dictionary_wik.php, Wiktionary, wiktionary, <span class="fa fa-terminal"></span>';
+		window.settings.dictionary_wikipedia = 'HTML, http://felkerdigitalmedia.com/gltn/dictionary_wiki.php, Wikipedia, wikipedia, <span class="fa fa-globe"></span>';
 	}	
 	if(window.settings.dictionarysort == undefined || window.settings.dictionarysort == "undefined")
 		window.settings.dictionarysort = window.settings.dictionary;
@@ -863,7 +863,7 @@ function RunPanelmain_Dictionary() {
 		out = "<button class='fa fa-angle-left' id='DictionaryBack'></button><br>";
 		out += "Sort the dictionaries that you want to access, separated by a comma then a space.<br>";
 		out += "<input id='DictionarySort' value='"+window.settings.dictionarysort+"' style='width:95%'>";
-		out += "<button id='DictionarySortSave'>Save Order</button>";
+		//out += "<button id='DictionarySortSave'>Save Order</button>";
 		out += "<br><br><u>Accessible Dictionaries</u><ul style='margin-left:-20px;margin-top:0px;'>";
 		var a = window.settings.dictionary.split(', ');
 		for(i in a) {
@@ -880,12 +880,13 @@ function RunPanelmain_Dictionary() {
 			openApp();
 		});
 		$('#DictionarySort').on('input', function() {
-			$('#DictionarySortSave').attr('disabled', false);
-		});
-		$('#DictionarySortSave').on('click', function() {
+			//$('#DictionarySortSave').attr('disabled', false);
 			window.settings['dictionarysort'] = $('#DictionarySort').val();
-			$('#DictionarySortSave').attr('disabled', true);
 		});
+		/*$('#DictionarySortSave').on('click', function() {
+			
+			$('#DictionarySortSave').attr('disabled', true);
+		});*/
 	}
 	function xmlDictionaryParse(d) {
 		out = "<span style='font-size:17pt'>"+d.name+"</span>";
@@ -946,7 +947,7 @@ function launchStore2() {
 	$('.build').append("<div style='background-color: #f9f9f9;width: 94%;margin-left: 3%;margin-top: 10px;padding-top: 10px;padding-bottom: 40px;border: solid 1px #999;box-shadow: black 0px 0px 3px 0px;'><div style='font-size:18pt;color:#222;font-family:sans-serif;text-align:center;'>Gltn Plugin Store</div><div style='text-align:center; width:100% ;font-size:18pt; padding-bottom:20px;' class='fa-stack fa-lg'><span class='fa fa-circle-o fa-stack-2x'></span><span class='fa fa-shopping-cart fa-stack-1x'></span></div><input type='search' placeholder='Search for something...' style='width:75%;margin-left:15%;' id='store_search'><div id='build_inner' class='build_inner'></div></div>");
 	function getIcon(datum) {
 		if(datum.icon_fa != undefined) 
-			return "<span style='padding-left:8px;' class='fa fa-"+datum.icon_fa+"'></span>";
+			return "<span class='fa fa-"+datum.icon_fa+"'></span>";
 		else if(datum.icon_url != undefined)
 			return "<img src='"+datum.icon_url+"'>";
 		else if(datum.icon_text != undefined)

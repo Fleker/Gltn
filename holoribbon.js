@@ -118,6 +118,7 @@ function ribbonGesture() {
 				}
 			});
 }
+//The following is Gltn specific code, so you'll need to modify the colors
 function highlight(el) {
 	//console.log(jQuery(el).attr('class'));
 	jQuery(el).animate({

@@ -21,6 +21,8 @@ body {
 	background-color:#ddd;
 	top:0px;
 	border-bottom:solid 1px #bbb;
+	left:0px;
+	width:100%;
 }	
 span, div, body {
 	column-span: all;

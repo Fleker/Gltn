@@ -794,7 +794,7 @@ function fullscreen() {
 		},300);
 	$('.fullscreenui').fadeIn(500);
 	setTimeout("$('.fullscreenui').css('opacity','.1')", 510);
-	window.fsuo = "rgba(204,204,204)";
+	window.fsuo = theme.normfsui;
 }
 function normalscreen() {
 	window.fullscreenOn = false;	
@@ -811,26 +811,27 @@ function normalscreen() {
 		$('.fullscreenui').fadeOut(100);
 }
 function nightscreen(option) {
-	if($('.content_textarea').css('background-color') == "rgb(0, 0, 0)" || option == 1) {
+	console.log($('.content_textarea').css('background-color'), theme.darkbg);
+	if($('.content_textarea').css('background-color') == theme.darkbg || option == 1) {
 		//Return to white
 		jQuery('.content_textarea').animate({
-			backgroundColor: "rgba(255,255,255)",
-			color: "rgba(0,0,0)"
+			backgroundColor: window.theme.normbg,
+			color: window.theme.normcolor
 		},5000);
-		fsuo = "rgba(204,204,204)";
+		fsuo = window.theme.normfsui;
 		jQuery('.fullscreenui').animate({
 			opacity: 0.1,
-			color:'black'
+			color:window.theme.normfsuicolor
 		},100);
-	} else {
+	} else if($('.content_textarea').css('background-color') != theme.darkbg || option == 2) {
 		jQuery('.content_textarea').animate({
-			backgroundColor: "rgba(0,0,0)",
-			color: "rgba(200,200,200)"
+			backgroundColor: window.theme.darkbg,
+			color: window.theme.darkcolor
 		},2000);
-		fsuo = "rgba(41,41,41)";
+		fsuo = theme.darkfsui;
 		jQuery('.fullscreenui').animate({
 			opacity:0.1,
-			color:"white"
+			color:window.theme.darkfsuicolor
 		},100);
 	}
 }
@@ -1304,4 +1305,68 @@ function closeButton(i) {
 		return "<span class='fa fa-times'/>"
 	else
 		return '<span class="fa fa-times"/>'	
+}
+/*** Custom Theming ***/
+function initTheme() {
+	window.theme = {};	
+	//set theme colors/css
+	//set theme variables
+	//fullscreen variables
+	theme.darkbg = "rgb(0, 0, 0)";
+	theme.normcolor = "rgb(0, 0, 0)";
+	theme.normbg = "rgb(255, 255, 255)";
+	theme.darkcolor = "rgb(200, 200, 200)";
+	theme.coloralt = '#222';
+	theme.normfsui = "rgb(204, 204, 204)";
+	theme.darkfsui = "rgb(41, 41, 41)";
+	theme.darkfsuicolor = 'white';
+	theme.normfsuicolor = 'black';
+}
+function themeCss(rule, val) {
+	$('body').css(rule, val);	
+}
+function startThemer() {
+	//isn't called until settings are grabbed because otherwise window.settings.theme wouldn't exist
+	//grab current theme
+	//if not set reset themes
+	var url = undefined;
+	if(window.settings.theme == undefined) {
+		window.settings.theme = "default";
+		window.settings.currenttheme = "0";
+		window.settings.theme_default = "default, Default, kernel.js, C";
+	} else {
+		var a = window.settings.theme.split(', ');
+		var b = window.settings['theme_'+a[parseInt(window.settings.currenttheme)]].split(', ');
+		url = b[2];
+	}
+	//if not default insert JS
+	if(url != undefined && b[0] != "default") {
+		console.log("Loading theme "+b[1]+" @ "+url);
+		loadjscssfile(url, 'js');	
+		//JS will have same function and call that script
+	} else if(b[0] == "default")
+		initTheme();
+}
+function install_theme(id, name, url, icon) {
+	if(window.settings.theme.indexOf(id) == -1) {
+		window.settings.theme += ", "+id;
+		window.settings['theme_'+id] = id+', '+name+', '+url+', '+icon;	
+	}
+}
+function uninstall_theme(id) {
+	var a = window.settings.theme.split(', ');
+	var b = new Array();
+	for(i in a) {
+		if(a[i] != id)
+			b.push(a[i]);	
+	}
+	window.settings.theme = b.join(', ');
+}
+function selectTheme(id) {
+	var a = window.settings.theme.split(', ');
+	var b = new Array();
+	for(i in a) {
+		if(a[i] == id)
+			window.settings.currenttheme = i;	
+	}
 }
