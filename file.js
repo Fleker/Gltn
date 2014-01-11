@@ -99,8 +99,6 @@ function saveFile() {
 	
 	$('.content_save').show();
 	$('.content_save').html("<span class='fa fa-file-text' style='color:"+window.theme.coloralt+"'></span>&nbsp;<span class='fa fa-check' style='color:"+window.theme.coloralt+"'></span>");
-	//Also, we will redo all the CSS rules just to make sure they're applied to all the new content
-	initTheme();
 }
 docformat = '';
 function restoreFile() {
@@ -122,13 +120,13 @@ function restoreFile() {
 	startThemer();
 	} catch(e) {
 		console.error(e.message);
-		var y=confirm("You'll need to reset your settings. Click okay to clear settings.");
-		if(y == true)
-			localStorage.removeItem("settings");
 		var z=confirm("Your settings file isn't working. Click okay to send a bug report.");
+		var y=confirm("You'll need to reset your settings. Click okay to clear settings.");
 		if(z == true) {
 			window.location = "mailto:handnf+gltn@gmail.com?subject=Settings%20Error&body="+encodeURIComponent(localStorage['settings']);
 		}
+		if(y == true)
+			localStorage.removeItem("settings");
 	}
 	
 	
@@ -138,12 +136,11 @@ function restoreFile() {
 	} catch(e) {
 		console.error(e.message);
 		var z = confirm("This document has improper XML. Click okay to send a bug report.");
-		var y = confirm("Click okay to delete all metadata. This removes citations, but keeps the main content.");
-		if(y == true) 
-			localStorage.removeItem(fileid);	
+		var y = confirm("Click okay to delete all metadata. This removes citations, but keeps the main content.");	
 		if(z == true)
 			window.location = "mailto:handnf+gltn@gmail.com?subject=File%20"+fileid+"%20Broken&body="+encodeURIComponent(localStorage[fileid]);
-		
+		if(y == true) 
+			localStorage.removeItem(fileid);
 	}
 	//$.xml2json(xml);
 	xc = localStorage[fileid+"_c"];
@@ -316,7 +313,7 @@ function writeToSettings(att, val) {
 //Nifty UI for saving
 function initNiftyUI4Saving() {
 	$('span, div, input').on('input', function() {
-		$('.content_save').html("<span class='fa fa-file-text' style='color:#222'></span>&nbsp;<span class='fa fa-pencil' style='color:#222'></span>");
+		$('.content_save').html("<span class='fa fa-file-text' style='color:"+window.theme.coloralt+"'></span>&nbsp;<span class='fa fa-pencil' style='color:"+window.theme.coloralt+"'></span>");
 	});	
 }
 function downloadXMLX() {

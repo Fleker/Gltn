@@ -19,19 +19,20 @@ function initTheme() {
 	$('.header').css('background-color', '#333').css('border-bottom', 'solid 0px #555');
 	$('#panel_content').css('background-color', '#333');
 	$('#panel_plugin').css('background-color', '#333');
-	$('input').css('background-color', '#444').css('color', theme.normcolor);
+	$('input').css('background-color', '#444').css('color', theme.normcolor).css('font-family', '"Roboto Condensed", sans-serif').css('font-size', '11pt');
+	$('button').css('font-family', '"Roboto Condensed", sans-serif');
 	$('.toolbar, .overflow').css('background-color', '#444');
 	$('.popuptop').css('color', 'white').css('background-color', theme.normbg);
 	$('.popuptitle').css('color', theme.coloralt);
 	
-	//Misc panel support
-	$('.tfile').css('background-color', '#444');
 	
+	//Misc panel support
+	$('.tfile').css('background-color', '#444');	
 }	
 initTheme();
-writeCss("@import url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900,900italic);");
+writeCss("@import url(http://fonts.googleapis.com/css?family=Roboto+Condensed:300italic,400italic,700italic,400,300,700);");
 //set theme colors/css
-	themeCss('font-family', '"Roboto", sans-serif');
+	themeCss('font-family', '"Roboto Condensed", sans-serif');
 	themeCss('background-color', theme.normbg);
 	themeCss('color', theme.normcolor);
 //Theme parameters for content_textarea not necessary (unless we removed the reload requirement for themes - but for now it'll stay due to a lack of default parameters)

@@ -21,12 +21,23 @@
 	<url>dictionary.php</url>
 	<type>Dictionary</type>
 	<type_d>XML</type_d>
-	<updated_last>1389163700</updated_last>
-	<updated_meta>1389163700</updated_meta>
 	<description>Gltn's stock Dictionary: it integrates into the Gltn Dictionary panel and is the first dictionary to use the Ouvert Dictionary format - a simple, open standard for dictionary data</description>
 	<credit>Nick Felker</credit> 
 	<updated_last>1389163700</updated_last>
 	<updated_meta>1389163700</updated_meta>
 	<version>1.0</version>
+</app>
+<app>
+	<parent>app</parent>
+	<name>Blackout Condensed</name>
+	<icon_fa>heart</icon_fa>
+	<id>blackoutc</id>
+	<url>theme_blackoutc.js</url>
+	<type>Theme</type>
+	<credit>Nick Felker</credit>
+	<description>A modification of the standard Blackout to use a condensed version of Roboto. A writing application should also include beautiful typography.</description>
+	<updated_last>1389163700</updated_last>
+	<updated_meta>1389163700</updated_meta>
+	<version>1.0</version>	
 </app>
 </gltn_store>

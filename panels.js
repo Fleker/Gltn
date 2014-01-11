@@ -936,6 +936,36 @@ function RunPanelmain_Dictionary() {
 	}
 	openApp();
 }
+//*** Theme Panel ***/
+function GetPanelmain_Themes() {
+	return {title:"Change Theme", bordercolor: '#2ecc71', width: 20};	
+}
+function RunPanelmain_Themes() {
+	function loadThemes() {
+		var a = window.settings.theme.split(', ');
+		out = "";
+		for(i in a) {
+			var b = window.settings['theme_'+a[i]].split(', ');
+			var bg = "rgba(255,0,0,.3)";
+			console.log(a[i], settings.currenttheme)
+			if(a[i] == settings.currenttheme)
+				bg = "rgba(0,128,255,.4)";
+			out += "<div style='background-color:"+bg+";min-height:50px;margin-bottom:15px;cursor:pointer;padding-left: 4px;padding-top: 3px;' class='ThemesCard' data-c='"+a[i]+"'>";
+			b[3] = b[3].replace(/&gt;/g, ">").replace(/&lt;/g, "<");
+			out += b[3]+"&nbsp;<span style='font-size:16pt'>"+b[1]+"</span>";
+			out += "</div>";
+		}
+		//out += "<br><br><button onclick='launchStore()'>Download More Themes</button>";
+		postPanelOutput(out);
+		$('.ThemesCard').on('click', function() {
+			var c = $(this).attr('data-c');
+			selectTheme(c);
+			window.location.reload();
+		});
+	}
+	loadThemes();
+}
+
 //*** Store-Related Code ***/
 function launchStore() {
 	//Grab store data
@@ -944,7 +974,8 @@ function launchStore() {
 }
 function launchStore2() {
 	console.log('ba');
-	$('.build').append("<div style='background-color: #f9f9f9;width: 94%;margin-left: 3%;margin-top: 10px;padding-top: 10px;padding-bottom: 40px;border: solid 1px #999;box-shadow: black 0px 0px 3px 0px;'><div style='font-size:18pt;color:#222;font-family:sans-serif;text-align:center;'>Gltn Plugin Store</div><div style='text-align:center; width:100% ;font-size:18pt; padding-bottom:20px;' class='fa-stack fa-lg'><span class='fa fa-circle-o fa-stack-2x'></span><span class='fa fa-shopping-cart fa-stack-1x'></span></div><input type='search' placeholder='Search for something...' style='width:75%;margin-left:15%;' id='store_search'><div id='build_inner' class='build_inner'></div></div>");
+	$('.build').append("<div style='background-color: #f9f9f9;width: 94%;margin-left: 3%;margin-top: 10px;padding-top: 10px;padding-bottom: 40px;border: solid 1px #999;box-shadow: black 0px 0px 3px 0px;color:#000'><div style='font-size:18pt;color:#222;font-family:sans-serif;text-align:center;'>Gltn Plugin Store</div><div style='text-align:center; width:100% ;font-size:18pt; padding-bottom:20px;' class='fa-stack fa-lg'><span class='fa fa-circle-o fa-stack-2x'></span><span class='fa fa-shopping-cart fa-stack-1x'></span></div><input type='search' placeholder='Search for something...' style='width:75%;margin-left:15%;' id='store_search'><div id='build_inner' class='build_inner'></div></div>");
+	$('.build').css('line-height', '1em');
 	function getIcon(datum) {
 		if(datum.icon_fa != undefined) 
 			return "<span class='fa fa-"+datum.icon_fa+"'></span>";
@@ -955,13 +986,13 @@ function launchStore2() {
 		return "";
 	}
 	function isInstalled(datum) {
-		return (datum.type == "Panel" && window.settings.panels.indexOf(datum.id) > -1) || (datum.type == "Dictionary" && window.settings.dictionary.indexOf(datum.id) > -1)
+		return ((datum.type == "Panel" || datum.type == "Service") && window.settings.panels.indexOf(datum.id) > -1) || (datum.type == "Dictionary" && window.settings.dictionary.indexOf(datum.id) > -1) || (datum.type == "Theme" && window.settings.theme.indexOf(datum.id) > -1)
 	}
 	function searchTermed(datum) {
-		n = $('#store_search').val();
-		if(datum.name.indexOf(n) > -1)
+		n = $('#store_search').val().toLowerCase();
+		if(datum.name.toLowerCase().indexOf(n) > -1)
 			return true;
-		else if(datum.credit.indexOf(n) > -1)
+		else if(datum.credit.toLowerCase().indexOf(n) > -1)
 			return true;
 		
 		return false;
@@ -1001,8 +1032,8 @@ function launchStore2() {
 			//console.log(d[i], d[i].parent);
 			//if(d[i].parent == "app") {
 				if(searchTermed(d[i])) {
-				out += getIcon(d[i]);
-				out += "&emsp;<b>"+d[i].name+"</b>";
+				out += "&emsp;"+getIcon(d[i]);
+				out += "&nbsp;<b>"+d[i].name+"</b>";
 				if(isInstalled(d[i])) {
 					out += "&emsp;<span style='color:green;font-size:8pt' class='fa fa-check'></span><span style='font-size:6pt;color:green'>ADDED</span>";	
 				}
@@ -1041,6 +1072,7 @@ function launchStore2() {
 			title = getIcon(i)+"&emsp;"+i.name;
 			subtitle = i.type+"<br><i>&emsp;&emsp;"+i.credit+"</i>";
 			ht = "<div style='margin-left:10%;width:80%;font-size:12pt;'>"+i.description+"</div>";
+			ht += "<br><span style='font-size:9pt;color:#999;padding-left:10%'>v "+i.version+"</span>";
 			if(isInstalled(i)) 
 				ht += "<br><br><br>&emsp;<span style='color:green;font-size:12pt' class='fa fa-check'></span><span style='font-size:10pt;color:green'>&nbsp;You've already installed this.</span><br><button class='store_uninstall' data-id='"+$(this).attr('data-id')+"'>Uninstall</button>";	
 			else
@@ -1058,9 +1090,10 @@ function launchStore2() {
 						install_dictionary(i.type_d, i.url, i.name, i.id, getIcon(i));	
 						alert('Dictionary added')
 					}
-					else if(i.type == "Theme")
-						alert('Install theme');
-					else
+					else if(i.type == "Theme") {
+						install_theme(i.id, i.name, i.url, getIcon(i));
+						alert('Theme added');
+					} else
 						alert('Unknown data');
 					closePopup();
 					grabStore();
@@ -1077,10 +1110,12 @@ function launchStore2() {
 					}
 					else if(i.type == "Dictionary") {
 						uninstall_dictionary(i.id);	
-						alert('UnInstall dictionary')
+						alert('The dictionary was removed.')
 					}
-					else if(i.type == "Theme")
-						alert('Install theme');
+					else if(i.type == "Theme") {
+						uninstall_theme(i.id);
+						alert('The theme was removed.');
+					}
 					else
 						alert('Unknown data');
 					closePopup();

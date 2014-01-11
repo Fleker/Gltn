@@ -6,7 +6,7 @@ function falseBuild(printr) {
 	$('.header').fadeOut(500);
 	$('.build').html('<button onclick="exitBuild()">Return to Editor</button>');
 	if(printr != true)
-		$('.build').append('<button onclick="window.print()" class="fa fa-print noprint" style="font-size:12pt;"></button>');	
+		$('.build').append('<button onclick="window.print()" class="noprint" style="font-size:12pt;"><span class="fa fa-print"></span></button>');	
 	console.log('fb');
 }
 function startBuild(el) {
@@ -17,7 +17,7 @@ function startBuild(el) {
 	//$('.page').css('width','8.5in');
 	window.section_name = "";
 	$('#searching').val('');
-	$('.build').html('<button onclick="exitBuild()" class="noprint">Return to Editor</button><button onclick="window.print()" class="fa fa-print noprint" style="font-size:12pt;"></button><span class="buildtime noprint" style="font-size:9pt"></span>');
+	$('.build').html('<button onclick="exitBuild()" class="noprint">Return to Editor</button><button onclick="window.print()" class="noprint" style="font-size:12pt;"><span class="fa fa-print"></span></button><span class="buildtime noprint" style="font-size:9pt"></span>');
 		//$('.build_progress').css('display', 'block').css('position', 'fixed').css('width', '50%').css('height', '50%').css('top','25%').css('left','25%').css('background-color', 'rgba(0,0,0,0.3)').css('font-size','16pt').css('margin-top','10%');
 	initiatePopup({title:"Build Progress",bordercolor:"rgb(44, 145, 16)",ht:"<div id='build_progress' class='build_progress' style='height:150px'></div>"});
 	updateBuildProgress('Initiating Build...');

@@ -1172,7 +1172,8 @@ function setHeader() {
 		),
 		Tools: new Array(
 			{text: 'Find', img: '<span style="font-size:18pt" class="fa fa-search"></span>', action: "runPanel('main_Find');", key: "Alt+F"}
-			/*{text: 'Dictionary', img: '<span style="font-size:18pt" class="fa fa-quote-left"></span>', action: "runPanel('main_Dictionary');"},*/
+			/*{text: 'Dictionary', img: '<span style="font-size:18pt" class="fa fa-quote-left"></span>', action: "runPanel('main_Dictionary');"},*/,
+			{text: 'Themes', img: '<span style="font-size:18pt" class="fa fa-picture-o"></span>', action: "runPanel('main_Themes')"}
 		),
 		About: new Array(
 			{text: 'Open Source', img: '<span style="font-size:18pt" class="fa fa-github-alt"></span>', action: "window.location='http://www.github.com/fleker/gluten'"},
@@ -1321,9 +1322,14 @@ function initTheme() {
 	theme.darkfsui = "rgb(41, 41, 41)";
 	theme.darkfsuicolor = 'white';
 	theme.normfsuicolor = 'black';
+	theme.ribbonhighlight = '#9999ff';
+	theme.ribbonplain = 'rgba(0,0,0,0)';
 }
 function themeCss(rule, val) {
 	$('body').css(rule, val);	
+}
+function writeCss(rules) {
+	$('body').append('<style>'+rules+'</style>');
 }
 function startThemer() {
 	//isn't called until settings are grabbed because otherwise window.settings.theme wouldn't exist
@@ -1331,14 +1337,15 @@ function startThemer() {
 	//if not set reset themes
 	var url = undefined;
 	if(window.settings.theme == undefined) {
-		window.settings.theme = "default";
-		window.settings.currenttheme = "0";
-		window.settings.theme_default = "default, Default, kernel.js, C";
-	} else {
+		window.settings.theme = "default, blackout";
+		window.settings.currenttheme = "default";
+		window.settings.theme_default = "default, Default, kernel.js, <span class='fa fa-heart-o'></span>";
+		window.settings.theme_blackout = "blackout, Blackout, theme_blackout.js, <span class='fa fa-heart'></span>";
+	} //else {
 		var a = window.settings.theme.split(', ');
-		var b = window.settings['theme_'+a[parseInt(window.settings.currenttheme)]].split(', ');
+		var b = window.settings['theme_'+window.settings.currenttheme].split(', ');
 		url = b[2];
-	}
+	//}
 	//if not default insert JS
 	if(url != undefined && b[0] != "default") {
 		console.log("Loading theme "+b[1]+" @ "+url);
@@ -1359,14 +1366,20 @@ function uninstall_theme(id) {
 	for(i in a) {
 		if(a[i] != id)
 			b.push(a[i]);	
+		if(a[i] == settings.currenttheme)
+			settings.currenttheme = a[i-1];
 	}
 	window.settings.theme = b.join(', ');
+	localStorage.removeItem('theme_'+id);
 }
 function selectTheme(id) {
 	var a = window.settings.theme.split(', ');
 	var b = new Array();
 	for(i in a) {
 		if(a[i] == id)
-			window.settings.currenttheme = i;	
+			window.settings.currenttheme = id;	
 	}
+	//startThemer();
+	saveFile();
+	setTimeout("window.location.reload();", 150);
 }

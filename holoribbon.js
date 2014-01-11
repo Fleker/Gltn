@@ -122,11 +122,11 @@ function ribbonGesture() {
 function highlight(el) {
 	//console.log(jQuery(el).attr('class'));
 	jQuery(el).animate({
-		backgroundColor: '#9999ff',
+		backgroundColor: theme.ribbonhighlight,
 	}, 175);
 }
 function unlight(el) {
 	jQuery(el).animate({
-		backgroundColor: 'rgba(0,0,0,0)'	
+		backgroundColor: theme.ribbonplain	
 	}, 175);
 }

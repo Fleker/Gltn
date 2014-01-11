@@ -108,6 +108,8 @@ function post_format() {
 			document.getElementsByClassName("content_textarea")[0].onkeyup = function() {
 				postRange('onkeyup');
 			}	
+	//Theme parameters for content_textarea
+	$('.content_textarea').css('background-color', theme.normbg).css('color', theme.normcolor);
 }
 
 function format_check_count(i) {
@@ -148,7 +150,7 @@ function post_format_text(m, inv) {
 	if(inv != undefined && inv != 0)
 		ind = (m.index-inv)+"_2";
 	else {
-		out = out + m.label;
+		out = out + m.label+":&nbsp;";
 		if(m.description.length)
 			out = out + "<br><span class='format_description'>"+m.description+"</span><br>";
 	}
@@ -165,7 +167,7 @@ function post_format_date(m, inv) {
 	if(inv != undefined && inv != 0)
 		ind = (m.index-inv)+"_2";
 	else {
-		out = out + m.label;
+		out = out + m.label+":&nbsp;";
 		if(m.description.length)
 			out = out + "<br><span class='format_description'>"+m.description+"</span><br>";
 	}
@@ -393,7 +395,8 @@ function update_toolbar_style() {
 		sy_save = sy;
 	}
 	$('.introjs-overlay').css('display', 'none');
-	
+	//Also, we will redo all the CSS rules just to make sure they're applied to all the new content
+	initTheme();
 	
 	//$('#panel_plugin').css('height', window.innerHeight);
 	
