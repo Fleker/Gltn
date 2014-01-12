@@ -15,7 +15,6 @@ function initTheme() {
 	theme.normfsuicolor = 'white';
 	theme.ribbonhighlight = '#05a';
 	theme.ribbonplain = 'rgba(0,0,0,0)';
-	
 	$('.header').css('background-color', '#333').css('border-bottom', 'solid 0px #555');
 	$('#panel_content').css('background-color', '#333');
 	$('#panel_plugin').css('background-color', '#333');
@@ -26,6 +25,7 @@ function initTheme() {
 	
 	//Misc panel support
 	$('.tfile').css('background-color', '#444');
+	
 	
 }	
 initTheme();

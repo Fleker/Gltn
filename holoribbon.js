@@ -23,7 +23,7 @@ function newRibbon(element, ribbon) {
     
 	out = '';
     for(i in keys) {
-        out = out + '<table class="ribbongroup" style="width:106%;text-align:center">'
+        out = out + '<table class="ribbongroup" style="width:98%;text-align:center;">'
         for(j in ribbon[keys[i]]) {
             var k = ribbon[keys[i]][j];
 			
@@ -94,7 +94,7 @@ function ribbonSwitch(index, bool) {
 			$('.ribbongroup').css('display', 'none');
 			$(element).css('margin-left', ml2+'%').css('display','inline-table');;
 			$(element).animate({
-				marginLeft: '-5%',
+				marginLeft: '0%',
 				opacity: 1
 			}, animation_time)
     });

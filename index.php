@@ -17,6 +17,7 @@
 <!-- Latest compiled and minified JavaScript -->
 <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
 <script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+<script src="xmlToJson.js"></script>
 <link href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 <link rel="icon" 
       type="image/png" 
@@ -35,6 +36,93 @@
 </head>
 
 <body>
+<div id="filesys" style="width:100%;margin-left:0px;margin-top:0px;background-color:rgba(0,128,255,0.5);height:75%;visibility:collapse;padding-left:15px;overflow-y:auto">
+
+</div>
+<script>
+function post(out,term,kb) {
+		if(kb > 0)
+			$('#filesys').html(out).css('visibility', 'visible').css('height', (window.innerHeight*.55)+"px");
+		$('#filesys_s').on('input', function() {
+			console.log(1);
+			resetFolder($('#filesys_s').val());
+		});
+		$('#filesys_s').focus();
+		$('#filesys_s').val(term);	
+		$('.tfile').on('click', function() {
+			if($('.Filesys_delete').attr('data-end') != "true")
+				wl($(this).attr('data-v'));
+		});
+}
+function wl(i) {
+		c('?file='+i);
+		window.location = 'edit.php?file='+i;	
+	}
+function c(t) {
+	console.log(t);
+}	
+function resetFolder(term) {
+		if(term == undefined)
+			sterm = "";
+		else
+			sterm = term.toLowerCase();
+		out = "&emsp;You already have files. Access them below.<br><span class='fa fa-search'></span>&nbsp;<input type='search' id='filesys_s' style='width:85%' value='"+sterm+"'><table style='width:100%'>";
+		fstotal = 0;
+		for(i in localStorage){
+			c(i);
+			if(localStorage[i] != undefined && localStorage[i+"_c"] != undefined) {
+				//We've got something!
+				var title = "";
+				try {
+					var xx = $.xml2json(localStorage[i]);
+					title = localStorage[i].indexOf("<id>Title</id>");
+				} catch(e) {
+					c(e.message);
+					continue;
+				}
+				if(title > -1) {
+					var title2 = localStorage[i].substring(title);
+					var t3 = title2.indexOf("<value>")+7;
+					var t4 = title2.indexOf("</value>");
+					var t5 = title2.substring(t3,t4);
+					c(title2);
+					c(t3);
+					c(t4);
+					c(t5);
+				}
+				if(t5 == undefined)
+					t5 = "";
+				bgc = '#ecf0f1';
+				var fsi = localStorage[i].length;
+				var fsci = localStorage[i+"_c"].length;
+				fstotal += fsi;
+				fstotal += fsci;
+				var fsout = Math.round((fsi+fsci)/100)/10+"KB";
+				//console.log(xx.file.tags.split(','),sterm)
+				if(sterm == undefined || (sterm != undefined  && (t5.toLowerCase().indexOf(sterm) > -1) || i.toLowerCase().indexOf(sterm) > -1 || xx.file.tags.indexOf(sterm) > -1)) {
+					try {
+						var y = xx.file.format;
+					} catch(e) {
+						console.error(e.message);
+						continue;
+					}
+					out += "<tr><td class='tfile' style='background-color:"+bgc+";border:solid 1px #2c3e50;padding-bottom:8px;width:98%;cursor:pointer;' data-v='"+i+"'><table style='font-size:7pt;font-family:sans-serif;width:100%;'><tr><td style='text-align:left'><span style='font-size:8pt' class='fa fa-file-text'></span>&nbsp;"+i+".gltn</td><td style='text-align:center;width:20px' class='Filesys_delete' data-f='"+i+"'><!--X--></td></tr></table>";
+					if(t5 != undefined)
+						out += "<div style='margin-left:3px'><b>"+t5+"</b></div>";	
+					out += "<span style='font-size:8pt'>&emsp;"+xx.file.format+"&nbsp;&nbsp;"+xx.file.language+"&nbsp;&nbsp;"+fsout+"</span>";	
+					out += "</td></tr>";	
+				}
+			}	
+		}
+		out += "</table>";
+		fstotal += localStorage['settings'].length;
+		fstotalout = "<span style='font-size:10pt'>&emsp;"+Math.round(fstotal/100)/10+"KB stored</span>"
+		out += fstotalout;
+		post(out,term,fstotal);
+		//setTimeout("post(out);", 50);
+	}	
+	resetFolder();
+</script>
  <div class="collapse navbar-collapse naving" id="bs-example-navbar-collapse-1" style="background-color:#ddd">
     <ul class="nav navbar-nav">
       <li><a href="#intelligence">Intelligence</a></li>

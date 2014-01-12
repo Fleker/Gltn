@@ -1,6 +1,6 @@
 // Misc. stuff from edit.php that shouldn't be in there - clutters up stuff
 //In the future, arrange a way to programitically grab all values.
-	formats = [{name: "APA", type: "Essay"}, {name: "MLA", "type": "Essay"}, {name:"IEEE", type:"Report"}];	
+	formats = [{name: "APA", type: "IN BETA"}, {name: "MLA", "type": "Essay"}, {name:"IEEE", type:"Report"}];	
 	
 /*(function(){
     //saving the original console.log function

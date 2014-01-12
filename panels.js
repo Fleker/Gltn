@@ -40,7 +40,8 @@ function runPanel(panel_id_name) {
 	openPanelPlugin(p.width, min, panel_id_name);
 }
 function openPanelPlugin(percent, min, panel_id_name) {
-	$('#panel_plugin').css('display', 'block').css('opacity', 0.01);
+	$('#panel_plugin').css('display', 'block').css('opacity', 0).css('width', '1px');
+	animateContentPanel(100-percent+'%');
 	$('#panel_plugin').animate({
 		/*width: percent+"%",*/
 		width:'95%',
@@ -48,7 +49,6 @@ function openPanelPlugin(percent, min, panel_id_name) {
 		opacity: 1,
 		marginLeft: 0
 		}, 70, function() {
-			animateContentPanel(100-percent+'%');
 			setTimeout("populatePanelPlugin('"+panel_id_name+"');",10);	
 		}
 	);
@@ -448,9 +448,9 @@ function RunPanelmain_Filesys() {
 			}
 		});
 		$('.Filesys_delete').hover(function() {
-			$(this).css('color', '#fff').css('background-color', '#f44').css('border-radius', 100);
+			$(this).css('color', theme.normbg).css('background-color', '#f44').css('border-radius', 100);
 		}, function() {
-			$(this).css('color', '#000').css('background-color', 'inherit');
+			$(this).css('color', theme.normcolor).css('background-color', 'inherit');
 		});
 		
 		$('.tfile').on('click', function() {
@@ -775,7 +775,7 @@ function RunPanelmain_Dictionary() {
 	if(window.settings.dictionarysort == undefined || window.settings.dictionarysort == "undefined")
 		window.settings.dictionarysort = window.settings.dictionary;
 	function openApp() {
-		out = "<input type='search' id='DictionaryIn' style='width:90%'><button class='fa fa-cog' id='DictionarySettings'></button>";
+		out = "<input type='search' id='DictionaryIn' style='width:90%'><button id='DictionarySettings'><span class='fa fa-cog'></span></button>";
 		out += "<div id='DictionaryOut'><span style='font-size:16pt'>Welcome</span><br>Search for something<br><br><br><div style='text-align:center;padding-left:80%;font-size:30pt;margin-top:25%;' class='fa-stack fa-lg'><span class='fa fa-circle-o fa-stack-2x'></span><span class='fa fa-quote-left fa-stack-1x'></span></div>";
 		out += "</div>";
 		postPanelOutput(out);	
@@ -817,14 +817,14 @@ function RunPanelmain_Dictionary() {
 				console.log(i, d[i]);
 				j = window.settings['dictionary_'+d[i]].split(', ');
 				console.log(j[2], $('#DictionaryIn').val());
-				$('#DictionaryOut').css('background-color', 'inherit').css('padding-left', '0').css('padding-top', '0').css('padding-bottom', '0').css('border', 'none').css('margin-top', '0').css('width', '100%');
+				$('#DictionaryOut').css('background-color', 'inherit').css('padding-left', '0').css('padding-top', '0').css('padding-bottom', '0').css('border', 'none').css('margin-top', '0').css('width', '100%').css('color', 'inherit');
 				var req = $.get(j[1], {word: $('#DictionaryIn').val()}, function (data) {
 					if(j[0] == "XML") {
 						console.log(data);
 						data = $.parseJSON(data);
 						if(data.error != "404") {
 							//style='background-color: white;padding-left: 6px;padding-top: 8px;padding-bottom: 50px;border: solid 1px #999;margin-top: 4px;width: 95%;
-							$('#DictionaryOut').html(xmlDictionaryParse(data)).css('background-color', 'white').css('padding-left', '6px').css('padding-top', '8px').css('border', 'solid 1px #999').css('margin-top', '4px').css('width', '95%');
+							$('#DictionaryOut').html(xmlDictionaryParse(data)).css('background-color', 'white').css('padding-left', '6px').css('padding-top', '8px').css('border', 'solid 1px #999').css('margin-top', '4px').css('width', '95%').css('color', 'black');
 							end = true;	
 						} else {
 							if(i == d.length-1)
@@ -860,7 +860,7 @@ function RunPanelmain_Dictionary() {
 		});
 	}
 	function openSettings() {
-		out = "<button class='fa fa-angle-left' id='DictionaryBack'></button><br>";
+		out = "<button id='DictionaryBack'><span class='fa fa-angle-left'></span></button><br>";
 		out += "Sort the dictionaries that you want to access, separated by a comma then a space.<br>";
 		out += "<input id='DictionarySort' value='"+window.settings.dictionarysort+"' style='width:95%'>";
 		//out += "<button id='DictionarySortSave'>Save Order</button>";
