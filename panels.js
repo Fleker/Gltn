@@ -120,7 +120,8 @@ function PanelOnPopupClose(title) {
 }
 function initService(id, title, icon) {
 	//onclick='runPanel(\'"+id+"\')'
-	$('.content'+id).remove(this);
+	//console.error(id, title, icon)
+	$('.content'+id).remove();
 	$('#content_row').append("<span title='"+title+"' class='content"+id+"' onclick='runPanel(\""+id+"\")'>&emsp;"+icon+"</span>");	
 }
 
@@ -202,7 +203,7 @@ function InitPanelmain_Character() {
 			runPanel('main_Character');	
 		}
 	});
-	initService('main_Character', 'Character', 'C');
+	//initService('main_Character', 'Character', 'C');
 }
 function StylePanelmain_Character() {
 

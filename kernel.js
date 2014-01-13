@@ -1299,6 +1299,9 @@ function doesThisWork() {
 		alert('Blobs are not supported');
 		flag.push('Blobs are not supported');	
 	}
+	if(window.applicationCache == undefined) {
+		alert('You do not have Application Cache in your browser. You may still use Gltn, but it will not work offline.');	
+	}
 	return !flag.length;
 }
 function closeButton(i) {
@@ -1383,3 +1386,45 @@ function selectTheme(id) {
 	saveFile();
 	setTimeout("window.location.reload();", 150);
 }
+function onUpdateReady() {
+  alert('found new version!');
+}
+window.applicationCache.addEventListener('error', function() {
+	alert("Error caching files for offline use.")	
+});
+function appcache() {
+	console.log("App is now available for offline use.")
+	//if($('.contentmain_Offline').length == 0)
+		setTimeout('initService("main_Offline", "App available offline", "<span class=\'fa fa-plane\'></span>");', 2000);
+	//hot swap	
+	try {
+		window.applicationCache.swapCache()
+	} catch(e) {
+		
+	}
+	return false;
+}
+function GetPanelmain_Offline() {
+	return {title: "Offline", bordercolor:"#ff9900", width: 15};	
+}
+function RunPanelmain_Offline() {
+	out = "<span style='font-size:16pt'>This App is Available Offline</span><br>What Does this Mean?<br><br>If your device is not connected to the Internet, you can still open Gltn in your browser. Of course, not every feature will be available eg. the Dictionary and the Store, but you will be able to edit and build documents like always.";
+	postPanelOutput(out);
+}
+window.applicationCache.oncached = appcache();
+window.applicationCache.onupdateready = appcache();
+//
+window.applicationCache.onprogress = function(e) {
+    // The event object should be a progress event (like those used by XHR2)
+    // that allows us to compute a completion percentage, but if not,
+    // we keep count of how many times we've been called.
+    var progress = "";
+    if (e && e.lengthComputable) // Progress event: compute percentage
+        progress = " " + Math.round(100*e.loaded/e.total) + "%"
+    else                         // Otherwise report # of times called
+        progress = " (" + ++progresscount + ")"
+
+    //console.log("Downloading new version" + progress);
+	initService("main_Offline", "App caching", "<span class='fa fa-plane'></span>"+progress+"%");
+    return false;
+};

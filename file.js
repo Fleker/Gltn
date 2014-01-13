@@ -16,7 +16,7 @@ max_word = 0;
 hovertagRegistrar = new Array();
 obj = {};
 document.ready = function() {
-	console.log('Gltn has woken up: v 1.0.1.3');
+	console.log('Gltn has woken up: v 1.0.1.4');
 	restoreFile();
 };
 

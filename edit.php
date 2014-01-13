@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html manifest="offline.php">
 <head>
 <meta charset="utf-8">
 <title>Gltn</title>
