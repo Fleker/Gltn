@@ -16,7 +16,7 @@ max_word = 0;
 hovertagRegistrar = new Array();
 obj = {};
 document.ready = function() {
-	console.log('Gltn has woken up: v 1.0.1.4');
+	console.log('Gltn has woken up: v 1.0.1.9');
 	restoreFile();
 };
 
@@ -117,7 +117,6 @@ function restoreFile() {
 			window.settings[i] = xpref[i].replace(/&gt;/g, ">").replace(/&lt;/g, "<");	
 		}
 	}
-	startThemer();
 	} catch(e) {
 		console.error(e.message);
 		var z=confirm("Your settings file isn't working. Click okay to send a bug report.");
@@ -128,7 +127,11 @@ function restoreFile() {
 		if(y == true)
 			localStorage.removeItem("settings");
 	}
-	
+	try {
+		startThemer();	
+	} catch(e) {
+		
+	}
 	
 	//var x = xml2json(jQuery.parseHTML(localStorage[fileid]),"  ");
 	try {
@@ -207,6 +210,7 @@ function finishRestore(x, xc) {
 			//newFile();	
 		//} else {
 			//if(x.file != undefined) {
+				console.log("onInitFormat", xc);
 				onInitFormat();
 			//}
 			//else
@@ -230,7 +234,7 @@ function finishRestore(x, xc) {
 				}
 			}
 		}	*/
-		formatShift2();
+		
 		//console.log(3);
 		//Do a little more cleaning up
 		try {
@@ -238,6 +242,7 @@ function finishRestore(x, xc) {
 		} catch(e) {
 			console.error("*"+e.message);
 		}	
+		formatShift2();
 		$('#file_name').val(fileid);
 	} else {
 		//Brand new file - let's do some base stuff here.
@@ -248,10 +253,14 @@ function finishRestore(x, xc) {
 	postWordCount();
 	setHeader();
 	initNiftyUI4Saving();
-	initPanels();
+	if(window.offline != true)
+		initPanels();
 	//start save client because code should all work by this point
 	hideHovertag();
+	if(offlineGo != undefined)
+		offlineGo();
 	console.log("Client save initiated; This is a go for launch.");
+	saveFile();
 	setInterval("saveFile()", 500);
 }
 function newFile(x,xc) {

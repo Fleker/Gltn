@@ -7,18 +7,19 @@ echo "# version 3".count($_GET)."\n\n";
 echo "CACHE:\n";
 
 echo "APA.js\n";
-echo "build.js\n";
-echo "file.js\n";
-echo "format.js\n";
+echo "null.js\n";
+//echo "build.js\n";
+//echo "file.js\n";
+//echo "format.js\n";
 echo "hammer.js\n";
 echo "holoribbon.js\n";
 echo "IntroJS/intro.js\n";
 echo "IntroJS/introjs.min.css\n";
 echo "json2xml.js\n";
-echo "kernel.js\n";
+//echo "kernel.js\n";
 echo "MLA.js\n";
-echo "panels.js\n";
-echo "popup.js\n";
+//echo "panels.js\n";
+//echo "popup.js\n";
 echo "standard.css\n";
 echo "xmlToJson.js\n";
 
@@ -29,7 +30,7 @@ echo "rangy-1.3alpha.772/rangy-core.js\n";
 echo "rangy-1.3alpha.772/rangy-cssclassapplier.js\n";
 echo "rangy-1.3alpha.772/rangy-textrange.js\n";
 echo "http://fgnass.github.io/spin.js/spin.min.js\n";
-echo "https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css\n";
+echo "http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css\n";
 
 $g = $_GET;
 foreach($g as $i) {
@@ -42,5 +43,8 @@ echo "\nNETWORK:\n";
 //Gather up all the other potential files
 //echo "/ \n";
 echo "* \n";
+
+echo "\nFALLBACK:\n";
+echo "/ offlineload.js"
 
 ?>

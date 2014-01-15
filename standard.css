@@ -369,4 +369,5 @@ text-decoration: none;
 .centerOfAttention {
 	display:block;
 	text-align:center;	
+	padding-bottom:5px;
 }

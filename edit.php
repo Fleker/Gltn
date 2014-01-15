@@ -1,5 +1,6 @@
 <!doctype html>
-<html manifest="offline.php">
+<html manifest="null.appcache">
+<!--manifest="offline.php"-->
 <head>
 <meta charset="utf-8">
 <title>Gltn</title>
@@ -9,7 +10,7 @@
 
 <link rel="stylesheet" type="text/css" href="standard.css">
 <link rel="stylesheet" type="text/css" href="IntroJS/introjs.min.css">
-<link href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+<link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 <!--<?php
 /*
 $server=$_SERVER['HTTP_HOST'];
@@ -48,6 +49,7 @@ if(strpos($server, "felkerdigitalmedia") > -1) {
 <script src="hammer.js"></script>
 <script src="holoribbon.js"></script>
 <script src="kernel.js"></script>
+<script src="offlineload.js"></script>
 
 
 

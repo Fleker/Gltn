@@ -40,4 +40,17 @@
 	<updated_meta>1389163700</updated_meta>
 	<version>1.0</version>	
 </app>
+<app>
+	<parent>app</parent>
+	<name>Translate</name>
+	<icon_fa>yen</icon_fa>
+	<id>fleker_Translate</id>
+	<url>panels_translate.js</url>
+	<type>Panel</type>
+	<credit>Nick Felker</credit>
+	<description>A Google Translate client for Gltn</description>
+	<updated_last>1389163700</updated_last>
+	<updated_meta>1389163700</updated_meta>
+	<version>1.0</version>
+</app>
 </gltn_store>

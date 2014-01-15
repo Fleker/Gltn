@@ -87,7 +87,7 @@ var opts = {
   corners: 1, // Corner roundness (0..1)
   rotate: 0, // The rotation offset
   direction: 1, // 1: clockwise, -1: counterclockwise
-  color: '#000', // #rgb or #rrggbb or array of colors
+  color: theme.normcolor, // #rgb or #rrggbb or array of colors
   speed: 0.7, // Rounds per second
   trail: 20, // Afterglow percentage
   shadow: false, // Whether to render a shadow
@@ -101,7 +101,7 @@ var target = document.getElementById('build_progress');
 var spinner = new Spinner(opts).spin(target);
 $('.build_progress').append(text);
 $('.spinner').css('top','55px').css('left','50%');
-;	
+
 //target.appendChild(spinner.el);
 }
 function finishBuild() {

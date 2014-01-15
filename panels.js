@@ -16,7 +16,7 @@ function initPanels() {
 			}
 		} else {
 			//Need to add script
-			var b = a[i].split(', ');
+			var b = window.settings['panels_'+a[i]].split(', ');
 			install_panel(b[0], b[1], b[2], b[3]);
 		}
 	}
@@ -24,8 +24,8 @@ function initPanels() {
 function runPanel(panel_id_name) {
 	//Get Properties of the Panel First
 	var p = eval("GetPanel"+panel_id_name+"();");
-	$('.panel_plugin_title').html(p.title);
-	$('.panel_plugin_title').append('&emsp;<span class="PanelPopupEvent"></span><span class="PanelKeyEvent" data-keycode="" data-alt="" data-ctrl="" data-shift=""></span><span id="PanelCloseEvent"></span> <button onclick="hidePanelPlugin()" data-step="22" data-intro="Click me to hide the panel.">'+closeButton()+'</button>');
+	//$('.panel_plugin_title').html();
+	$('.panel_plugin_title').html(lcr_split(p.title+'&emsp;<span class="PanelPopupEvent"></span><span class="PanelKeyEvent" data-keycode="" data-alt="" data-ctrl="" data-shift=""></span><span id="PanelCloseEvent"></span>', '', '<button onclick="hidePanelPlugin()" data-step="22" data-intro="Click me to hide the panel.">'+closeButton()+'</button>'));
 	$('#panel_plugin').css("border-color", p.bordercolor);
 	window.paneloverride = p.override;
 	//$('#panel_plugin').css('margin-top');
@@ -68,7 +68,7 @@ function stretchContentPanel() {
 function animateContentPanel(p) {
 	$('#panel_content').animate({
 		width: p
-		}, 250
+		}, 100
 	);
 }
 function hidePanelPlugin() {
@@ -310,7 +310,7 @@ function RunPanelmain_Outline() {
 		postPanelOutput(generatePanel());
 		range = obtainRange();
 	function generatePanel() {
-		ht = "<button class='fa fa-file' id='outlineBuild'></button>";
+		ht = "<button id='outlineBuild'><span class='fa fa-file'></span></button>";
 		ht += "<div style='overflow-y:auto;/*height:"+(window.innerHeight-215)+"px*/'><ul contenteditable='true' class='Outline'>"+outline+"</ul></div>";
 		return ht;
 	}	
@@ -538,7 +538,7 @@ function RunPanelmain_Filesys() {
 			  corners: 1, // Corner roundness (0..1)
 			  rotate: 0, // The rotation offset
 			  direction: 1, // 1: clockwise, -1: counterclockwise
-			  color: '#000', // #rgb or #rrggbb or array of colors
+			  color: theme.normcolor, // #rgb or #rrggbb or array of colors
 			  speed: 0.7, // Rounds per second
 			  trail: 20, // Afterglow percentage
 			  shadow: false, // Whether to render a shadow
@@ -763,7 +763,7 @@ function GetPanelmain_Dictionary() {
 }
 function RunPanelmain_Dictionary() {
 	var no_results = "<span style='font-size:16pt'>No Results</span><br>This does not appear in any of your dictionaries. Try to:<ul><li> Install a new dictionary</li>OR<li>Change your search.</li></ul>";
-	var no_connection = "<span style='font-size:16pt'>Sorry</span><br>The dictionary feature is currently broken. Please report this if you feel it should work.";
+	var no_connection = "<span style='font-size:16pt'>Sorry</span><br>The dictionary does not work offline.";
 	var connect_time = 0;
 	var ajaxrequests = new Array();
 	//Check stock dictionaries and 'install' if null
@@ -794,7 +794,7 @@ function RunPanelmain_Dictionary() {
 				  corners: 1, // Corner roundness (0..1)
 				  rotate: 0, // The rotation offset
 				  direction: 1, // 1: clockwise, -1: counterclockwise
-				  color: '#000', // #rgb or #rrggbb or array of colors
+				  color: theme.normcolor, // #rgb or #rrggbb or array of colors
 				  speed: 0.7, // Rounds per second
 				  trail: 20, // Afterglow percentage
 				  shadow: false, // Whether to render a shadow
@@ -836,7 +836,7 @@ function RunPanelmain_Dictionary() {
 					} else {
 						if(data != "404") {
 							//console.log(data);
-							$('#DictionaryOut').html('<iframe style="width:100%;height:'+(window.innerHeight-203)+'px" id="DictionaryFrame" seamless></iframe>');
+							$('#DictionaryOut').html('<iframe style="width:100%;height:'+(window.innerHeight-210)+'px" id="DictionaryFrame" seamless></iframe>');
 							//$('#DictionaryFrame').attr('srcdoc', data);
 							$('#DictionaryFrame').attr('src', j[1]+"?word="+$('#DictionaryIn').val());
 							end = true;	
@@ -849,7 +849,8 @@ function RunPanelmain_Dictionary() {
 					}
 				})
 				.fail(function() {
-					//$('#DictionaryOut').html(no_connection);
+					if(offline == true)
+						$('#DictionaryOut').html(no_connection);
 				})
 				.always(function() {
 					if($('#DictionaryIn').val().length == 0) 
@@ -1007,7 +1008,7 @@ function launchStore2() {
 				  corners: 1, // Corner roundness (0..1)
 				  rotate: 0, // The rotation offset
 				  direction: 1, // 1: clockwise, -1: counterclockwise
-				  color: '#000', // #rgb or #rrggbb or array of colors
+				  color: theme.normcolor, // #rgb or #rrggbb or array of colors
 				  speed: 0.7, // Rounds per second
 				  trail: 20, // Afterglow percentage
 				  shadow: false, // Whether to render a shadow
@@ -1044,7 +1045,7 @@ function launchStore2() {
 				else
 					out += "<div style='font-size:8pt;padding-left:5px;'>"+d[i].description+"...</div>";
 				
-				outt = "<div style='border:solid 1px #222;cursor:pointer;background-color:white;' class='store_item' data-id='"+i+"'>"+out+"</div>";
+				outt = "<div style='border:solid 1px #222;cursor:pointer;background-color:white;padding-top:3px;margin-top:-1px' class='store_item' data-id='"+i+"'>"+out+"</div>";
 				//console.log(i, outt);
 				if(d[i].type == "Panel" || d[i].type == "Service")
 					pout += outt;

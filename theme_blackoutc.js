@@ -16,7 +16,7 @@ function initTheme() {
 	theme.ribbonhighlight = '#05a';
 	theme.ribbonplain = 'rgba(0,0,0,0)';
 	
-	$('.header').css('background-color', '#333').css('border-bottom', 'solid 0px #555');
+	$('.header').css('background-color', '#333').css('border-bottom', 'solid 0px #676767');
 	$('#panel_content').css('background-color', '#333');
 	$('#panel_plugin').css('background-color', '#333');
 	$('input').css('background-color', '#444').css('color', theme.normcolor).css('font-family', '"Roboto Condensed", sans-serif').css('font-size', '11pt');
@@ -36,4 +36,4 @@ writeCss("@import url(http://fonts.googleapis.com/css?family=Roboto+Condensed:30
 	themeCss('background-color', theme.normbg);
 	themeCss('color', theme.normcolor);
 //Theme parameters for content_textarea not necessary (unless we removed the reload requirement for themes - but for now it'll stay due to a lack of default parameters)
-	//$('.content_textarea').css('background-color', theme.normbg).css('color', theme.normcolor);
+	$('.content_textarea').css('background-color', theme.normbg).css('color', theme.normcolor);

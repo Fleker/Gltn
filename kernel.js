@@ -23,6 +23,7 @@
 		alert(JSON.stringify(arguments));
     }
 })()*/
+//a.replace(/\*(\w+)\*/, '<b>$1<\/b>')
 function new_gluten_formats() {		
 		//Now, let's put them into an HTML based format.
 		var out = "";
@@ -1218,18 +1219,23 @@ function postLegal() {
 	f = function x() { };
 	initiatePopup({title:'Credits', value: out, fnc: f});
 }
-function install_panel(id, name, img, uri, service) {
+function install_panel(id, name, img, url, service) {
 	if(service != true) {
 		holoribbon_std['Panels'].push({text: name, img: img, action: "runPanel('"+id+"')"});
 		newRibbon('.header', holoribbon_std);
 		ribbonSwitch(2,false);
 	}
-	createjscssfile(uri, "js");
+	loadjscssfile(url, "js");
 	console.log("eval('InitPanel"+id+"();');");
 	setTimeout("eval('InitPanel"+id+"();');", 500);
 	if(window.settings.panels.indexOf(id) == -1) {
 		window.settings.panels += ", "+id;
-		window.settings['panels_'+id] = id+", "+name+", "+img+", "+uri;
+		window.settings['panels_'+id] = id+", "+name+", "+img+", "+url;
+	}
+	if(window.offline != true) {
+	//Now store script offline - this really sucks though
+		$('body').append('<iframe id="themeframe" src="'+url+'" style="visibility:collapse;width:1px;height:1px;"></iframe>');
+		setTimeout("localStorage['zpanels_"+id+"'] = $('#themeframe').contents().text();", 1000);
 	}
 }
 function uninstall_panel(id) {
@@ -1261,6 +1267,8 @@ function uninstall_panel(id) {
 	}	
 	window.settings.panels = b.join(', ');
 	window.settings['panels_'+id] = undefined;	
+	if(localStorage['zpanels_'+id] != undefined) 
+		localStorage.removeItem('zpanels_'+id);
 }
 function appendHoloSelection() {
 	var selection = {
@@ -1328,6 +1336,7 @@ function initTheme() {
 	theme.ribbonhighlight = '#9999ff';
 	theme.ribbonplain = 'rgba(0,0,0,0)';
 }
+initTheme();
 function themeCss(rule, val) {
 	$('body').css(rule, val);	
 }
@@ -1352,7 +1361,14 @@ function startThemer() {
 	//if not default insert JS
 	if(url != undefined && b[0] != "default") {
 		console.log("Loading theme "+b[1]+" @ "+url);
-		loadjscssfile(url, 'js');	
+		console.log(window.offline != true)
+		if(window.offline != true) {
+			loadjscssfile(url, 'js');
+			//Load script and save it
+			//Now store script offline - this really sucks though
+			$('body').append('<iframe id="themeframe" src="'+url+'" style="visibility:collapse;width:1px;height:1px;"></iframe>');
+			setTimeout("localStorage['ztheme_"+id+"'] = $('#themeframe').contents().text();", 1000);
+		}
 		//JS will have same function and call that script
 	} else if(b[0] == "default")
 		initTheme();
@@ -1361,6 +1377,11 @@ function install_theme(id, name, url, icon) {
 	if(window.settings.theme.indexOf(id) == -1) {
 		window.settings.theme += ", "+id;
 		window.settings['theme_'+id] = id+', '+name+', '+url+', '+icon;	
+	}
+	if(offline != true) {
+		//Now store script offline - this really sucks though
+		$('body').append('<iframe id="themeframe" src="'+url+'" style="visibility:collapse;width:1px;height:1px;"></iframe>');
+		setTimeout("localStorage['ztheme_"+id+"'] = $('#themeframe').contents().text();", 1000);
 	}
 }
 function uninstall_theme(id) {
@@ -1374,6 +1395,8 @@ function uninstall_theme(id) {
 	}
 	window.settings.theme = b.join(', ');
 	localStorage.removeItem('theme_'+id);
+	if(localStorage['ztheme_'+id] != undefined)
+		localStorage.removeItem('ztheme_'+id);
 }
 function selectTheme(id) {
 	var a = window.settings.theme.split(', ');
@@ -1387,10 +1410,11 @@ function selectTheme(id) {
 	setTimeout("window.location.reload();", 150);
 }
 function onUpdateReady() {
-  alert('found new version!');
+  console.log('Found new version!');
+  appcache();
 }
 window.applicationCache.addEventListener('error', function() {
-	alert("Error caching files for offline use.")	
+	console.error("Error caching files for offline use.")	
 });
 function appcache() {
 	console.log("App is now available for offline use.")
@@ -1405,14 +1429,15 @@ function appcache() {
 	return false;
 }
 function GetPanelmain_Offline() {
-	return {title: "Offline", bordercolor:"#ff9900", width: 15};	
+	return {title: "<span class='fa fa-plane'></span>&nbsp;Offline", bordercolor:"#ff9900", width: 15};	
 }
 function RunPanelmain_Offline() {
-	out = "<span style='font-size:16pt'>This App is Available Offline</span><br>What Does this Mean?<br><br>If your device is not connected to the Internet, you can still open Gltn in your browser. Of course, not every feature will be available eg. the Dictionary and the Store, but you will be able to edit and build documents like always.";
+	out = "<span style='font-size:16pt'>This App is Available Offline</span><br>What Does this Mean?<br><br>If your device is not connected to the Internet, you can still open Gltn in your browser. Of course, not every feature will be available such as the Dictionary and the Gltn Store, but you will be able to edit and build documents like always.";
 	postPanelOutput(out);
 }
 window.applicationCache.oncached = appcache();
-window.applicationCache.onupdateready = appcache();
+window.applicationCache.onupdateready = onUpdateReady();
+//window.applicationCache.onerror = console.log('ACE');
 //
 window.applicationCache.onprogress = function(e) {
     // The event object should be a progress event (like those used by XHR2)
@@ -1425,6 +1450,7 @@ window.applicationCache.onprogress = function(e) {
         progress = " (" + ++progresscount + ")"
 
     //console.log("Downloading new version" + progress);
-	initService("main_Offline", "App caching", "<span class='fa fa-plane'></span>"+progress+"%");
+	initService("main_Offline", "App caching", "<span class='fa fa-plane'></span>"+progress);
     return false;
 };
+$('html').attr('manifest', 'online.php?a=theme_blackoutc.js');
