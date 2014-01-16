@@ -16,7 +16,7 @@ max_word = 0;
 hovertagRegistrar = new Array();
 obj = {};
 document.ready = function() {
-	console.log('Gltn has woken up: v 1.0.1.9');
+	console.log('Gltn has woken up: v 1.0.1.10');
 	restoreFile();
 };
 
@@ -150,8 +150,6 @@ function restoreFile() {
 	if(x.file != undefined) {
 		//Load Script
 		$('#file_format').val(x.file.format);
-		$('#file_name').val(fileid);
-		$('#file_name_internal').val(fileid);
 		docformat = x.file.format;
 		console.log(docformat);
 		loadjscssfile(docformat+".js", "js");
@@ -222,7 +220,7 @@ function finishRestore(x, xc) {
 		return;
 	}
 	//console.log(5);
-	if(x.file != undefined) {
+	//if(x.file != undefined) {
 		/*for(i in x['metadata']) {
 			//window.metadata[i] = x['metadata'][i];	
 			//console.log(4);
@@ -237,6 +235,7 @@ function finishRestore(x, xc) {
 		
 		//console.log(3);
 		//Do a little more cleaning up
+		console.log('CT Ins', xc);
 		try {
 			$('.content_textarea').html(xc.replace(/<span class="searchResult">/g, ""));
 		} catch(e) {
@@ -244,24 +243,31 @@ function finishRestore(x, xc) {
 		}	
 		formatShift2();
 		$('#file_name').val(fileid);
-	} else {
+	//} else {
 		//Brand new file - let's do some base stuff here.
 		//newFile(x,xc);
-	}
+	//}
 	
+	setTimeout("finishRestore2()", 100);
+}
+function finishRestore2() {
+	initNotifications();
+	setHeader();
 	recallHovertags();
 	postWordCount();
-	setHeader();
 	initNiftyUI4Saving();
 	if(window.offline != true)
 		initPanels();
 	//start save client because code should all work by this point
 	hideHovertag();
-	if(offlineGo != undefined)
+	try {
 		offlineGo();
+	} catch(e) {
+		offline = false;
+	}	
 	console.log("Client save initiated; This is a go for launch.");
 	saveFile();
-	setInterval("saveFile()", 500);
+	setInterval("saveFile()", 500);	
 }
 function newFile(x,xc) {
 	console.log('No file found for this name.');

@@ -7,6 +7,7 @@
 	<id>main_Dictionary</id>
 	<url>panels.js</url>
 	<type>Panel</type>
+	<key>Alt+D</key>
 	<description>Handy panel to quickly find a word or item. Developers can extend this application by writing HTML or XML plugins. By default it checks Ouvert Dictionary, Wiktionary, and Wikipedia and chooses the result based on priority and if that item exists.</description>
 	<credit>Nick Felker</credit>
 	<updated_last>1389163700</updated_last>
@@ -48,6 +49,7 @@
 	<url>panels_translate.js</url>
 	<type>Panel</type>
 	<credit>Nick Felker</credit>
+	<key></key>
 	<description>A Google Translate client for Gltn</description>
 	<updated_last>1389163700</updated_last>
 	<updated_meta>1389163700</updated_meta>

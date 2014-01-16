@@ -1,5 +1,5 @@
 	// JavaScript Document
-mainpanels = "main_Character, main_Idea, main_Citation, main_Find, main_Filesys";
+mainpanels = "main_Character, main_Idea, main_Citation, main_Find, main_Filesys, main_Notifications";
 //Other panels are here by default, but don't need to be called on init
 function initPanels() {
 	if(window.settings.panels == undefined) {
@@ -9,15 +9,21 @@ function initPanels() {
 	for(i in a) {
 		if(a[i].indexOf('main') > -1) {
 			try {
-				//console.log(a[i]);
+				//
 				eval('InitPanel'+a[i]+'();');	
+				console.log('InitPanel'+a[i]);
 			} catch(e) {
 				//console.error(e.message);
 			}
 		} else {
 			//Need to add script
 			var b = window.settings['panels_'+a[i]].split(', ');
-			install_panel(b[0], b[1], b[2], b[3]);
+			if(b.length == 4)
+				install_panel(b[0], b[1], b[2], b[3]);
+			else if(b.length == 5)
+				install_panel(b[0], b[1], b[2], b[3], b[4]);
+			else if(b.length == 6)
+				install_panel(b[0], b[1], b[2], b[3], b[4], b[5]);
 		}
 	}
 }
@@ -121,9 +127,30 @@ function PanelOnPopupClose(title) {
 function initService(id, title, icon) {
 	//onclick='runPanel(\'"+id+"\')'
 	//console.error(id, title, icon)
-	$('.content'+id).remove();
-	$('#content_row').append("<span title='"+title+"' class='content"+id+"' onclick='runPanel(\""+id+"\")'>&emsp;"+icon+"</span>");	
+	if($('.content'+id).length == 0) {
+		$('#content_row').append("<span title='"+title+"' class='content"+id+"' onclick='runPanel(\""+id+"\")'>&emsp;"+icon+"</span>");		
+	} else {
+		$('.content'+id).attr('title', title).html("&emsp;"+icon);
+	}
+	//$('.content'+id).remove();
+	
 }
+function keyboardShortcut(id, keys) {
+	//keyboardShortcut('main_Charater', {alt: true, key: 67});
+	if(keys.alt == undefined)
+		keys.alt = false;
+	if(keys.shift == undefined)
+		keys.shift = false;
+	if(keys.ctrl == undefined)
+		keys.ctrl = false;
+	if(keys.key == undefined)
+		return;
+	$(document).on('keydown', function(e) {
+		if(e.keyCode == keys.key && e.altKey == keys.alt && e.shiftKey == keys.shift && e.ctrlKey == keys.ctrl) {
+			runPanel(id);	
+		}
+	});
+}	
 
 //Default Plugins Here:
 
@@ -198,6 +225,7 @@ function RunPanelmain_Character() {
 	
 }
 function InitPanelmain_Character() {
+	keyboardShortcut('main_Character', {alt: true, key: 67});
 	$(document).on('keydown', function(e) {
 		if(e.keyCode == 67 && e.altKey) {
 			runPanel('main_Character');	
@@ -1085,7 +1113,7 @@ function launchStore2() {
 				y = confirm("Install "+i.name+"?");
 				if(y == true) {
 					if(i.type == "Panel" || i.type == "Service") {
-						install_panel(i.id, i.name, getIcon(i), i.url, (i.type == "Service"));
+						install_panel(i.id, i.name, getIcon(i), i.url, (i.type == "Service"), i.key);
 						alert('Panel installed');
 					}
 					else if(i.type == "Dictionary") {

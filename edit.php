@@ -1,6 +1,6 @@
 <!doctype html>
-<html manifest="null.appcache">
-<!--manifest="offline.php"-->
+<html manifest="offline.php">
+<!--manifest="null.appcache"-->
 <head>
 <meta charset="utf-8">
 <title>Gltn</title>
@@ -49,7 +49,7 @@ if(strpos($server, "felkerdigitalmedia") > -1) {
 <script src="hammer.js"></script>
 <script src="holoribbon.js"></script>
 <script src="kernel.js"></script>
-<script src="offlineload.js"></script>
+<script src="panels_translate.js"></script>
 
 
 
@@ -172,7 +172,7 @@ LOREM IPS/um o
 <datalist id="gluten_formats"></datalist>
 
 <datalist id="gluten_languages"></datalist>
-
+<iframe id="themeframe" src="" style="visibility:collapse;width:1px;height:1px;"></iframe>
 <script>
 	
 </script>

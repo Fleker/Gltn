@@ -1156,12 +1156,13 @@ function tableDetails(tableid) {
 	   )
     });*/
 function setHeader() {
+	console.log('Header set');
 	window.holoribbon_std =  {
 		Home: new Array(
 			{group: '', value: '<font size="4" id="temp_header" >Welcome to Gluten!</font><br><table style=\'width:40%;margin-left:30%\'><tr><td><button onclick="window.introdisabled = true;introJsStart();"><span class=\'fa fa-home\'></span>&nbsp;Start the Tour!</button></td><td><button id="iFILESYS" onclick="runPanel(\'main_Filesys\')"><span class=\'fa fa-folder-open\'></span>&nbsp;Explore Files</button></td></tr></table>'}
 		),
 		File: new Array(
-			{group: "File Name", value:"<input id='file_name' style='width:7em'><button id='file_name_con' disabled='true'>Save As</button><input type='hidden' id='file_name_internal'>"},
+			{group: "File Name", value:"<input type='text' id='file_name' style='width:7em'><button id='file_name_con' disabled='true'>Save As</button><input type='hidden' id='file_name_internal'>"},
 			{text: 'Build', img: '<span style="font-size:18pt" class="fa fa-file"></span>', action: "startBuild();setTimeout('exitintro();', 1000);", key: "Alt+B"},
 			{text: 'Export', img: '<span style="font-size:18pt" class="fa fa-download"></span>', action: "exportFile();"}
 		),
@@ -1183,15 +1184,20 @@ function setHeader() {
 			{text: 'Credits', img: '<span style="font-size:18pt" class="fa fa-legal"></span>', action: 'postLegal()'}
 		),
 		Me: new Array(
-			{group: 'Name', value:'<input id="me_name">'}
+			{group: 'Name', value:'<input id="me_name" type="text">'}
 		)
 	};
 	newRibbon('.header', holoribbon_std);
 	ribbonSwitch(0,false);
-	
-	$('#file_name').val(fileid);
+	ribbonLoad();
+}
+function ribbonLoad() {
+	//$('#file_name').val(fileid);
+	$('#file_name').attr('value', fileid);
+	$('#file_name').attr('defaultValue', fileid);
 	$('#file_name_internal').val(fileid);
 	$('#file_name').on('input', function() {
+		console.log('file_name oninput');
 		$('#file_name_con').attr('disabled', false);
 	});
 	$('#file_name_con').on('click', function() {
@@ -1209,7 +1215,9 @@ function setHeader() {
 			setTimeout('window.location = "?file='+v+'";', 250);
 		}
 	});
-	$('#me_name').val(window.settings.me_name);
+	//$('#me_name').val(window.settings.me_name);
+	$('#me_name').attr('value', settings.me_name);
+	$('#me_name').attr('defaultValue', settings.me_name);
 	$('#me_name').on('input', function() {
 		writeToSettings('me_name', $('#me_name').val());		
 	});
@@ -1219,24 +1227,36 @@ function postLegal() {
 	f = function x() { };
 	initiatePopup({title:'Credits', value: out, fnc: f});
 }
-function install_panel(id, name, img, url, service) {
+function install_panel(id, name, img, url, service, key) {
+	if(service == undefined)
+		service = false;
+	if(key == undefined)
+		key = "";
 	if(service != true) {
-		holoribbon_std['Panels'].push({text: name, img: img, action: "runPanel('"+id+"')"});
+		if(key != undefined && key.length > 0)
+			holoribbon_std['Panels'].push({text: name, img: img, action: "runPanel('"+id+"')", key:key});
+		else
+			holoribbon_std['Panels'].push({text: name, img: img, action: "runPanel('"+id+"')"});
 		newRibbon('.header', holoribbon_std);
+		console.log("Installing "+name+"...");
 		ribbonSwitch(2,false);
+		ribbonLoad();
 	}
-	loadjscssfile(url, "js");
-	console.log("eval('InitPanel"+id+"();');");
-	setTimeout("eval('InitPanel"+id+"();');", 500);
 	if(window.settings.panels.indexOf(id) == -1) {
 		window.settings.panels += ", "+id;
-		window.settings['panels_'+id] = id+", "+name+", "+img+", "+url;
 	}
+	window.settings['panels_'+id] = id+", "+name+", "+img+", "+url+", "+service+", "+key;
+	
 	if(window.offline != true) {
 	//Now store script offline - this really sucks though
-		$('body').append('<iframe id="themeframe" src="'+url+'" style="visibility:collapse;width:1px;height:1px;"></iframe>');
+		loadjscssfile(url, "js");
+		//$('body').append('');
+		$('#themeframe').attr('src', url);
 		setTimeout("localStorage['zpanels_"+id+"'] = $('#themeframe').contents().text();", 1000);
+	//} else {
 	}
+	console.log("eval('InitPanel"+id+"();');");
+	setTimeout("eval('InitPanel"+id+"();');", 500);	
 }
 function uninstall_panel(id) {
 	//alert('Fix ribbon');
@@ -1366,7 +1386,7 @@ function startThemer() {
 			loadjscssfile(url, 'js');
 			//Load script and save it
 			//Now store script offline - this really sucks though
-			$('body').append('<iframe id="themeframe" src="'+url+'" style="visibility:collapse;width:1px;height:1px;"></iframe>');
+			$('#themeframe').attr('src', url);		
 			setTimeout("localStorage['ztheme_"+id+"'] = $('#themeframe').contents().text();", 1000);
 		}
 		//JS will have same function and call that script
@@ -1380,7 +1400,7 @@ function install_theme(id, name, url, icon) {
 	}
 	if(offline != true) {
 		//Now store script offline - this really sucks though
-		$('body').append('<iframe id="themeframe" src="'+url+'" style="visibility:collapse;width:1px;height:1px;"></iframe>');
+		$('#themeframe').attr('src', url);
 		setTimeout("localStorage['ztheme_"+id+"'] = $('#themeframe').contents().text();", 1000);
 	}
 }
@@ -1410,19 +1430,29 @@ function selectTheme(id) {
 	setTimeout("window.location.reload();", 150);
 }
 function onUpdateReady() {
+	appcache();
+  //window.appcachestatus = "Found new version - Refresh to update";
   console.log('Found new version!');
-  appcache();
+
 }
 window.applicationCache.addEventListener('error', function() {
-	console.error("Error caching files for offline use.")	
+	console.error("Error caching files for offline use.");
+	if(window.offline != true) {
+		window.appcachestatus = "Error caching files for offline use";
+		initService("main_Offline", "App caching", "&nbsp;");
+	} else {
+		window.appcachestatus = "You are currently working offline";
+		setTimeout('initService("main_Offline", "App available offline", "<span class=\'fa fa-plane\'></span>");', 2000);
+	}
 });
+window.appcachestatus = "App available offline";
 function appcache() {
-	console.log("App is now available for offline use.")
+	console.log("App is now available for offline use.");
 	//if($('.contentmain_Offline').length == 0)
 		setTimeout('initService("main_Offline", "App available offline", "<span class=\'fa fa-plane\'></span>");', 2000);
 	//hot swap	
 	try {
-		window.applicationCache.swapCache()
+		window.applicationCache.swapCache();
 	} catch(e) {
 		
 	}
@@ -1432,7 +1462,7 @@ function GetPanelmain_Offline() {
 	return {title: "<span class='fa fa-plane'></span>&nbsp;Offline", bordercolor:"#ff9900", width: 15};	
 }
 function RunPanelmain_Offline() {
-	out = "<span style='font-size:16pt'>This App is Available Offline</span><br>What Does this Mean?<br><br>If your device is not connected to the Internet, you can still open Gltn in your browser. Of course, not every feature will be available such as the Dictionary and the Gltn Store, but you will be able to edit and build documents like always.";
+	out = "<span style='font-size:16pt'>This App is Available Offline</span><br>What Does this Mean?<br><br>If your device is not connected to the Internet, you can still open Gltn in your browser. Of course, not every feature will be available such as the Dictionary and the Gltn Store, but you will be able to edit and build documents like always.<br><br><span style='font-weight:bold;font-size:10pt;color:#ff9900'>"+window.appcachestatus+"</span>";
 	postPanelOutput(out);
 }
 window.applicationCache.oncached = appcache();
@@ -1449,8 +1479,53 @@ window.applicationCache.onprogress = function(e) {
     else                         // Otherwise report # of times called
         progress = " (" + ++progresscount + ")"
 
-    //console.log("Downloading new version" + progress);
+   // console.log("Downloading new version" + progress);
 	initService("main_Offline", "App caching", "<span class='fa fa-plane'></span>"+progress);
+	window.appcachestatus = "Found new version - Refresh to update";
     return false;
 };
-$('html').attr('manifest', 'online.php?a=theme_blackoutc.js');
+function initNotifications() {
+	initService("main_Notifications", "Notifications (0)", "<span class='fa fa-comment-o'></span>");
+	//Notifications live, send out requests?	
+	if(window.notifications == undefined) {
+		window.notifications = new Array();		
+	}
+	
+	//since appcache is too fast:
+	console.log(appcachestatus);
+	if(appcachestatus == "Found new version - Refresh to update")
+		postNotification("appcache", "A new version of the app was downloaded. Click to update.", "window.location.reload()");
+}
+function InitPanelmain_Notifications() {
+	
+}
+function GetPanelmain_Notifications() {
+	return {title: "Notifications", bordercolor: "#666", width:25};	
+}
+function RunPanelmain_Notifications() {
+	//get window.notifications
+	var nonotes = "You have no new notifications";
+	var out = "";
+	if(notifications.length) {
+		for(i in notifications) {
+			out += "<div style='background-color: rgba(0,255,0,.3);cursor:pointer;padding-left: 5px;padding-top: 5px;border: solid 1px "+theme.coloralt+";' onclick='"+notifications[i].action+"'>"+notifications[i].text+"</span><br>";
+		}
+		postPanelOutput(out);
+	} else {
+		postPanelOutput(nonotes);	
+	}
+}
+function postNotification(id, text, action) {
+	var npush = -1;
+	for(i in notifications) {
+		if(notifications[i].id == id)
+			npush = i;
+	}
+	if(npush == -1) {
+		notifications.push({id:id, text:text, action:action});
+		initService("main_Notifications", "Notifications ("+notifications.length+")", "<span class='fa fa-comment'></span>&nbsp;"+notifications.length);
+	} else {
+		notifications[npush] = {id:id, text:text, action:action};
+		initService("main_Notifications", "Notifications ("+notifications.length+")", "<span class='fa fa-comment'></span>&nbsp;"+notifications.length);
+	}
+}

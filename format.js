@@ -110,6 +110,7 @@ function post_format() {
 			}	
 	//Theme parameters for content_textarea
 	$('.content_textarea').css('background-color', theme.normbg).css('color', theme.normcolor);
+	console.log('CT colors set');
 }
 
 function format_check_count(i) {
