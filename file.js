@@ -256,6 +256,7 @@ function finishRestore2() {
 	recallHovertags();
 	postWordCount();
 	initNiftyUI4Saving();
+	parseCT();
 	if(window.offline != true)
 		initPanels();
 	//start save client because code should all work by this point

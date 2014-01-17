@@ -151,6 +151,42 @@ function keyboardShortcut(id, keys) {
 		}
 	});
 }	
+function create_panel_data(d) {
+	//Like an Intent in Android, you can create a bunch of data here in order to send to a panel. The panel must be programmed to interact with these intents
+	for(i in d) { 
+		$('.panelIntent').attr('data-'+i, d[i]);
+	}
+	if(window.paneltitle != undefined)
+		$('.panelIntent').attr('data-sender', paneltitle);
+}
+function grab_panel_data() {
+	//Returns an object containing all of this stuff
+	var obj = {};
+	$('.panelIntent').each(function() {
+	  $.each(this.attributes, function() {
+		// this.attributes is not a plain object, but an array
+		// of attribute nodes, which contain both the name and value
+		if(this.specified && this.name.indexOf('data') > -1) {
+			obj[this.name.substr(5)] = this.value;
+		  //console.log(this.name, this.value);
+		}
+	  });
+	});
+	return obj;
+}
+function clear_panel_data() {
+	$('.panelIntent').each(function() {
+	  $.each(this.attributes, function() {
+		// this.attributes is not a plain object, but an array
+		// of attribute nodes, which contain both the name and value
+		if(this.specified && this.name.indexOf('data') > -1) {
+			//this.name = undefined;
+			$(this).attr(this.name, null);
+		  //console.log(this.name, this.value);
+		}
+	  });
+	});
+}
 
 //Default Plugins Here:
 
@@ -643,10 +679,10 @@ function RunPanelmain_Filesys() {
 	}	
 	resetFolder();
 }
-function GetPanelmain_Style() {
+function GetPanelmain_Guide() {
 	return {title: '<span class="fa fa-info-circle" style="font-size:13pt"></span>&nbsp;Style Guide', bordercolor: '#7f8c8d', width:30};
 }
-function RunPanelmain_Style() {
+function RunPanelmain_Guide() {
 	try {
 		out = onStyleGuide();
 	} catch(e) {

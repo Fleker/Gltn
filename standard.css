@@ -115,9 +115,13 @@ span, div, body {
 }
 /* Internal Styles Formatting */
 .citation {
-		text-decoration: none;
-		border-bottom: solid 1px #0CF;
-	}	
+	text-decoration: none;
+	border-bottom: solid 1px #0CF;
+}	
+.style {
+	text-decoration: none;
+	border-bottom: solid 1px #2980b9;
+}	
 .heading1 {
 	display:block;
 	text-decoration: none;
