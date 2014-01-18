@@ -1531,61 +1531,111 @@ function postNotification(id, text, action) {
 	}
 }
 
-/*** Style API ***/
+/*** Context API ***/
+function initContext() {
+	if(window.context == undefined)
+		window.context = new Array();
+	parseCT();
+		//formatHovertag("img", "'Image Details'", "'imgDetails('+$(this).attr('data-id')+');'");
+	formatHovertag('context', "window.context[parseInt($(this).attr('data-i'))].type", "'contextPanel('+$(this).attr('data-i')+')'");	
+}
 function parseCT() {
 	var a = $('.content_textarea').html();
-	var r = new RegExp('<span class="style" data-i="[^"]*">([^<]*)</span>', 'gi');
-	a = a.replace(r, '$1');
-	//Properly reapply a
-	$('.content_textarea').html(a);
-	if(window.style == undefined)
-		window.style = new Array();
-	console.log($('.content_textarea').html());
+	var r = new RegExp('<span class="context" data-i="[^"]*">([^<]*)</span>', 'gi');
+	try {
+		saveSelection();
+   		a = a.replace(r, '$1');
+		$('.content_textarea').html(a);
+		restoreSelection();
+	} catch(e) {
+		console.error(e.message);
+		a = a.replace(r, '$1');
+		$('.content_textarea').html(a);
+	}
+	//findTextReplaceText(r, '$1');
 	//Now we ping other functions, one internal and one by {format}.js to set up stuff
-	styleMarkup();
-	console.log($('.content_textarea').html());	
-	//onStyleMarkup
+	contextMarkup();
+	//console.log($('.content_textarea').html());	
+	try {
+		onStyleMarkup
+	} catch(e) {
+		
+	}
 	//Now we do a jQuery event
-	$('.style').on('click', function() {
-		//Create intent
-		create_panel_data({html:$(this).html(), index:$(this).attr('data-i')});
-		//Launch panel
-		runPanel('main_Style');
-		//In panel, populate data and organize it
-		console.log($(this).html());
-	});
 }
-function apply_style(text, d) {
+function contextPanel(e) {
+	//occurs when item is clicked
+	
+	//Create intent
+	var f = $('.context[data-i='+e+']');
+	create_panel_data({html:f.html(), index:f.attr('data-i')});
+	//Launch panel
+	runPanel('main_Context');
+	//In panel, populate data and organize it
+	console.log(f.html());
+
+}
+function apply_context(text, d) {
 	//Finds text (or HTML unfortunately FTM) and replaces it
 	var a = $('.content_textarea').html();
 	var r = new RegExp('('+text+')', 'gi');
 	var b = a.match(r);
 	if(b != null) {
-		a = a.replace(r, "<span class='style' data-i='"+window.style.length+"'>$1</span>");
-		$('.content_textarea').html(a);
-		//Somehow return cursor
-		window.style.push(d);
+		//a = a.replace(r, "<span class='context' data-i='"+window.context.length+"'>$1</span>");
+		//$('.content_textarea').html(a);
+		findTextReplaceText(r, "<span class='context' data-i='"+window.context.length+"'>$1</span>");
+		//	setTimeout("moveCarat('character', -1);", 100);
+		window.context.push(d);
 	}
-	//Hovertag
+	//Hovertag - use d.type
 }
-function styleMarkup() {
-	//Markup the paper with all these issues, tied with a style object that will give users a recommendation
+function contextMarkup() {
+	//Markup the paper with all these issues, tied with a content object that will give users a recommendation
 	function getStrunkTips(note) {
 		return "From William Strunk Jr:<br><i style='font-size:10pt'>"+note+"</i>"
 	}
-	apply_style("[sS]tudent [bB]ody", {type:"Consider Revising", replacement:"studentry", text: getStrunkTips("Use the word studentry instead of the two word phrase 'student body'. It is cleaner.")});	
+	apply_context("[sS]tudent [bB]ody", {type:"Consider Revising", replacement:"studentry", text: getStrunkTips("Use the word studentry instead of the two word phrase 'student body'. It is cleaner.")});	
 }
-function GetPanelmain_Style() {
+function GetPanelmain_Context() {	
 	return {title: "Writing Tips", bordercolor:"#16a085", width:25};	
 }
-function RunPanelmain_Style() {
+function RunPanelmain_Context() {
 	var d = grab_panel_data();	
-	var e = window.style[d.index];
+	var e = window.context[d.index];
 	out = '<br><span style="font-size:15pt;font-style:italics;">"'+d.html+'"</span>';
 	out += '<br>&emsp;(<b style="font-size:10pt">'+e.type+'</b>)<br><br>'+e.text+'<br>';
 	if(e.replacement != undefined) {
 		//Create option to replace all values (or just that one)
+		//$('span[data-i=0]')
 		out += '<br><br><br><b>What to Do</b><br><span style="font-size:11pt">&emsp;Replace with "'+e.replacement+'"</span>';	
 	}
 	postPanelOutput(out);
+}
+/*** Still Important Div Cursor Restore
+-Thanks to Rangy ***/
+var savedSel = null;
+var savedSelActiveElement = null;
+
+function saveSelection() {
+	// Remove markers for previously saved selection
+	if (savedSel) {
+		rangy.removeMarkers(savedSel);
+	}
+	savedSel = rangy.saveSelection();
+	savedSelActiveElement = document.activeElement;
+	//gEBI("restoreButton").disabled = false;
+}
+
+function restoreSelection() {
+	if (savedSel) {
+		rangy.restoreSelection(savedSel, true);
+		savedSel = null;
+		//gEBI("restoreButton").disabled = true;
+		window.setTimeout(function() {
+			if (savedSelActiveElement && typeof savedSelActiveElement.focus != "undefined") {
+				savedSelActiveElement.focus();
+			}
+			saveSelection();
+		}, 1);
+	}
 }

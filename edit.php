@@ -56,6 +56,7 @@ if(strpos($server, "felkerdigitalmedia") > -1) {
 <script src="rangy-1.3alpha.772\rangy-core.js"></script>
 <script src="rangy-1.3alpha.772\rangy-cssclassapplier.js"></script>
 <script src="rangy-1.3alpha.772\rangy-textrange.js"></script>
+<script src="rangy-1.3alpha.772\uncompressed\rangy-selectionsaverestore.js"></script>
 <script src="json2xml.js"></script>
 <script src="xmlToJson.js"></script>
 <script src="IntroJS/intro.js"></script>

@@ -31,6 +31,7 @@ rangy.createModule("SaveRestore", function(api, module) {
         // Clone the Range and collapse to the appropriate boundary point
         var boundaryRange = range.cloneRange();
         boundaryRange.collapse(atStart);
+	console.log('boundaryRange:',boundaryRange);
 
         // Create the marker element containing a single invisible character using DOM methods and insert it
         markerEl = doc.createElement("span");
@@ -41,12 +42,16 @@ rangy.createModule("SaveRestore", function(api, module) {
         markerEl.appendChild(doc.createTextNode(markerTextChar));
 
         boundaryRange.insertNode(markerEl);
+	console.log(markerEl);
         boundaryRange.detach();
+	//console.log('RangeMarker '+markerEl+' created');
         return markerEl;
     }
 
     function setRangeBoundary(doc, range, markerId, atStart) {
         var markerEl = gEBI(markerId, doc);
+	//console.log('setRangeBoundary');
+       // console.log(markerEl, markerId, doc);
         if (markerEl) {
             range[atStart ? "setStartBefore" : "setEndBefore"](markerEl);
             markerEl.parentNode.removeChild(markerEl);
@@ -60,10 +65,12 @@ rangy.createModule("SaveRestore", function(api, module) {
     }
 
     function saveRange(range, backward) {
+	console.log('range saved');
         var startEl, endEl, doc = api.DomRange.getRangeDocument(range), text = range.toString();
 
         if (range.collapsed) {
             endEl = insertRangeBoundaryMarker(range, false);
+		console.log('range.collapsed: ',endEl, endEl.id);
             return {
                 document: doc,
                 markerId: endEl.id,
@@ -94,6 +101,8 @@ rangy.createModule("SaveRestore", function(api, module) {
         var range = api.createRange(doc);
         if (rangeInfo.collapsed) {
             var markerEl = gEBI(rangeInfo.markerId, doc);
+		console.log('restoreRange:');
+    	    console.log(markerEl, rangeInfo.markerId);
             if (markerEl) {
                 markerEl.style.display = "inline";
                 var previousNode = markerEl.previousSibling;
@@ -155,8 +164,9 @@ rangy.createModule("SaveRestore", function(api, module) {
         }
         var sel = api.getSelection(win);
         var ranges = sel.getAllRanges();
-        var backward = (ranges.length == 1 && sel.isBackward());
-
+	//        var backward = (ranges.length == 1 && sel.isBackward());
+	console.log('var backward');
+	var backward = false;
         var rangeInfos = saveRanges(ranges, backward);
 
         // Ensure current selection is unaffected

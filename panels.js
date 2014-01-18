@@ -791,6 +791,58 @@ function RunPanelmain_Find() {
 		}
 	}
 }
+function findTextReplaceText(finder, replacer) {
+	re = finder;
+	//console.log(re);
+	ro = replacer;
+  
+	$('.content_textarea').each(function() {
+		traverseChildNodes(this);
+	});
+			 
+	function traverseChildNodes(node) {
+		var next;		 
+		if (node.nodeType === 1) {
+			// (Element node)
+			if (node = node.firstChild) {
+				do {
+					// Recursively call traverseChildNodes
+					// on each child node
+					next = node.nextSibling;
+					traverseChildNodes(node);
+				} while(node = next);
+			}
+		} else if (node.nodeType === 3) {
+			// (Text node
+			if (re.test(node.data)) {
+				wrapMatchesInNode(node);
+			}
+		}
+	}	
+	function wrapMatchesInNode(textNode) {
+		var temp = document.createElement('span');
+		temp.innerHTML = textNode.data.replace(re, ro);
+		// temp.innerHTML is now:
+		// "\n    This order's reference number is <a href="/order/RF83297">RF83297</a>.\n"
+		// |_______________________________________|__________________________________|___|
+		//                     |                                      |                 |
+		//                 TEXT NODE                             ELEMENT NODE       TEXT NODE
+	 
+		// Extract produced nodes and insert them
+		// before original textNode:
+		while (temp.firstChild) {
+			/*console.log(temp.firstChild);
+			console.log(textNode);
+			console.log(textNode.parentNode);
+			console.log(textNode.parentNode.parentNode);
+			console.log(temp.firstChild.nodeType);*/
+			textNode.parentNode.insertBefore(temp.firstChild, textNode);
+		}
+		// Logged: 3,1,3
+		// Remove original text-node:
+		textNode.parentNode.removeChild(textNode);
+	}
+}
 function install_dictionary(format, url, name, id, icon) {
 	//window.settings.dictionary = 'gltn, wiktionary, wikipedia';
 	//window.settings.dictionary_gltn = 'XML, http://felkerdigitalmedia.com/gltn/dictionary.php, Ouvert Dictionary, gltn, G';

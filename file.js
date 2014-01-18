@@ -16,7 +16,7 @@ max_word = 0;
 hovertagRegistrar = new Array();
 obj = {};
 document.ready = function() {
-	console.log('Gltn has woken up: v 1.0.1.10');
+	console.log('Gltn has woken up: v 1.0.1.11');
 	restoreFile();
 };
 
@@ -253,10 +253,10 @@ function finishRestore(x, xc) {
 function finishRestore2() {
 	initNotifications();
 	setHeader();
+	initContext();
 	recallHovertags();
 	postWordCount();
 	initNiftyUI4Saving();
-	parseCT();
 	if(window.offline != true)
 		initPanels();
 	//start save client because code should all work by this point
