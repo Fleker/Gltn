@@ -490,6 +490,10 @@ function citationHovertag(recall) {
 }
 //'
 function formatHovertag(classname, textcode, action, recall) {
+	for(i in hovertagRegistrar) {
+		if(hovertagRegistrar[i].classname == classname && recall != true)
+			return;	
+	}
 	$('.'+classname).off('mouseenter');
 	$('.'+classname).off('mouseleave');
 	
@@ -522,6 +526,7 @@ function hovertagRegistry(c, t, a) {
 	saveFile();
 }
 function recallHovertags() {
+	//console.log('.');
 	for(i in hovertagRegistrar) {
 		if(hovertagRegistrar[i].textcode != undefined)
 			try {
@@ -890,7 +895,8 @@ document.onkeydown = function(e) {
 			//Word filtering
 			//Save
 			//saveFile();	
-			parseCT();		
+			//if(e.shiftKey)
+				parseCT();		
 		break;
 		case 66:
 			if(e.altKey) {
@@ -1171,11 +1177,12 @@ function setHeader() {
 			{text: 'Outline', img: '<span style="font-size:18pt" class="fa fa-list"></span>', action: "runPanel('main_Outline');"},
 			{text: 'Citations', img: '<span style="font-size:18pt" class="fa fa-book"></span>', action: "runPanel('main_Citation');"},
 			{text: 'Ideas', img: '<span style="font-size:18pt" class="fa fa-lightbulb-o"></span>', action: "runPanel('main_Idea');"},
-			{text: 'Style Guide', img: '<span style="font-size:18pt" class="fa fa-info-circle"/>', action: "runPanel('main_Guide');"}
+			{text: 'Style Guide', img: '<span style="font-size:18pt" class="fa fa-info-circle"/>', action: "runPanel('main_Guide');"},
+			{text: 'Gltn Store', img: '<span style="font-size:18pt" class="fa fa-shopping-cart"/>', action: "launchStore()"}
 		),
 		Tools: new Array(
-			{text: 'Find', img: '<span style="font-size:18pt" class="fa fa-search"></span>', action: "runPanel('main_Find');", key: "Alt+F"}
-			/*{text: 'Dictionary', img: '<span style="font-size:18pt" class="fa fa-quote-left"></span>', action: "runPanel('main_Dictionary');"},*/,
+			{text: 'Find', img: '<span style="font-size:18pt" class="fa fa-search"></span>', action: "runPanel('main_Find');", key: "Alt+F"},
+			{text: 'Dictionary', img: '<span style="font-size:18pt" class="fa fa-quote-left"></span>', action: "runPanel('main_Dictionary');"},
 			{text: 'Themes', img: '<span style="font-size:18pt" class="fa fa-picture-o"></span>', action: "runPanel('main_Themes')"}
 		),
 		About: new Array(
@@ -1232,7 +1239,8 @@ function install_panel(id, name, img, url, service, key) {
 	if(service == undefined)
 		service = false;
 	if(key == undefined)
-		key = "";
+		key = " ";
+	img = img.replace(/&gt;/g, ">").replace(/&lt;/g, "<");
 	if(service != true) {
 		if(key != undefined && key.length > 0)
 			holoribbon_std['Panels'].push({text: name, img: img, action: "runPanel('"+id+"')", key:key});
@@ -1537,18 +1545,26 @@ function initContext() {
 		window.context = new Array();
 	parseCT();
 		//formatHovertag("img", "'Image Details'", "'imgDetails('+$(this).attr('data-id')+');'");
-	formatHovertag('context', "window.context[parseInt($(this).attr('data-i'))].type", "'contextPanel('+$(this).attr('data-i')+')'");	
+	formatHovertag('context', "window.context[parseInt($(this).attr('data-i'))].type", "'contextPanel('+$(this).attr('data-i')+')'");
+	$('.content_textarea').on('keydown', function( event ) {
+	  if ( event.which == 32 ) {
+	  	//parseCT();
+		//contentAddText(' ');
+	  	//event.preventDefault();
+	  }
+	});
 }
 function parseCT() {
-	var a = $('.content_textarea').html();
-	var r = new RegExp('<span class="context" data-i="[^"]*">([^<]*)</span>', 'gi');
+	var r = new RegExp('<span class="context" [^>]*>([\\s\\S]+?)</span>', 'gi');
 	try {
 		saveSelection();
+		var a = $('.content_textarea').html();
    		a = a.replace(r, '$1');
 		$('.content_textarea').html(a);
-		restoreSelection();
+		console.log(a, r);
 	} catch(e) {
 		console.error(e.message);
+		var a = $('.content_textarea').html();
 		a = a.replace(r, '$1');
 		$('.content_textarea').html(a);
 	}
@@ -1557,7 +1573,12 @@ function parseCT() {
 	contextMarkup();
 	//console.log($('.content_textarea').html());	
 	try {
-		onStyleMarkup
+		onStyleMarkup();
+	} catch(e) {
+		
+	}
+	try {
+		restoreSelection();	
 	} catch(e) {
 		
 	}
@@ -1583,9 +1604,20 @@ function apply_context(text, d) {
 	if(b != null) {
 		//a = a.replace(r, "<span class='context' data-i='"+window.context.length+"'>$1</span>");
 		//$('.content_textarea').html(a);
-		findTextReplaceText(r, "<span class='context' data-i='"+window.context.length+"'>$1</span>");
-		//	setTimeout("moveCarat('character', -1);", 100);
-		window.context.push(d);
+		if(d.type == "Don't Overuse") {
+			var wc = $('.content_textarea').text().split(' ').length;
+			var ac = a.match(r);
+			if(ac != null) {
+				if((ac.length / wc) > d.limit) {
+					findTextReplaceText(r, "<span class='context' data-i='"+window.context.length+"'>$1</span>");
+					window.context.push(d);
+				}
+				console.log(ac.length, wc, (ac.length/wc),d.limit);
+			}
+		} else {
+			findTextReplaceText(r, "<span class='context' data-i='"+window.context.length+"'>$1</span>");
+			window.context.push(d);
+		}
 	}
 	//Hovertag - use d.type
 }
@@ -1594,7 +1626,60 @@ function contextMarkup() {
 	function getStrunkTips(note) {
 		return "From William Strunk Jr:<br><i style='font-size:10pt'>"+note+"</i>"
 	}
-	apply_context("[sS]tudent [bB]ody", {type:"Consider Revising", replacement:"studentry", text: getStrunkTips("Use the word studentry instead of the two word phrase 'student body'. It is cleaner.")});	
+	var revise = "Consider Revising";
+	var syn = "Suggested Synonym";
+	var remove = "Remove Word";
+	var overuse = "Don't Overuse";
+	/***/
+	var simplify = "Simplify your sentence by using just one word.";
+	var preposition = "You don't need a prepositional phrase to give a specific meaning.";
+	var nouning = "A noun should not necessarily be turned into a verb.";
+	var overusetip = "Don't overuse this word in your writing.";
+	/***/
+	var rare = .05;
+	var urare = .005;
+	
+	apply_context("[sS]tudent [bB]ody", {type:"Consider Revising", replacement:"studentry", text: getStrunkTips("Use the word studentry instead of the two word phrase 'student body'. It is cleaner.")});
+	apply_context("[Tt]he question as to whether", {type: "Consider Revising", replacement:"whether", text: getStrunkTips(simplify)});
+	apply_context("[Tt]he fact that", {type: "Consider Revising", replacement:"", text: getStrunkTips("Don't overcomplicate your sentence. Get rid of this phrase. You don't need it.")});
+	apply_context("[Nn]ot honest", {type: "Consider Revising", replacement:"Dishonest", text: getStrunkTips(simplify)});
+	apply_context("[Nn]ot important", {type: revise, replacement: "trifling", text: getStrunkTips(simplify)});
+	apply_context("[Dd]id not remember", {type: revise, replacement: "forgot", text: getStrunkTips(simplify)});
+	apply_context("[Dd]id not pay any attention to", {type: revise, replacement: "ignored", text: getStrunkTips(simplify)});
+	apply_context("[Dd]id not have any confidence in", {type: revise, replacement: "distrusted", text: getStrunkTips(simplify)});
+	apply_context("[Hh]e is a man who", {type: revise, replacement: "he", text: getStrunkTips(simplify)});
+	apply_context("[Tt]here is no doubt but that|[Tt]here is no doubt that", {type: revise, replacement: "no doubt", text: getStrunkTips("You can simplify this phrase by stating 'no doubt' or 'doubtless'.")});
+	apply_context("[Ii]n a hasty manner", {type: revise, replacement: "hastily", text: getStrunkTips(simplify)});
+	apply_context("[Tt]he reason why is that", {type: revise, replacement: "because", text: getStrunkTips(simplify)});
+	apply_context("[Tt]his is a reason that", {type: revise, replacement:"this subject", text: getStrunkTips(simplify)});
+	
+	apply_context("[Cc]ope", {type: syn, replacement:"cope with", text: getStrunkTips("Including 'with' will improve the sentence's flow.")});
+	apply_context("[Aa]nticipate", {type: syn, replacement:"expect", text: getStrunkTips("Don't use fancy words when a simpler word works much better.")});
+	apply_context("[Uu]tilize", {type: syn, replacement: "use", text: getStrunkTips("Don't use fancy words when a simpler word works much better.")});
+	apply_context("[Oo]wing to the fact that", {type: revise, replacement: "since", text: getStrunkTips("This phrase can be replaced with 'since' or 'because' and retain the same meaning.")});
+	apply_context("[Ii]n spite of the fact that", {type: revise, replacement: "although", text: getStrunkTips(simplify)});
+	apply_context("[Cc]all your attention to the fact that", {type: revise, replacement: "remind you", text: getStrunkTips("You can easily replace that whole phrase with two words. Why overcomplicate things?")});
+	apply_context("I was unaware of the fact that", {type: revise, replacement: "I was unaware that", text: getStrunkTips("You can remove the phrase 'of the fact' and the meaning won't change.")});
+	apply_context("[Tt]he fact that he had not succeeded", {type: revise, replacement: "his failure", text: getStrunkTips("Be direct with your sentences. Don't overcomplicate things.")});
+	apply_context("[Tt]he fact that I had arrived", {type: revise, replacement: "my arrival", text: getStrunkTips("Don't state 'the fact that' because it becomes too wordy. 'My arrival' has the same meaning.")});
+	apply_context("[Ww]ho is a member of", {type: revise, replacement: "a member of", text: getStrunkTips("Using the word 'who' in a non-question makes the sentence overly complicated.")});
+	apply_context("[Aa]s to whether", {type: revise, replacement: "whether", text: getStrunkTips(preposition)});
+	apply_context("[Aa]s yet|[Aa]s of yet", {type: revise, replacement: "yet", text: getStrunkTips(preposition)});
+	apply_context("[Ee]nthuse", {type: remove, replacement: "", text: getStrunkTips(nouning)});
+	apply_context("[Ff]acility", {type: revise, text: getStrunkTips("This is a very broad word. You should consider being more specific to help the reader understand and create more sophisticated imagery.")});
+	apply_context("[Ff]olk", {type: revise, text: getStrunkTips("This word is very colloquial. You should consider changing the word to be more sophisticated.")});
+	apply_context("[Pp]ersonalize", {type: revise, text: getStrunkTips("You should consider changing the word. It has a pretentious connontation.")});
+	apply_context("[Tt]he foreseeable future", {type: revise, text: getStrunkTips("What is the definition of 'foreseeable'? This phrase is vague and should be replaced by something more specific.")});
+	apply_context("[Tt]ry and", {type: revise, replacement: "try to", text: getStrunkTips("If you're going to 'try and' do something else, then you're doing two separate actions. If so, 'try' isn't very specific and should be improved. If you're doing a single action, you'll 'try to' do that one thing.")});
+	apply_context("[Ee]ach and every one", {type: revise, text: getStrunkTips("Unless this is said in conversation, it should be removed. This phrase is very wordy and could easily be simplified to a single word.")});
+	
+	/***/
+	apply_context("[Vv]ery", {type: overuse, text: getStrunkTips(overusetip), limit: rare});
+	apply_context("[Pp]rodigious", {type: overuse, text: getStrunkTips(overusetip), limit: rare});
+	apply_context("[Cc]urvaceous", {type: overuse, text: getStrunkTips(overusetip), limit: rare});
+	apply_context("[Dd]iscombobulate", {type: overuse, text: getStrunkTips(overusetip), limit: urare});
+	apply_context("[Rr]eally", {type: overuse, text: getStrunkTips(overusetip), limit: rare});
+	apply_context("[Ii]ncredibly", {type: overuse, text: getStrunkTips(overusetip), limit: rare});
 }
 function GetPanelmain_Context() {	
 	return {title: "Writing Tips", bordercolor:"#16a085", width:25};	
@@ -1607,9 +1692,23 @@ function RunPanelmain_Context() {
 	if(e.replacement != undefined) {
 		//Create option to replace all values (or just that one)
 		//$('span[data-i=0]')
-		out += '<br><br><br><b>What to Do</b><br><span style="font-size:11pt">&emsp;Replace with "'+e.replacement+'"</span>';	
+		out += '<br><br><br><b>What to Do</b><br>&emsp;<span style="font-size:11pt; cursor:pointer;border-bottom:solid 1px '+theme.normcolor+'" class="contextReplaceA">Replace all with "'+e.replacement+'"</span>';	
+		//<span style="font-size:11pt; cursor:pointer;border-bottom:solid 1px '+theme.normcolor+'" class="contextReplace">Replace this with "'+e.replacement+'"</span><br><br>&emsp;
 	}
 	postPanelOutput(out);
+	$('.contextReplace').on('click', function() {
+		//Global and singular
+		console.log($('.context[data-i='+d.index+']'));
+		$('.context[data-i='+d.index+']').html(e.replacement);
+		parseCT();
+	});
+	$('.contextReplaceA').on('click', function() {
+		//Global and singular
+		var re = new RegExp(d.html, 'gi');
+		console.log(re, e.replacement);
+		findTextReplaceText(re, e.replacement);
+		parseCT();
+	});
 }
 /*** Still Important Div Cursor Restore
 -Thanks to Rangy ***/
@@ -1624,10 +1723,11 @@ function saveSelection() {
 	savedSel = rangy.saveSelection();
 	savedSelActiveElement = document.activeElement;
 	//gEBI("restoreButton").disabled = false;
+	console.log($('.content_textarea').html());
 }
 
 function restoreSelection() {
-	if (savedSel) {
+	if (savedSel != null) {
 		rangy.restoreSelection(savedSel, true);
 		savedSel = null;
 		//gEBI("restoreButton").disabled = true;
@@ -1635,7 +1735,8 @@ function restoreSelection() {
 			if (savedSelActiveElement && typeof savedSelActiveElement.focus != "undefined") {
 				savedSelActiveElement.focus();
 			}
-			saveSelection();
+			//saveSelection();
+			console.log($('.content_textarea').html());
 		}, 1);
 	}
 }

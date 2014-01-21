@@ -1073,7 +1073,7 @@ function RunPanelmain_Themes() {
 			out += b[3]+"&nbsp;<span style='font-size:16pt'>"+b[1]+"</span>";
 			out += "</div>";
 		}
-		//out += "<br><br><button onclick='launchStore()'>Download More Themes</button>";
+		out += "<br><br><button onclick='launchStore()'>Download More Themes</button>";
 		postPanelOutput(out);
 		$('.ThemesCard').on('click', function() {
 			var c = $(this).attr('data-c');
@@ -1085,10 +1085,13 @@ function RunPanelmain_Themes() {
 }
 
 //*** Store-Related Code ***/
+function getBaseLog(y, x) {
+    return Math.log(y) / Math.log(x);
+}
 function launchStore() {
 	//Grab store data
 	falseBuild(true);
-	setTimeout('launchStore2()', 250);
+	setTimeout('launchStore2()', 251);
 }
 function launchStore2() {
 	console.log('ba');
@@ -1105,6 +1108,18 @@ function launchStore2() {
 	}
 	function isInstalled(datum) {
 		return ((datum.type == "Panel" || datum.type == "Service") && window.settings.panels.indexOf(datum.id) > -1) || (datum.type == "Dictionary" && window.settings.dictionary.indexOf(datum.id) > -1) || (datum.type == "Theme" && window.settings.theme.indexOf(datum.id) > -1)
+	}
+	function getDownloadCount(number) {
+		if(number == 0)
+			return "Few downloads"
+		else if(number == 1)
+			return "Few downloads";
+		else {
+			//console.log(getBaseLog(number, 10),Math.floor(getBaseLog(number, 10)),Math.pow(10, Math.floor(getBaseLog(number, 10))),Math.floor(number/Math.pow(10, Math.floor(getBaseLog(number, 10)))));
+			var n = Math.pow(10, Math.floor(getBaseLog(number, 10)))*Math.round(number/Math.pow(10, Math.floor(getBaseLog(number, 10))))
+			return "About "+ n + " downloads";
+			//Math.round(10*(n/Math.pow(10, Math.floor(getBaseLog(n,10)))))	
+		}
 	}
 	function searchTermed(datum) {
 		n = $('#store_search').val().toLowerCase();
@@ -1188,28 +1203,39 @@ function launchStore2() {
 		$('.store_item').on('click', function() {
 			var i = store[$(this).attr('data-id')];
 			title = getIcon(i)+"&emsp;"+i.name;
-			subtitle = i.type+"<br><i>&emsp;&emsp;"+i.credit+"</i>";
-			ht = "<div style='margin-left:10%;width:80%;font-size:12pt;'>"+i.description+"</div>";
-			ht += "<br><span style='font-size:9pt;color:#999;padding-left:10%'>v "+i.version+"</span>";
+			//subtitle = i.type+"<br><i>&emsp;&emsp;"+i.credit+"</i>";
+			ht = threeColumnText("<div style='padding-left:16px;color:#999'>"+i.type+"<br>"+i.credit+"</div>", "<div style='font-size:9pt;color:#999'>v "+i.version+"<br>"+getDownloadCount(i.install)+"</div>", "")+"<br>";
+			ht += "<div style='margin-left:10%;width:80%;font-size:12pt;'>"+i.description+"</div>";
+			//ht += "<br><span style='font-size:9pt;color:#999;padding-left:10%'>v "+i.version+"</span>";
+			//ht += "<br><span style='font-size:9pt;color:#999;padding-left:10%'>"+getDownloadCount(i.install)+"</span>";
 			if(isInstalled(i)) 
 				ht += "<br><br><br>&emsp;<span style='color:green;font-size:12pt' class='fa fa-check'></span><span style='font-size:10pt;color:green'>&nbsp;You've already installed this.</span><br><button class='store_uninstall' data-id='"+$(this).attr('data-id')+"'>Uninstall</button>";	
 			else
 				ht += "<br><br><br>&emsp;<button class='store_install' data-id='"+$(this).attr('data-id')+"'>Install Now</button>";
-			initiatePopup({title: title, subtitle: subtitle, ht: ht, bordercolor: '#222'});
+			initiatePopup({title: title, ht: ht, bordercolor: '#222'});
 			$('.store_install').on('click', function() {
 				var i = store[$(this).attr('data-id')];
 				y = confirm("Install "+i.name+"?");
 				if(y == true) {
 					if(i.type == "Panel" || i.type == "Service") {
 						install_panel(i.id, i.name, getIcon(i), i.url, (i.type == "Service"), i.key);
+						$.get('storepost.php', {item: i.id, action: 'Download'}, function() {
+							console.log('Panel installed');
+						});
 						alert('Panel installed');
 					}
 					else if(i.type == "Dictionary") {
 						install_dictionary(i.type_d, i.url, i.name, i.id, getIcon(i));	
+						$.get('storepost.php', {item: i.id, action: 'Download'}, function() {
+							console.log('Dictionary installed');
+						});
 						alert('Dictionary added')
 					}
 					else if(i.type == "Theme") {
 						install_theme(i.id, i.name, i.url, getIcon(i));
+						$.get('storepost.php', {item: i.id, action: 'Download'}, function() {
+							console.log('Theme installed');
+						});
 						alert('Theme added');
 					} else
 						alert('Unknown data');
@@ -1224,14 +1250,23 @@ function launchStore2() {
 					if(i.type == "Panel" || i.type == "Service") {
 						//install_panel(i.id, i.name, getIcon(i), i.url);
 						uninstall_panel(i.id);
+						$.get('storepost.php', {item: i.id, action: 'Uninstall'}, function() {
+							console.log('Panel uninstalled');
+						});
 						alert('The panel was uninstalled.');
 					}
 					else if(i.type == "Dictionary") {
 						uninstall_dictionary(i.id);	
+						$.get('storepost.php', {item: i.id, action: 'Uninstall'}, function() {
+							console.log('Dictionary uninstalled');
+						});
 						alert('The dictionary was removed.')
 					}
 					else if(i.type == "Theme") {
 						uninstall_theme(i.id);
+						$.get('storepost.php', {item: i.id, action: 'Uninstall'}, function() {
+							console.log('Theme uninstalled');
+						});
 						alert('The theme was removed.');
 					}
 					else

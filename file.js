@@ -16,7 +16,7 @@ max_word = 0;
 hovertagRegistrar = new Array();
 obj = {};
 document.ready = function() {
-	console.log('Gltn has woken up: v 1.0.1.11');
+	console.log('Gltn has woken up: v 1.1.1.2');
 	restoreFile();
 };
 
@@ -253,8 +253,14 @@ function finishRestore(x, xc) {
 function finishRestore2() {
 	initNotifications();
 	setHeader();
-	initContext();
+	try {
+		initContext();
+	} catch(e) {
+		//may not be ready yet, so the function will be disabled
+		console.warn(e.message);	
+	}
 	recallHovertags();
+	setInterval("recallHovertags();",1000);
 	postWordCount();
 	initNiftyUI4Saving();
 	if(window.offline != true)

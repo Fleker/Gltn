@@ -13,6 +13,8 @@
 	<updated_last>1389163700</updated_last>
 	<updated_meta>1389163700</updated_meta>
 	<version>1.0</version>
+	<install>0</install>
+	<uninstall>0</uninstall>
 </app>
 <app>
 	<parent>app</parent>
@@ -27,6 +29,8 @@
 	<updated_last>1389163700</updated_last>
 	<updated_meta>1389163700</updated_meta>
 	<version>1.0</version>
+	<install>0</install>
+	<uninstall>0</uninstall>
 </app>
 <app>
 	<parent>app</parent>
@@ -40,6 +44,8 @@
 	<updated_last>1389163700</updated_last>
 	<updated_meta>1389163700</updated_meta>
 	<version>1.0</version>	
+	<install>0</install>
+	<uninstall>0</uninstall>
 </app>
 <app>
 	<parent>app</parent>
@@ -54,5 +60,7 @@
 	<updated_last>1389163700</updated_last>
 	<updated_meta>1389163700</updated_meta>
 	<version>1.0</version>
+	<install>0</install>
+	<uninstall>0</uninstall>
 </app>
 </gltn_store>
