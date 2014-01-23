@@ -47,6 +47,12 @@ function new_gluten_formats() {
 	}
 function install_gluten_format(name, type, uri) {
 	formats.push({name: name, type: type, uri: uri});
+	if(settings['formats_name'].indexOf(name) == -1) {
+		window.settings['formats_name'] = window.settings['formats_name'] + ", " + name;
+		window.settings['formats_type'] = window.settings['formats_type'] + ", " + type;
+		window.settings['formats_uri'] = window.settings['formats_uri'] + ", " + uri;
+	}
+
 	new_gluten_formats();
 }
 	
@@ -888,7 +894,11 @@ document.onkeydown = function(e) {
 	//Word counting - Place in Space only?
 		postWordCount();
 	//Check beginning and ends of div
+	try{
 		contentValidate();
+	} catch(e) {
+		
+	}
 		//saveFile();
 	switch(e.keyCode) {
 		case 32: /* Space */

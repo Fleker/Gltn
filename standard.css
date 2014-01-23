@@ -72,7 +72,7 @@ span, div, body {
 
 /* Styles */
 .format_count_min {
-	color: rgba(0,0,0,.6);	
+	/*color: rgba(0,0,0,.6);*/	
 }
 .format_description {
 	font-size:9pt;	

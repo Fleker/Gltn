@@ -16,7 +16,7 @@ max_word = 0;
 hovertagRegistrar = new Array();
 obj = {};
 document.ready = function() {
-	console.log('Gltn has woken up: v 1.1.1.2');
+	console.log('Gltn has woken up: v 1.1.1.3');
 	restoreFile();
 };
 
@@ -149,10 +149,12 @@ function restoreFile() {
 	xc = localStorage[fileid+"_c"];
 	if(x.file != undefined) {
 		//Load Script
+		initFormats();
 		$('#file_format').val(x.file.format);
 		docformat = x.file.format;
 		console.log(docformat);
-		loadjscssfile(docformat+".js", "js");
+//		loadjscssfile(docformat+".js", "js");
+		formatShift();
 		
 		$('#file_language').val(x.file.language);
 		$('#file_tags').val(x.file.tags);
@@ -176,7 +178,6 @@ function restoreFile() {
 		if(x.idea != undefined)	
 			idea = x.idea;
 		ideadefault = x.ideadefault;
-		
 		if(x.saved != undefined) {
 			window.saved = {};
 			for(i in x.saved) {
@@ -193,6 +194,7 @@ function restoreFile() {
 					hovertagRegistrar.push(x.hovertagRegistrar[i]);	
 				}
 		}
+		
 		setTimeout("finishRestore(x,xc);", 300);		
 	} else {
 		//New document - most things initialize at the top of this file
@@ -414,27 +416,68 @@ function checkloadjscssfile(filename, filetype){
   alert("file already added!")
 }
 //format = 'mla';
+function initFormats() {
+	if(settings['formats_name'] == undefined) {
+		settings['formats_name'] = "";
+		settings['formats_type'] = "";
+		settings['formats_uri'] = "";
+	}
+	//load all custom formats
+	for(i in window.settings.formats_name.split(', ')) {
+		if(settings.formats_name.split(', ')[i].length)
+			install_gluten_format(settings.formats_name.split(', ')[i], settings.formats_type.split(', ')[i], settings.formats_uri.split(', ')[i]);	
+	}
+}
 function formatShift() {
 	//unload js file
+	console.log(formats);
 	format2 = $('#file_format').val();
+	docformat = docformat+'.js';
 	for(i in formats) {
 		if(formats[i].name == docformat && formats[i].uri != undefined)
 			docformat = formats[i].uri;
 		else if(formats[i].name == docformat)
 			docformat = docformat+'.js';
+	}
+	for(i in formats) {
 		if(formats[i].name == format2) {
-//			console.log(docformat, formats[i]);
+			console.log(docformat, formats[i].name, formats[i].uri);
 			//replacejscssfile('formats/'+docformat+'/format.js', 'formats/'+format2+'/format.js', 'js');
-			if(formats[i].uri == undefined)
-				replacejscssfile(docformat, format2+".js", "js");
-			else
-				replacejscssfile(docformat, formats[i].uri, "js");
-			docformat = format2;
-			//alert("Shift formats");
-			//setTimeout("save();$('#body').empty();input();save();", 500)
-			setTimeout("onInitFormat();$('.content_textarea').html(xc);", 500);
-			setTimeout('formatShift2()', 510);
-			console.log('The document format is shifting.');
+			if(window.offline != true || formats[i].uri == undefined) {
+				if($('#formatscript').length == 0) {
+					$('body').append('<div id="formatscript" style="visibility:hidden"></div>');
+				}			
+				
+				if(formats[i].uri == undefined) {
+					$('#formatscript').html('<script src="'+format2+'.js'+'"></script>');
+					//replacejscssfile(docformat, format2+".js", "js");
+				} else {
+					console.log('Load format from '+formats[i].uri);
+					$('#formatscript').html('<script src="'+formats[i].uri+'"></script>');
+					//replacejscssfile(docformat, formats[i].uri, "js");
+					//save it
+					$('#themeframe').attr('src', formats[i].uri);
+					setTimeout("localStorage['zformat_"+format2+"'] = $('#themeframe').contents().text();", 1000);
+				}
+				docformat = format2;
+				//alert("Shift formats");
+				//setTimeout("save();$('#body').empty();input();save();", 500)
+				setTimeout("onInitFormat();$('.content_textarea').html(xc);", 500);
+				setTimeout('formatShift2()', 510);
+				console.log('The document format is shifting.');
+			} else {
+				if($('#formatscript').length == 0) {
+					$('body').append('<div id="formatscript" style="visibility:hidden"></div>');
+				}
+				$('#formatscript').html('<script>'+localStorage['zformat_'+format2]+'</script>');
+				
+				docformat = format2;
+				//alert("Shift formats");
+				//setTimeout("save();$('#body').empty();input();save();", 500)
+				setTimeout("onInitFormat();$('.content_textarea').html(xc);", 500);
+				setTimeout('formatShift2()', 510);
+				console.log('The document format is shifting.');
+			}
 		}
 	}
 }
@@ -447,6 +490,7 @@ function formatShift2() {
 			for(j in window.metadata) {
 				//console.log("'"+x.metadata[i].id+"'", "'"+window.metadata[j].id+"'");
 //				console.log(i,j);
+			try {
 				if(i == window.metadata[j].id.replace(/ /g, '_') && $('#format_item_'+j).val().length == 0) {
 //					console.log(i,j,x.metadata[i]);
 					//console.log($('#format_item_'+j).val(), i);
@@ -455,6 +499,9 @@ function formatShift2() {
 				} else {
 					//console.log('-');	
 				}
+			} catch(e) {
+					
+			}
 			}
 	}
 	console.log('The document format has shifted.');

@@ -103,7 +103,7 @@ function post_format() {
 			}
 			document.getElementsByClassName("content_textarea")[0].oninput = function() {
 				//postRange('oninput');
-				saveFile();
+				//saveFile();
 			}	
 			document.getElementsByClassName("content_textarea")[0].onkeyup = function() {
 				postRange('onkeyup');
@@ -115,6 +115,8 @@ function post_format() {
 
 function format_check_count(i) {
 	content = $('#format_item_'+i).val();
+	if(content.length == 0)
+		content = $('#format_item_'+i).html();
 	if(window.metadata[i] == undefined)
 		console.log("md"+i);
 	mtype = window.metadata[i].mtype;
@@ -124,9 +126,9 @@ function format_check_count(i) {
 		characters = content.length;
 		var e = '#format_count_'+i;
 		if(min > characters) {
-			$(e).html('<span class="format_count_min">'+min+'</span>&emsp;<span class="gluten_red">'+characters+'&nbsp;'+mtype+'</span>&emsp;<span class="format_count_min">'+max+'</span>');
+			$(e).html('<span style="color:'+theme.coloralt+'">'+min+'</span>&emsp;<span class="gluten_red">'+characters+'&nbsp;'+mtype+'</span>&emsp;<span style="color:'+theme.coloralt+'">'+max+'</span>');
 		} else if(max < characters) {
-			$(e).html('<span class="format_count_min">'+min+'</span>&emsp;<span class="gluten_red">'+characters+'&nbsp;'+mtype+'</span>&emsp;<span class="format_count_min">'+max+'</span>');
+			$(e).html('<spanstyle="color:'+theme.coloralt+'">'+min+'</span>&emsp;<span class="gluten_red">'+characters+'&nbsp;'+mtype+'</span>&emsp;<span style="color:'+theme.coloralt+'">'+max+'</span>');
 		} else {
 			$(e).html('<span class="gluten_gray">'+characters+'&nbsp;'+mtype+'</span>');
 		}	
@@ -134,9 +136,9 @@ function format_check_count(i) {
 		words = content.split(' ').length;
 		var e = '#format_count_'+i;
 		if(min > words) {
-			$(e).html('<span class="format_count_min">'+min+'</span>&emsp;<span class="gluten_red">'+words+'&nbsp;'+mtype+'</span>&emsp;<span class="format_count_min">'+max+'</span>');
+			$(e).html('<span style="color:'+theme.coloralt+'">'+min+'</span>&emsp;<span class="gluten_red">'+words+'&nbsp;'+mtype+'</span>&emsp;<span style="color:'+theme.coloralt+'">'+max+'</span>');
 		} else if(max < words) {
-			$(e).html('<span class="format_count_min">'+min+'</span>&emsp;<span class="gluten_red">'+words+'&nbsp;'+mtype+'</span>&emsp;<span class="format_count_min">'+max+'</span>');
+			$(e).html('<span style="color:'+theme.coloralt+'">'+min+'</span>&emsp;<span class="gluten_red">'+words+'&nbsp;'+mtype+'</span>&emsp;<span style="color:'+theme.coloralt+'">'+max+'</span>');
 		} else {
 			$(e).html('<span class="gluten_gray">'+words+'&nbsp;'+mtype+'</span>');
 		}
@@ -185,7 +187,7 @@ function post_format_mltext(m) {
 		out = out + "<span class='format_description'>"+m.description+"</span><br>";	
 	out = out + "<div class='post_format_mltext' contenteditable id='format_item_"+m.index+"' onmouseenter='hideHovertag()'></div>";
 	if(m.min.length != 0 || m.max.length != 0) {
-		out = out + "<br><div class='format_count' id='format_count_"+m.index+"'></div>";	
+		out = out + "<div class='format_count' id='format_count_"+m.index+"'></div>";	
 	}
 	return out;
 }
