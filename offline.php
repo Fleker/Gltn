@@ -3,7 +3,7 @@
 // Add the correct Content-Type for the cache manifest
 header('Content-Type: text/cache-manifest');
 echo "CACHE MANIFEST\n";
-echo "# version 1.1.1.3.18".count($_GET)."\n\n";
+echo "# version 1.1.1.4.AF".count($_GET)."\n\n";
 echo "CACHE:\n";
 
 echo "APA.js\n";
@@ -29,6 +29,7 @@ echo "http://code.jquery.com/color/jquery.color-2.1.2.min.js\n";
 echo "rangy-1.3alpha.772/rangy-core.js\n";
 echo "rangy-1.3alpha.772/rangy-cssclassapplier.js\n";
 echo "rangy-1.3alpha.772/rangy-textrange.js\n";
+echo "rangy-1.3alpha.772/uncompressed/rangy-selectionsaverestore.js\n";
 echo "http://fgnass.github.io/spin.js/spin.min.js\n";
 echo "http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css\n";
 

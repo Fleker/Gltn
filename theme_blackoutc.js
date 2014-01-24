@@ -16,7 +16,7 @@ function initTheme() {
 	theme.ribbonhighlight = '#05a';
 	theme.ribbonplain = 'rgba(0,0,0,0)';
 	
-	$('.header').css('background-color', '#333').css('border-bottom', 'solid 0px #676767');
+	$('.header').css('background-color', '#333').css('border-bottom', 'solid 1px rgba(255,255,255,0.4)');
 	$('#panel_content').css('background-color', '#333');
 	$('#panel_plugin').css('background-color', '#333');
 	$('input').css('background-color', '#444').css('color', theme.normcolor).css('font-family', '"Roboto Condensed", sans-serif').css('font-size', '11pt');

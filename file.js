@@ -16,7 +16,7 @@ max_word = 0;
 hovertagRegistrar = new Array();
 obj = {};
 document.ready = function() {
-	console.log('Gltn has woken up: v 1.1.1.3');
+	console.log('Gltn has woken up: v 1.1.1.4');
 	restoreFile();
 };
 
@@ -462,8 +462,10 @@ function formatShift() {
 				docformat = format2;
 				//alert("Shift formats");
 				//setTimeout("save();$('#body').empty();input();save();", 500)
+				window.metadata2 = JSON.stringify(x.metadata);
+				//console.error(window.metadata2);
 				setTimeout("onInitFormat();$('.content_textarea').html(xc);", 500);
-				setTimeout('formatShift2()', 510);
+				setTimeout('formatShift2(window.metadata2)', 900);
 				console.log('The document format is shifting.');
 			} else {
 				if($('#formatscript').length == 0) {
@@ -474,28 +476,37 @@ function formatShift() {
 				docformat = format2;
 				//alert("Shift formats");
 				//setTimeout("save();$('#body').empty();input();save();", 500)
+				window.metadata2 = JSON.stringify(x.metadata);
+				//console.error(window.metadata2);
 				setTimeout("onInitFormat();$('.content_textarea').html(xc);", 500);
-				setTimeout('formatShift2()', 510);
+				setTimeout('formatShift2(window.metadata2)', 900);
 				console.log('The document format is shifting.');
 			}
 		}
 	}
 }
-function formatShift2() {
+function formatShift2(d) {
+//		console.log(d, x.metadata, window.metadata2);	
+
 	//Set up parameters	
-	for(i in x['metadata']) {
+	if(d == undefined)
+		d = x.metadata;
+	else
+		d = JSON.parse(d);
+	console.log(d);
+	for(i in d) {
 			//window.metadata[i] = x['metadata'][i];	
 			//console.log(4);
 			//$('#format_item_'+i).val(window.metadata[i]['value']);
 			for(j in window.metadata) {
 				//console.log("'"+x.metadata[i].id+"'", "'"+window.metadata[j].id+"'");
-//				console.log(i,j);
+				console.log(i,j,window.metadata[j],window.metadata[j].id.replace(/ /g, '_'),$('#format_item_'+j).val(),d[i]);
 			try {
 				if(i == window.metadata[j].id.replace(/ /g, '_') && $('#format_item_'+j).val().length == 0) {
-//					console.log(i,j,x.metadata[i]);
+					console.log("Insert "+d[i]+" for "+window.metadata[j].id);
 					//console.log($('#format_item_'+j).val(), i);
-					$('#format_item_'+j).val(x.metadata[i]);
-					$('#format_item_'+j).html(x.metadata[i]);
+					$('#format_item_'+j).val(d[i]);
+					$('#format_item_'+j).html(d[i]);
 				} else {
 					//console.log('-');	
 				}
@@ -503,6 +514,11 @@ function formatShift2() {
 					
 			}
 			}
+	}
+	if(window.services != undefined) {
+		for(i in services) {
+			initService(services[i].id, services[i].title, services[i].icon);	
+		}
 	}
 	console.log('The document format has shifted.');
 }

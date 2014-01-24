@@ -805,8 +805,8 @@ function fullscreen() {
 			lineHeight:"1.5em"
 		},300);
 	$('.fullscreenui').fadeIn(500);
-	setTimeout("$('.fullscreenui').css('opacity','.1')", 510);
 	window.fsuo = theme.normfsui;
+	setTimeout("$('.fullscreenui').css('opacity','.1').css('background-color', '"+theme.normfsui+"')", 510);
 }
 function normalscreen() {
 	window.fullscreenOn = false;	
@@ -1184,15 +1184,15 @@ function setHeader() {
 			{text: 'Export', img: '<span style="font-size:18pt" class="fa fa-download"></span>', action: "exportFile();"}
 		),
 		Panels: new Array(
+			{text: 'Gltn Store', img: '<span style="font-size:18pt" class="fa fa-shopping-cart"/>', action: "launchStore()", key: "Alt+S"},
 			{text: 'Outline', img: '<span style="font-size:18pt" class="fa fa-list"></span>', action: "runPanel('main_Outline');"},
 			{text: 'Citations', img: '<span style="font-size:18pt" class="fa fa-book"></span>', action: "runPanel('main_Citation');"},
 			{text: 'Ideas', img: '<span style="font-size:18pt" class="fa fa-lightbulb-o"></span>', action: "runPanel('main_Idea');"},
-			{text: 'Style Guide', img: '<span style="font-size:18pt" class="fa fa-info-circle"/>', action: "runPanel('main_Guide');"},
-			{text: 'Gltn Store', img: '<span style="font-size:18pt" class="fa fa-shopping-cart"/>', action: "launchStore()"}
+			{text: 'Style Guide', img: '<span style="font-size:18pt" class="fa fa-info-circle"/>', action: "runPanel('main_Guide');"}
 		),
 		Tools: new Array(
 			{text: 'Find', img: '<span style="font-size:18pt" class="fa fa-search"></span>', action: "runPanel('main_Find');", key: "Alt+F"},
-			{text: 'Dictionary', img: '<span style="font-size:18pt" class="fa fa-quote-left"></span>', action: "runPanel('main_Dictionary');"},
+			{text: 'Dictionary', key:"Alt+D", img: '<span style="font-size:18pt" class="fa fa-quote-left"></span>', action: "runPanel('main_Dictionary');"},
 			{text: 'Themes', img: '<span style="font-size:18pt" class="fa fa-picture-o"></span>', action: "runPanel('main_Themes')"}
 		),
 		About: new Array(

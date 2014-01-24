@@ -127,10 +127,19 @@ function PanelOnPopupClose(title) {
 function initService(id, title, icon) {
 	//onclick='runPanel(\'"+id+"\')'
 	//console.error(id, title, icon)
+	if(window.services == undefined)
+		window.services = new Array();
 	if($('.content'+id).length == 0) {
-		$('#content_row').append("<span title='"+title+"' class='content"+id+"' onclick='runPanel(\""+id+"\")'>&emsp;"+icon+"</span>");		
+		$('#content_row').append("<span title='"+title+"' class='content"+id+"' onclick='runPanel(\""+id+"\")'>&emsp;"+icon+"</span>");
+		services.push({id: id, title: title, icon: icon});		
 	} else {
 		$('.content'+id).attr('title', title).html("&emsp;"+icon);
+		for(i in services) {
+			if(services[i].id == id) {
+				services[i].title = title;
+				services[i].icon = icon;	
+			}
+		}
 	}
 	//$('.content'+id).remove();
 	
