@@ -790,7 +790,7 @@ function fullscreen() {
 	window.fullscreenOn = true;	
 	hidePanelPlugin();
 	$('.content_textarea').css('z-index', 3).css('position', 'fixed');
-		$('.content_textarea').animate({
+		$('.content_textarea').stop().animate({
 			top: "-.1%",
 			left:"-.1%",
 			width:"95%",
@@ -803,7 +803,8 @@ function fullscreen() {
 			paddingRight:"30px",
 			paddingTop:"35px",
 			lineHeight:"1.5em"
-		},300);
+		},300, 'linear', function() {
+		});
 	$('.fullscreenui').fadeIn(500);
 	window.fsuo = theme.normfsui;
 	setTimeout("$('.fullscreenui').css('opacity','.1').css('background-color', '"+theme.normfsui+"')", 510);

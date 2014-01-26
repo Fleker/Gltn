@@ -372,20 +372,66 @@ function GetPanelmain_Outline() {
 }
 function RunPanelmain_Outline() {
 	range = null;
+	raw = "";
+	formatted = "";
 	try {
-		outline = x.saved.main_outline;
-	} catch(e) {
-		outline = "<li></li>";
-	}
+			outline = x.saved.main_outline.replace(/&gt;/g, ">").replace(/&lt;/g, "<");
+		} catch(e) {
+			outline = "-";
+		}
 	if(!outline.length)
-		outline = "<li></li>";
+		outline = "-";
 	//load
-		postPanelOutput(generatePanel());
+		generatePanel();
 		range = obtainRange();
 	function generatePanel() {
-		ht = "<button id='outlineBuild'><span class='fa fa-file'></span></button>";
-		ht += "<div style='overflow-y:auto;/*height:"+(window.innerHeight-215)+"px*/'><ul contenteditable='true' class='Outline'>"+outline+"</ul></div>";
-		return ht;
+		ht = "<div id='outlineButtons'><button id='outlineBuild'><span class='fa fa-file'></span></button>&nbsp;Use '-' to denote levels.</div>";
+		ht += "<div style='overflow-y:auto;/*height:"+(window.innerHeight-215)+"px*/'><div contenteditable='true' style='background-color:"+theme.normbg+";color:"+theme.normcolor+"' class='Outline'>"+outline;+"</div></div>";
+		postPanelOutput(ht);
+		$('.Outline').on('input', function() {
+			writeToSaved('main_outline', $('.Outline').html());
+			if($('.Outline').html().substring(0,1) != "-" || $('.Outline').html().length == 0) 
+				$('.Outline').html("-");
+			var sel = rangy.getSelection();
+			range = sel.rangeCount ? sel.getRangeAt(0) : null;
+		});
+		$('#outlineBuild').on('click', function() {
+			raw = $('.Outline').html();
+			formatted = raw+"<br>";
+			
+			var r = new RegExp("---([\\s\\S]+?)(\\n|\\r|<br>|<div>|</div>)", "gi");
+			formatted = formatted.replace(r, "<ul><ul><li>$1</li></ul></ul>");
+			
+			var r = new RegExp("--([\\s\\S]+?)(\\n|\\r|<br>|<div>|</div>)", "gi");
+			formatted = formatted.replace(r, "<ul><li>$1</li></ul>");
+			
+			var r = new RegExp("-([\\s\\S]+?)(\\n|\\r|<br>|<div>|</div>)", "gi");
+			formatted = formatted.replace(r, "<li>$1</li>");
+			
+			formatted = "<ul>"+formatted+"</ul>";
+			console.log(formatted);
+			$('.Outline').attr('contenteditable', 'false').html(formatted);
+			$('#outlineButtons').html("<button id='outlineBack'><span class='fa fa-angle-left'></span></button><button id='outline2Build'><span class='fa fa-file'></span></button>");
+			$('#outlineBack').on('click', function() {
+				outline = raw;
+				generatePanel();
+				$('.Outline').on('input', function() {
+					writeToSaved('main_outline', $('.Outline').html());
+					if($('.Outline').html().substring(0,1) != "-" || $('.Outline').html().length == 0) 
+						$('.Outline').html("-");
+					var sel = rangy.getSelection();
+					range = sel.rangeCount ? sel.getRangeAt(0) : null;
+				});
+			});
+				$('#outline2Build').on('click', function() {
+				//$('.draft').html(valMetadata('Author')+"<br>"+"<ul style='line-height:1.8em'>"+formatted+"</ul>");
+				//startBuild('.draft');
+				falseBuild();
+				add_new_page();
+					add_to_page(valMetadata('Author')+"<br>");
+					add_to_page("<div style='line-height:1.8em'>"+formatted+"</div>");
+			});	
+		});
 	}	
 	function obtainRange() {
 		var el = document.getElementsByClassName("Outline")[0];
@@ -460,7 +506,7 @@ function RunPanelmain_Outline() {
 	//Tab Get
 	$('.PanelKeyEvent').on('click', function() {
 			//console.log($(this).attr('data-keycode'))
-			if($(this).attr('data-keycode') == 9 && $(this).attr('data-shift') == "true") {
+			/*if($(this).attr('data-keycode') == 9 && $(this).attr('data-shift') == "true") {
 				deleteTab();
 				console.log("DT");				
 				$(this).attr('data-keycode', '');	
@@ -468,27 +514,11 @@ function RunPanelmain_Outline() {
 				insertTab();
 				//console.log("IT");
 				$(this).attr('data-keycode', '');	 	
-			}
+			}*/
 		});
-	//save
-	$('.Outline').on('input', function() {
-		writeToSaved('main_outline', $('.Outline').html());
-		if($('.Outline').html().substring(0,4) != "<li>" || $('.Outline').html().length == 0) 
-			$('.Outline').html("<li></li>");
-		var sel = rangy.getSelection();
-		range = sel.rangeCount ? sel.getRangeAt(0) : null;
-	});
-	$('#outlineBuild').on('click', function() {
-		$('.draft').html(valMetadata('Author')+"<br>"+"<ul style='line-height:1.8em'>"+$('.Outline').html()+"</ul>");
-		//startBuild('.draft');
-		falseBuild();
-		add_new_page();
-			add_to_page(valMetadata('Author')+"<br>");
-			add_to_page("<ul style='line-height:1.8em'>"+$('.Outline').html()+"</ul>");
-	});	
 }
 function StylePanelmain_Outline() {
-	$('.Outline').css('background-color', 'white').css('border', 'solid 1px black').css('width', '85%');
+	$('.Outline').css('border', 'solid 1px black').css('width', '85%');
 }
 function GetPanelmain_Filesys() {
 	return {title: '<span class="fa fa-folder-open" style="font-size:13pt"></span>&nbsp;My Documents', bordercolor: '#7f8c8d', width:15};
@@ -671,7 +701,7 @@ function RunPanelmain_Filesys() {
 						console.error(e.message);
 						continue;
 					}
-					out += "<tr><td class='tfile' style='background-color:"+bgc+";border:solid 1px #2c3e50;padding-bottom:8px;width:98%;cursor:pointer;' data-v='"+i+"'><table style='font-size:7pt;font-family:sans-serif;width:100%;'><tr><td style='text-align:left'><span style='font-size:8pt' class='fa fa-file-text'></span>&nbsp;"+i+".gltn</td><td style='text-align:center;width:20px' class='Filesys_delete' data-f='"+i+"'>X</td></tr></table>";
+					out += "<tr><td class='tfile' style='background-color:"+bgc+";border:solid 1px #2c3e50;padding-bottom:8px;width:98%;cursor:pointer;' data-v='"+i+"'><table style='font-size:7pt;font-family:sans-serif;width:100%;'><tr><td style='text-align:left'><span style='font-size:8pt' class='fa fa-file-text'></span>&nbsp;"+i+".gltn</td><td style='text-align:center;width:23px' class='Filesys_delete' data-f='"+i+"'>X</td></tr></table>";
 					if(t5 != undefined)
 						out += "<div style='margin-left:3px'><b>"+t5+"</b></div>";	
 					out += "<span style='font-size:8pt'>&emsp;"+xx.file.format+"&nbsp;&nbsp;"+xx.file.language+"&nbsp;&nbsp;"+fsout+"</span>";	

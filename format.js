@@ -358,10 +358,13 @@ function update_toolbar_style() {
 	//$('.toolbar').width(.94*window.innerWidth);
 	if(toolbar_width != $('.toolbar').width()) {
 		//$('.toolbar').width(.94*window.innerWidth);
+		//tw = window.innerWidth - 75;
+		//toolbar_width = tw;
 		toolbar_width = $('.toolbar').width();
 		//console.log(toolbar_width+" ",$('.toolbar').width());
 		if(window.fullscreenOn == false) {
-			tw = $('.toolbar').width();
+			//tw = window.innerWidth - 75;
+			/**/tw = $('.toolbar').width();
 			$('.content_textarea').width(tw);
 			$('.overflow').width(tw);
 			bh = window.innerHeight;
@@ -375,7 +378,7 @@ function update_toolbar_style() {
 				height:100.2%;
 			});*/
 		} else {
-			$('.content_textarea').css('z-index', 3).css('position', 'fixed')/*.css('background-color', 'white')*/;
+			//$('.content_textarea').css('z-index', 3).css('position', 'fixed')/*.css('background-color', 'white')*/;
 		}	
 		
 		//Update Header

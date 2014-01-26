@@ -449,11 +449,18 @@ function formatShift() {
 				}			
 				
 				if(formats[i].uri == undefined) {
-					$('#formatscript').html('<script src="'+format2+'.js'+'"></script>');
-					//replacejscssfile(docformat, format2+".js", "js");
+					//try {	
+						$('#formatscript').html('<script src="'+format2+'.js'+'"></script>');
+					//} catch(e) {
+						replacejscssfile(docformat, format2+".js", "js");	
+					//}
 				} else {
 					console.log('Load format from '+formats[i].uri);
-					$('#formatscript').html('<script src="'+formats[i].uri+'"></script>');
+					try {
+						$('#formatscript').html('<script src="'+formats[i].uri+'"></script>');
+					} catch(e) {
+						
+					}
 					//replacejscssfile(docformat, formats[i].uri, "js");
 					//save it
 					$('#themeframe').attr('src', formats[i].uri);
@@ -493,17 +500,17 @@ function formatShift2(d) {
 		d = x.metadata;
 	else
 		d = JSON.parse(d);
-	console.log(d);
+//	console.log(d);
 	for(i in d) {
 			//window.metadata[i] = x['metadata'][i];	
 			//console.log(4);
 			//$('#format_item_'+i).val(window.metadata[i]['value']);
 			for(j in window.metadata) {
 				//console.log("'"+x.metadata[i].id+"'", "'"+window.metadata[j].id+"'");
-				console.log(i,j,window.metadata[j],window.metadata[j].id.replace(/ /g, '_'),$('#format_item_'+j).val(),d[i]);
+//				console.log(i,j,window.metadata[j],window.metadata[j].id.replace(/ /g, '_'),$('#format_item_'+j).val(),d[i]);
 			try {
 				if(i == window.metadata[j].id.replace(/ /g, '_') && $('#format_item_'+j).val().length == 0) {
-					console.log("Insert "+d[i]+" for "+window.metadata[j].id);
+//					console.log("Insert "+d[i]+" for "+window.metadata[j].id);
 					//console.log($('#format_item_'+j).val(), i);
 					$('#format_item_'+j).val(d[i]);
 					$('#format_item_'+j).html(d[i]);
