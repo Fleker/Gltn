@@ -1572,7 +1572,7 @@ function parseCT() {
 		var a = $('.content_textarea').html();
    		a = a.replace(r, '$1');
 		$('.content_textarea').html(a);
-		console.log(a, r);
+//		console.log(a, r);
 	} catch(e) {
 		console.error(e.message);
 		var a = $('.content_textarea').html();
@@ -1734,7 +1734,7 @@ function saveSelection() {
 	savedSel = rangy.saveSelection();
 	savedSelActiveElement = document.activeElement;
 	//gEBI("restoreButton").disabled = false;
-	console.log($('.content_textarea').html());
+//	console.log($('.content_textarea').html());
 }
 
 function restoreSelection() {
@@ -1747,7 +1747,17 @@ function restoreSelection() {
 				savedSelActiveElement.focus();
 			}
 			//saveSelection();
-			console.log($('.content_textarea').html());
+//			console.log($('.content_textarea').html());
 		}, 1);
 	}
+}
+
+
+/*** Sync Service - Not directly related to files ***/
+function GetPanelmain_Sync() {
+    return {title: "Sync", bordercolor: "#34495e", width:20};   
+}
+function RunPanelmain_Sync() {
+    out = "<span style='font-size:15'>Sync is On</span><br>This file is currently saved somewhere online. You can access it from a different computer.";
+    postPanelOutput(out);
 }

@@ -38,7 +38,7 @@ if(strpos($server, "felkerdigitalmedia") > -1) {
 */
 ?>-->
 
-<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+<script src="http://code.jquery.com/jquery-2.1.0.js"></script>
 <script src="http://code.jquery.com/color/jquery.color-2.1.2.min.js"></script>
 
 <script src="format.js"></script>
@@ -177,6 +177,6 @@ LOREM IPS/um o
 <script>
 	
 </script>
-
+<script type="text/javascript" src="https://api.filepicker.io/v1/filepicker.js"></script>
 </body>
 </html>

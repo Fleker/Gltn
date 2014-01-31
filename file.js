@@ -96,10 +96,14 @@ function saveFile() {
 	xo = json2xml(op, "");
 	localStorage['settings'] = xo;
 	
-	
+	if(window.dirty == true) {
+        cloudResave();
+        window.dirty = false;
+    }
 	$('.content_save').show();
 	$('.content_save').html("<span class='fa fa-file-text' style='color:"+window.theme.coloralt+"'></span>&nbsp;<span class='fa fa-check' style='color:"+window.theme.coloralt+"'></span>");
 }
+
 docformat = '';
 function restoreFile() {
 	$("#file_format").on("input", function() {
@@ -267,16 +271,19 @@ function finishRestore2() {
 	initNiftyUI4Saving();
 	if(window.offline != true)
 		initPanels();
-	//start save client because code should all work by this point
+	
 	hideHovertag();
+    //Setup Filepicker
+    filepicker.setKey("AePnevdApT62LvpkSSsiVz");
 	try {
 		offlineGo();
 	} catch(e) {
 		offline = false;
 	}	
+    //start save client because code should all work by this point
 	console.log("Client save initiated; This is a go for launch.");
 	saveFile();
-	setInterval("saveFile()", 500);	
+	setInterval("saveFile()", 5000);	
 }
 function newFile(x,xc) {
 	console.log('No file found for this name.');
@@ -307,7 +314,7 @@ function exportFile() {
 	add_to_page("File XML:<br><textarea style='width:95%;height:200px;'>"+localStorage[fileid]+"</textarea><br>");
 	add_to_page("Content HTML:<br><textarea style='width:95%;height:200px;'>"+localStorage[fileid+'_c']+"</textarea><br>");
 	//fa fa-save
-	add_to_page("<br><button onclick='downloadXML()' style='font-size:14pt'><span class='fa fa-cloud-download'></span>&nbsp;Download</button><br>");
+	add_to_page("<br><button onclick='downloadXML()' style='font-size:14pt'><span class='fa fa-cloud-download'></span>&nbsp;Download</button><button onclick='cloudXML()' style='font-size:14pt'><span class='fa fa-cloud-upload'></span>&nbsp;Upload</button><br>");
 	//add_to_page('Execute this code in a web console to transfer the files over to a different computer:<br><textarea style="width:95%;height:200px;">localStorage["'+fileid+'5"] = \042'+localStorage[fileid].replace(/"/g, '\\"')+'\042;localStorage["'+fileid+'5_c"] = \042'+localStorage[fileid+"_c"].replace(/"/g, '\\"')+'\042;</textarea>');
 }
 
@@ -338,6 +345,9 @@ function writeToSettings(att, val) {
 function initNiftyUI4Saving() {
 	$('span, div, input').on('input', function() {
 		$('.content_save').html("<span class='fa fa-file-text' style='color:"+window.theme.coloralt+"'></span>&nbsp;<span class='fa fa-pencil' style='color:"+window.theme.coloralt+"'></span>");
+         window.dirty = true;
+        if(isCloudSaved())
+            initService("main_Sync", "Syncing Online...", "<span style='color:rgba(0,255,0,.5);border-radius:100%'>&nbsp;<span class='fa fa-cloud'></span>&nbsp;<i class='fa fa-refresh fa-spin'></i>&nbsp;<span>");
 	});	
 }
 function downloadXMLX() {
@@ -349,10 +359,12 @@ function downloadXMLX() {
 	saveAs(blob, title+".txt");	
 }
 function downloadXML() {
+    content = $('.content_textarea').html();
 	filename = valMetadata('Title')+".gltn";
 	filename = fileid+".gltn";
     var pom = document.createElement('a');
-    pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(xo+content));
+    input = json2xml(o, "")+content;
+    pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(input));
     pom.setAttribute('download', filename);
     pom.click();
 }
@@ -360,6 +372,71 @@ function deleteFile(id) {
 	localStorage.removeItem(id)
 	localStorage.removeItem(id+"_c");
 }	
+//Filepicker.io
+function cloudXML() {
+    //var inkblob = {url: 'https://www.filepicker.io/api/file/IObhDbs2Qxm0nXRRoGPk',
+//    filename: 'hello.txt', mimetype: 'text/plain', isWriteable: true, size: 100};
+    content = $('.content_textarea').html();
+    input = json2xml(o, "")+content;
+    console.log(input);
+    filepicker.store(input, function(InkBlob){
+            filepicker.exportFile(
+              InkBlob,
+              {extension:'.gltn',
+                suggestedFilename: fileid,
+               base64decode: false
+              },
+              function(InkBlob){
+                  window.ink = InkBlob;
+                  writeToFile("inkblob_url", InkBlob.url);
+                  writeToFile("inkblob_filename", InkBlob.filename);
+                  writeToFile("inklob_mimetype", InkBlob.mimetype);
+                  writeToFile("inkblob_iswriteable", "false");
+                  writeToFile("inkblob_size", InkBlob.size);
+                  saveFile();
+                  filepicker.write(InkBlob,
+                     json2xml(o, "")+content,
+                    function(InkBlob){
+                        saveFile();
+                        console.log("Complete sync for now");
+                    }, function(FPError) {
+                        console.log("Error: "+FPError.toString());
+                    }
+                );
+                console.log(InkBlob.url);
+            });
+            console.log("Store successful:", JSON.stringify(InkBlob));
+        }, function(FPError) {
+            console.log(FPError.toString());
+        }, function(progress) {
+            console.log("Loading: "+progress+"%");
+        }
+   );   
+}
+function isCloudSaved() {
+    return (window.ink != undefined || window.saved.inkblob_url != undefined);
+}
+function cloudResave() {
+    if(window.ink == undefined) {
+        if(window.saved.inkblob_url != undefined)
+            window.ink = {url: window.saved.inkblob_url, filename: window.saved.inkblob_filename, mimetype: window.saved.inkblob_mimetype, isWriteable: window.saved.inkblob_iswriteable, size: window.saved.inkblob_size};
+        else {
+            //This is entirely online -- don't do anything
+            return;
+        }
+    }
+    content = $('.content_textarea').html();
+    initService("main_Sync", "Synced", "<span class='fa fa-cloud'></span>");
+     filepicker.write(window.ink,
+         json2xml(o, "")+content,
+        function(InkBlob){
+            console.log("Complete resync for now");
+        }, function(FPError) {
+            console.log("Error: "+FPError.toString());
+        }
+    );   
+}
+
 //Formatting Script Launcher
 function createjscssfile(filename, filetype){
  if (filetype=="js"){ //if filename is a external JavaScript file
