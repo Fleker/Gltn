@@ -938,6 +938,12 @@ document.onkeydown = function(e) {
 				e.preventDefault();	
 			}
 		break;
+        case 84:
+            if(e.altKey) {
+                window.introdisabled = true;
+                introJsStart();      
+            }
+        break;
 		case 13: /* Enter */
 		
 		break;
@@ -1177,7 +1183,10 @@ function setHeader() {
 	console.log('Header set');
 	window.holoribbon_std =  {
 		Home: new Array(
-			{group: '', value: '<font size="4" id="temp_header" >Welcome to Gluten!</font><br><table style=\'width:40%;margin-left:30%\'><tr><td><button onclick="window.introdisabled = true;introJsStart();"><span class=\'fa fa-home\'></span>&nbsp;Start the Tour!</button></td><td><button id="iFILESYS" onclick="runPanel(\'main_Filesys\')"><span class=\'fa fa-folder-open\'></span>&nbsp;Explore Files</button></td></tr></table>'}
+            {text: "Start the Tour", img: "<span class='fa fa-home' style='font-size:18pt'></span>", action: "window.introdisabled = true;introJsStart();", key:"Alt+T"}, 
+            {group: "", value:"<span style='font-size:16pt'>Welcome to Gltn!</span>"},
+            {text: "Explore Files", img: "<span class='fa fa-folder-open' style='font-size:18pt'></span>", action: "runPanel('main_Filesys')", key: "Alt+O"} 
+		//	{group: '', value: '<font size="4" id="temp_header" >Welcome to Gluten!</font><br><table style=\'width:40%;margin-left:30%\'><tr><td><button onclick="window.introdisabled = true;introJsStart();"><span class=\'fa fa-home\'></span>&nbsp;Start the Tour!</button></td><td><button id="iFILESYS" onclick="runPanel(\'main_Filesys\')"><span class=\'fa fa-folder-open\'></span>&nbsp;Explore Files</button></td></tr></table>'}
 		),
 		File: new Array(
 			{group: "File Name", value:"<input type='text' id='file_name' style='width:7em'><button id='file_name_con' disabled='true'>Save As</button><input type='hidden' id='file_name_internal'>"},

@@ -4,9 +4,10 @@ function falseBuild(printr) {
 	$('.build').fadeIn(500);
 	$('.body').fadeOut(500);
 	$('.header').fadeOut(500);
-	$('.build').html('<button onclick="exitBuild()">Return to Editor</button>');
+	out = '<span class="buildRow"><button onclick="exitBuild()">Return to Editor</button>';
 	if(printr != true)
-		$('.build').append('<button onclick="window.print()" class="noprint" style="font-size:12pt;"><span class="fa fa-print"></span></button>');	
+		out += '<button onclick="window.print()" class="noprint" style="font-size:12pt;"><span class="fa fa-print"></span></button>';
+    out += '</span>';
 	console.log('fb');
 }
 function startBuild(el) {
@@ -17,11 +18,32 @@ function startBuild(el) {
 	//$('.page').css('width','8.5in');
 	window.section_name = "";
 	$('#searching').val('');
-	$('.build').html('<button onclick="exitBuild()" class="noprint">Return to Editor</button><button onclick="window.print()" class="noprint" style="font-size:12pt;"><span class="fa fa-print"></span></button><span class="buildtime noprint" style="font-size:9pt"></span>');
+	$('.build').html('<span class="buildRow"><button onclick="exitBuild()" class="noprint">Return to Editor</button><button onclick="window.print()" class="noprint" style="font-size:12pt;"><span class="fa fa-print"></span></button></span><span class="buildtime noprint" style="font-size:9pt"></span>');
 		//$('.build_progress').css('display', 'block').css('position', 'fixed').css('width', '50%').css('height', '50%').css('top','25%').css('left','25%').css('background-color', 'rgba(0,0,0,0.3)').css('font-size','16pt').css('margin-top','10%');
 	initiatePopup({title:"Build Progress",bordercolor:"rgb(44, 145, 16)",ht:"<div id='build_progress' class='build_progress' style='height:150px'></div>"});
 	updateBuildProgress('Initiating Build...');
 	setTimeout('continueBuild("'+el+'")',500);
+    
+    //Search for all services and see if any of them support the ExportFile{panel} function which will let them add an export option
+    var a = window.settings.panels.split(', ');
+    for(i in a) {
+        var b = window.settings['panels_'+a[i]].split(', ');
+        var c = b[4];
+        if(c == true) {
+            try {
+                eval("ExportFile"+a[i]);   
+            } catch(e) {
+                //
+            }
+        }
+    }
+}
+function add_export_button(title, icon, fnc) {
+    $('.buildRow').append('<button class="export_'+title+'">'+icon+"&nbsp;"+title+"</button>"); 
+    $('.export_'+title).on('click', function() {
+       eval(fnc+";x();"); 
+        //Program to create an export then send to the FilePicker for saving
+    });
 }
 
 function continueBuild(el) {

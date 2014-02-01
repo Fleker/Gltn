@@ -16,8 +16,27 @@ max_word = 0;
 hovertagRegistrar = new Array();
 obj = {};
 document.ready = function() {
-	console.log('Gltn has woken up: v 1.1.1.4');
-	restoreFile();
+	console.log('Gltn has woken up: v 1.1.2.1');
+    x = {};
+    //Setup Filepicker
+    filepicker.setKey("AePnevdApT62LvpkSSsiVz");
+    
+    //Let's check the file to determine whether we should grab it locally or online
+    if(localStorage[fileid] != undefined) {
+        if(localStorage[fileid].indexOf('<inkblob_filename') > -1) {
+            //Okay, grab the InkBlob url and sync    
+             initiatePopup({title:'Syncing...',ht:'<div class="progress" style="font-size:14pt;text-align:center;width:100%;"></div>',bordercolor:'#7f8c8d', ht:"&emsp;&emsp;&emsp;Downloading the latest copy."});
+            var a = localStorage[fileid].indexOf('<inkblob_url>')+13;
+            var b = localStorage[fileid].indexOf('</inkblob_url>');
+            console.log(localStorage[fileid].substring(a,b));
+            var c = localStorage[fileid].substring(a,b);
+            cloudRead(c,"RF");
+        } else {
+            restoreFile();   
+        }
+    } else {
+        restoreFile();
+    }
 };
 
 function saveFile() {
@@ -104,6 +123,8 @@ function saveFile() {
 	$('.content_save').html("<span class='fa fa-file-text' style='color:"+window.theme.coloralt+"'></span>&nbsp;<span class='fa fa-check' style='color:"+window.theme.coloralt+"'></span>");
 }
 
+
+
 docformat = '';
 function restoreFile() {
 	$("#file_format").on("input", function() {
@@ -151,6 +172,8 @@ function restoreFile() {
 	}
 	//$.xml2json(xml);
 	xc = localStorage[fileid+"_c"];
+    if(x == undefined)
+         x = {file: undefined};
 	if(x.file != undefined) {
 		//Load Script
 		initFormats();
@@ -207,6 +230,7 @@ function restoreFile() {
 		//setTimeout("finishRestore(x,xc);", 300);
 		newFile(x,xc);
 	}
+    
 }
 function finishRestore(x, xc) {
 	try {
@@ -273,8 +297,7 @@ function finishRestore2() {
 		initPanels();
 	
 	hideHovertag();
-    //Setup Filepicker
-    filepicker.setKey("AePnevdApT62LvpkSSsiVz");
+    
 	try {
 		offlineGo();
 	} catch(e) {
@@ -311,10 +334,10 @@ function newFile2() {
 function exportFile() {
 	falseBuild();
 	add_new_page();	
+    add_to_page("<br><button onclick='downloadXML()' style='font-size:14pt;display:none'><span class='fa fa-cloud-download'></span>&nbsp;Download</button><button onclick='cloudXML()' style='font-size:14pt'><span class='fa fa-cloud-upload'></span>&nbsp;Upload</button><br>");
 	add_to_page("File XML:<br><textarea style='width:95%;height:200px;'>"+localStorage[fileid]+"</textarea><br>");
 	add_to_page("Content HTML:<br><textarea style='width:95%;height:200px;'>"+localStorage[fileid+'_c']+"</textarea><br>");
-	//fa fa-save
-	add_to_page("<br><button onclick='downloadXML()' style='font-size:14pt'><span class='fa fa-cloud-download'></span>&nbsp;Download</button><button onclick='cloudXML()' style='font-size:14pt'><span class='fa fa-cloud-upload'></span>&nbsp;Upload</button><br>");
+
 	//add_to_page('Execute this code in a web console to transfer the files over to a different computer:<br><textarea style="width:95%;height:200px;">localStorage["'+fileid+'5"] = \042'+localStorage[fileid].replace(/"/g, '\\"')+'\042;localStorage["'+fileid+'5_c"] = \042'+localStorage[fileid+"_c"].replace(/"/g, '\\"')+'\042;</textarea>');
 }
 
@@ -347,7 +370,7 @@ function initNiftyUI4Saving() {
 		$('.content_save').html("<span class='fa fa-file-text' style='color:"+window.theme.coloralt+"'></span>&nbsp;<span class='fa fa-pencil' style='color:"+window.theme.coloralt+"'></span>");
          window.dirty = true;
         if(isCloudSaved())
-            initService("main_Sync", "Syncing Online...", "<span style='color:rgba(0,255,0,.5);border-radius:100%'>&nbsp;<span class='fa fa-cloud'></span>&nbsp;<i class='fa fa-refresh fa-spin'></i>&nbsp;<span>");
+            initService("main_Sync", "Syncing Online...", "<span style='color:rgba(0,255,0,.5);border-radius:100%'><span class='fa fa-cloud'></span>&nbsp;<i class='fa fa-refresh fa-spin'></i><span>");
 	});	
 }
 function downloadXMLX() {
@@ -376,6 +399,7 @@ function deleteFile(id) {
 function cloudXML() {
     //var inkblob = {url: 'https://www.filepicker.io/api/file/IObhDbs2Qxm0nXRRoGPk',
 //    filename: 'hello.txt', mimetype: 'text/plain', isWriteable: true, size: 100};
+    initiatePopup({title:'Saving File Online',ht:'<div class="progress" style="font-size:14pt;text-align:center;width:100%;"></div>',bordercolor:'#7f8c8d', ht:"&emsp;&emsp;&emsp;Please wait as the export menu loads."});
     content = $('.content_textarea').html();
     input = json2xml(o, "")+content;
     console.log(input);
@@ -383,16 +407,13 @@ function cloudXML() {
             filepicker.exportFile(
               InkBlob,
               {extension:'.gltn',
+                 /*mimetype: 'text/gltn',*/
                 suggestedFilename: fileid,
                base64decode: false
               },
               function(InkBlob){
-                  window.ink = InkBlob;
-                  writeToFile("inkblob_url", InkBlob.url);
-                  writeToFile("inkblob_filename", InkBlob.filename);
-                  writeToFile("inklob_mimetype", InkBlob.mimetype);
-                  writeToFile("inkblob_iswriteable", "false");
-                  writeToFile("inkblob_size", InkBlob.size);
+                  console.log(event);
+                  cloudSaveInkblob(InkBlob);
                   saveFile();
                   filepicker.write(InkBlob,
                      json2xml(o, "")+content,
@@ -406,12 +427,42 @@ function cloudXML() {
                 console.log(InkBlob.url);
             });
             console.log("Store successful:", JSON.stringify(InkBlob));
+            closePopup();
         }, function(FPError) {
+            closePopup();
             console.log(FPError.toString());
         }, function(progress) {
             console.log("Loading: "+progress+"%");
         }
    );   
+}
+function cloudSaveInkblob(InkBlob) {
+    window.ink = InkBlob;
+     writeToFile("inkblob_url", InkBlob.url);
+      writeToFile("inkblob_filename", InkBlob.filename);
+      writeToFile("inklob_mimetype", InkBlob.mimetype);
+      writeToFile("inkblob_iswriteable", "false");
+      writeToFile("inkblob_size", ""+InkBlob.size);   
+    saveFile();
+}
+function cloudSaveMetadata() {
+    filepicker.stat(window.ink, {
+       uploaded: true,
+        location:true,
+        container:true,
+        filename:true,
+        size:true,
+        path:true,
+        mimetype:true
+    }, function(metadata){
+        console.log(JSON.stringify(metadata));
+        return JSON.stringify(metadata);
+    });   
+}
+function cloudGetMetadata() {
+    a = {url: window.saved.inkblob_url, filename: window.saved.inkblob_filename, mimetype: window.saved.inkblob_mimetype, isWriteable: window.saved.inkblob_iswriteable, size: window.saved.inkblob_size};  
+    window.ink = a;
+    return a;
 }
 function isCloudSaved() {
     return (window.ink != undefined || window.saved.inkblob_url != undefined);
@@ -436,7 +487,56 @@ function cloudResave() {
         }
     );   
 }
-
+//Now we PICK files
+function cloudImport(callback) {
+     filepicker.pick({
+        extension: '.gltn'
+      },
+      function(InkBlob){
+          window.ink2 = InkBlob;
+        console.log(JSON.stringify(InkBlob));
+          if(callback == "HFS")
+              cloudRead(window.ink2, callback);
+      },
+      function(FPError){
+        console.log(FPError.toString());
+      }
+    );
+}
+function cloudRead(ink, callback) {
+    filepicker.read(ink, function(data){
+//        console.log(data);
+        //Asynchronously handle callback
+        if(callback == "HFS") {
+            window.imported = data;
+            $('#filesys_file').click();
+        }
+        else if(callback == "RF") {
+            //First read the actual file
+//            console.log(data);
+            var xmli = data.indexOf('</gluten_doc>')+13;
+            var xml = data.substring(0,xmli);
+            try {
+                var i = $.xml2json(xml);
+            } catch(e) {
+                //$('.progress').html('<span style="color:red">Error: Not a proper Gltn file</span>');
+                //setTimeout('closePopup();', 4000);
+                console.log(xml);
+                console.error(e.message);
+                return null;
+            }
+            var ht = data.substring(xmli);
+            
+            //Now sync the files. Then we read the file.
+            
+            localStorage[fileid] = xml;
+            localStorage[fileid+"_c"] = ht;
+            closePopup();
+            restoreFile();
+        }
+        return data;
+    });   
+}
 //Formatting Script Launcher
 function createjscssfile(filename, filetype){
  if (filetype=="js"){ //if filename is a external JavaScript file

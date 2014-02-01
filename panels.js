@@ -568,19 +568,24 @@ function RunPanelmain_Filesys() {
 			wl('untitled');
 		});
 		$('#filesys_up').on('click', function() {
-			$('#filesys_u').click();
-			document.getElementById('filesys_u').addEventListener('change', handleFileSelect, false);
+            cloudImport("HFS");
+            //handleFileSelect(window.ink);
+			//$('#filesys_u').click();
+			//document.getElementById('filesys_u').addEventListener('change', handleFileSelect, false);
 		});
+        $('#filesys_file').on('click', function() {
+           handleFileSelect(window.imported, window.ink2.filename); 
+        });
 		$('#filesys_s').on('input', function() {
-			console.log(1);
 			resetFolder($('#filesys_s').val());
 		});
 		$('#filesys_s').focus();
 		$('#filesys_s').val(term);	
-		function handleFileSelect(evt) {
+		function handleFileSelect(evt, filename) {
 			//Popup
 			initiatePopup({title:'Importing File',ht:'<div class="progress" style="font-size:14pt;text-align:center;width:100%;"></div>',bordercolor:'#7f8c8d'});
-    		var files = evt.target.files;
+            
+    	/*	var files = evt.target.files;
 			var file = files[0];
 			var start = 0;
 			var stop = file.size - 1;
@@ -590,47 +595,55 @@ function RunPanelmain_Filesys() {
 				//set timeout close
 				setTimeout('closePopup()', 4000);
 				return null;
-			}
+			}*/
 		
-			var reader = new FileReader();
+//			var reader = new FileReader();
 			// If we use onloadend, we need to check the readyState.
-			reader.onloadend = function(evt) {
-			  if (evt.target.readyState == FileReader.DONE) { // DONE == 2
+//			reader.onloadend = function(evt) {
+//			  if (evt.target.readyState == FileReader.DONE) { // DONE == 2
 				//console.log(evt.target.result);
 				//Save to localStorage
-				var xmli = evt.target.result.indexOf('</gluten_doc>')+13;
-				var xml = evt.target.result.substring(0,xmli);
+				var xmli = evt.indexOf('</gluten_doc>')+13;
+				var xml = evt.substring(0,xmli);
 				try {
-					var i = $.xml2json(xml);
+					var i = $.xml2json(xml);                
 				} catch(e) {
 					$('.progress').html('<span style="color:red">Error: Not a proper Gltn file</span>');
-					setTimeout('closePopup()', 4000);
+					setTimeout('closePopup();', 4000);
 					return null;
 				}
-				var ht = evt.target.result.substring(xmli);
+				var ht = evt.substring(xmli);
+                //Need to insert something before I'm completely finished
+                if(xml.indexOf("inkblob_url") == -1) {
+                    var j = xml.indexOf("<saved>");
+                    if(j > -1)
+                        xml = xml.substring(0,j+7) + "<inkblob_url>"+ink2.url+"</inkblob_url>" + xml.substring(j+7,xmli);
+                    else
+                        xml = xml.substring(0,12) + "<saved><inkblob_url>"+ink2.url+"</inkblob_url></saved>" + xml.substring(12,xmli);
+                }
 				console.log(xml+";;;;"+ht);
 				//evt.target.result;
-				save = file.name.split(' ')[0];
+				save = filename.split(' ')[0];
 				save = save.split('.')[0];
+                ovr = true;
 				if(localStorage[save] != undefined) {
 					ovr = confirm('This filename already exists: '+save+'; Overwrite the contents of this file?');
 				}
 				if(ovr) {
 					localStorage[save] = xml;
 					localStorage[save+"_c"] = ht;
-					console.log(file.name, save);
+					console.log(filename, save);
 					$('.progress').html('<span style="color:green">The file '+save+'.gltn was successfully imported.<br><span style="font-size:10pt">The file will now be accessible on this computer. To use it on another computer you must export the file after editing.</span></span>');
 					setTimeout('closePopup()', 4000);
 					resetFolder(term);
 				}
-			  }
-			};
+//			  }
+			}
 		
-			var blob = file.slice(start, stop + 1);
-			reader.readAsText(blob);
-		}
+			//var blob = file.slice(start, stop + 1);
+			//reader.readAsText(blob);
 	}
-	function resetFolder(term) {
+    function resetFolder(term) {
 		//postPanelOutput("<div id='spin' style='margin-left:25%'></div>");
 		$('.panel_plugin_content').html("<div id='spin' style='margin-left:8%'></div>");
 			var opts = {
@@ -658,7 +671,7 @@ function RunPanelmain_Filesys() {
 			sterm = "";
 		else
 			sterm = term.toLowerCase();
-		out = "<button id='filesys_new'><span class='fa fa-plus'></span>&nbsp;New</button><input type='file' id='filesys_u' style='display:none' name='file[]'><button id='filesys_up'><span class='fa fa-cloud-upload'>&nbsp;Upload</span></button><br><span class='fa fa-search'></span>&nbsp;<input type='search' id='filesys_s' style='width:85%' value='"+sterm+"'><table style='width:100%'>";
+		out = "<button id='filesys_new'><span class='fa fa-plus'></span>&nbsp;New</button><input type='file' id='filesys_u' style='display:none' name='file[]'><button id='filesys_up'><span class='fa fa-cloud-upload'>&nbsp;</span>Upload</button><br><span class='fa fa-search'></span>&nbsp;<input type='search' id='filesys_s' style='width:85%' value='"+sterm+"'><table style='width:100%'><input type='hidden' id='filesys_file'>";
 		fstotal = 0;
 		for(i in localStorage){
 			c(i);
@@ -667,20 +680,21 @@ function RunPanelmain_Filesys() {
 				var title = "";
 				try {
 					var xx = $.xml2json(localStorage[i]);
-					title = localStorage[i].indexOf("<id>Title</id>");
+					title = localStorage[i].indexOf("<metadata>");
 				} catch(e) {
 					c(e.message);
 					continue;
 				}
 				if(title > -1) {
 					var title2 = localStorage[i].substring(title);
-					var t3 = title2.indexOf("<value>")+7;
-					var t4 = title2.indexOf("</value>");
+					var t3 = title2.indexOf("<Title>")+7;
+					var t4 = title2.indexOf("</Title>");
 					var t5 = title2.substring(t3,t4);
 					c(title2);
-					c(t3);
+//					c(t3);
 					c(t4);
 					c(t5);
+//                    console.log(i+" "+title2);
 				}
 				if(t5 == undefined)
 					t5 = "";
