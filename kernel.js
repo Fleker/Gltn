@@ -1155,6 +1155,45 @@ function tableDetails(tableid) {
 	initiatePopup({title:"Table Editor", bordercolor:'#111', ht: ht, fnc: fnc});
 	
 }
+function smartTextDetails(id) {
+    ht = "<span style='font-size:14pt'>Pick an Object. The text will mimic the figure number of this object. (Just the number)</span><br><div id='Popup'></div>";
+    $('.smarttext'+id).attr('data-id', id);
+    ht += "<input type='hidden' id='PopupId' value='"+id+"'>";
+    fnc = function x() {
+        id = $('#PopupId').val();
+        function populate(ind) {
+//            console.log("populate {"+ind+"}");
+            var a = $('.img');
+            out = "<table style='width:90%'>";
+            var i = 0;
+            $('.content_textarea .img').each(function() {
+                if(ind == i)
+                    bg = "rgba(0,255,0,.5)";
+                else
+                    bg = "rgba(0,0,0,0)";
+                out += "<tr style='border:solid 1px black;background-color:"+bg+";cursor:pointer;' class='PopupImg' data-i='"+i+"'><td style='text-align:center'><img src='"+$(this).attr('data-src')+"' style='width:50%'></td><td style='vertical-align:center'>&emsp;"+$(this).attr('data-des')+"</td></tr>";     
+                i++;
+            });
+            out += "</table><button class='PopupSave'>Save</button>";
+            $('#Popup').html(out);
+            $('.PopupImg').on('click', function() {
+                $('.smarttext'+id).attr('data-ref', 'img'+$(this).attr('data-i')); 
+                $('.smarttext'+id).attr('data-refid', $(this).attr('data-i')); 
+                populate($(this).attr('data-i'));
+            });
+            $('.PopupSave').on('click', function() {
+                closePopup(); 
+            });
+        }
+        //TODO Restore
+        if($('.smarttext'+id).attr('data-ref') != undefined) {
+            populate($('.smarttext'+id).attr('data-refid'));
+        } else {
+            populate(-1);
+        }
+    };
+    initiatePopup({title: "Ref Text", bordercolor:"#09f", ht: ht, fnc: fnc});
+}
 /*** HOLORIBBON ***/
 /*newRibbon('.header', {
        'File': new Array(
@@ -1255,6 +1294,7 @@ function postLegal() {
 	f = function x() { };
 	initiatePopup({title:'Credits', value: out, fnc: f});
 }
+currentpanel = "";
 function install_panel(id, name, img, url, service, key) {
 	if(service == undefined)
 		service = false;
@@ -1281,11 +1321,25 @@ function install_panel(id, name, img, url, service, key) {
 		loadjscssfile(url, "js");
 		//$('body').append('');
 		$('#themeframe').attr('src', url);
-		setTimeout("localStorage['zpanels_"+id+"'] = $('#themeframe').contents().text();", 1000);
+        window.setTimeout(function() {download_panel(id)}, 200);
+        
+//        console.log(localStorage['zpanels_'+id]);
+//		setTimeout("localStorage['zpanels_"+id+"'] = $('#themeframe').contents().text();", 1000);
 	//} else {
 	}
 	console.log("eval('InitPanel"+id+"();');");
 	setTimeout("eval('InitPanel"+id+"();');", 500);	
+}
+function download_panel(id) {
+ if(currentpanel != id) {
+    console.log(id, currentpanel);
+     if(!currentpanel.length)
+         return;
+      window.setTimeout(function() {download_panel(id)}, 200);
+ } else {
+     console.log("Installed");
+     localStorage['zpanels_'+id] = $('#themeframe').contents().text();   
+ }
 }
 function uninstall_panel(id) {
 	//alert('Fix ribbon');
@@ -1511,6 +1565,7 @@ window.applicationCache.onprogress = function(e) {
    // console.log("Downloading new version" + progress);
 	initService("main_Offline", "App caching", "<span class='fa fa-plane'></span>"+progress);
 	window.appcachestatus = "Found new version - Refresh to update";
+    postNotification("appcache", "A new version of the app was downloaded. Click to update.", "window.location.reload()");
     return false;
 };
 function initNotifications() {

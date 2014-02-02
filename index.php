@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Project Gltn</title>
+<title>Gltn - Write Better</title>
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="shortcut icon" sizes="196x196" href="gltn_f.png">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
@@ -132,6 +132,7 @@ function resetFolder(term) {
       <li><a href="#intuitiveness">Intuitiveness</a></li>
       <li><a href="#html">Web App</a></li>
       <li><a href="#open">Open Source</a></li>
+      <li><a href="http://www.github.com/Fleker/Gluten">GitHub</a></li>
       </ul></div>
       <a style="visibility:collapse" href="https://plus.google.com/110319342351519403865" rel="publisher">Google+</a>
 <div class="container center-block row">
@@ -183,7 +184,9 @@ function resetFolder(term) {
     <div id="html" class="page row" style="background-color:#9b59b6;">
     	<h1>Web App<br></h1><h3>It's HTML5 without the 3d Graphics</h3>
         <div class="center"><img src="upload.png" class="promo"></div>
-        <h4><b>Cross-Platform</b>- The beauty of the web is being cross-platform; write once, run everywhere. With browsers improving their web technologies constantly, it is actually possible to build and use a full-fledged document editor online. Plus, it takes advantage of many new features such as FileReader, LocalStorage, new form events, along with a few external libraries that are icing on top of the cake.</h4>
+        <h4><b>Cross-Platform</b>- The beauty of the web is being cross-platform; write once, run everywhere. With browsers improving their web technologies constantly, it is actually possible to build and use a full-fledged document editor online. Plus, it takes advantage of many new features such as FileReader, LocalStorage, ApplicationCache, new form events, along with a few external libraries that are icing on top of the cake.
+        <br>That's not all. You can use InkFilePicker to access and save files to all kinds of online services. Google Drive? Box? SkyDrive? FTP? All accessible.
+        </h4>
     </div>
     <div id="open" class="page row" style="background-color:#2ecc71;">
     	<h1>Open Source<br></h1><h3>Let's All Make it Better</h3>

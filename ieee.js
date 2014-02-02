@@ -1,5 +1,5 @@
 // JavaScript Document
-
+currentformat = "ieee";
 function onInitFormat() {
 	new_format();
 	new_format_item("text", {label:"Title", id:"Title"});

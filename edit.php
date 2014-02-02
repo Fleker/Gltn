@@ -1,6 +1,6 @@
 <!doctype html>
 <html manifest="offline.php">
-<!--manifest="null.appcache"-->
+<!--manifest="null.appcache" -->
 <head>
 <meta charset="utf-8">
 <title>Gltn</title>

@@ -8,6 +8,7 @@ function falseBuild(printr) {
 	if(printr != true)
 		out += '<button onclick="window.print()" class="noprint" style="font-size:12pt;"><span class="fa fa-print"></span></button>';
     out += '</span>';
+     $('.build').html(out);
 	console.log('fb');
 }
 function startBuild(el) {
@@ -627,12 +628,15 @@ function post_content_formatting(object) {
 	});
 	
 	//Figure numbers
-	if(object.figure != undefined)	
+	if(object.figure !== undefined)	
 		eval(object.figure+";x();");
 	
 	//Images
-	$('.draft .img').each(function() {
+	var j = 0;
+    $('.draft .img').each(function() {
 		$(this).html(imageFormatted(object.img,$(this),$(this).attr('data-figure-number')));
+        $('.smarttext[data-ref=img'+$(this).attr('data-id')+']').html($(this).attr('data-figure-number'));
+          j++;
 		for(i=0;i<object.imgstyle.length;i+=2) {
 			$(this).css(object.imgstyle[i], object.imgstyle[i+1]);	
 		}
@@ -852,7 +856,9 @@ for(i in b) {
 	for(j in d) {
 		//TODO - Find a way to grab the current page, not necessarily the last one. This will be handy for things that are added after content
 		p = $('.page').length-1;
-		add_to_page("<span class='hideme'>"+d[j]+" "+"</span>", undefined, undefined, col_count);
+        var dspan = d[j]+' ';
+        dspan = dspan.replace('</span>  ', '</span>');
+		add_to_page("<span class='hideme'>"+dspan +" "+"</span>", undefined, undefined, col_count);
 		//console.warn($('.page'+p+'body').height(), maxh);
 		//console.warn(('.page'+p+'col'+(col_count-1)), $('.page'+p+'col'+(col_count-1)).height(), maxh, $('.page'+p+'col'+(col_count-1)).html().length);
 		//console.warn(('.page'+p+'col'+(col_count-1)), $('.page'+p+'col'+(col_count-1)).html().length, $('.page'+p+'col'+(col_count-1)).height());
@@ -879,7 +885,11 @@ for(i in b) {
 		}
 		$('.hideme').remove();
 		//$('.pasteContent').append(ca[j]+" ");	
-		add_to_page(d[j]+' ', undefined, undefined, col_count);
+        var dspan = d[j]+' ';
+        console.log("'"+dspan+"'");
+        dspan = dspan.replace('</span>  ', '</span>');
+        //console.log("'"+dspan+"'");
+		add_to_page(dspan, undefined, undefined, col_count);
 	}
 	$('.build').html($('.build').html().replace(/===/g,' ').replace(/~~~/g, ' ')/*.replace(/<span[^<]+?>/g, "")*/);
 	$('.pagebody').css('height', maxh+"px");

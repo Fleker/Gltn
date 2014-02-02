@@ -1,4 +1,5 @@
 // Translate Panel
+currentpanel = "fleker_Translate";
 function GetPanelfleker_Translate() {
 	return {title: "Translate", bordercolor: "#09f", width: 35, override:[13]};
 }

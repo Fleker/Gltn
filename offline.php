@@ -3,24 +3,24 @@
 // Add the correct Content-Type for the cache manifest
 header('Content-Type: text/cache-manifest');
 echo "CACHE MANIFEST\n";
-echo "# version 1.1.1.4.AF".count($_GET)."\n\n";
+echo "# version 1.1.2.2.G ".count($_GET)."\n\n";
 echo "CACHE:\n";
 
-echo "APA.js\n";
-			//echo "null.js\n";
-	echo "build.js\n";
-	echo "file.js\n";
-	echo "format.js\n";
+//echo "APA.js\n";
+//			echo "null.js\n";
+//	echo "build.js\n";
+//	echo "file.js\n";
+//	echo "format.js\n";
 echo "hammer.js\n";
 echo "holoribbon.js\n";
 echo "IntroJS/intro.js\n";
 echo "IntroJS/introjs.min.css\n";
 echo "json2xml.js\n";
-	echo "kernel.js\n";
+//	echo "kernel.js\n";
 echo "MLA.js\n";
 	echo "panels.js\n";
 	echo "popup.js\n";
-echo "standard.css\n";
+//echo "standard.css\n";
 echo "xmlToJson.js\n";
 
 /* Other Javascript Files loaded elsewhere */
@@ -38,6 +38,7 @@ echo "http://netdna.bootstrapcdn.com/font-awesome/4.0.3/fonts/fontawesome-webfon
 echo "http://netdna.bootstrapcdn.com/font-awesome/4.0.3/fonts/fontawesome-webfont.eot?#iefix&v=4.0.3 \n";
 echo "http://netdna.bootstrapcdn.com/font-awesome/4.0.3/fonts/fontawesome-webfont.woff?v=4.0.3 \n";
 echo "http://netdna.bootstrapcdn.com/font-awesome/4.0.3/fonts/fontawesome-webfont.svg?v=4.0.3#fontawesomeregular \n";  
+echo "https://api.filepicker.io/v1/filepicker.js \n";
 
 $g = $_GET;
 foreach($g as $i) {

@@ -1,5 +1,5 @@
 // This is a sample file to show how one is able to quickly create and customize a document
-
+currentformat = "APA";
 function onInitFormat() {
 	new_format();
 	new_format_item("text", {label: "Running Head", mtype:"c", max:50, id:"Running Head"});
@@ -15,7 +15,7 @@ function onInitFormat() {
 }
 
 function onInitToolbar() {
-	var toolbar = ["citation", "heading1", "heading2", "heading3", "image"];	
+	var toolbar = ["citation", "heading1", "heading2", "heading3", "image", "smarttext"];	
 	post_toolbar(toolbar);
 }
 function onStylePaper() {
@@ -47,6 +47,15 @@ function onGetFormats() {
 	obj.img = "IMG";
 	obj.imgstyle = "";
 	obj.paragraph_indent = "&emsp;";
+    
+    obj.figure = function x() {
+		var i = 1;
+		$('.draft .table, .draft .img').each(function() {
+			$(this).attr('data-figure-number', i);
+			i++;
+		});
+	};
+    
 	post_content_formatting(obj);	
 }
 function onBuildBibliography() {

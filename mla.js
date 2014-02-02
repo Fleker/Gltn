@@ -1,4 +1,5 @@
 // Sample Format
+currentformat = "MLA";
 function onInitFormat() {
 	new_format();
 	new_format_item("text", {label: "Your Name", id:"Author"});

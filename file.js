@@ -16,7 +16,7 @@ max_word = 0;
 hovertagRegistrar = new Array();
 obj = {};
 document.ready = function() {
-	console.log('Gltn has woken up: v 1.1.2.1');
+	console.log('Gltn has woken up: v 1.1.2.3');
     x = {};
     //Setup Filepicker
     filepicker.setKey("AePnevdApT62LvpkSSsiVz");
@@ -116,7 +116,8 @@ function saveFile() {
 	localStorage['settings'] = xo;
 	
 	if(window.dirty == true) {
-        cloudResave();
+        if(isCloudSaved())
+            cloudResave();
         window.dirty = false;
     }
 	$('.content_save').show();
@@ -465,7 +466,11 @@ function cloudGetMetadata() {
     return a;
 }
 function isCloudSaved() {
-    return (window.ink != undefined || window.saved.inkblob_url != undefined);
+    try {
+        return (window.ink != undefined || window.saved.inkblob_url != undefined);
+    } catch(e) {
+        return false;   
+    }
 }
 function cloudResave() {
     if(window.ink == undefined) {
@@ -627,9 +632,9 @@ function formatShift() {
 				
 				if(formats[i].uri == undefined) {
 					//try {	
-						$('#formatscript').html('<script src="'+format2+'.js'+'"></script>');
-					//} catch(e) {
-						replacejscssfile(docformat, format2+".js", "js");	
+                    $('#formatscript').html('<script src="'+format2+'.js'+'"></script>');
+                    replacejscssfile(docformat, format2+".js", "js");	
+						setTimeout("download_format2('"+format2+"')", 100);
 					//}
 				} else {
 					console.log('Load format from '+formats[i].uri);
@@ -641,15 +646,15 @@ function formatShift() {
 					//replacejscssfile(docformat, formats[i].uri, "js");
 					//save it
 					$('#themeframe').attr('src', formats[i].uri);
-					setTimeout("localStorage['zformat_"+format2+"'] = $('#themeframe').contents().text();", 1000);
+					setTimeout("download_format('"+format2+"')", 100);
 				}
 				docformat = format2;
 				//alert("Shift formats");
 				//setTimeout("save();$('#body').empty();input();save();", 500)
 				window.metadata2 = JSON.stringify(x.metadata);
 				//console.error(window.metadata2);
-				setTimeout("onInitFormat();$('.content_textarea').html(xc);", 500);
-				setTimeout('formatShift2(window.metadata2)', 900);
+//				setTimeout("onInitFormat();$('.content_textarea').html(xc);", 500);
+//				setTimeout('formatShift2(window.metadata2)', 900);
 				console.log('The document format is shifting.');
 			} else {
 				if($('#formatscript').length == 0) {
@@ -661,13 +666,36 @@ function formatShift() {
 				//alert("Shift formats");
 				//setTimeout("save();$('#body').empty();input();save();", 500)
 				window.metadata2 = JSON.stringify(x.metadata);
+                
+                setTimeout("download_format2('"+format2+"')", 100);
 				//console.error(window.metadata2);
-				setTimeout("onInitFormat();$('.content_textarea').html(xc);", 500);
-				setTimeout('formatShift2(window.metadata2)', 900);
+//				setTimeout("onInitFormat();$('.content_textarea').html(xc);", 500);
+//				setTimeout('formatShift2(window.metadata2)', 900);
 				console.log('The document format is shifting.');
 			}
 		}
 	}
+}
+function download_format(y) {
+    if(!currentformat.length)
+         return;
+    if(currentformat == y) {
+        localStorage['zformat_"+y+"'] = $('#themeframe').contents().text(); 
+        formatShift2(window.metadata2)
+    } else {
+        setTimeout("download_format('"+y+"')", 100);   
+    }
+}
+function download_format2(y) {
+    if(!currentformat.length)
+         return;
+    if(currentformat == y) {
+        onInitFormat();$('.content_textarea').html(xc);
+        setTimeout("formatShift2(window.metadata2);", 400);
+        return;
+    } else {
+        setTimeout("download_format('"+y+"')", 100);   
+    } 
 }
 function formatShift2(d) {
 //		console.log(d, x.metadata, window.metadata2);	

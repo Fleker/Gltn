@@ -236,6 +236,9 @@ function post_toolbar(tools) {
 				case "italics":
 					tool_pretty = "<button class='fontawesome-italics'></button>";
 				break;
+                case "smarttext":
+                    tool_pretty = "Ref Text";
+                break;
 			}
 		} else {
 			tool_pretty = tools[i].label;
@@ -319,6 +322,12 @@ function post_toolbar(tools) {
 			case "italics":
 				toggleItalics();
 			break;
+            case "smarttext":
+                var stid = $('.smarttext').length;
+                contentAddSpan({node:"span", class:"smarttext smarttext"+stid});
+                smartTextDetails(stid);
+                formatHovertag("smarttext", "'Ref: '+$(this).attr('data-ref')", "'smartTextDetails('+$(this).attr('data-id')+');'");
+            break;
 			case 'overflow':
 				$('.overflow').toggle(150);
 			break;
