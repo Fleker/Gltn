@@ -1454,8 +1454,8 @@ function startThemer() {
 	if(window.settings.theme == undefined) {
 		window.settings.theme = "default, blackout";
 		window.settings.currenttheme = "default";
-		window.settings.theme_default = "default, Default, kernel.js, <span class='fa fa-heart-o'></span>";
-		window.settings.theme_blackout = "blackout, Blackout, theme_blackout.js, <span class='fa fa-heart'></span>";
+		window.settings.theme_default = "default, Default, js/themes/kernel.js, <span class='fa fa-heart-o'></span>";
+		window.settings.theme_blackout = "blackout, Blackout, js/themes/theme_blackout.js, <span class='fa fa-heart'></span>";
 	} //else {
 		var a = window.settings.theme.split(', ');
 		var b = window.settings['theme_'+window.settings.currenttheme].split(', ');

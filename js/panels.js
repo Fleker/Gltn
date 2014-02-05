@@ -938,9 +938,9 @@ function RunPanelmain_Dictionary() {
 	//Check stock dictionaries and 'install' if null
 	if(window.settings.dictionary == undefined) {
 		window.settings.dictionary = 'gltn, wiktionary, wikipedia';
-		window.settings.dictionary_gltn = 'XML, http://felkerdigitalmedia.com/gltn/dictionary.php, Ouvert Dictionary, gltn, <span class="fa fa-leaf"></span>';
-		window.settings.dictionary_wiktionary = 'HTML, http://felkerdigitalmedia.com/gltn/dictionary_wik.php, Wiktionary, wiktionary, <span class="fa fa-terminal"></span>';
-		window.settings.dictionary_wikipedia = 'HTML, http://felkerdigitalmedia.com/gltn/dictionary_wiki.php, Wikipedia, wikipedia, <span class="fa fa-globe"></span>';
+		window.settings.dictionary_gltn = 'XML, http://felkerdigitalmedia.com/gltn/dictionaries/dictionary.php, Ouvert Dictionary, gltn, <span class="fa fa-leaf"></span>';
+		window.settings.dictionary_wiktionary = 'HTML, http://felkerdigitalmedia.com/gltn/dictionaries/dictionary_wik.php, Wiktionary, wiktionary, <span class="fa fa-terminal"></span>';
+		window.settings.dictionary_wikipedia = 'HTML, http://felkerdigitalmedia.com/gltn/dictionaries/dictionary_wiki.php, Wikipedia, wikipedia, <span class="fa fa-globe"></span>';
 	}	
 	if(window.settings.dictionarysort == undefined || window.settings.dictionarysort == "undefined")
 		window.settings.dictionarysort = window.settings.dictionary;

@@ -8,8 +8,8 @@
 <link rel="shortcut icon" sizes="196x196" href="gltn_f.png">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 
-<link rel="stylesheet" type="text/css" href="standard.css">
-<link rel="stylesheet" type="text/css" href="IntroJS/introjs.min.css">
+<link rel="stylesheet" type="text/css" href="css/standard.css">
+<link rel="stylesheet" type="text/css" href="js/IntroJS/introjs.min.css">
 <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 <!--<?php
 /*
@@ -41,31 +41,31 @@ if(strpos($server, "felkerdigitalmedia") > -1) {
 <script src="http://code.jquery.com/jquery-2.1.0.js"></script>
 <script src="http://code.jquery.com/color/jquery.color-2.1.2.min.js"></script>
 
-<script src="format.js"></script>
-<script src="panels.js"></script>
-<script src="popup.js"></script>
-<script src="file.js"></script>
-<script src="build.js"></script>
-<script src="hammer.js"></script>
-<script src="holoribbon.js"></script>
-<script src="kernel.js"></script>
-<script src="panels_translate.js"></script>
+<script src="js/format.js"></script>
+<script src="js/panels.js"></script>
+<script src="js/popup.js"></script>
+<script src="js/file.js"></script>
+<script src="js/build.js"></script>
+<script src="js/hammer.js"></script>
+<script src="js/holoribbon.js"></script>
+<script src="js/kernel.js"></script>
+<script src="js/panels_translate.js"></script>
 
 
 
-<script src="rangy-1.3alpha.772\rangy-core.js"></script>
-<script src="rangy-1.3alpha.772\rangy-cssclassapplier.js"></script>
-<script src="rangy-1.3alpha.772\rangy-textrange.js"></script>
-<script src="rangy-1.3alpha.772\uncompressed\rangy-selectionsaverestore.js"></script>
-<script src="json2xml.js"></script>
-<script src="xmlToJson.js"></script>
-<script src="IntroJS/intro.js"></script>
+<script src="js/rangy-1.3alpha.772\rangy-core.js"></script>
+<script src="js/rangy-1.3alpha.772\rangy-cssclassapplier.js"></script>
+<script src="js/rangy-1.3alpha.772\rangy-textrange.js"></script>
+<script src="js/rangy-1.3alpha.772\uncompressed\rangy-selectionsaverestore.js"></script>
+<script src="js/json2xml.js"></script>
+<script src="js/xmlToJson.js"></script>
+<script src="js/IntroJS/intro.js"></script>
 <script src="http://fgnass.github.io/spin.js/spin.min.js"></script>
 
 
 <link rel="icon" 
       type="image/png" 
-      href="gltn_f.png">
+      href="images/gltn_f.png">
      
  <script>
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

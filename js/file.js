@@ -632,8 +632,8 @@ function formatShift() {
 				
 				if(formats[i].uri == undefined) {
 					//try {	
-                    $('#formatscript').html('<script src="'+format2+'.js'+'"></script>');
-                    replacejscssfile(docformat, format2+".js", "js");	
+                    $('#formatscript').html('<script src="js/formats/'+format2+'.js'+'"></script>');
+                    replacejscssfile(docformat, "js/formats/"+format2+".js", "js");	
 						setTimeout("download_format2('"+format2+"')", 100);
 					//}
 				} else {
