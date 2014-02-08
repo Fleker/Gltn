@@ -24,13 +24,22 @@ document.ready = function() {
     //Let's check the file to determine whether we should grab it locally or online
     if(localStorage[fileid] != undefined) {
         if(localStorage[fileid].indexOf('<inkblob_filename') > -1) {
+            //First, let's get the last time the local file was modified
+            var a = localStorage[fileid].indexOf('<last_modified>')+15;
+            var b = localStorage[fileid].indexOf('</last_modified>');
+            console.log(localStorage[fileid].substring(a,b));
+            var d = localStorage[fileid].substring(a,b);
+            
             //Okay, grab the InkBlob url and sync    
              initiatePopup({title:'Syncing...',ht:'<div class="progress" style="font-size:14pt;text-align:center;width:100%;"></div>',bordercolor:'#7f8c8d', ht:"&emsp;&emsp;&emsp;Downloading the latest copy."});
             var a = localStorage[fileid].indexOf('<inkblob_url>')+13;
             var b = localStorage[fileid].indexOf('</inkblob_url>');
             console.log(localStorage[fileid].substring(a,b));
             var c = localStorage[fileid].substring(a,b);
-            cloudRead(c,"RF");
+            
+            //Okay, we can pass the modified date to this function. If the cloud file is newer, use that. Else, return nothing and keep using local
+            //Then we can call this function continuosly to check for updates in the session
+            cloudRead(c,"RF", d);
         } else {
             restoreFile();   
         }
@@ -38,7 +47,18 @@ document.ready = function() {
         restoreFile();
     }
 };
-
+function startSaveFile() {
+    //Will only sync if dirty -- else it syncs down instead
+    //If not a cloud doc, saves as usual
+    if(isCloudSaved() && window.dirty)
+        saveFile();
+    else if(isCloudSaved()) {
+        cloudRead(window.saved.inkblob_url, "RF2", x.file.last_modified);
+    } else {
+        saveFile();   
+    }
+    
+}
 function saveFile() {
 	try {
 		window.document.title = "✎"+valMetadata('Title');
@@ -66,6 +86,8 @@ function saveFile() {
 	obj['file']['format'] = $('#file_format').val();
 	obj['file']['language'] = $('#file_language').val();
 	obj['file']['tags'] = $('#file_tags').val();
+    obj['file']['fileid'] = fileid;
+    obj['file']['last_modified'] = new Date().getTime();
 	obj['file']['min_char'] = 0;
 	obj['file']['max_char'] = 0;
 	obj['file']['min_word'] = 0;
@@ -239,7 +261,7 @@ function finishRestore(x, xc) {
 			//newFile();	
 		//} else {
 			//if(x.file != undefined) {
-				console.log("onInitFormat", xc);
+				console.log("onInitFormat");
 				onInitFormat();
 			//}
 			//else
@@ -266,7 +288,7 @@ function finishRestore(x, xc) {
 		
 		//console.log(3);
 		//Do a little more cleaning up
-		console.log('CT Ins', xc);
+		//console.log('CT Ins', xc);
 		try {
 			$('.content_textarea').html(xc.replace(/<span class="searchResult">/g, ""));
 		} catch(e) {
@@ -306,8 +328,8 @@ function finishRestore2() {
 	}	
     //start save client because code should all work by this point
 	console.log("Client save initiated; This is a go for launch.");
-	saveFile();
-	setInterval("saveFile()", 5000);	
+	//saveFile();
+	setInterval("startSaveFile()", 5000);	
 }
 function newFile(x,xc) {
 	console.log('No file found for this name.');
@@ -368,11 +390,14 @@ function writeToSettings(att, val) {
 //Nifty UI for saving
 function initNiftyUI4Saving() {
 	$('span, div, input').on('input', function() {
-		$('.content_save').html("<span class='fa fa-file-text' style='color:"+window.theme.coloralt+"'></span>&nbsp;<span class='fa fa-pencil' style='color:"+window.theme.coloralt+"'></span>");
+		markAsDirty();
+	});	
+}
+function markAsDirty() {
+    $('.content_save').html("<span class='fa fa-file-text' style='color:"+window.theme.coloralt+"'></span>&nbsp;<span class='fa fa-pencil' style='color:"+window.theme.coloralt+"'></span>");
          window.dirty = true;
         if(isCloudSaved())
-            initService("main_Sync", "Syncing Online...", "<span style='color:rgba(0,255,0,.5);border-radius:100%'><span class='fa fa-cloud'></span>&nbsp;<i class='fa fa-refresh fa-spin'></i><span>");
-	});	
+            initService("main_Sync", "Syncing Online...", "<span style='border-radius:100%'><span class='fa fa-cloud-upload'></span>&nbsp;<i class='fa fa-refresh fa-spin'></i><span>");   
 }
 function downloadXMLX() {
 	//creates an XML file
@@ -508,7 +533,7 @@ function cloudImport(callback) {
       }
     );
 }
-function cloudRead(ink, callback) {
+function cloudRead(ink, callback, localMod) {
     filepicker.read(ink, function(data){
 //        console.log(data);
         //Asynchronously handle callback
@@ -516,9 +541,23 @@ function cloudRead(ink, callback) {
             window.imported = data;
             $('#filesys_file').click();
         }
-        else if(callback == "RF") {
-            //First read the actual file
-//            console.log(data);
+        else if(callback == "RF" || callback == "RF2") {
+            //First check the modified date
+            var a = data.indexOf('<last_modified>')+15;
+            var b = data.indexOf('</last_modified>');
+            var c = parseInt(data.substring(a,b));
+            localMod = parseInt(localMod);
+            if(c <= localMod) {
+                console.log("Not synced: "+c+", "+localMod);
+                if(callback == "RF") {
+                    restoreFile();
+                    closePopup();
+                }
+                   return;
+            }
+            initService("main_Sync", "Downloading...", "<span style='border-radius:100%'><span class='fa fa-cloud-download'></span>&nbsp;<i class='fa fa-refresh fa-spin'></i><span>");
+            
+            //If so, let's keep going
             var xmli = data.indexOf('</gluten_doc>')+13;
             var xml = data.substring(0,xmli);
             try {

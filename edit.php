@@ -61,6 +61,7 @@ if(strpos($server, "felkerdigitalmedia") > -1) {
 <script src="js/xmlToJson.js"></script>
 <script src="js/IntroJS/intro.js"></script>
 <script src="http://fgnass.github.io/spin.js/spin.min.js"></script>
+<script src="http://timeago.yarp.com/jquery.timeago.js"></script>
 
 
 <link rel="icon" 

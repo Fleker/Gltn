@@ -1035,34 +1035,55 @@ function postWordCount() {
 	}
 }
 function imgDetails(pid) {
-	var ht = "&emsp;Image URL: <input type='url' id='image_url'><br>";
+	var ht = "&emsp;<input type='url' id='image_url'><br>";
 	ht += "&emsp;Description: <input id='image_des' style='width:75%'><br>";
 	ht += "<button id='image_save'>Save</button><div style='margin-left:50px' id='image_preview'></div>";
 	ht += "&emsp;<input type='hidden' id='image_pid' value='"+pid+"'>";
+        
 	fnc = function x() {
 		var pid = $('#image_pid').val();
-		if($('.img'+pid).attr('data-src') != undefined) {
+		if($('.img'+pid).attr('data-src') != undefined || $('#image_url').val().length > 0) {
 			$('#image_url').val($('.img'+pid).attr('data-src'));
 			$('#image_des').val($('.img'+pid).attr('data-des'));
 			previewImg();	
 		}
 		function previewImg() {
-			var url = $('#image_url').val()
+			var url = $('#image_url').val();
 			$('#image_preview').html('<img src="'+url+'">');
 		}
-		$('#image_url').on('input', function() {
-			previewImg();
-		});
+        $('#image_url').on('input', function() {
+           previewImg(); 
+        });
+        $('#image_url').on('click', function() {
+           previewImg(); 
+        });
 		$('#image_save').on('click', function() {
+            console.log(".img"+pid);
 			$('.img'+pid).attr('data-id', pid);
 			$('.img'+pid).attr('data-des', $('#image_des').val());
 			$('.img'+pid).attr('data-src', $('#image_url').val());
 			$('.img'+pid).html("<img src='"+$('#image_url').val()+"' style='width:10%'>");
 			closePopup();
-			saveFile();
+			markAsDirty();
 		});	
 	};
-	initiatePopup({title:"Image Details", bordercolor:'#B54E7C', ht: ht, fnc: fnc});
+    
+     if($('.img'+pid).attr('data-src') != undefined && $('.img'+pid).attr('data-src') != "undefined") { 
+        initiatePopup({title:"Image Details", bordercolor:'#B54E7C', ht: ht, fnc: fnc});
+    } else {
+        filepicker.pick({
+                mimetype: "image/*"
+              },
+              function(InkBlob){
+                  initiatePopup({title:"Image Details", bordercolor:'#B54E7C', ht: ht, fnc: fnc});
+                  setTimeout("$('#image_url').val('"+InkBlob.url+"').click();", 600);
+              },
+              function(FPError){
+                console.log(FPError.toString());
+              }
+            );
+    }
+	//initiatePopup({title:"Image Details", bordercolor:'#B54E7C', ht: ht, fnc: fnc});
 }
 function tableDetails(tableid) {
 	var ht = "&emsp;Title: <input id='table_name'>&emsp;Col:<input type='number' style='width:5em' id='table_c'>&nbsp;&nbsp;Row:<input type='number' style='width:5em' id='table_r'><br><button id='table_save'>Save</button><table id='tablep' style='margin-left:30px'></table>"
@@ -1271,6 +1292,7 @@ function ribbonLoad() {
 		var v = $('#file_name').val();
 		v = v.replace(/ /g, "");
 		//console.log(v, localStorage[v]);
+        ovr = true;
 		if(localStorage[v] != undefined) {
 			ovr = confirm('This file already exists: '+v+'; Overwrite the contents of this file?');	
 		}

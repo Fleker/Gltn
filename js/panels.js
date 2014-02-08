@@ -677,48 +677,57 @@ function RunPanelmain_Filesys() {
 			c(i);
 			if(localStorage[i] != undefined && localStorage[i+"_c"] != undefined) {
 				//We've got something!
-				var title = "";
 				try {
 					var xx = $.xml2json(localStorage[i]);
-					title = localStorage[i].indexOf("<metadata>");
 				} catch(e) {
 					c(e.message);
 					continue;
 				}
-				if(title > -1) {
-					var title2 = localStorage[i].substring(title);
-					var t3 = title2.indexOf("<Title>")+7;
-					var t4 = title2.indexOf("</Title>");
-					var t5 = title2.substring(t3,t4);
-					c(title2);
-//					c(t3);
-					c(t4);
-					c(t5);
-//                    console.log(i+" "+title2);
-				}
-				if(t5 == undefined)
-					t5 = "";
+				title = xx.metadata.Title;
+				if(title == undefined)
+					title = "";
+                
+                
 				if(i == fileid)
 					bgc = '#2980b9';
 				else
-					bgc = '#ecf0f1';
+					bgc = '#2c3e50';
 				var fsi = localStorage[i].length;
 				var fsci = localStorage[i+"_c"].length;
 				fstotal += fsi;
 				fstotal += fsci;
 				var fsout = Math.round((fsi+fsci)/100)/10+"KB";
 				//console.log(xx.file.tags.split(','),sterm)
-				if(sterm == undefined || (sterm != undefined  && (t5.toLowerCase().indexOf(sterm) > -1) || i.toLowerCase().indexOf(sterm) > -1 || xx.file.tags.indexOf(sterm) > -1)) {
+				if(sterm == undefined || (sterm != undefined  && (title.toLowerCase().indexOf(sterm) > -1) || i.toLowerCase().indexOf(sterm) > -1 || xx.file.tags.indexOf(sterm) > -1)) {
 					try {
 						var y = xx.file.format;
 					} catch(e) {
 						console.error(e.message);
 						continue;
 					}
-					out += "<tr><td class='tfile' style='background-color:"+bgc+";border:solid 1px #2c3e50;padding-bottom:8px;width:98%;cursor:pointer;' data-v='"+i+"'><table style='font-size:7pt;font-family:sans-serif;width:100%;'><tr><td style='text-align:left'><span style='font-size:8pt' class='fa fa-file-text'></span>&nbsp;"+i+".gltn</td><td style='text-align:center;width:23px' class='Filesys_delete' data-f='"+i+"'>X</td></tr></table>";
-					if(t5 != undefined)
-						out += "<div style='margin-left:3px'><b>"+t5+"</b></div>";	
-					out += "<span style='font-size:8pt'>&emsp;"+xx.file.format+"&nbsp;&nbsp;"+xx.file.language+"&nbsp;&nbsp;"+fsout+"</span>";	
+                    var time = "";
+                    timeiso = undefined;
+                    try {
+                         //console.log(xx.file.last_modified, time);
+                       time = jQuery.timeago(new Date().setTime(xx.file.last_modified));
+                        timeiso = new Date();
+                        timeiso.setTime(xx.file.last_modified);
+                        //console.log(xx.file.last_modified,timeiso, timeiso.getTime());
+                        timeiso = timeiso.toISOString();
+                        //console.log(xx.file.last_modified, time, timeiso);
+                    } catch(e) {
+                        time = undefined;   
+                        timeiso = undefined;
+                        //console.error(e.message);
+                    } 
+                    //#2c3e50
+					out += "<tr><td class='tfile' style='background-color:#ecf0f1;border:solid 2px "+bgc+";padding-bottom:8px;width:98%;cursor:pointer;' data-v='"+i+"'><table style='font-size:7pt;font-family:sans-serif;width:100%;'><tr><td style='text-align:left'><span style='font-size:8pt' class='fa fa-file-text'></span>&nbsp;"+i+".gltn</td><td style='text-align:center;width:23px' class='Filesys_delete' data-f='"+i+"'>X</td></tr></table>";
+					if(title != undefined)
+						out += "<div style='margin-left:3px'><b>"+title+"</b></div>";	
+					out += "<span style='font-size:8pt'>&emsp;"+xx.file.format+"&nbsp;&nbsp;"+xx.file.language+"&nbsp;&nbsp;"+fsout+"</span><br>";
+                    time = "";
+                    if(timeiso != undefined)
+                        out += "<span style='font-size:7pt'>&emsp;Last edited <abbr class='timeago' title='"+timeiso+"'></abbr>"+time+"</span>";
 					out += "</td></tr>";	
 				}
 			}	
@@ -728,6 +737,7 @@ function RunPanelmain_Filesys() {
 		fstotalout = "<span style='font-size:10pt'>&emsp;"+Math.round(fstotal/100)/10+"KB stored</span>"
 		out += fstotalout;
 		post(out,term);
+        jQuery("abbr.timeago").timeago();
 		//setTimeout("post(out);", 50);
 	}	
 	resetFolder();
