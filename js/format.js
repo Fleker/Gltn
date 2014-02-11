@@ -236,8 +236,11 @@ function post_toolbar(tools) {
 				case "italics":
 					tool_pretty = "<button class='fontawesome-italics'></button>";
 				break;
-                case "smarttext":
+                case "reftext":
                     tool_pretty = "Ref Text";
+                break;
+                case "LaTeX":
+                    tool_pretty = "LaTeX";
                 break;
 			}
 		} else {
@@ -322,12 +325,19 @@ function post_toolbar(tools) {
 			case "italics":
 				toggleItalics();
 			break;
-            case "smarttext":
-                var stid = $('.smarttext').length;
-                contentAddSpan({node:"span", class:"smarttext smarttext"+stid});
-                smartTextDetails(stid);
-                formatHovertag("smarttext", "'Ref: '+$(this).attr('data-ref')", "'smartTextDetails('+$(this).attr('data-id')+');'");
+            case "reftext":
+                var rtid = $('.reftext').length;
+                contentAddSpan({node:"span", class:"reftext reftext"+stid});
+                refTextDetails(rtid);
+                formatHovertag("reftext", "'Ref: '+$(this).attr('data-ref')", "'refTextDetails('+$(this).attr('data-id')+');'");
             break;
+            case "LaTeX":
+                var lid = $('.latex').length;
+                contentAddSpan({node:"span", class:"latex latex"+lid});
+                latexDetails(lid);
+                formatHovertag("latex", "$(this).attr('data-cmd')", "'latexDetails('+$(this).attr('data-id')+');'");
+            break;
+            
 			case 'overflow':
 				$('.overflow').toggle(150);
 			break;

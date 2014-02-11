@@ -1,6 +1,6 @@
 // Misc. stuff from edit.php that shouldn't be in there - clutters up stuff
 //In the future, arrange a way to programitically grab all values.
-	formats = [{name: "APA", type: "IN BETA"}, {name: "MLA", "type": "Essay"}, {name:"IEEE", type:"Report"}];	
+	formats = [{name: "APA", type: "IN BETA"}, {name: "MLA", "type": "Essay"}, {name:"IEEE", type:"Report"},{name:"Lab", type:"Report"}];	
 	
 /*(function(){
 	//saving the original console.log function
@@ -1035,10 +1035,10 @@ function postWordCount() {
 	}
 }
 function imgDetails(pid) {
-	var ht = "&emsp;<input type='url' id='image_url'><br>";
-	ht += "&emsp;Description: <input id='image_des' style='width:75%'><br>";
-	ht += "<button id='image_save'>Save</button><div style='margin-left:50px' id='image_preview'></div>";
-	ht += "&emsp;<input type='hidden' id='image_pid' value='"+pid+"'>";
+	var ht = "<table style='width:100%'><tr><td style='vertical-align:top'><input type='url' id='image_url' style='width:95%'><br>";
+	ht += "Description: <input id='image_des' style='width:95%'><br>";
+	ht += "<button id='image_save'>Save</button></td><td><div style='margin-left:50px;height:100%' id='image_preview'></div>";
+	ht += "&emsp;<input type='hidden' id='image_pid' value='"+pid+"'></td></tr></table>";
         
 	fnc = function x() {
 		var pid = $('#image_pid').val();
@@ -1049,7 +1049,7 @@ function imgDetails(pid) {
 		}
 		function previewImg() {
 			var url = $('#image_url').val();
-			$('#image_preview').html('<img src="'+url+'">');
+			$('#image_preview').html('<img src="'+url+'" style="max-height:'+(window.innerHeight/3.3)+'px">');
 		}
         $('#image_url').on('input', function() {
            previewImg(); 
@@ -1176,9 +1176,9 @@ function tableDetails(tableid) {
 	initiatePopup({title:"Table Editor", bordercolor:'#111', ht: ht, fnc: fnc});
 	
 }
-function smartTextDetails(id) {
-    ht = "<span style='font-size:14pt'>Pick an Object. The text will mimic the figure number of this object. (Just the number)</span><br><div id='Popup'></div>";
-    $('.smarttext'+id).attr('data-id', id);
+function refTextDetails(id) {
+    ht = "<span style='font-size:14pt'>Pick an Object. The text will use the figure number of this object. (Just the number)</span><br><div id='Popup'></div>";
+    $('.reftext'+id).attr('data-id', id);
     ht += "<input type='hidden' id='PopupId' value='"+id+"'>";
     fnc = function x() {
         id = $('#PopupId').val();
@@ -1198,22 +1198,112 @@ function smartTextDetails(id) {
             out += "</table><button class='PopupSave'>Save</button>";
             $('#Popup').html(out);
             $('.PopupImg').on('click', function() {
-                $('.smarttext'+id).attr('data-ref', 'img'+$(this).attr('data-i')); 
-                $('.smarttext'+id).attr('data-refid', $(this).attr('data-i')); 
+                $('.reftext'+id).attr('data-ref', 'img'+$(this).attr('data-i')); 
+                $('.reftext'+id).attr('data-refid', $(this).attr('data-i')); 
                 populate($(this).attr('data-i'));
             });
             $('.PopupSave').on('click', function() {
                 closePopup(); 
             });
         }
-        //TODO Restore
-        if($('.smarttext'+id).attr('data-ref') != undefined) {
-            populate($('.smarttext'+id).attr('data-refid'));
+        if($('.reftext'+id).attr('data-ref') != undefined) {
+            populate($('.reftext'+id).attr('data-refid'));
         } else {
             populate(-1);
         }
     };
     initiatePopup({title: "Ref Text", bordercolor:"#09f", ht: ht, fnc: fnc});
+}
+function latexDetails(id) {
+    ht = "<table style='width:100%'><tr><td style='vertical-align:top'>LaTeX is a form of markup that, among other features, allows for rich math formatting. <br>Reference guide for LaTeX markup:<br><input type='search' style='width:50%' id='latexSearch'></td><td>";
+    ht += "<div id='latexRef' style='display:none'></div></td></tr></table>";
+   // ht += "<button id='latexPrev'>Preview</button>";
+    ht += "<table style='width:99%'><tr><td style='width:50%'><div id='latexCmd' style='height:4em;width:95%;border: solid 1px rgba(0,129,255,1);background-color:"+theme.normfsui+";margin-top:5px;margin-left:5px;margin-bottom:10px;' contenteditable='true'></div></td>";
+    
+    ht += "<td style='width:50%'><div id='latexView' style='height:4em;width:95%;border: solid 1px;background-color:"+theme.normfsui+";margin-top:5px;margin-left:5px;margin-bottom:10px;'></div></td></tr></table>";
+    ht += "<div id='latexBuffer' style='visibility:hidden'></div>";
+    ht += "<button id='latexSave'>Save</button>";
+    $('.latex'+id).attr('data-id', id);
+    ht += "<input type='hidden' id='PopupId' value='"+id+"'>";
+    fnc = function x(){
+        id = $('#PopupId').val();
+        Preview.Init();
+        function populate(cmd) {
+            var preview = false;
+            if(cmd != -1) {
+                $('#latexCmd').html(cmd);
+                Preview.Update();
+            }
+            $('#latexPrev').on('click', function() {
+                if(preview) { 
+                    $('#latexCmd').fadeIn(300);
+                    $('#latexView').fadeOut(300);
+                    $('#latexPrev').html('Preview');
+                    preview = false;
+                } else {
+                    $('#latexCmd').fadeOut(300);
+                    $('#latexView').fadeIn(300);
+                    $('#latexPrev').html('View Commands');
+                    preview = true;
+                }
+            });
+            $('#latexCmd').on('input', function() {
+                $('.latex'+id).html($('#latexView').html());
+                $('.latex'+id).attr('data-cmd', $('#latexCmd').text());
+                console.log('latexing');
+                Preview.Update();
+            });
+            $('#latexSave').on('click', function() {
+                if($('#latexView').html().length < 1)
+                    $('#latexView').html("LaTeX")
+                $('.latex'+id).html($('#latexView').html());
+                markAsDirty();
+                closePopup();
+            });
+            function showReference(item) {
+                console.log(item);
+                out = "<b>"+item.id+"</b><br>";
+                out += "<span style='font-family:monospace'>"+item.cmd+"</span>";
+                out += "<div style='margin-left:35px;font-size:10pt'><ul>";
+                for(i in item.param) {
+                    out += "<li>"+item.param[i].id+": "+item.param[i].value+"</li>";
+                }
+                out += "</ul>"+item.des+"</div>";
+                $('#latexRef').html(out);
+            }
+            $('#latexSearch').on('input', function() {
+                var v = $(this).val().toLowerCase();
+                if(v.length) {
+                    $('#latexRef').fadeIn(300);
+                    for(i in commands) {
+                        if(v == commands[i].id) {
+                            showReference(commands[i]); 
+                            return;
+                        }
+                        var a = commands[i].keywords.split(',');
+                        if(a.indexOf(v) > -1) {
+                            showReference(commands[i]); 
+                            return;
+                        }
+                    }
+                    $('#latexRef').html("<span style='font-size:11pt'>&emsp;Sorry, that could not be found.</span>");
+                } else {
+                    $('#latexRef').fadeOut(300);   
+                }
+            });
+        }
+        
+        
+        commands = [{id:"Bar", keywords:"bar", cmd:"\\bar{x}", param:[{id:"x", value:"Value to get bar placed over it"}], des:"Places a bar over the input value"}];
+        
+        
+        if($('.latex'+id).attr('data-cmd') != undefined) {
+            populate($('.latex'+id).attr('data-cmd'));
+        } else {
+            populate(-1);
+        }  
+    };
+    initiatePopup({title: "Insert LaTeX", bordercolor: "#f1c40f", ht: ht, fnc: fnc});
 }
 /*** HOLORIBBON ***/
 /*newRibbon('.header', {
@@ -1622,6 +1712,8 @@ function RunPanelmain_Notifications() {
 	}
 }
 function postNotification(id, text, action) {
+    if(notifications == undefined)
+            initNotifications();
 	var npush = -1;
 	for(i in notifications) {
 		if(notifications[i].id == id)
@@ -1846,4 +1938,88 @@ function GetPanelmain_Sync() {
 function RunPanelmain_Sync() {
     out = "<span style='font-size:15'>Sync is On</span><br>This file is currently saved somewhere online. You can access it from a different computer.";
     postPanelOutput(out);
+}
+function initMathjax() {
+    window.Preview = {
+  delay: 150,        // delay after keystroke before updating
+
+  preview: null,     // filled in by Init below
+  buffer: null,      // filled in by Init below
+
+  timeout: null,     // store setTimout id
+  mjRunning: false,  // true when MathJax is processing
+  oldText: null,     // used to check if an update is needed
+
+  //
+  //  Get the preview and buffer DIV's
+  //
+  Init: function () {
+    this.preview = document.getElementById("latexView");
+    this.buffer = document.getElementById("latexView");
+  },
+
+  //
+  //  Switch the buffer and preview, and display the right one.
+  //  (We use visibility:hidden rather than display:none since
+  //  the results of running MathJax are more accurate that way.)
+  //
+  SwapBuffers: function () {
+    var buffer = this.preview, preview = this.buffer;
+    this.buffer = buffer; this.preview = preview;
+    buffer.style.visibility = "hidden"; buffer.style.position = "absolute";
+    preview.style.position = ""; preview.style.visibility = "";
+  },
+
+  //
+  //  This gets called when a key is pressed in the textarea.
+  //  We check if there is already a pending update and clear it if so.
+  //  Then set up an update to occur after a small delay (so if more keys
+  //    are pressed, the update won't occur until after there has been 
+  //    a pause in the typing).
+  //  The callback function is set up below, after the Preview object is set up.
+  //
+  Update: function () {
+    if (this.timeout) {clearTimeout(this.timeout)}
+    this.timeout = setTimeout(this.callback,this.delay);
+  },
+
+  //
+  //  Creates the preview and runs MathJax on it.
+  //  If MathJax is already trying to render the code, return
+  //  If the text hasn't changed, return
+  //  Otherwise, indicate that MathJax is running, and start the
+  //    typesetting.  After it is done, call PreviewDone.
+  //  
+  CreatePreview: function () {
+    Preview.timeout = null;
+    if (this.mjRunning) return;
+    var text = document.getElementById("latexCmd").innerHTML;
+      console.log(this.oldtext, text);
+    if (text === this.oldtext) return;
+    this.buffer.innerHTML = this.oldtext = text;
+    this.mjRunning = true;
+      console.log(text);
+    MathJax.Hub.Queue(
+      ["Typeset",MathJax.Hub,this.buffer],
+      ["PreviewDone",this]
+    );
+  },
+
+  //
+  //  Indicate that MathJax is no longer running,
+  //  and swap the buffers to show the results.
+  //
+  PreviewDone: function () {
+    this.mjRunning = false;
+    this.SwapBuffers();
+  }
+
+};
+
+//
+//  Cache a callback to the CreatePreview action
+//
+Preview.callback = MathJax.Callback(["CreatePreview",Preview]);
+Preview.callback.autoReset = true;  // make sure it can run more than once
+   
 }

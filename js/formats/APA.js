@@ -15,7 +15,7 @@ function onInitFormat() {
 }
 
 function onInitToolbar() {
-	var toolbar = ["citation", "heading1", "heading2", "heading3", "image", "smarttext"];	
+	var toolbar = ["citation", "heading1", "heading2", "heading3", "image", "reftext", "LaTeX"];	
 	post_toolbar(toolbar);
 }
 function onStylePaper() {

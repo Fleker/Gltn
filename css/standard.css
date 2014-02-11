@@ -118,10 +118,14 @@ span, div, body {
 	text-decoration: none;
 	border-bottom: solid 1px #0CF;
 }	
-.smarttext {
+.reftext {
 	text-decoration: none;
 	border-bottom: solid 1px #999;
     opacity:0.9; 
+}
+.latex {
+	text-decoration: none;
+	border-bottom: solid 1px #f1c40f;
 }	
 .context {
 	text-decoration: none;

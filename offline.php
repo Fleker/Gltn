@@ -3,7 +3,7 @@
 // Add the correct Content-Type for the cache manifest
 header('Content-Type: text/cache-manifest');
 echo "CACHE MANIFEST\n";
-echo "# version 1.1.2.2.G ".count($_GET)."\n\n";
+echo "# version 1.1.2.4.A ".count($_GET)."\n\n";
 echo "CACHE:\n";
 
 //echo "APA.js\n";
@@ -17,7 +17,7 @@ echo "js/IntroJS/intro.js\n";
 echo "js/IntroJS/introjs.min.css\n";
 echo "js/json2xml.js\n";
 //	echo "kernel.js\n";
-echo "js/MLA.js\n";
+echo "js/formats/MLA.js\n";
 	echo "js/panels.js\n";
 	echo "js/popup.js\n";
 //echo "standard.css\n";

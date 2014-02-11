@@ -62,7 +62,15 @@ if(strpos($server, "felkerdigitalmedia") > -1) {
 <script src="js/IntroJS/intro.js"></script>
 <script src="http://fgnass.github.io/spin.js/spin.min.js"></script>
 <script src="http://timeago.yarp.com/jquery.timeago.js"></script>
-
+    
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    showProcessingMessages: false,
+    tex2jax: { inlineMath: [['$','$'],['\\(','\\)']] }
+  });
+</script>
 
 <link rel="icon" 
       type="image/png" 

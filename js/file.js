@@ -15,8 +15,9 @@ max_word = 0;
 
 hovertagRegistrar = new Array();
 obj = {};
+currentformat = "";
 document.ready = function() {
-	console.log('Gltn has woken up: v 1.1.2.3');
+	console.log('Gltn has woken up: v 1.1.2.5');
     x = {};
     //Setup Filepicker
     filepicker.setKey("AePnevdApT62LvpkSSsiVz");
@@ -320,6 +321,7 @@ function finishRestore2() {
 		initPanels();
 	
 	hideHovertag();
+    initMathjax();
     
 	try {
 		offlineGo();
@@ -577,10 +579,48 @@ function cloudRead(ink, callback, localMod) {
             localStorage[fileid+"_c"] = ht;
             closePopup();
             restoreFile();
+             initService("main_Sync", "Synced", "<span class='fa fa-cloud'></span>");
         }
         return data;
     });   
 }
+//A Gltn Package is a single file containing all the data for a particular terminal. This is all files and associated data, plus all settings
+//First, we need a function to generate the data correctly
+function getGltp() {
+    var gltp = "";
+    for(i in localStorage) {
+        if(localStorage[i] != undefined && localStorage[i+"_c"] != undefined) {
+            gltp += localStorage[i]+localStorage[i+"_c"];    
+        }   
+    }
+    gltp += localStorage["settings"];
+    return gltp;
+}
+//Now, this function parses the .gltp and implements the data
+function parseGltp(gltp) {
+    pre = "<gluten_";
+    var a = gltp.split(pre);
+    for(i in a) {
+        var b = a[i].indexOf("<fileid>")+8;
+        var c = a[i].indexOf("</fileid");
+        var d = a[i].substring(b, c);
+        a[i] = pre+a[i];
+        if(b == -1) {
+            //Is settings   
+            localStorage['settings'] = pre+a[i];
+        } else {
+            //Is file   
+            //Separate
+            var e = a[i].indexOf("</gluten_doc>")+13;
+            var f = a[i].substring(0,e);
+            var g = a[i].substr(f);
+            console.log("Get "+d);
+            localStorage[d] = f;
+            localStorage[d+"_c"] = g;
+        }
+    }
+}
+
 //Formatting Script Launcher
 function createjscssfile(filename, filetype){
  if (filetype=="js"){ //if filename is a external JavaScript file
@@ -651,7 +691,7 @@ function initFormats() {
 }
 function formatShift() {
 	//unload js file
-	console.log(formats);
+	//console.log(formats);
 	format2 = $('#file_format').val();
 	docformat = docformat+'.js';
 	for(i in formats) {
@@ -671,8 +711,15 @@ function formatShift() {
 				
 				if(formats[i].uri == undefined) {
 					//try {	
-                    $('#formatscript').html('<script src="js/formats/'+format2+'.js'+'"></script>');
-                    replacejscssfile(docformat, "js/formats/"+format2+".js", "js");	
+                    console.log(docformat, format2, formats[i].name);
+                    try {
+                        var v = '<script src="js/formats/'+format2+'.js'+'"></script>'; 
+                        //console.log(v);
+                        $('#formatscript').html(v);
+                    } catch(e) {
+                        console.error(e.message);
+                        replacejscssfile(docformat, "js/formats/"+format2+".js", "js");	
+                    }
 						setTimeout("download_format2('"+format2+"')", 100);
 					//}
 				} else {
