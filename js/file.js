@@ -7,6 +7,8 @@ citationi = 0;
 idea = new Array();
 ideadefault = "";
 fileid = window.location.search.substr(6);
+if(window.location.search.indexOf("&share") > -1)
+    fileid = window.location.search.substring(6,window.location.search.indexOf("&share"));
 
 min_char = 0;
 max_char = 0;
@@ -17,14 +19,17 @@ hovertagRegistrar = new Array();
 obj = {};
 currentformat = "";
 document.ready = function() {
-	console.log('Gltn has woken up: v 1.1.2.5');
+	console.log('Gltn has woken up: v 1.1.3.1');
     x = {};
     //Setup Filepicker
     filepicker.setKey("AePnevdApT62LvpkSSsiVz");
     
     //Let's check the file to determine whether we should grab it locally or online
     if(localStorage[fileid] != undefined) {
-        if(localStorage[fileid].indexOf('<inkblob_filename') > -1) {
+        if(window.location.href.indexOf("&share=") > -1) {
+            var c = window.location.href.substr(window.location.href.indexOf("&share=")+7);
+            cloudRead("https://www.filepicker.io/api/file/"+c, "RF", fileid);
+        } else if(localStorage[fileid].indexOf('<inkblob_filename') > -1) {
             //First, let's get the last time the local file was modified
             var a = localStorage[fileid].indexOf('<last_modified>')+15;
             var b = localStorage[fileid].indexOf('</last_modified>');
@@ -45,7 +50,12 @@ document.ready = function() {
             restoreFile();   
         }
     } else {
-        restoreFile();
+        if(window.location.href.indexOf("&share=") > -1) {
+            var c = window.location.href.substr(window.location.href.indexOf("&share=")+7);
+            cloudRead("https://www.filepicker.io/api/file/"+c, "RF", fileid);
+        }
+        else
+            restoreFile();
     }
 };
 function startSaveFile() {
@@ -59,13 +69,13 @@ function startSaveFile() {
         saveFile();   
     }
     
-}
-function saveFile() {
-	try {
+    try {
 		window.document.title = "✎"+valMetadata('Title');
 	} catch(e) {
 		window.document.title = 'Editing Document';
-	}	
+	}    
+}
+function saveFile() {	
 	fileid = $('#file_name_internal').val();
 	$('.content_save').hide();
 	//console.log(o.gluten_doc, x, obj);
@@ -150,7 +160,11 @@ function saveFile() {
 
 
 docformat = '';
-function restoreFile() {
+function restoreFile(full) {
+    if(full == true)
+        full = true;
+    else
+        full = false;
 	$("#file_format").on("input", function() {
 		console.log($(this).val());
 		formatShift();
@@ -177,7 +191,8 @@ function restoreFile() {
 			localStorage.removeItem("settings");
 	}
 	try {
-		startThemer();	
+        if(!full)
+		  startThemer();	
 	} catch(e) {
 		
 	}
@@ -200,7 +215,8 @@ function restoreFile() {
          x = {file: undefined};
 	if(x.file != undefined) {
 		//Load Script
-		initFormats();
+        if(!full)
+		  initFormats();
 		$('#file_format').val(x.file.format);
 		docformat = x.file.format;
 		console.log(docformat);
@@ -246,7 +262,7 @@ function restoreFile() {
 				}
 		}
 		
-		setTimeout("finishRestore(x,xc);", 300);		
+		setTimeout("finishRestore(x,xc,"+full+");", 300);		
 	} else {
 		//New document - most things initialize at the top of this file
 		//$('#file_format').val("APA");
@@ -256,7 +272,7 @@ function restoreFile() {
 	}
     
 }
-function finishRestore(x, xc) {
+function finishRestore(x, xc, full) {
 	try {
 		//if(x == undefined) {
 			//newFile();	
@@ -270,7 +286,7 @@ function finishRestore(x, xc) {
 		//}
 	} catch(e) {
 		console.error(e.message);
-		setTimeout("finishRestore('"+x+"','"+xc+"');",100);
+		setTimeout("finishRestore('"+x+"','"+xc+"', '"+full+"');",100);
 		return;
 	}
 	//console.log(5);
@@ -302,11 +318,13 @@ function finishRestore(x, xc) {
 		//newFile(x,xc);
 	//}
 	
-	setTimeout("finishRestore2()", 100);
+	setTimeout("finishRestore2("+full+")", 100);
 }
-function finishRestore2() {
-	initNotifications();
-	setHeader();
+function finishRestore2(full) {
+    if(!full) {
+	   initNotifications();
+	   setHeader();
+    }
 	try {
 		initContext();
 	} catch(e) {
@@ -317,11 +335,12 @@ function finishRestore2() {
 	setInterval("recallHovertags();",1000);
 	postWordCount();
 	initNiftyUI4Saving();
-	if(window.offline != true)
+	if(window.offline != true && !full)
 		initPanels();
 	
 	hideHovertag();
-    initMathjax();
+    if(!full)
+        initMathjax();
     
 	try {
 		offlineGo();
@@ -329,9 +348,11 @@ function finishRestore2() {
 		offline = false;
 	}	
     //start save client because code should all work by this point
-	console.log("Client save initiated; This is a go for launch.");
+    if(!full) {
+	   console.log("Client save initiated; This is a go for launch.");
 	//saveFile();
-	setInterval("startSaveFile()", 5000);	
+	   setInterval("startSaveFile()", 1000);	
+    }
 }
 function newFile(x,xc) {
 	console.log('No file found for this name.');
@@ -339,7 +360,7 @@ function newFile(x,xc) {
 	$('#file_name').val(fileid);
 		x.file = {};
 	formatShift();
-	setTimeout('finishRestore(x,xc);newFile2();', 1000);
+	setTimeout('finishRestore(x,xc);newFile2();', 4000);
 	
 }	
 function newFile2() {
@@ -359,7 +380,7 @@ function newFile2() {
 function exportFile() {
 	falseBuild();
 	add_new_page();	
-    add_to_page("<br><button onclick='downloadXML()' style='font-size:14pt;display:none'><span class='fa fa-cloud-download'></span>&nbsp;Download</button><button onclick='cloudXML()' style='font-size:14pt'><span class='fa fa-cloud-upload'></span>&nbsp;Upload</button><br>");
+    add_to_page("<br><button onclick='downloadXML()' style='font-size:14pt;display:none'><span class='fa fa-cloud-download'></span>&nbsp;Download</button><button onclick='cloudXML()' style='font-size:14pt'><span class='fa fa-cloud-upload'></span>&nbsp;Upload</button><button onclick='getShare()' style='font-size:14pt'><span class='fa fa-group'></span>&nbsp;Share</button> <br>");
 	add_to_page("File XML:<br><textarea style='width:95%;height:200px;'>"+localStorage[fileid]+"</textarea><br>");
 	add_to_page("Content HTML:<br><textarea style='width:95%;height:200px;'>"+localStorage[fileid+'_c']+"</textarea><br>");
 
@@ -561,7 +582,7 @@ function cloudRead(ink, callback, localMod) {
             
             //If so, let's keep going
             var xmli = data.indexOf('</gluten_doc>')+13;
-            var xml = data.substring(0,xmli);
+            var xml = data.substring(data.indexOf('<'),xmli);
             try {
                 var i = $.xml2json(xml);
             } catch(e) {
@@ -577,12 +598,29 @@ function cloudRead(ink, callback, localMod) {
             
             localStorage[fileid] = xml;
             localStorage[fileid+"_c"] = ht;
-            closePopup();
-            restoreFile();
+           // closePopup();
+            restoreFile(callback == "RF2");
              initService("main_Sync", "Synced", "<span class='fa fa-cloud'></span>");
         }
         return data;
     });   
+}
+function getShare() {
+    if(window.saved == undefined) {
+        initiatePopup({title:"Share...",ht:"You must export the document to a cloud service before you can share it."});    
+        return;
+    }
+    //If there is an inkblob, get the url
+    if(window.saved.inkblob_url != undefined) {
+        //Get the id only for the url
+        //https://www.filepicker.io/api/file/ z1cUucGQaOwmWbkvTQ49
+        var id = window.saved.inkblob_url.substr(35);
+        //Display the URL
+        initiatePopup({title:"Share...",ht:"Send this link to other people and they can collaborate on this document in real time!<br><br><a href='http://felkerdigitalmedia.com/gltn/edit.php?file="+fileid+"&share="+id+"' style='color:"+theme.coloralt+"'>http://felkerdigitalmedia.com/gltn/edit.php?file="+fileid+"&share="+id+"</a>"});
+    } else {
+        initiatePopup({title:"Share...",ht:"You must export the document to a cloud service before you can share it."});
+    }
+    
 }
 //A Gltn Package is a single file containing all the data for a particular terminal. This is all files and associated data, plus all settings
 //First, we need a function to generate the data correctly

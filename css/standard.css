@@ -126,7 +126,11 @@ span, div, body {
 .latex {
 	text-decoration: none;
 	border-bottom: solid 1px #f1c40f;
+    display:inline;
 }	
+.build .latex {
+    border-bottom: solid 0px;   
+}
 .context {
 	text-decoration: none;
 	border-bottom: solid 1px #16a085;

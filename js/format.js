@@ -333,7 +333,7 @@ function post_toolbar(tools) {
             break;
             case "LaTeX":
                 var lid = $('.latex').length;
-                contentAddSpan({node:"span", class:"latex latex"+lid});
+                contentAddSpan({node:"div", class:"latex latex"+lid});
                 latexDetails(lid);
                 formatHovertag("latex", "$(this).attr('data-cmd')", "'latexDetails('+$(this).attr('data-id')+');'");
             break;

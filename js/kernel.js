@@ -524,8 +524,10 @@ function formatHovertag(classname, textcode, action, recall) {
     });
 	//'
 
-	if(recall == undefined) 
+	if(recall != true && recall != "true") { 
 		hovertagRegistry(classname, textcode, action);
+        console.log(classname, recall);
+    }
 }
 function hovertagRegistry(c, t, a) {
 	hovertagRegistrar.push({classname: c, textcode: t, action: a});
@@ -536,9 +538,11 @@ function recallHovertags() {
 	for(i in hovertagRegistrar) {
 		if(hovertagRegistrar[i].textcode != undefined)
 			try {
-			eval('formatHovertag("'+hovertagRegistrar[i].classname+'", "'+hovertagRegistrar[i].textcode+'", "'+hovertagRegistrar[i].action+'", true)'); 
+			formatHovertag(hovertagRegistrar[i].classname, hovertagRegistrar[i].textcode, hovertagRegistrar[i].action, true);
+//                eval('formatHovertag("'+hovertagRegistrar[i].classname+'", "'+hovertagRegistrar[i].textcode+'", "'+hovertagRegistrar[i].action+'", true)'); 
 			} catch(e) {
-			eval("formatHovertag('"+hovertagRegistrar[i].classname+"', 'Item', null, true)"); 	
+                formatHovertag(hovertagRegistrar[i].classname, 'Item', null, true);
+//			eval("formatHovertag('"+hovertagRegistrar[i].classname+"', 'Item', null, true)"); 	
 			}
 		else 
 			eval(hovertagRegistrar[i].classname);
@@ -1215,8 +1219,8 @@ function refTextDetails(id) {
     initiatePopup({title: "Ref Text", bordercolor:"#09f", ht: ht, fnc: fnc});
 }
 function latexDetails(id) {
-    ht = "<table style='width:100%'><tr><td style='vertical-align:top'>LaTeX is a form of markup that, among other features, allows for rich math formatting. <br>Reference guide for LaTeX markup:<br><input type='search' style='width:50%' id='latexSearch'></td><td>";
-    ht += "<div id='latexRef' style='display:none'></div></td></tr></table>";
+    ht = "<table style='width:100%'><tr><td style='vertical-align:top;width:50%;'>LaTeX is a form of markup that, among other features, allows for rich math formatting. <br><br>Reference Guide:&nbsp;<input type='search' style='width:50%' id='latexSearch' placeholder='Search for something...'><br><span style='font-size:9pt'>Note that mathematical formulas must be placed between \"$\"</span></td><td width:50%;>";
+    ht += "<div id='latexRef' style='display:none;background-color: rgba(255,255,255,.1);padding:5px;'></div></td></tr></table>";
    // ht += "<button id='latexPrev'>Preview</button>";
     ht += "<table style='width:99%'><tr><td style='width:50%'><div id='latexCmd' style='height:4em;width:95%;border: solid 1px rgba(0,129,255,1);background-color:"+theme.normfsui+";margin-top:5px;margin-left:5px;margin-bottom:10px;' contenteditable='true'></div></td>";
     
@@ -1254,11 +1258,15 @@ function latexDetails(id) {
                 Preview.Update();
             });
             $('#latexSave').on('click', function() {
-                if($('#latexView').html().length < 1)
-                    $('#latexView').html("LaTeX")
-                $('.latex'+id).html($('#latexView').html());
-                markAsDirty();
-                closePopup();
+                Preview.Update();
+                setTimeout(function() {
+                    console.log($('#latexView').html());
+                    if($('#latexView').html().length < 1)
+                        $('#latexView').html("LaTeX")
+                    $('.latex'+id).html($('#latexView').html());
+                    markAsDirty();
+                    closePopup();
+                }, 250);
             });
             function showReference(item) {
                 console.log(item);
@@ -1277,11 +1285,12 @@ function latexDetails(id) {
                     $('#latexRef').fadeIn(300);
                     for(i in commands) {
                         if(v == commands[i].id) {
+//                            console.log(v, console[i].id);
                             showReference(commands[i]); 
                             return;
                         }
-                        var a = commands[i].keywords.split(',');
-                        if(a.indexOf(v) > -1) {
+                        
+                        if(commands[i].keywords.indexOf(v) > -1) {
                             showReference(commands[i]); 
                             return;
                         }
@@ -1294,7 +1303,7 @@ function latexDetails(id) {
         }
         
         
-        commands = [{id:"Bar", keywords:"bar", cmd:"\\bar{x}", param:[{id:"x", value:"Value to get bar placed over it"}], des:"Places a bar over the input value"}];
+        commands = [{id:"Bar", keywords:"bar", cmd:"\\bar{x}", param:[{id:"x", value:"Value to get bar placed over it"}], des:"Places a bar over the input value"},{id:"Fraction", keywords:"frac, fraction, divide, division", cmd:"\\frac{n}{d}", param:[{id:"n", value:"Numerator"},{id:"d", value:"Denominator"}], des:"Displays a fraction"},{id:"Pi", keywords:"pi", cmd:"\\pi", param:[], des:"Displays the letter Pi"},{id:"Sum", keywords:"sum, summation, sigma", cmd:"\\sum_{i}^{k}", param:[{id:"i", value:"The initial value"},{id:"k", value:"The final value"}],des:"Shows a summation using a sigma"}];
         
         
         if($('.latex'+id).attr('data-cmd') != undefined) {
@@ -1734,7 +1743,6 @@ function initContext() {
 		window.context = new Array();
 	parseCT();
 		//formatHovertag("img", "'Image Details'", "'imgDetails('+$(this).attr('data-id')+');'");
-	formatHovertag('context', "window.context[parseInt($(this).attr('data-i'))].type", "'contextPanel('+$(this).attr('data-i')+')'");
 	$('.content_textarea').on('keydown', function( event ) {
 	  if ( event.which == 32 ) {
 	  	parseCT();
@@ -1742,6 +1750,15 @@ function initContext() {
 	  	//event.preventDefault();
 	  }
 	});
+    
+    var exists = false;
+    for(i in hovertagRegistrar) {
+//        console.log(hovertagRegistrar[i].classname);
+        if(hovertagRegistrar[i].classname == "context")
+            exists = true;
+    }
+    if(!exists)
+        formatHovertag('context', "window.context[parseInt($(this).attr('data-i'))].type", "'contextPanel('+$(this).attr('data-i')+')'");
 }
 function parseCT() {
 	var r = new RegExp('<span class="context" [^>]*>([\\s\\S]+?)</span>', 'gi');
