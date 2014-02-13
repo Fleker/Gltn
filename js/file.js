@@ -351,7 +351,7 @@ function finishRestore2(full) {
     if(!full) {
 	   console.log("Client save initiated; This is a go for launch.");
 	//saveFile();
-	   setInterval("startSaveFile()", 1000);	
+	   setInterval("startSaveFile()", 4000);	
     }
 }
 function newFile(x,xc) {
@@ -360,7 +360,7 @@ function newFile(x,xc) {
 	$('#file_name').val(fileid);
 		x.file = {};
 	formatShift();
-	setTimeout('finishRestore(x,xc);newFile2();', 4000);
+	setTimeout('finishRestore(x,xc);newFile2();', 1000);
 	
 }	
 function newFile2() {

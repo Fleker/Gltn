@@ -21,7 +21,7 @@ function startBuild(el) {
 	$('#searching').val('');
 	$('.build').html('<span class="buildRow"><button onclick="exitBuild()" class="noprint">Return to Editor</button><button onclick="window.print()" class="noprint" style="font-size:12pt;"><span class="fa fa-print"></span></button></span><span class="buildtime noprint" style="font-size:9pt"></span>');
 		//$('.build_progress').css('display', 'block').css('position', 'fixed').css('width', '50%').css('height', '50%').css('top','25%').css('left','25%').css('background-color', 'rgba(0,0,0,0.3)').css('font-size','16pt').css('margin-top','10%');
-	initiatePopup({title:"Build Progress",bordercolor:"rgb(44, 145, 16)",ht:"<div id='build_progress' class='build_progress' style='height:150px'></div>"});
+	initiatePopup({title:"Build Progress",bordercolor:"rgb(44, 145, 16)",ht:"<div id='build_progress' class='build_progress' style=''></div><div class='loader10'></div>"});
 	updateBuildProgress('Initiating Build...');
 	setTimeout('continueBuild("'+el+'")',500);
     
@@ -102,7 +102,7 @@ function continueBuild(el) {
 }
 function updateBuildProgress(text) {
 	$('.build_progress').empty();
-var opts = {
+/*var opts = {
   lines: 7, // The number of lines to draw
   length: 10, // The length of each line
   width: 3, // The line thickness
@@ -121,9 +121,9 @@ var opts = {
   left: '50%' // Left position relative to parent in px
 };
 var target = document.getElementById('build_progress');
-var spinner = new Spinner(opts).spin(target);
+var spinner = new Spinner(opts).spin(target);*/
 $('.build_progress').append(text);
-$('.spinner').css('top','55px').css('left','50%');
+//$('.spinner').css('top','55px').css('left','50%');
 
 //target.appendChild(spinner.el);
 }

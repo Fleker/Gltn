@@ -525,7 +525,14 @@ function formatHovertag(classname, textcode, action, recall) {
 	//'
 
 	if(recall != true && recall != "true") { 
-		hovertagRegistry(classname, textcode, action);
+        include = true;
+        for(i in hovertagRegistrar) {
+            console.log("!-!", hovertagRegistrar[i].classname, classname, hovertagRegistrar[i].classname == classname);
+            if(hovertagRegistrar[i].classname == classname)
+                include = false;
+        }
+        if(include)
+		  hovertagRegistry(classname, textcode, action);
         console.log(classname, recall);
     }
 }
@@ -536,6 +543,7 @@ function hovertagRegistry(c, t, a) {
 function recallHovertags() {
 	//console.log('.');
 	for(i in hovertagRegistrar) {
+//        console.log(hovertagRegistrar[i].classname);
 		if(hovertagRegistrar[i].textcode != undefined)
 			try {
 			formatHovertag(hovertagRegistrar[i].classname, hovertagRegistrar[i].textcode, hovertagRegistrar[i].action, true);
@@ -1090,6 +1098,86 @@ function imgDetails(pid) {
 	//initiatePopup({title:"Image Details", bordercolor:'#B54E7C', ht: ht, fnc: fnc});
 }
 function tableDetails(tableid) {
+    //clear_panel_data();
+    console.log(tableid);
+    create_panel_data({tid: tableid});
+    $('.table'+tableid).attr('data-id', tableid);
+    
+    console.log(grab_panel_data());
+    runPanel('main_Table');
+}
+function GetPanelmain_Table() {
+    return {title: "Spreadsheets", bordercolor:"#2cc36b", width: 50};   
+}
+function RunPanelmain_Table() {
+    id = grab_panel_data().tid;
+    if($('.table'+id).attr('data-row') == undefined) {
+        $('.table'+id).attr('data-row', 1);
+        $('.table'+id).attr('data-col', 1);
+        $('.table'+id).attr('data-arr', "0");
+    }
+    //TODO Fix the system to be more modular  
+    //TODO Override Enter
+    //TODO Spreadsheet
+    //TODO Save
+    //TODO Fix inline text  
+    //TODO Optimize overflow
+    function generate() {
+        var r = $('.table'+id).attr('data-row');
+        var c = $('.table'+id).attr('data-col');
+        var t = $('.table'+id).attr('data-title');
+        console.log($('.table'+id).attr('data-arr'));
+        if($('.table'+id).attr('data-arr') != undefined)
+           var a = $('.table'+id).attr('data-arr').split(",");
+        else
+            var a = ["0"];
+        console.log("Create a "+r+" x "+c+" table");
+        
+        var span = "<span style='font-size:9pt;opacity:.6'>";
+        var alpha = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"];
+        
+        out = "&emsp;Title: <input type='text' id='tableTitle' value='"+t+"'><br><input type='number' id='tableRow' style='width:4em' value='"+r+"'>&nbsp;x&nbsp;<input type='number' id='tableCol' style='width:4em' value='"+c+"'><button id='tableSave'>Save</button>";
+        out += "<br><table style='width:97%;border-spacing:initial'><tr><td></td>";
+        //TODO Numbering with alpha
+        for(j=0;j<c;j++) {
+            out += "<td style='text-align:center'>"+span+alpha[j]+"</span></td>";   
+        }
+        out += "</tr>";
+        
+        for(i=1;i<=r;i++) {
+            out += "<tr><td style='vertical-align:middle;text-align:right;padding-right:3px;'>"+span+i+"</span></td>";
+            for(j=1;j<=c;j++) {
+                var k = a[(i-1)*r+j-1];
+                console.log(i,j, (i-1)*r+j,k);
+                if(k == undefined)
+                    k = "";
+                //BG Colors
+                if(i == 0 || j == 0)
+				    var bg = "rgba(200,200,200,.5)";
+				else if(k.substr(0,1) == "=")
+                    var bg = "rgba(180,224,180,.5)";
+                else
+					var bg = theme.normbg;
+                
+                out += "<td style='border:solid 1px "+theme.coloralt+"; background-color:"+bg+";min-width:3em;padding-left:4px;color:"+theme.normcolor+"' contenteditable class='tableCell' id='tableCell_"+i+"_"+j+"'>"+k+"</td>";
+            }
+            out += "</tr>";
+        }
+        out += "</table>";
+        
+        postPanelOutput(out);
+        $('#tableRow, #tableCol').on('input', function() {
+            //TODO Validation and min values
+            console.log("Changing dimensions");
+            $('.table'+id).attr('data-row', $('#tableRow').val());
+            $('.table'+id).attr('data-col', $('#tableCol').val()); 
+            generate();
+        });
+    }
+    
+    generate();
+}
+function tableDetailsPop(tableid) {
 	var ht = "&emsp;Title: <input id='table_name'>&emsp;Col:<input type='number' style='width:5em' id='table_c'>&nbsp;&nbsp;Row:<input type='number' style='width:5em' id='table_r'><br><button id='table_save'>Save</button><table id='tablep' style='margin-left:30px'></table>"
 	ht += "<input type='hidden' id='tableid' value='"+tableid+"'>";
 	fnc = function x() {
@@ -1312,7 +1400,7 @@ function latexDetails(id) {
             populate(-1);
         }  
     };
-    initiatePopup({title: "Insert LaTeX", bordercolor: "#f1c40f", ht: ht, fnc: fnc});
+    initiatePopup({title: "Insert LaTeX", bordercolor: "#f1c40f", ht: ht, fnc: fnc, size: "large"});
 }
 /*** HOLORIBBON ***/
 /*newRibbon('.header', {
@@ -1411,7 +1499,10 @@ function ribbonLoad() {
 	});
 }
 function postLegal() {
-	out = "©2014 Made by Nick Felker<br>(@HandNF)";
+	out = "©2014 Made by Nick Felker<br>(@HandNF)<br>";
+    out += "Made using libraries from Mathjax, Font Awesome, jQuery, Rangy, InkFilepicker, and others<br>";
+    out += "Shoutout to everyone who posted online about stuff like replacing text nodes and the ample amount of help from Stacked Overflow.<br>";
+    out += "Loader was created by TaniaLD";
 	f = function x() { };
 	initiatePopup({title:'Credits', value: out, fnc: f});
 }
@@ -2008,6 +2099,7 @@ function initMathjax() {
   //    typesetting.  After it is done, call PreviewDone.
   //  
   CreatePreview: function () {
+      //console.log(this);
     Preview.timeout = null;
     if (this.mjRunning) return;
     var text = document.getElementById("latexCmd").innerHTML;
@@ -2016,6 +2108,7 @@ function initMathjax() {
     this.buffer.innerHTML = this.oldtext = text;
     this.mjRunning = true;
       console.log(text);
+    
     MathJax.Hub.Queue(
       ["Typeset",MathJax.Hub,this.buffer],
       ["PreviewDone",this]
@@ -2029,8 +2122,11 @@ function initMathjax() {
   PreviewDone: function () {
     this.mjRunning = false;
     this.SwapBuffers();
-  }
-
+  },
+        
+  doNothing: function() {
+        
+    }
 };
 
 //
@@ -2039,4 +2135,20 @@ function initMathjax() {
 Preview.callback = MathJax.Callback(["CreatePreview",Preview]);
 Preview.callback.autoReset = true;  // make sure it can run more than once
    
+//Initialize all the LaTeX attributes because they look ugly at first (this is seriously going to break sync though)
+    $('.latex').each(function() {
+        $(this).html($(this).attr('data-cmd'));
+        console.log($(this).html());
+        //console.log(MathJax.Hub);
+        MathJax.Hub.Queue(
+          ["Typeset",MathJax.Hub,this],
+          ["doNothing",Preview]
+        );
+    });
 }
+/*
+function doNothing() {
+    
+}
+*/
+

@@ -43,7 +43,8 @@ function initiatePopup(data) {
 		data.ht = "";
 	if(data.fnc == undefined)
 		data.fnc = function x() {/*alert(0)*/};
-	populatePopup(data.ht, data.fnc);
+    console.log(data.size);
+	populatePopup(data.ht, data.fnc, data.size);
 	setTimeout('reheight()', 600);
 	
 	//initiatePopup({title: 'Hello', subtitle: 'World', img: 'https://fbcdn-profile-a.akamaihd.net/hprofile-ak-frc1/c43.27.338.338/s160x160/397165_10150559002575832_1521489086_n.jpg', value: '<b>Hello world.</b>'})
@@ -55,26 +56,36 @@ function reheight() {
 	$('.popupcontent2').height(c);	
 }
 	
-function populatePopup(ht, fnc) {
+function populatePopup(ht, fnc, size) {
 	//HT - Hypertext - the tags and output
 	//Fnc - Function - this is code that starts to run when initiated, if valid
 	//Panels - More of a widget/mini application that runs on its own, whereas popups are more just for displaying data and simpler scripts
 	$('.popupcontent').html(ht);
 	eval(fnc+"x();");
-	postPopup();
+	postPopup(size);
 }
-function postPopup() {
+function postPopup(size) {
+    var left = "15%";
+    var width = "70%";
+    var height = "60%";
+    var top = "20%";
+    if(size == "large") {
+        left = "5%";
+        width = "90%";
+        height = "80%";
+        top = "10%";
+    }
 	$('.popup').animate(
-	{opacity: 1},
-	500, 'linear', function() {
-		$('.popup').css('display', 'block')	
+	   {opacity: 1},
+	   500, 'linear', function() {
+		$('.popup').css('display', 'block');	
 	});	
-	$('.popuptop').animate(
-	{left:'15%',
-	width:'70%',
-	top:'20%',
-	height:'60%'},
-	500);
+	$('.popuptop').animate({
+	   left:left,
+	   width:width,
+	   top:top,
+	   height:height
+    },500);
 	$('.popuptop').focus();
 }
 function closePopup() {

@@ -24,6 +24,7 @@ function initTheme() {
 	$('.toolbar, .overflow').css('background-color', '#444');
 	$('.popuptop').css('color', 'white').css('background-color', theme.normbg);
 	$('.popuptitle').css('color', theme.coloralt);
+    $('.content_textarea').css('line-height:1.4em');
 	$('.hovertag').css('font-size', '10pt');
 	
 	//Misc panel support

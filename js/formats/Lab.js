@@ -23,8 +23,8 @@ function onStyleGuide() {
 function onBuildFormat() {
 	//Cover Page
 	add_new_page('coverpage'); 	
-        add_to_page(valMetadata('Author').split(";").join("&emsp;"));
-        add_to_page(valMetadata("Class"));
+        add_to_page(valMetadata('Author').split(";").join("&emsp;")+"<br>");
+        add_to_page(valMetadata("Class")+"<br>");
     
         var due = valMetadata("DueDate");
 		var duedate = Date.parse(due);
@@ -34,7 +34,7 @@ function onBuildFormat() {
 		add_to_page(dueout+"<br>");
     
 		add_to_page(centerText("<b>"+valMetadata('Title')+"</b>"));
-	add_new_page();
+	//add_new_page();
 }
 function onSetHeader() {
 	push_header(lcr_split("", "", "PAGE"));
