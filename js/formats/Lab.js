@@ -59,16 +59,18 @@ function onGetFormats() {
 		});
 	};
     obj.table = function x(table,row,col) {
-		table = $.xml2json(table);
-		console.log(table);
+        table = table.split(";;");
 		out = "<br><span style='display:block;text-align:center'>"+smallcaps("Table")+" FIGN. TEXT%sc</span><table style='border-collapse:collapse;border:solid 1px black;width:100%;'>";
-		for(i=0;i<row;i++) {
-			out += "<tr>";
-			for(j=0;j<col;j++) {
-				out += "<td style='border:solid 1px black'>"+table['row'][i]['cell'][j]+"</td>";	
-			}
-			out += "</tr>";
-		}
+		for(i=1;i<=row;i++) {
+            out += "<tr>";
+            for(j=0;j<=col;j++) {
+                var v = table[(i-1)*r+j];
+                if(v.substr(0,1) == "=")
+                    v = eval(v.substr(1));
+                out += "<td style='border:solid 1px black'>"+v+"</td>";
+            }
+            out += "</tr>";
+        }
 		out += "</table>";
 		return out;
 	};

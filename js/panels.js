@@ -15,6 +15,7 @@ function initPanels() {
 			} catch(e) {
 				//console.error(e.message);
 			}
+            InitPanelmain_Table();
 		} else {
 			//Need to add script
 			var b = window.settings['panels_'+a[i]].split(', ');

@@ -1106,6 +1106,10 @@ function tableDetails(tableid) {
     console.log(grab_panel_data());
     runPanel('main_Table');
 }
+function InitPanelmain_Table() {
+    //Initiate the Spreadsheet framework
+    window.Spreadsheet = {};
+}
 function GetPanelmain_Table() {
     return {title: "Spreadsheets", bordercolor:"#2cc36b", width: 50};   
 }
@@ -1116,19 +1120,29 @@ function RunPanelmain_Table() {
         $('.table'+id).attr('data-col', 1);
         $('.table'+id).attr('data-arr', "0");
     }
+    var r = $('.table'+id).attr('data-row');
+    var c = $('.table'+id).attr('data-col');
+    var t = $('.table'+id).attr('data-title');
+    var current = "tableCell_1_1";
+    
+    out = "&emsp;Title: <input type='text' id='tableTitle' value='"+t+"'><br><input type='number' id='tableRow' style='width:4em' value='"+r+"'>&nbsp;x&nbsp;<input type='number' id='tableCol' style='width:4em' value='"+c+"'><button id='tableSave'>Save</button>";
+    out += "<br><input style='width:85%' id='tableForm'>";
+    out += "<br><div id='tableFrame' style='width:"+($('.panel_plugin_content').width() - 30)+"px;overflow:auto;padding-bottom: 20px;padding-right: 12px;'><table style='border-spacing:initial;' id='tableView'></table></div>";
+    postPanelOutput(out);
     //TODO Fix the system to be more modular  
     //TODO Override Enter
     //TODO Spreadsheet
     //TODO Save
-    //TODO Fix inline text  
+    //TODO Fix inline text
+    //TODO Title
     //TODO Optimize overflow
     function generate() {
         var r = $('.table'+id).attr('data-row');
         var c = $('.table'+id).attr('data-col');
-        var t = $('.table'+id).attr('data-title');
+        
         console.log($('.table'+id).attr('data-arr'));
         if($('.table'+id).attr('data-arr') != undefined)
-           var a = $('.table'+id).attr('data-arr').split(",");
+           var a = $('.table'+id).attr('data-arr').split(";;");
         else
             var a = ["0"];
         console.log("Create a "+r+" x "+c+" table");
@@ -1136,46 +1150,149 @@ function RunPanelmain_Table() {
         var span = "<span style='font-size:9pt;opacity:.6'>";
         var alpha = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"];
         
-        out = "&emsp;Title: <input type='text' id='tableTitle' value='"+t+"'><br><input type='number' id='tableRow' style='width:4em' value='"+r+"'>&nbsp;x&nbsp;<input type='number' id='tableCol' style='width:4em' value='"+c+"'><button id='tableSave'>Save</button>";
-        out += "<br><table style='width:97%;border-spacing:initial'><tr><td></td>";
-        //TODO Numbering with alpha
-        for(j=0;j<c;j++) {
+       // out = "&emsp;Title: <input type='text' id='tableTitle' value='"+t+"'><br><input type='number' id='tableRow' style='width:4em' value='"+r+"'>&nbsp;x&nbsp;<input type='number' id='tableCol' style='width:4em' value='"+c+"'><button id='tableSave'>Save</button>";
+//        out += "<br><table style='width:97%;border-spacing:initial'><tr><td></td>";
+        out = "<tr><td></td>";
+        for(j=0;j<=c;j++) {
             out += "<td style='text-align:center'>"+span+alpha[j]+"</span></td>";   
         }
         out += "</tr>";
         
+        console.log("Preparing to rebuild");
+        console.log(a);
+        for(i=1;i<=r;i++) {
+            for(j=0;j<=c;j++) {
+                Spreadsheet[alpha[j]+i] = a[(i-1)*r+j];
+            }
+        }
+        
         for(i=1;i<=r;i++) {
             out += "<tr><td style='vertical-align:middle;text-align:right;padding-right:3px;'>"+span+i+"</span></td>";
-            for(j=1;j<=c;j++) {
-                var k = a[(i-1)*r+j-1];
-                console.log(i,j, (i-1)*r+j,k);
-                if(k == undefined)
+            for(j=0;j<=c;j++) {
+                var k = a[(i-1)*r+j];
+                var l = k;
+                console.log(k);
+                if(k == undefined || k == "undefined")
                     k = "";
+//                console.log(k);
+                console.log(i,j, (i-1)*r+j,k);
                 //BG Colors
-                if(i == 0 || j == 0)
-				    var bg = "rgba(200,200,200,.5)";
+                if(i == 1 || j == 0)
+				    var bg = "rgba(200,200,200,.25)";
 				else if(k.substr(0,1) == "=")
-                    var bg = "rgba(180,224,180,.5)";
+                    var bg = "rgba(0,224,0,.2)";
                 else
 					var bg = theme.normbg;
                 
-                out += "<td style='border:solid 1px "+theme.coloralt+"; background-color:"+bg+";min-width:3em;padding-left:4px;color:"+theme.normcolor+"' contenteditable class='tableCell' id='tableCell_"+i+"_"+j+"'>"+k+"</td>";
+                if(k.substr(0,1) == "=") {
+                    $('#tableForm').val(k);
+                    k = eval(k.substr(1));
+                } else {
+                    $('#tableForm').val("");   
+                }
+                
+                if(k.toString().substr(0,1) == "=") {
+                    $('#tableForm').val(k);
+                    k = eval(k.substr(1));
+                } else {
+                    $('#tableForm').val("");   
+                }
+                
+                out += "<td style='border:solid 1px "+theme.coloralt+"; background-color:"+bg+";padding-left:4px;min-width:5em;color:"+theme.normcolor+"' contenteditable class='tableCell' id='tableCell_"+i+"_"+j+"' data-form='"+l+"'>"+k+"</td>";
             }
             out += "</tr>";
         }
         out += "</table>";
+        $('#tableView').css('min-width', r*5+"em");
+        $('#tableFrame').css('width', ($('.panel_plugin_content').width() - 30)+"px");  
+        $('#tableView').html(out);
         
-        postPanelOutput(out);
-        $('#tableRow, #tableCol').on('input', function() {
-            //TODO Validation and min values
-            console.log("Changing dimensions");
-            $('.table'+id).attr('data-row', $('#tableRow').val());
-            $('.table'+id).attr('data-col', $('#tableCol').val()); 
-            generate();
+        function saveArray() {
+            var a = "";
+            for(i=1;i<=r;i++) {
+                for(j=0;j<=c;j++) {
+                   // var k = a[(i-1)*r+j-1];
+                    var f = $('#tableCell_'+i+'_'+j).attr('data-form');
+                    if(f != undefined && f != "" && f != "undefined")
+                        var k = f;
+                    else
+                        var k = $('#tableCell_'+i+'_'+j).html();
+                    a += k+";;";  
+                }
+            }
+            $('.table'+id).attr('data-arr', a);
+            console.log(a);
+            
+        }
+            
+        
+        $('.tableCell').off().on('input', function() {
+            saveArray();
+            //generate();
+        });
+        
+        $('.tableCell').on('focusout', function() {
+            current = $(this).attr('id');
+            console.log("Out: "+current);
+            //generate();
+        });
+        $('.tableCell').on('focusin', function() {
+            current = $(this).attr('id'); 
+            if($(this).attr('data-form') != undefined && $(this).attr('data-form') != "0" && $(this).attr('data-form') != "undefined" && $(this).attr('data-form') != $(this).html())
+                $('#tableForm').val($(this).attr('data-form'));
+            else {
+                $('#tableForm').val("");
+                $(this).attr('data-form', "undefined");
+            }
+            $('#tableFrame').css('width', ($('.panel_plugin_content').width() - 30)+"px");  
+            console.log("In: "+current,$(this).attr('data-form'),$(this).html(),$(this).attr('data-form') != $(this).val());
+        });
+//        $('#tableForm').on('focusin', function() {
+//            alert(1);
+//            console.log("Formin: "+current); 
+//            $(this).val($('#'+current).attr('data-form'));
+//        });   
+        $('#tableForm').focusin(function() {
+           //console.log("Formin: "+current); 
+           //$(this).val($('#'+current).attr('data-form'));
+            if($('#'+current).attr('data-form') == $('#'+current).html())
+                $(this).val('');
+        });
+        $('#tableForm').focusout(function() {
+            console.log("Formout "+current, $(this).val());
+            var f = $(this).val();
+            if(f.length < 2)
+                f = undefined;
+            $('#'+current).attr('data-form', $(this).val());
+            saveArray();
+    //            generate();
+            $('#tableForm').val('');
+            current = "tableCell_0_0";
         });
     }
     
+    
+    
+    
+    $('#tableRow, #tableCol').on('input', function() {
+        //TODO Validation and min values
+        console.log("Changing dimensions");
+        $('.table'+id).attr('data-row', $('#tableRow').val());
+        $('.table'+id).attr('data-col', $('#tableCol').val()); 
+        generate();
+    });
+    $('.PanelKeyEvent').on('click', function() {
+        if($(this).attr('data-keycode') == 187 && $(this).attr('data-shift')) {
+            $(this).attr('data-keycode', '');   
+            $('#tableForm').focus();
+        }
+    });
+     $('#tableSave').on('click', function() {
+           generate(); 
+        });
+    
     generate();
+    setTimeout(function() { $('#tableFrame').css('width', ($('.panel_plugin_content').width() - 30)+"px"); }, 600);
 }
 function tableDetailsPop(tableid) {
 	var ht = "&emsp;Title: <input id='table_name'>&emsp;Col:<input type='number' style='width:5em' id='table_c'>&nbsp;&nbsp;Row:<input type='number' style='width:5em' id='table_r'><br><button id='table_save'>Save</button><table id='tablep' style='margin-left:30px'></table>"

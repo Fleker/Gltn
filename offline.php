@@ -3,7 +3,7 @@
 // Add the correct Content-Type for the cache manifest
 header('Content-Type: text/cache-manifest');
 echo "CACHE MANIFEST\n";
-echo "# version 1.1.3.1 ".count($_GET)."\n\n";
+echo "# version 1.1.3.2.1 ".count($_GET)."\n\n";
 echo "CACHE:\n";
 
 //echo "APA.js\n";

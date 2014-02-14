@@ -21,21 +21,26 @@ function startBuild(el) {
 	$('#searching').val('');
 	$('.build').html('<span class="buildRow"><button onclick="exitBuild()" class="noprint">Return to Editor</button><button onclick="window.print()" class="noprint" style="font-size:12pt;"><span class="fa fa-print"></span></button></span><span class="buildtime noprint" style="font-size:9pt"></span>');
 		//$('.build_progress').css('display', 'block').css('position', 'fixed').css('width', '50%').css('height', '50%').css('top','25%').css('left','25%').css('background-color', 'rgba(0,0,0,0.3)').css('font-size','16pt').css('margin-top','10%');
-	initiatePopup({title:"Build Progress",bordercolor:"rgb(44, 145, 16)",ht:"<div id='build_progress' class='build_progress' style=''></div><div class='loader10'></div>"});
+	initiatePopup({title:"Build Progress",bordercolor:"rgb(44, 145, 16)",ht:"<div id='build_progress' class='build_progress' style=''></div><div class='loader10' style='margin-top:12px'></div>"});
 	updateBuildProgress('Initiating Build...');
 	setTimeout('continueBuild("'+el+'")',500);
     
     //Search for all services and see if any of them support the ExportFile{panel} function which will let them add an export option
     var a = window.settings.panels.split(', ');
     for(i in a) {
-        var b = window.settings['panels_'+a[i]].split(', ');
-        var c = b[4];
-        if(c == true) {
-            try {
-                eval("ExportFile"+a[i]);   
-            } catch(e) {
-                //
+        try {
+            console.log(a, i, a[i]);
+            var b = window.settings['panels_'+a[i]].split(', ');
+            var c = b[4];
+            if(c == true) {
+                try {
+                    eval("ExportFile"+a[i]);   
+                } catch(e) {
+                    //
+                }
             }
+        } catch(e) {
+            
         }
     }
 }
@@ -508,6 +513,8 @@ function tableFormatted(input,fig,title) {
 }
 function smallcaps(inp) {
 	//console.warn(inp);
+    if(inp == undefined)
+        return "";
 	var out = "";
 	for(i=0;i<inp.length;i++) {
 		out += inp[i].replace(/[a-z]/g, "<span style='font-size:"+(nptfont-3)+"pt'>"+inp[i].toUpperCase()+"</span>");	
@@ -646,13 +653,13 @@ function post_content_formatting(object) {
 	$('.draft .table').each(function() {
 		$(this).css('background-color','white');
 		//var table = $.xml2json($(this).attr('data-xml'));
-		table = $(this).attr('data-xml');
+		table = $(this).attr('data-arr');
 		var r = $(this).attr('data-row');
 		var c = $(this).attr('data-col');
 		//use XML to encode table into rows and columns? Place into data-table and then decode in a preview in the div.
 		console.log("x("+table+","+r+","+c+");");
 		$(this).html(eval(object.table+';x("'+table+'",'+r+','+c+');'));
-		$(this).attr('data-xml', "");
+		$(this).attr('data-arr', "");
 		$(this).html(tableFormatted($(this).html(),$(this).attr('data-figure-number'),$(this).attr('data-title')));
 	});
 	

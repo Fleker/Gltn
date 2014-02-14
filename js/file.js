@@ -19,7 +19,7 @@ hovertagRegistrar = new Array();
 obj = {};
 currentformat = "";
 document.ready = function() {
-	console.log('Gltn has woken up: v 1.1.3.1');
+	console.log('Gltn has woken up: v 1.1.3.2');
     x = {};
     //Setup Filepicker
     filepicker.setKey("AePnevdApT62LvpkSSsiVz");
