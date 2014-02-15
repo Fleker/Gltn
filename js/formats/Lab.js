@@ -63,10 +63,10 @@ function onGetFormats() {
 		out = "<br><span style='display:block;text-align:center'>"+smallcaps("Table")+" FIGN. TEXT%sc</span><table style='border-collapse:collapse;border:solid 1px black;width:100%;'>";
 		for(i=1;i<=row;i++) {
             out += "<tr>";
-            for(j=0;j<=col;j++) {
-                var v = table[(i-1)*r+j];
+            for(j=0;j<col;j++) {
+                var v = table[(i-1)*c+j];
                 if(v.substr(0,1) == "=")
-                    v = eval(v.substr(1));
+                    v = tableEvaluate(v.substr(1));
                 out += "<td style='border:solid 1px black'>"+v+"</td>";
             }
             out += "</tr>";

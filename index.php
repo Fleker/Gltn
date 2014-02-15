@@ -132,7 +132,7 @@ function resetFolder(term) {
       <li><a href="#intuitiveness">Intuitiveness</a></li>
       <li><a href="#html">Web App</a></li>
       <li><a href="#open">Open Source</a></li>
-      <li><a href="http://www.github.com/Fleker/Gluten">GitHub</a></li>
+      <li><a href="http://www.github.com/Fleker/Gltn">GitHub</a></li>
       </ul></div>
       <a style="visibility:collapse" href="https://plus.google.com/110319342351519403865" rel="publisher">Google+</a>
 <div class="container center-block row">
@@ -155,7 +155,7 @@ function resetFolder(term) {
     
     </tr></table> </div>
     </div>
-    <div class="container">
+    <div class="">
     <div id="intelligence" class="page row" style="background-color:#f1c40f;">
     	<h1>Intelligence<br></h1><h3>Let's Have the Editor be as Smart as You</h3>
         <div class="center"><img src="images/name_collage.png" class="promo"></div>
@@ -198,10 +198,10 @@ function resetFolder(term) {
        	It's very easy to get started! Plus, the Wiki is filled with documentation, so you won't get lost. The framework is very extensive and gives developers control over what they want.<br>
         <h4>Create a Panel</h4>
         <pre>
-        function getPanel{name}() {
+        function GetPanel{name}() {
             return {title: "Document Notes", bordercolor: "#f1c40f", width: 40};	
         }
-        function runPanel{name}() {
+        function RunPanel{name}() {
         	//code here
             var output = "Hello World!"
             postPanelOutput(output);
@@ -235,10 +235,10 @@ a {
 	color:#05a;	
 }
 .page {
-	width: 102%;
-left: -1%;
-padding-left: 5%;
-height:100%;
+padding-left: 15px;
+padding-right: 15px;
+width: 100%;
+margin-left: 0px;
 }
 .promo {
 	max-width:96%;	

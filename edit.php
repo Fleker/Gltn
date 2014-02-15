@@ -99,7 +99,7 @@ ga('send', 'pageview');
             <!--<i>What Kind of Document do You Want to Create?</i><br>-->
             <!--File Name: <input type="text" id="file_name"><br><span style="font-size:9pt">Your file will be available at edit.php?file={file_name}. This is for the alpha version testing. To access a document, go to that URL. This WILL overwrite existing files so please be careful. Do not use spaces.</span><br>-->
             Format:<input type="text" id="file_format" list="gluten_formats" value="">&emsp;&emsp;Language:<input id="file_language" list="gluten_languages" value="English (US)"><br>
-            Tags:<input id="file_tags" placeholder="Space Separated Tags">
+            Tags:<input id="file_tags" placeholder="Comma Separated Tags">
             
             <div id="file_metadata">
             

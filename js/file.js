@@ -571,7 +571,7 @@ function cloudRead(ink, callback, localMod) {
             var c = parseInt(data.substring(a,b));
             localMod = parseInt(localMod);
             if(c <= localMod) {
-                console.log("Not synced: "+c+", "+localMod);
+//                console.log("Not synced: "+c+", "+localMod);
                 if(callback == "RF") {
                     restoreFile();
                     closePopup();

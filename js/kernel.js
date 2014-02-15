@@ -620,8 +620,8 @@ function contentAddSpan(t) {
 		//Because both quotes must be the ending and closing of a citation, we must add to the text content.anchor(
 		if(t.class == 'citation')
 			el.textContent += ' "';
-		else if(t.class.split(" ")[0] == "table")
-			el.textContent += "<span class='fa fa-table'></span>";
+		/*else if(t.class.split(" ")[0] == "table")
+			el.textContent += "<span class='fa fa-table'></span>";*/
 		else
 			el.textContent += t.class.split(" ")[0];
 			//range.insertNode(document.createTextNode('"'));
@@ -1108,7 +1108,18 @@ function tableDetails(tableid) {
 }
 function InitPanelmain_Table() {
     //Initiate the Spreadsheet framework
-    window.Spreadsheet = {};
+    window.Spreadsheet = {
+        IF: function(bool, tr, fl) {
+            if(bool) {
+                return tr;    
+            } else {
+                return fl;   
+            }
+        }
+    };
+    window.SpreadsheetAPI = {
+        IF: {id: "If", tags: "conditional if boolean", cmd: "IF(bool, true, false)", param:[{id:"bool", des:"A conditional statement"}, {id:"true", des:"The value to return if true"}, {id:"false", des:"The value to return if false"}], des:"Changes the output depending on the conditional statement"}
+    };
 }
 function GetPanelmain_Table() {
     return {title: "Spreadsheets", bordercolor:"#2cc36b", width: 50};   
@@ -1125,8 +1136,8 @@ function RunPanelmain_Table() {
     var t = $('.table'+id).attr('data-title');
     var current = "tableCell_1_1";
     
-    out = "&emsp;Title: <input type='text' id='tableTitle' value='"+t+"'><br><input type='number' id='tableRow' style='width:4em' value='"+r+"'>&nbsp;x&nbsp;<input type='number' id='tableCol' style='width:4em' value='"+c+"'><button id='tableSave'>Save</button>";
-    out += "<br><input style='width:85%' id='tableForm'>";
+    out = "&emsp;Title: <input type='text' id='tableTitle' value='"+t+"'><br><input type='number' id='tableRow' style='width:4em' value='"+r+"'>&nbsp;<span class='fa fa-times'></span>&nbsp;<input type='number' id='tableCol' style='width:4em' value='"+c+"'><button id='tableSave'>Save</button><button id='tableHelp'>Reference</button>";
+    out += "<br><span id='tableCurrent'></span><input style='width:85%' id='tableForm' placeholder='Cell Function'>";
     out += "<br><div id='tableFrame' style='width:"+($('.panel_plugin_content').width() - 30)+"px;overflow:auto;padding-bottom: 20px;padding-right: 12px;'><table style='border-spacing:initial;' id='tableView'></table></div>";
     postPanelOutput(out);
     //TODO Fix the system to be more modular  
@@ -1153,7 +1164,7 @@ function RunPanelmain_Table() {
        // out = "&emsp;Title: <input type='text' id='tableTitle' value='"+t+"'><br><input type='number' id='tableRow' style='width:4em' value='"+r+"'>&nbsp;x&nbsp;<input type='number' id='tableCol' style='width:4em' value='"+c+"'><button id='tableSave'>Save</button>";
 //        out += "<br><table style='width:97%;border-spacing:initial'><tr><td></td>";
         out = "<tr><td></td>";
-        for(j=0;j<=c;j++) {
+        for(j=0;j<c;j++) {
             out += "<td style='text-align:center'>"+span+alpha[j]+"</span></td>";   
         }
         out += "</tr>";
@@ -1161,39 +1172,41 @@ function RunPanelmain_Table() {
         console.log("Preparing to rebuild");
         console.log(a);
         for(i=1;i<=r;i++) {
-            for(j=0;j<=c;j++) {
-                Spreadsheet[alpha[j]+i] = a[(i-1)*r+j];
+            for(j=0;j<c;j++) {
+                Spreadsheet[alpha[j]+i] = a[(i-1)*c+j];
             }
         }
         
         for(i=1;i<=r;i++) {
             out += "<tr><td style='vertical-align:middle;text-align:right;padding-right:3px;'>"+span+i+"</span></td>";
-            for(j=0;j<=c;j++) {
-                var k = a[(i-1)*r+j];
+            for(j=0;j<c;j++) {
+                var k = a[(i-1)*c+j];
                 var l = k;
                 console.log(k);
                 if(k == undefined || k == "undefined")
                     k = "";
 //                console.log(k);
-                console.log(i,j, (i-1)*r+j,k);
+                console.log(i,j, (i-1), r, (i-1)*c, (i-1)*c+j,k);
                 //BG Colors
-                if(i == 1 || j == 0)
-				    var bg = "rgba(200,200,200,.25)";
-				else if(k.substr(0,1) == "=")
+				if(k.substr(0,1) == "=")
                     var bg = "rgba(0,224,0,.2)";
+                else if(i == 1 || j == 0)
+				    var bg = "rgba(200,200,200,.25)";
                 else
 					var bg = theme.normbg;
                 
                 if(k.substr(0,1) == "=") {
                     $('#tableForm').val(k);
-                    k = eval(k.substr(1));
+                    k = tableEvaluate(k.substr(1));
+                    console.log(k);
                 } else {
                     $('#tableForm').val("");   
                 }
                 
                 if(k.toString().substr(0,1) == "=") {
                     $('#tableForm').val(k);
-                    k = eval(k.substr(1));
+                    k = tableEvaluate(k.substr(1));
+                    console.log(k);
                 } else {
                     $('#tableForm').val("");   
                 }
@@ -1210,7 +1223,7 @@ function RunPanelmain_Table() {
         function saveArray() {
             var a = "";
             for(i=1;i<=r;i++) {
-                for(j=0;j<=c;j++) {
+                for(j=0;j<c;j++) {
                    // var k = a[(i-1)*r+j-1];
                     var f = $('#tableCell_'+i+'_'+j).attr('data-form');
                     if(f != undefined && f != "" && f != "undefined")
@@ -1224,22 +1237,42 @@ function RunPanelmain_Table() {
             console.log(a);
             
         }
-            
-        
+        function setCurrent(id) {
+            var a = id.split('_');
+            if(id == "tableCell_0_0")
+                $('#tableCurrent').empty();
+            else
+                $('#tableCurrent').html(alpha[a[2]]+(parseInt(a[1])));
+            current = id;
+        }
+        function tableForm(text) {
+            //Take in form and remove all instances of Spreadsheet
+            console.log("tFI: "+text.replace(/Spreadsheet./g, ""));
+            return text.replace(/Spreadsheet./g, "");
+//            return text;
+        }
+        function tableFormOut(text) {
+            for(i in Spreadsheet) {
+                var r = new RegExp(i, 'g');
+                console.log(r);
+                text = text.replace(i, "Spreadsheet."+i)    ;
+            }
+            return text;
+        }
         $('.tableCell').off().on('input', function() {
             saveArray();
             //generate();
         });
         
         $('.tableCell').on('focusout', function() {
-            current = $(this).attr('id');
+            setCurrent($(this).attr('id'));
             console.log("Out: "+current);
             //generate();
         });
         $('.tableCell').on('focusin', function() {
-            current = $(this).attr('id'); 
+            setCurrent($(this).attr('id'));
             if($(this).attr('data-form') != undefined && $(this).attr('data-form') != "0" && $(this).attr('data-form') != "undefined" && $(this).attr('data-form') != $(this).html())
-                $('#tableForm').val($(this).attr('data-form'));
+                $('#tableForm').val(tableForm($(this).attr('data-form')));
             else {
                 $('#tableForm').val("");
                 $(this).attr('data-form', "undefined");
@@ -1263,11 +1296,11 @@ function RunPanelmain_Table() {
             var f = $(this).val();
             if(f.length < 2)
                 f = undefined;
-            $('#'+current).attr('data-form', $(this).val());
+            $('#'+current).attr('data-form', tableFormOut($(this).val()));
             saveArray();
-    //            generate();
+                generate();
             $('#tableForm').val('');
-            current = "tableCell_0_0";
+            setCurrent('tableCell_0_0');
         });
     }
     
@@ -1287,13 +1320,70 @@ function RunPanelmain_Table() {
             $('#tableForm').focus();
         }
     });
-     $('#tableSave').on('click', function() {
-           generate(); 
-        });
+    $('#tableSave').on('click', function() {
+        generate(); 
+    });
+    $('#tableHelp').on('click', function() {
+        ht = "&emsp;&emsp;&emsp;Search for what you want to do:<br>&emsp;<input type='search' id='spreadsheetSearch' style='width:95%' autofocus='true'><br><div id='spreadsheetDetails'></div>";
+        fnc = function x() {
+            function showFunction(i) {
+                out = "<b>"+i.id+"</b>";
+                out += "<br>&emsp;<span style='font-family:monospace'>"+i.cmd+"</span>";
+                out += "<br>&emsp;"+i.des;
+                out += "<ul>";
+                for(j in i.param) {
+                    out += "<li>"+i.param[j].id+" - "+i.param[j].des+"</li>";
+                }
+                out += "</ul>";
+                $('#spreadsheetDetails').html(out);
+            }
+            $('#spreadsheetSearch').on('input', function() {
+                var t = $(this).val();
+                for(i in SpreadsheetAPI) {
+                    console.log(i);
+                    if(SpreadsheetAPI[i].id == t) {
+                        showFunction(SpreadsheetAPI[i]);
+                        return;
+                    } else if(SpreadsheetAPI[i].tags.indexOf(t) > -1) {
+                        showFunction(SpreadsheetAPI[i]);
+                        return;
+                    }
+                }
+                $('#spreadsheetDetails').html("Sorry... we can't anything.");
+            });
+        };
+        initiatePopup({title:"Spreadsheet Reference", fnc: fnc, ht: ht, bordercolor:"#2cc36b"});
+    });
     
     generate();
     setTimeout(function() { $('#tableFrame').css('width', ($('.panel_plugin_content').width() - 30)+"px"); }, 600);
 }
+function tableEvaluate(k) {
+    console.log(k);
+    var r = new RegExp("(Spreadsheet.[\\w|(|)|,]*)",'gi');
+    console.log(r);
+    k = k.replace(r, "eval($1)");
+    l = k.match(r);
+    var m = [];
+    console.log(l);
+    /*for(i in l) {
+        m[i] = l[i].substr(0, l[i].length-1)
+        var j = eval(m[i]);
+        j = j.replace(/=/g, "");
+        console.log(j);
+        var ra = new RegExp(m[i], 'g');
+        k = k.replace(ra, j);
+    }   */
+    
+    console.log(k);
+    k = k.replace(/=/g, "");
+    console.log(k);
+    return eval(k);
+}
+
+
+
+
 function tableDetailsPop(tableid) {
 	var ht = "&emsp;Title: <input id='table_name'>&emsp;Col:<input type='number' style='width:5em' id='table_c'>&nbsp;&nbsp;Row:<input type='number' style='width:5em' id='table_r'><br><button id='table_save'>Save</button><table id='tablep' style='margin-left:30px'></table>"
 	ht += "<input type='hidden' id='tableid' value='"+tableid+"'>";
@@ -1570,7 +1660,7 @@ function setHeader() {
 			{text: 'Themes', img: '<span style="font-size:18pt" class="fa fa-picture-o"></span>', action: "runPanel('main_Themes')"}
 		),
 		About: new Array(
-			{text: 'Open Source', img: '<span style="font-size:18pt" class="fa fa-github-alt"></span>', action: "window.location='http://www.github.com/fleker/gluten'"},
+			{text: 'Open Source', img: '<span style="font-size:18pt" class="fa fa-github-alt"></span>', action: "window.location='http://www.github.com/fleker/gltn'"},
 			{text: 'Send Feedback', img: '<span style="font-size:18pt" class="fa fa-envelope"></span>', action: "window.location='mailto:handnf+gltn@gmail.com'"},
 			{text: 'Gltn Blog', img: '<span style="font-size:18pt" class="fa fa-bullhorn"></span>', action:"window.location='http://gltndev.wordpress.com/'"},
 			{text: 'Credits', img: '<span style="font-size:18pt" class="fa fa-legal"></span>', action: 'postLegal()'}
