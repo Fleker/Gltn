@@ -23,7 +23,7 @@ function onStyleGuide() {
 function onBuildFormat() {
 	//Cover Page
 	add_new_page('coverpage'); 	
-        add_to_page(valMetadata('Author').split(";").join("&emsp;")+"<br>");
+        add_to_page(valMetadata('Author').split(",").join(",&emsp;")+"<br>");
         add_to_page(valMetadata("Class")+"<br>");
     
         var due = valMetadata("DueDate");
@@ -33,7 +33,7 @@ function onBuildFormat() {
 		var dueout = (duedate.getDate()+1) + " " + months[duedate.getMonth()] + " " + duedate.getFullYear();
 		add_to_page(dueout+"<br>");
     
-		add_to_page(centerText("<b>"+valMetadata('Title')+"</b>"));
+		add_to_page(centerText("<b><u>"+valMetadata('Title')+"</u></b>"));
 	//add_new_page();
 }
 function onSetHeader() {

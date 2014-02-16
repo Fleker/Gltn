@@ -63,7 +63,7 @@ function continueBuild(el) {
 	//el = '.content_textarea';
 	var cont = $(el).html();
 	//console.log(cont);
-	$('.draft').html(cont);
+	$('.draft').html(cont.replace(/&nbsp;/g, " ").trim());
 	$('.draft span').css('border','none');
 	
 	//To {format}.js
@@ -687,7 +687,8 @@ function post_content_formatting(object) {
 	window.cont = cont.replace(/<\/div><div><br><\/div><div>/g, "<br>"+object.paragraph_indent);
 	window.cont = cont.replace(/<div><br><\/div><div>/g, "<br>"+object.paragraph_indent);
 	window.cont = cont.replace(/<br><\/div>/g, "");
-	console.log(cont);
+    window.cont = cont.replace(/<\/div><div>/g, "<br>");
+//	console.log(cont);
 	updateBuildProgress("Generating HTML...");
 	//cont = cont.replace(/<span[^<]+?>/g, "");
 	//cont = cont.replace("</span>", "",'g');
@@ -786,7 +787,7 @@ for(i in b) {
             ine = false; 
 			c("ine "+e);  
         }
-        if(!intag  && e.substr(0,4) != "<div") {
+        if(!intag  && e.substr(0,4) != "<div" && e.substr(0,4) != "<kbd") {
 			out = out + output(e, tag, w);
 			c("___"+tag+", "+e+"; "+w);
 			if(e == "<br>") {
@@ -808,7 +809,7 @@ for(i in b) {
 		}
 		if(ine) {
 			e = e + b[i];
-			if(e == "<div") {
+			if(e == "<div" || e == "<kbd") {
 				parsingdiv = true;
 				c(e+" "+parsingdiv);
 			}
@@ -893,13 +894,23 @@ for(i in b) {
 		$('.hideme').remove();
 		//$('.pasteContent').append(ca[j]+" ");	
         var dspan = d[j]+' ';
-        console.log("'"+dspan+"'");
+//        console.log("'"+dspan+"'");
         dspan = dspan.replace('</span>  ', '</span>');
         //console.log("'"+dspan+"'");
 		add_to_page(dspan, undefined, undefined, col_count);
 	}
 	$('.build').html($('.build').html().replace(/===/g,' ').replace(/~~~/g, ' ')/*.replace(/<span[^<]+?>/g, "")*/);
 	$('.pagebody').css('height', maxh+"px");
+    
+    //Do some LaTeX corrections to display properly
+    var frac = ($('.mfrac > span > span:last-child')[1]);
+    var num = $(frac).prev().prev().width();
+    var den = $(frac).prev().width();
+    if(num > den)
+        den = num;
+    var fracin = $(frac).children()[0];
+    $(fracin).css('width', den).css('color', 'black').css('border', 'solid').css('border-left', 'none').css('border-right', 'none').css('border-top', 'none');
+    
 	/*if(column > 0) {
 		$('.pagebody').css('column-count', column).css('-webkit-column-count', column).css('-moz-column-count');	
 	}*/

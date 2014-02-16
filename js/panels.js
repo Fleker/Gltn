@@ -966,7 +966,7 @@ function RunPanelmain_Dictionary() {
 		});	
 		$('#DictionaryIn').on('input', function() {
 			var end = false;
-			var opts = {
+			/*var opts = {
 				  lines: 7, // The number of lines to draw
 				  length: 10, // The length of each line
 				  width: 3, // The line thickness
@@ -986,13 +986,15 @@ function RunPanelmain_Dictionary() {
 				};
 				$('#DictionaryOut').empty();
 				var target = document.getElementById('DictionaryOut');
-				var spinner = new Spinner(opts).spin(target);
+				var spinner = new Spinner(opts).spin(target);*/
+            if($('#DictionaryOut .loader10').length == 0)
+                $('#DictionaryOut').append("<span class='loader10'></span>");
 			for(i in ajaxrequests) {
 				ajaxrequests[i].abort();	
 			}
 			var d = window.settings.dictionarysort.split(', ');
 			var end = false;
-			ajaxrequests = new Array();
+			ajaxrequests = [];
 			index = 0;
 			function tryDictionary(i) {
 				console.log(i, d[i]);

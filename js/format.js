@@ -157,7 +157,7 @@ function post_format_text(m, inv) {
 		if(m.description.length)
 			out = out + "<br><span class='format_description'>"+m.description+"</span><br>";
 	}
-	out = out + "<input id='format_item_"+m.index+"' placeholder='"+m.placeholder+"' onmouseenter='hideHovertag()'>";
+	out = out + "<input id='format_item_"+m.index+"' placeholder='"+m.placeholder+"' style='width:55%' onmouseenter='hideHovertag()'>";
 	if(m.min.length != 0 || m.max.length != 0) {
 		out = out + "<br><div class='format_count' id='format_count_"+m.index+"'></div>";	
 	}
@@ -333,7 +333,7 @@ function post_toolbar(tools) {
             break;
             case "LaTeX":
                 var lid = $('.latex').length;
-                contentAddSpan({node:"div", class:"latex latex"+lid});
+                contentAddSpan({node:"kbd", class:"latex latex"+lid});
                 latexDetails(lid);
                 formatHovertag("latex", "$(this).attr('data-cmd')", "'latexDetails('+$(this).attr('data-id')+');'");
             break;

@@ -1147,7 +1147,8 @@ function RunPanelmain_Table() {
     //TODO Fix inline text
     //TODO Title
     //TODO Optimize overflow
-    function generate() {
+    function generate(why) {
+        console.warn("Generating a table because of step "+why);
         var r = $('.table'+id).attr('data-row');
         var c = $('.table'+id).attr('data-col');
         
@@ -1182,6 +1183,7 @@ function RunPanelmain_Table() {
             for(j=0;j<c;j++) {
                 var k = a[(i-1)*c+j];
                 var l = k;
+                var y = k;
                 console.log(k);
                 if(k == undefined || k == "undefined")
                     k = "";
@@ -1196,22 +1198,23 @@ function RunPanelmain_Table() {
 					var bg = theme.normbg;
                 
                 if(k.substr(0,1) == "=") {
+                    //$('#tableForm').val(k);
+                     console.warn("", k.substr(1));
+                    y = tableEvaluate(k.substr(1));
+                    console.log(y);
+                } else {
+                    $('#tableForm').val("");   
+                }
+                
+/*                if(k.toString().substr(0,1) == "=") {
                     $('#tableForm').val(k);
                     k = tableEvaluate(k.substr(1));
                     console.log(k);
                 } else {
                     $('#tableForm').val("");   
                 }
-                
-                if(k.toString().substr(0,1) == "=") {
-                    $('#tableForm').val(k);
-                    k = tableEvaluate(k.substr(1));
-                    console.log(k);
-                } else {
-                    $('#tableForm').val("");   
-                }
-                
-                out += "<td style='border:solid 1px "+theme.coloralt+"; background-color:"+bg+";padding-left:4px;min-width:5em;color:"+theme.normcolor+"' contenteditable class='tableCell' id='tableCell_"+i+"_"+j+"' data-form='"+l+"'>"+k+"</td>";
+                */
+                out += "<td style='border:solid 1px "+theme.coloralt+"; background-color:"+bg+";padding-left:4px;min-width:5em;color:"+theme.normcolor+"' contenteditable class='tableCell' id='tableCell_"+i+"_"+j+"' data-form='"+l+"'>"+y+"</td>";
             }
             out += "</tr>";
         }
@@ -1298,7 +1301,7 @@ function RunPanelmain_Table() {
                 f = undefined;
             $('#'+current).attr('data-form', tableFormOut($(this).val()));
             saveArray();
-                generate();
+                generate("D");
             $('#tableForm').val('');
             setCurrent('tableCell_0_0');
         });
@@ -1312,8 +1315,14 @@ function RunPanelmain_Table() {
         console.log("Changing dimensions");
         $('.table'+id).attr('data-row', $('#tableRow').val());
         $('.table'+id).attr('data-col', $('#tableCol').val()); 
-        generate();
+        $('.table'+id).attr('data-title', $('#table').val()); 
+        generate("B");
     });
+    $('#tableTitle').on('input', function() {
+        //TODO Validation and min values
+        $('.table'+id).attr('data-title', $('#tableTitle').val()); 
+    });
+    
     $('.PanelKeyEvent').on('click', function() {
         if($(this).attr('data-keycode') == 187 && $(this).attr('data-shift')) {
             $(this).attr('data-keycode', '');   
@@ -1321,7 +1330,7 @@ function RunPanelmain_Table() {
         }
     });
     $('#tableSave').on('click', function() {
-        generate(); 
+        generate("C"); 
     });
     $('#tableHelp').on('click', function() {
         ht = "&emsp;&emsp;&emsp;Search for what you want to do:<br>&emsp;<input type='search' id='spreadsheetSearch' style='width:95%' autofocus='true'><br><div id='spreadsheetDetails'></div>";
@@ -1355,30 +1364,48 @@ function RunPanelmain_Table() {
         initiatePopup({title:"Spreadsheet Reference", fnc: fnc, ht: ht, bordercolor:"#2cc36b"});
     });
     
-    generate();
-    setTimeout(function() { $('#tableFrame').css('width', ($('.panel_plugin_content').width() - 30)+"px"); }, 600);
+    generate("A");
+    setTimeout(function() { $('#tableFrame').css('width', ($('.panel_plugin_content').width() - 30)+"px"); }, 1000);
 }
+
 function tableEvaluate(k) {
     console.log(k);
-    var r = new RegExp("(Spreadsheet.[\\w|(|)|,]*)",'gi');
+    if(typeof(k) == "number")
+        return k;
+    var r = new RegExp("(Spreadsheet.[\\w(,\\s><=]*\\))|(Spreadsheet.[\\w]*)",'gi');
     console.log(r);
-    k = k.replace(r, "eval($1)");
+//    k = k.replace(r, "eval($1)");
     l = k.match(r);
-    var m = [];
     console.log(l);
-    /*for(i in l) {
-        m[i] = l[i].substr(0, l[i].length-1)
-        var j = eval(m[i]);
+    if(l == null)
+        l = [];
+    console.log(l);
+    n = k;
+    for(q in l) {
+        m = l[q].substr(0, l[q].length);
+        console.log(m);
+        var j = eval(m).toString();
+        //Recursive?
         j = j.replace(/=/g, "");
         console.log(j);
-        var ra = new RegExp(m[i], 'g');
-        k = k.replace(ra, j);
-    }   */
+        var ra = new RegExp(m, 'g');
+        console.log(ra);
+        console.log(n);
+        n = n.replace(ra, j);
+    }   
     
-    console.log(k);
-    k = k.replace(/=/g, "");
-    console.log(k);
-    return eval(k);
+    console.log(n);
+    n = n.replace(/=/g, "");
+//    console.log(k);
+    var p = undefined;
+    try {
+        p = eval(n)   
+    } catch(e) {
+        console.error(e.message);
+        console.warn(n);
+    }
+    console.log(p);
+    return p;
 }
 
 
@@ -1598,7 +1625,7 @@ function latexDetails(id) {
         }
         
         
-        commands = [{id:"Bar", keywords:"bar", cmd:"\\bar{x}", param:[{id:"x", value:"Value to get bar placed over it"}], des:"Places a bar over the input value"},{id:"Fraction", keywords:"frac, fraction, divide, division", cmd:"\\frac{n}{d}", param:[{id:"n", value:"Numerator"},{id:"d", value:"Denominator"}], des:"Displays a fraction"},{id:"Pi", keywords:"pi", cmd:"\\pi", param:[], des:"Displays the letter Pi"},{id:"Sum", keywords:"sum, summation, sigma", cmd:"\\sum_{i}^{k}", param:[{id:"i", value:"The initial value"},{id:"k", value:"The final value"}],des:"Shows a summation using a sigma"}];
+        commands = [{id:"Bar", keywords:"bar", cmd:"\\bar{x}", param:[{id:"x", value:"Value to get bar placed over it"}], des:"Places a bar over the input value"},{id:"Fraction", keywords:"frac, fraction, divide, division", cmd:"\\frac{n}{d}", param:[{id:"n", value:"Numerator"},{id:"d", value:"Denominator"}], des:"Displays a fraction"},{id:"Pi", keywords:"pi", cmd:"\\pi", param:[], des:"Displays the letter Pi"},{id:"Sum", keywords:"sum, summation, sigma", cmd:"\\sum_{i}^{k}", param:[{id:"i", value:"The initial value"},{id:"k", value:"The final value"}],des:"Shows a summation using a sigma"},{id:"Times", keywords:"multiplication multiply times", cmd:"\\times", param:[], des:"Displays the times symbol, often used for multiplication"},{id:"Space", keywords:"space tab whitespace", cmd:"\\, or \\: or \\;", param:[], des:"Displays a space that is thin, medium, or wide respectively."},{id:"Subscript", keywords:"element sub subscript", cmd:"_{exp}", param:[{id:"exp", des:"The expression you want subscripted"}], des:"Subscripts a specific input"},{id:"Superscript", keywords:"exponent sup superscript", cmd:"^{exp}", param:[{id:"exp", des:"The expression you want superscripted"}], des:"Superscripts a specific input"},{id:"Root", keywords:"square root radical", cmd:"\\sqrt[root]{exp}", param:[{id:"root", des:"Opt. The root of the radical"}, {id:"exp", des:"The expression you want under the radical"}], des:"Shows an expression under a radical"}];
         
         
         if($('.latex'+id).attr('data-cmd') != undefined) {

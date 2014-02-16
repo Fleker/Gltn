@@ -307,10 +307,22 @@ button {
 	font-family:serif;
 	font-size:12pt;
 }
+.mfrac {
+       
+}
+.draft .mfrac {
+      
+}
+.page .mfrac {
+    
+}
 .draft {
 	color:black;
 	font-family:serif;
 	font-size:12pt;
+}
+kbd {
+    font-family: serif;   
 }
 @media screen {
 .page {

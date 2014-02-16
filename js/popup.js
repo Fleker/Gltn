@@ -70,10 +70,10 @@ function postPopup(size) {
     var height = "60%";
     var top = "20%";
     if(size == "large") {
-        left = "5%";
-        width = "90%";
-        height = "80%";
-        top = "10%";
+        left = "3%";
+        width = "94%";
+        height = "90%";
+        top = "5%";
     }
 	$('.popup').animate(
 	   {opacity: 1},
