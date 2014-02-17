@@ -252,6 +252,7 @@ function restoreFile(full) {
 			}
 		}
 		
+        //TODO FIX STORAGE LEAK RIGHT HERE!!!
 		if(x.hovertagRegistrar == undefined) {
 			
 		} else if(x.hovertagRegistrar.length == undefined && x.hovertagRegistrar != undefined) {
@@ -331,8 +332,23 @@ function finishRestore2(full) {
 		//may not be ready yet, so the function will be disabled
 		console.warn(e.message);	
 	}
-	recallHovertags();
-	setInterval("recallHovertags();",1000);
+    //TODO STORAGE LEAK CONTINUES HERE
+    console.log("Finishing... the registrar contains "+hovertagRegistrar.length+" items");
+    hovertagRegistrarTemp = [];
+    for(i in hovertagRegistrar) {
+        var include = true;
+        for(j in hovertagRegistrarTemp) {
+            if(hovertagRegistrarTemp[j].classname == hovertagRegistrar[i].classname) {
+                include = false;
+            }
+        }
+        if(include)
+            hovertagRegistrarTemp.push(hovertagRegistrar[i]);
+    }
+    hovertagRegistrar = hovertagRegistrarTemp;
+    console.log("The temp registrar contains "+hovertagRegistrarTemp.length+" items");
+	recallHovertags(hovertagRegistrar);
+	setInterval("recallHovertags(hovertagRegistrar);",1000);
 	postWordCount();
 	initNiftyUI4Saving();
 	if(window.offline != true && !full)
@@ -599,6 +615,7 @@ function cloudRead(ink, callback, localMod) {
             localStorage[fileid] = xml;
             localStorage[fileid+"_c"] = ht;
            // closePopup();
+            console.log("Downloaded file.", c, localMod);
             restoreFile(callback == "RF2");
              initService("main_Sync", "Synced", "<span class='fa fa-cloud'></span>");
         }

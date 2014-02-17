@@ -496,12 +496,11 @@ function citationHovertag(recall) {
 }
 //'
 function formatHovertag(classname, textcode, action, recall) {
-	for(i in hovertagRegistrar) {
+	/*for(i in hovertagRegistrar) {
 		if(hovertagRegistrar[i].classname == classname && recall != true)
 			return;	
-	}
-	$('.'+classname).off('mouseenter');
-	$('.'+classname).off('mouseleave');
+	}*/
+	$('.'+classname).off();
 	
 	$('.'+classname).each(function(index, element) {
         $(this).on('mouseenter', function() {
@@ -528,32 +527,37 @@ function formatHovertag(classname, textcode, action, recall) {
         include = true;
         for(i in hovertagRegistrar) {
             console.log("!-!", hovertagRegistrar[i].classname, classname, hovertagRegistrar[i].classname == classname);
-            if(hovertagRegistrar[i].classname == classname)
+            if(hovertagRegistrar[i].classname == classname) {
                 include = false;
+            }
         }
-        if(include)
+        if(include) {
 		  hovertagRegistry(classname, textcode, action);
+        }
         console.log(classname, recall);
+    } else {
+//        console.log("We should NOT be including "+classname);   
     }
 }
 function hovertagRegistry(c, t, a) {
+    console.log("Adding to the Registry: "+c,t,a);
 	hovertagRegistrar.push({classname: c, textcode: t, action: a});
 	saveFile();
 }
-function recallHovertags() {
+function recallHovertags(hovertagRegistryArray) {
 	//console.log('.');
-	for(i in hovertagRegistrar) {
+	for(i in hovertagRegistryArray) {
 //        console.log(hovertagRegistrar[i].classname);
-		if(hovertagRegistrar[i].textcode != undefined)
+		if(hovertagRegistryArray[i].textcode != undefined)
 			try {
-			formatHovertag(hovertagRegistrar[i].classname, hovertagRegistrar[i].textcode, hovertagRegistrar[i].action, true);
+			formatHovertag(hovertagRegistryArray[i].classname, hovertagRegistryArray[i].textcode, hovertagRegistryArray[i].action, true);
 //                eval('formatHovertag("'+hovertagRegistrar[i].classname+'", "'+hovertagRegistrar[i].textcode+'", "'+hovertagRegistrar[i].action+'", true)'); 
 			} catch(e) {
-                formatHovertag(hovertagRegistrar[i].classname, 'Item', null, true);
+                formatHovertag(hovertagRegistryArray[i].classname, 'Item', null, true);
 //			eval("formatHovertag('"+hovertagRegistrar[i].classname+"', 'Item', null, true)"); 	
 			}
 		else 
-			eval(hovertagRegistrar[i].classname);
+			eval(hovertagRegistryArray[i].classname);
 	}
 }
 
@@ -1200,7 +1204,12 @@ function RunPanelmain_Table() {
                 if(k.substr(0,1) == "=") {
                     //$('#tableForm').val(k);
                      console.warn("", k.substr(1));
-                    y = tableEvaluate(k.substr(1));
+                    try {
+                        y = tableEvaluate(k.substr(1));
+                    } catch(e) {
+                        console.error(e.message);
+                        y = l
+                    }
                     console.log(y);
                 } else {
                     $('#tableForm').val("");   
@@ -1624,8 +1633,31 @@ function latexDetails(id) {
             });
         }
         
+        commands = [];
         
-        commands = [{id:"Bar", keywords:"bar", cmd:"\\bar{x}", param:[{id:"x", value:"Value to get bar placed over it"}], des:"Places a bar over the input value"},{id:"Fraction", keywords:"frac, fraction, divide, division", cmd:"\\frac{n}{d}", param:[{id:"n", value:"Numerator"},{id:"d", value:"Denominator"}], des:"Displays a fraction"},{id:"Pi", keywords:"pi", cmd:"\\pi", param:[], des:"Displays the letter Pi"},{id:"Sum", keywords:"sum, summation, sigma", cmd:"\\sum_{i}^{k}", param:[{id:"i", value:"The initial value"},{id:"k", value:"The final value"}],des:"Shows a summation using a sigma"},{id:"Times", keywords:"multiplication multiply times", cmd:"\\times", param:[], des:"Displays the times symbol, often used for multiplication"},{id:"Space", keywords:"space tab whitespace", cmd:"\\, or \\: or \\;", param:[], des:"Displays a space that is thin, medium, or wide respectively."},{id:"Subscript", keywords:"element sub subscript", cmd:"_{exp}", param:[{id:"exp", des:"The expression you want subscripted"}], des:"Subscripts a specific input"},{id:"Superscript", keywords:"exponent sup superscript", cmd:"^{exp}", param:[{id:"exp", des:"The expression you want superscripted"}], des:"Superscripts a specific input"},{id:"Root", keywords:"square root radical", cmd:"\\sqrt[root]{exp}", param:[{id:"root", des:"Opt. The root of the radical"}, {id:"exp", des:"The expression you want under the radical"}], des:"Shows an expression under a radical"}];
+        /*** LATEX TEXT MARKUP ***/
+        commands.push({id:"Bar", keywords:"bar", cmd:"\\bar{x}", param:[{id:"x", value:"Value to get bar placed over it"}], des:"Places a bar over the input value"});
+        commands.push({id:"Subscript", keywords:"element sub subscript", cmd:"_{exp}", param:[{id:"exp", des:"The expression you want subscripted"}], des:"Subscripts a specific input"});
+        commands.push({id:"Superscript", keywords:"exponent sup superscript", cmd:"^{exp}", param:[{id:"exp", des:"The expression you want superscripted"}], des:"Superscripts a specific input"});
+
+        
+        /*** LATEX MATH MARKUP ***/
+        commands.push({id:"Fraction", keywords:"frac, fraction, divide, division", cmd:"\\frac{n}{d}", param:[{id:"n", value:"Numerator"},{id:"d", value:"Denominator"}], des:"Displays a fraction"});
+        commands.push({id:"Sum", keywords:"sum, summation, sigma", cmd:"\\sum_{i}^{k}", param:[{id:"i", value:"The initial value"},{id:"k", value:"The final value"}],des:"Shows a summation using a sigma"});
+        commands.push({id:"Root", keywords:"square root radical", cmd:"\\sqrt[root]{exp}", param:[{id:"root", des:"Opt. The root of the radical"},{id:"exp", des:"The expression you want under the radical"}], des:"Shows an expression under a radical"});
+
+        
+        /*** LATEX CONSTANTS: GREEK ***/
+        function LatexGreek(char) {
+            return {id:char, keywords: char, cmd:"\\"+char.toLowerCase(), param:[], des:"Displays the letter "+char};
+        }
+        commands.push(LatexGreek("Alpha"));
+        commands.push(LatexGreek("Pi"));
+        commands.push(LatexGreek("Omega")); 
+        
+        /*** LATEX SYMBOLS & CONSTANTS ***/
+        commands.push({id:"Times", keywords:"multiplication multiply times", cmd:"\\times", param:[], des:"Displays the times symbol, often used for multiplication"});
+        commands.push({id:"Space", keywords:"space tab whitespace", cmd:"\\, or \\: or \\;", param:[], des:"Displays a space that is thin, medium, or wide respectively."});
         
         
         if($('.latex'+id).attr('data-cmd') != undefined) {

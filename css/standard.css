@@ -128,6 +128,13 @@ span, div, body {
 	border-bottom: solid 1px #f1c40f;
     display:inline;
 }	
+.table {
+    text-decoration:none;
+    border: solid 1px #f0f;
+}
+.build .table {
+    border:none 0px;
+}
 .build .latex {
     border-bottom: solid 0px;   
 }

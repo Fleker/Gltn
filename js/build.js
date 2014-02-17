@@ -657,8 +657,8 @@ function post_content_formatting(object) {
 		var r = $(this).attr('data-row');
 		var c = $(this).attr('data-col');
 		//use XML to encode table into rows and columns? Place into data-table and then decode in a preview in the div.
-		console.log("x("+table+","+r+","+c+");");
-		$(this).html(eval(object.table+';x("'+table+'",'+r+','+c+');'));
+		console.log("x('"+table+"',"+r+","+c+");");
+		$(this).html(eval(object.table+";x('"+table+"',"+r+","+c+");"));
 		$(this).attr('data-arr', "");
 		$(this).html(tableFormatted($(this).html(),$(this).attr('data-figure-number'),$(this).attr('data-title')));
 	});

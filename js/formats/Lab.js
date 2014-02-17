@@ -57,16 +57,27 @@ function onGetFormats() {
 			$(this).attr('data-figure-number', i);
 			i++;
 		});
+        
+        var i = 1;
+		$('.draft .table').each(function() {
+			$(this).attr('data-figure-number', i);
+			i++;
+		});
 	};
     obj.table = function x(table,row,col) {
+        console.log(table);
         table = table.split(";;");
-		out = "<br><span style='display:block;text-align:center'>"+smallcaps("Table")+" FIGN. TEXT%sc</span><table style='border-collapse:collapse;border:solid 1px black;width:100%;'>";
+		out = "<br><span style='display:block;text-align:center'>Table FIGN. TEXT</span><table style='border-collapse:collapse;border:solid 1px black;width:100%;'>";
 		for(i=1;i<=row;i++) {
             out += "<tr>";
             for(j=0;j<col;j++) {
                 var v = table[(i-1)*c+j];
+                try {
                 if(v.substr(0,1) == "=")
                     v = tableEvaluate(v.substr(1));
+                } catch(e) {
+                    console.error("Table building error "+v+":    "+e.message);   
+                }
                 out += "<td style='border:solid 1px black'>"+v+"</td>";
             }
             out += "</tr>";
