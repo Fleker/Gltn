@@ -1119,14 +1119,24 @@ function InitPanelmain_Table() {
             } else {
                 return fl;   
             }
+        },
+        SUB: function(str) {
+            return "<sub>"+str.toString()+"</sub>";   
+        },
+        SUP: function(str) {
+            return "<sup>"+str.toString()+"</sup>";   
         }
     };
     window.SpreadsheetAPI = {
-        IF: {id: "If", tags: "conditional if boolean", cmd: "IF(bool, true, false)", param:[{id:"bool", des:"A conditional statement"}, {id:"true", des:"The value to return if true"}, {id:"false", des:"The value to return if false"}], des:"Changes the output depending on the conditional statement"}
+        IF: {id: "If", tags: "conditional if boolean", cmd: "IF(bool, true, false)", param:[{id:"bool", des:"A conditional statement"}, {id:"true", des:"The value to return if true"}, {id:"false", des:"The value to return if false"}], des:"Changes the output depending on the conditional statement"},
+        
+        SUB: {id: "Subscript", tags:"element sub subscript", cmd: "SUB(str)", param:[{id:"str", des:"The string to format in subscript"}], des:"Makes a string subscript"},
+        
+        SUP: {id: "Superscript", tags:"exponent sup superscript", cmd: "SUP(str)", param:[{id:"str", des:"The string to format in superscript"}], des:"Makes a string superscript"},
     };
 }
 function GetPanelmain_Table() {
-    return {title: "Spreadsheets", bordercolor:"#2cc36b", width: 50};   
+    return {title: "Spreadsheets", bordercolor:"#2cc36b", width: 50, maximize:true};   
 }
 function RunPanelmain_Table() {
     id = grab_panel_data().tid;
@@ -1158,7 +1168,7 @@ function RunPanelmain_Table() {
         
         console.log($('.table'+id).attr('data-arr'));
         if($('.table'+id).attr('data-arr') != undefined)
-           var a = $('.table'+id).attr('data-arr').split(";;");
+           var a = $('.table'+id).attr('data-arr').split("~~");
         else
             var a = ["0"];
         console.log("Create a "+r+" x "+c+" table");
@@ -1208,7 +1218,7 @@ function RunPanelmain_Table() {
                         y = tableEvaluate(k.substr(1));
                     } catch(e) {
                         console.error(e.message);
-                        y = l
+                        y = l;
                     }
                     console.log(y);
                 } else {
@@ -1228,7 +1238,7 @@ function RunPanelmain_Table() {
             out += "</tr>";
         }
         out += "</table>";
-        $('#tableView').css('min-width', r*5+"em");
+        $('#tableView').css('min-width', c*5+"em");
         $('#tableFrame').css('width', ($('.panel_plugin_content').width() - 30)+"px");  
         $('#tableView').html(out);
         
@@ -1242,7 +1252,7 @@ function RunPanelmain_Table() {
                         var k = f;
                     else
                         var k = $('#tableCell_'+i+'_'+j).html();
-                    a += k+";;";  
+                    a += k+"~~";  
                 }
             }
             $('.table'+id).attr('data-arr', a);
@@ -1341,6 +1351,7 @@ function RunPanelmain_Table() {
     $('#tableSave').on('click', function() {
         generate("C"); 
     });
+
     $('#tableHelp').on('click', function() {
         ht = "&emsp;&emsp;&emsp;Search for what you want to do:<br>&emsp;<input type='search' id='spreadsheetSearch' style='width:95%' autofocus='true'><br><div id='spreadsheetDetails'></div>";
         fnc = function x() {

@@ -18,7 +18,7 @@ echo "js/IntroJS/introjs.min.css\n";
 echo "js/json2xml.js\n";
 //	echo "kernel.js\n";
 echo "js/formats/MLA.js\n";
-	echo "js/panels.js\n";
+//	echo "js/panels.js\n";
 	echo "js/popup.js\n";
 //echo "standard.css\n";
 echo "js/xmlToJson.js\n";

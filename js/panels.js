@@ -32,9 +32,17 @@ function runPanel(panel_id_name) {
 	//Get Properties of the Panel First
 	var p = eval("GetPanel"+panel_id_name+"();");
 	//$('.panel_plugin_title').html();
-	$('.panel_plugin_title').html(lcr_split(p.title+'&emsp;<span class="PanelPopupEvent"></span><span class="PanelKeyEvent" data-keycode="" data-alt="" data-ctrl="" data-shift=""></span><span id="PanelCloseEvent"></span>', '', '<button onclick="hidePanelPlugin()" data-step="22" data-intro="Click me to hide the panel.">'+closeButton()+'</button>'));
+    var max = "";
+    console.warn(p.maximize);
+    if(p.maximize == true) {
+        
+        max = "<span class='PanelMaximizeEvent' data-status='0'></span><button onclick='maximizePanel()'><span class='fa fa-arrows-alt'></span></button>";
+    }
+    console.log(max);
+	$('.panel_plugin_title').html(lcr_split(p.title+'&emsp;<span class="PanelPopupEvent"></span><span class="PanelKeyEvent" data-keycode="" data-alt="" data-ctrl="" data-shift=""></span><span id="PanelCloseEvent"></span>', '', max+'<button onclick="hidePanelPlugin()" data-step="22" data-intro="Click me to hide the panel.">'+closeButton()+'</button>'));
 	$('#panel_plugin').css("border-color", p.bordercolor);
 	window.paneloverride = p.override;
+    window.panelwidth = p.width;
 	//$('#panel_plugin').css('margin-top');
 	
 	//for a phone, do a type of check so that it isn't too small. 
@@ -77,6 +85,15 @@ function animateContentPanel(p) {
 		width: p
 		}, 100
 	);
+}
+function maximizePanel() {
+    if($('.PanelMaximizeEvent').attr('data-status') == 0) {
+        $('#panel_content').hide(200);
+        $('.PanelMaximizeEvent').attr('data-status', 1)
+    } else {
+        $('#panel_content').show(200);
+        $('.PanelMaximizeEvent').attr('data-status', 0)
+    }
 }
 function hidePanelPlugin() {
 	$('#PanelCloseEvent').click();

@@ -316,7 +316,7 @@ function post_toolbar(tools) {
 			var tid = $('.table').length;
 				contentAddSpan({node:"div", class:"table inline table"+tid});
 				tableDetails(tid);
-				formatHovertag("table", "'Edit Table'", "'tableDetails('+$(this).attr('data-id')+');'");
+				formatHovertag("table", "$(this).attr('data-title')", "'tableDetails('+$(this).attr('data-id')+');'");
 			break;
 			case "bold":
 				console.warn("bold");
