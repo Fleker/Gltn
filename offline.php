@@ -3,14 +3,14 @@
 // Add the correct Content-Type for the cache manifest
 header('Content-Type: text/cache-manifest');
 echo "CACHE MANIFEST\n";
-echo "# version 1.1.3.3.3 ".count($_GET)."\n\n";
+echo "# version 1.1.3.3.5 ".count($_GET)."\n\n";
 echo "CACHE:\n";
 
-//echo "APA.js\n";
+//echo "js/formats/APA.js\n";
 //			echo "null.js\n";
-//	echo "build.js\n";
-//	echo "file.js\n";
-//	echo "format.js\n";
+//	echo "js/build.js\n";
+//	echo "js/file.js\n";
+//	echo "js/format.js\n";
 echo "js/hammer.js\n";
 echo "js/holoribbon.js\n";
 echo "js/IntroJS/intro.js\n";

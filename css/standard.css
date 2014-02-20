@@ -23,6 +23,7 @@ body {
 	border-bottom:solid 1px #bbb;
 	left:0px;
 	width:100%;
+    z-index:99;
 }	
 span, div, body {
 	column-span: all;

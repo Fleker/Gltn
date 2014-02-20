@@ -1125,6 +1125,10 @@ function InitPanelmain_Table() {
         },
         SUP: function(str) {
             return "<sup>"+str.toString()+"</sup>";   
+        },
+        LATEX: function(str) {
+            postLatex(str);
+            return getLatex();
         }
     };
     window.SpreadsheetAPI = {
@@ -1133,6 +1137,8 @@ function InitPanelmain_Table() {
         SUB: {id: "Subscript", tags:"element sub subscript", cmd: "SUB(str)", param:[{id:"str", des:"The string to format in subscript"}], des:"Makes a string subscript"},
         
         SUP: {id: "Superscript", tags:"exponent sup superscript", cmd: "SUP(str)", param:[{id:"str", des:"The string to format in superscript"}], des:"Makes a string superscript"},
+        
+        LATEX: {id: "LaTeX", tags:"latex math exponent text string subscript", cmd: "LATEX(cmd)", param:[{id:"cmd", des:"A LaTeX command as a string"}], des:"Displays a LaTeX formula"}
     };
 }
 function GetPanelmain_Table() {
@@ -1150,7 +1156,7 @@ function RunPanelmain_Table() {
     var t = $('.table'+id).attr('data-title');
     var current = "tableCell_1_1";
     
-    out = "&emsp;Title: <input type='text' id='tableTitle' value='"+t+"'><br><input type='number' id='tableRow' style='width:4em' value='"+r+"'>&nbsp;<span class='fa fa-times'></span>&nbsp;<input type='number' id='tableCol' style='width:4em' value='"+c+"'><button id='tableSave'>Save</button><button id='tableHelp'>Reference</button>";
+    out = "<div style='display:inline-table'>&emsp;Title: <input type='text' id='tableTitle' value='"+t+"'><br><input type='number' id='tableRow' style='width:4em' value='"+r+"'>&nbsp;<span class='fa fa-times'></span>&nbsp;<input type='number' id='tableCol' style='width:4em' value='"+c+"'><button id='tableSave'>Save</button><button id='tableHelp'>Reference</button></div><div id='tableHelpReference' style='display:inline-table;padding-left:90px'><input id='tableHelpReferenceHelp' placeholder='Search for something' type='search' style='width:30em;display:inline-table;'></div><div id='tableHelpReferenceOut' style='display:inline-table'></div>";
     out += "<br><span id='tableCurrent'></span><input style='width:85%' id='tableForm' placeholder='Cell Function'>";
     out += "<br><div id='tableFrame' style='width:"+($('.panel_plugin_content').width() - 30)+"px;overflow:auto;padding-bottom: 20px;padding-right: 12px;'><table style='border-spacing:initial;' id='tableView'></table></div>";
     postPanelOutput(out);
@@ -1383,16 +1389,29 @@ function RunPanelmain_Table() {
         };
         initiatePopup({title:"Spreadsheet Reference", fnc: fnc, ht: ht, bordercolor:"#2cc36b"});
     });
+    $('.PanelMaximizeEvent').on('click', function() {
+        if($(this).attr('data-status') == 1) {
+            $('#tableHelp').hide(100);
+            $('#tableHelpReference, #tableHelpReferenceOut').show(100);
+        } else {
+            $('#tableHelp').show(100);
+            $('#tableHelpReference, #tableHelpReferenceOut').hide(100);
+        }
+    });
+    $('#tableHelpReferenceHelp').on('input', function() {
+        $('#tableHelpReferenceOut').html(showSpreadsheetFunction($(this).val()));
+    });
     
+    $('#tableHelpReference, #tableHelpReferenceOut').hide(100);
     generate("A");
     setTimeout(function() { $('#tableFrame').css('width', ($('.panel_plugin_content').width() - 30)+"px"); }, 1000);
-}
+} 
 
 function tableEvaluate(k) {
     console.log(k);
     if(typeof(k) == "number")
         return k;
-    var r = new RegExp("(Spreadsheet.[\\w(,\\s><=]*\\))|(Spreadsheet.[\\w]*)",'gi');
+    var r = new RegExp("(Spreadsheet.[\\w(,\\s><=$\\\\{}\\\"]*\\))|(Spreadsheet.[\\w]*)",'gi');
     console.log(r);
 //    k = k.replace(r, "eval($1)");
     l = k.match(r);
@@ -1415,7 +1434,7 @@ function tableEvaluate(k) {
     }   
     
     console.log(n);
-    n = n.replace(/=/g, "");
+//    n = n.replace(/=/g, "");
 //    console.log(k);
     var p = undefined;
     try {
@@ -1427,7 +1446,35 @@ function tableEvaluate(k) {
     console.log(p);
     return p;
 }
-
+function showSpreadsheetFunction(str) {
+    function showFunction(i) {
+                out = "<b>"+i.id+"</b>";
+                out += "<br>&emsp;<span style='font-family:monospace'>"+i.cmd+"</span>";
+                out += "<br>&emsp;"+i.des;
+                out += "<ul>";
+                for(j in i.param) {
+                    out += "<li>"+i.param[j].id+" - "+i.param[j].des+"</li>";
+                }
+                out += "</ul>";
+                $('#spreadsheetDetails').html(out);
+                return out;
+            }
+    var t = str.toLowerCase();
+    if(t.length == 0)
+        return "";
+    for(i in SpreadsheetAPI) {
+        console.log(i);
+        if(SpreadsheetAPI[i].id.toLocaleLowerCase() == t) {
+            return showFunction(SpreadsheetAPI[i]);
+        
+        } else if(SpreadsheetAPI[i].tags.indexOf(t) > -1) {
+            return showFunction(SpreadsheetAPI[i]);
+            
+        }
+    }
+    $('#spreadsheetDetails').html("Sorry... we can't anything.");
+    return "Sorry... we can't anything.";
+}
 
 
 
@@ -1610,65 +1657,36 @@ function latexDetails(id) {
                     closePopup();
                 }, 250);
             });
-            function showReference(item) {
-                console.log(item);
-                out = "<b>"+item.id+"</b><br>";
-                out += "<span style='font-family:monospace'>"+item.cmd+"</span>";
-                out += "<div style='margin-left:35px;font-size:10pt'><ul>";
-                for(i in item.param) {
-                    out += "<li>"+item.param[i].id+": "+item.param[i].value+"</li>";
-                }
-                out += "</ul>"+item.des+"</div>";
-                $('#latexRef').html(out);
-            }
             $('#latexSearch').on('input', function() {
-                var v = $(this).val().toLowerCase();
-                if(v.length) {
-                    $('#latexRef').fadeIn(300);
-                    for(i in commands) {
-                        if(v == commands[i].id) {
-//                            console.log(v, console[i].id);
-                            showReference(commands[i]); 
-                            return;
-                        }
-                        
-                        if(commands[i].keywords.indexOf(v) > -1) {
-                            showReference(commands[i]); 
-                            return;
-                        }
-                    }
-                    $('#latexRef').html("<span style='font-size:11pt'>&emsp;Sorry, that could not be found.</span>");
-                } else {
-                    $('#latexRef').fadeOut(300);   
-                }
+                showLatexReference($(this).val());
             });
         }
         
-        commands = [];
+        window.LatexAPI = {
+            /*** LATEX TEXT MARKUP ***/
+            Bar: {id:"Bar", keywords:"bar", cmd:"\\bar{x}", param:[{id:"x", value:"Value to get bar placed over it"}], des:"Places a bar over the input value"},
+            Subscript: {id:"Subscript", keywords:"element sub subscript", cmd:"_{exp}", param:[{id:"exp", des:"The expression you want subscripted"}], des:"Subscripts a specific input"},
+            Superscript: {id:"Superscript", keywords:"exponent sup superscript", cmd:"^{exp}", param:[{id:"exp", des:"The expression you want superscripted"}], des:"Superscripts a specific input"},
+            
+            /*** LATEX MATH MARKUP ***/
+            Fraction: {id:"Fraction", keywords:"frac, fraction, divide, division", cmd:"\\frac{n}{d}", param:[{id:"n", value:"Numerator"},{id:"d", value:"Denominator"}], des:"Displays a fraction"},
+            Sum: {id:"Sum", keywords:"sum, summation, sigma", cmd:"\\sum_{i}^{k}", param:[{id:"i", value:"The initial value"},{id:"k", value:"The final value"}],des:"Shows a summation using a sigma"},
+            Root: {id:"Root", keywords:"square root radical", cmd:"\\sqrt[root]{exp}", param:[{id:"root", des:"Opt. The root of the radical"},{id:"exp", des:"The expression you want under the radical"}], des:"Shows an expression under a radical"},
+                
+            /*** LATEX CONSTANTS: GREEK ***/
+            LatexGreek: function(char) {
+                return {id:char, keywords: char, cmd:"\\"+char.toLowerCase(), param:[], des:"Displays the letter "+char};
+            },
+            Alpha: LatexAPI.LatexGreek("Alpha"),
+            Pi: LatexAPI.LatexGreek("Pi"),
+            Omega: LatexAPI.LatexGreek("Omega"),
+    
+            /*** LATEX SYMBOLS & CONSTANTS ***/
+            Times: {id:"Times", keywords:"multiplication multiply times", cmd:"\\times", param:[], des:"Displays the times symbol, often used for multiplication"},
+            Space: {id:"Space", keywords:"space tab whitespace", cmd:"\\, or \\: or \\;", param:[], des:"Displays a space that is thin, medium, or wide respectively."}
+        };
         
-        /*** LATEX TEXT MARKUP ***/
-        commands.push({id:"Bar", keywords:"bar", cmd:"\\bar{x}", param:[{id:"x", value:"Value to get bar placed over it"}], des:"Places a bar over the input value"});
-        commands.push({id:"Subscript", keywords:"element sub subscript", cmd:"_{exp}", param:[{id:"exp", des:"The expression you want subscripted"}], des:"Subscripts a specific input"});
-        commands.push({id:"Superscript", keywords:"exponent sup superscript", cmd:"^{exp}", param:[{id:"exp", des:"The expression you want superscripted"}], des:"Superscripts a specific input"});
-
-        
-        /*** LATEX MATH MARKUP ***/
-        commands.push({id:"Fraction", keywords:"frac, fraction, divide, division", cmd:"\\frac{n}{d}", param:[{id:"n", value:"Numerator"},{id:"d", value:"Denominator"}], des:"Displays a fraction"});
-        commands.push({id:"Sum", keywords:"sum, summation, sigma", cmd:"\\sum_{i}^{k}", param:[{id:"i", value:"The initial value"},{id:"k", value:"The final value"}],des:"Shows a summation using a sigma"});
-        commands.push({id:"Root", keywords:"square root radical", cmd:"\\sqrt[root]{exp}", param:[{id:"root", des:"Opt. The root of the radical"},{id:"exp", des:"The expression you want under the radical"}], des:"Shows an expression under a radical"});
-
-        
-        /*** LATEX CONSTANTS: GREEK ***/
-        function LatexGreek(char) {
-            return {id:char, keywords: char, cmd:"\\"+char.toLowerCase(), param:[], des:"Displays the letter "+char};
-        }
-        commands.push(LatexGreek("Alpha"));
-        commands.push(LatexGreek("Pi"));
-        commands.push(LatexGreek("Omega")); 
-        
-        /*** LATEX SYMBOLS & CONSTANTS ***/
-        commands.push({id:"Times", keywords:"multiplication multiply times", cmd:"\\times", param:[], des:"Displays the times symbol, often used for multiplication"});
-        commands.push({id:"Space", keywords:"space tab whitespace", cmd:"\\, or \\: or \\;", param:[], des:"Displays a space that is thin, medium, or wide respectively."});
+       
         
         
         if($('.latex'+id).attr('data-cmd') != undefined) {
@@ -1678,6 +1696,39 @@ function latexDetails(id) {
         }  
     };
     initiatePopup({title: "Insert LaTeX", bordercolor: "#f1c40f", ht: ht, fnc: fnc, size: "large"});
+}
+function showLatexReference(str) {
+    function showReference(item) {
+        console.log(item);
+        out = "<b>"+item.id+"</b><br>";
+        out += "<span style='font-family:monospace'>"+item.cmd+"</span>";
+        out += "<div style='margin-left:35px;font-size:10pt'><ul>";
+        for(i in item.param) {
+            out += "<li>"+item.param[i].id+": "+item.param[i].value+"</li>";
+        }
+        out += "</ul>"+item.des+"</div>";
+        $('#latexRef').html(out);
+        return out;
+    }
+    var v = str;
+    if(v.length) {
+        $('#latexRef').fadeIn(300);
+        for(i in LatexAPI) {
+            if(v == LatexAPI[i].id) {
+//                            console.log(v, console[i].id);
+                showLatexReference(LatexAPI[i]); 
+                return;
+            }
+            
+            if(LatexAPI[i].keywords.indexOf(v) > -1) {
+                showLatexReference(LatexAPI[i]); 
+                return;
+            }
+        }
+        $('#latexRef').html("<span style='font-size:11pt'>&emsp;Sorry, that could not be found.</span>");
+    } else {
+        $('#latexRef').fadeOut(300);   
+    }
 }
 /*** HOLORIBBON ***/
 /*newRibbon('.header', {
@@ -2058,16 +2109,22 @@ window.applicationCache.onprogress = function(e) {
     return false;
 };
 function initNotifications() {
-	initService("main_Notifications", "Notifications (0)", "<span class='fa fa-comment-o'></span>");
 	//Notifications live, send out requests?	
 	if(window.notifications == undefined) {
 		window.notifications = new Array();		
 	}
+    postNotificationsIcon();
 	
 	//since appcache is too fast:
 	console.log(appcachestatus);
 	if(appcachestatus == "Found new version - Refresh to update")
 		postNotification("appcache", "A new version of the app was downloaded. Click to update.", "window.location.reload()");
+}
+function postNotificationsIcon() {
+    if(notifications.length == 0)
+        initService("main_Notifications", "Notifications (0)", "<span class='fa fa-comment-o'></span>");
+    else
+        initService("main_Notifications", "Notifications ("+notifications.length+")", "<span class='fa fa-comment'></span>&nbsp;"+notifications.length);
 }
 function InitPanelmain_Notifications() {
 	
@@ -2081,9 +2138,29 @@ function RunPanelmain_Notifications() {
 	var out = "";
 	if(notifications.length) {
 		for(i in notifications) {
-			out += "<div style='background-color: rgba(0,255,0,.3);cursor:pointer;padding-left: 5px;padding-top: 5px;border: solid 1px "+theme.coloralt+";' onclick='"+notifications[i].action+"'>"+notifications[i].text+"</span><br>";
+			out += "<div class='notification' style='background-color: rgba(0,255,0,.3);cursor:pointer;padding-left: 5px;padding-top: 5px;border: solid 1px "+theme.coloralt+";' data-id='"+notifications[i].id+"' data-i='"+i+"'><div class='notification_delete fa fa-times' style='width:21px;text-align:center;' data-id='"+notifications[i].id+"'></div>&nbsp;&nbsp;<div style='display:inline-table' onclick='"+notifications[i].action+"' >"+notifications[i].text+"</div></div><br>";
 		}
 		postPanelOutput(out);
+        
+        $('.notification_delete').off().hover(function() {
+			$(this).css('color', theme.normbg).css('background-color', '#f44').css('border-radius', 100);
+		}, function() {
+			$(this).css('color', theme.normcolor).css('background-color', 'inherit');
+		}).on('click', function() {
+            
+            for(i in notifications) {
+                if(notifications[i].id == $(this).attr('data-id')) {
+                    notifications.splice(i);
+                    $('.notification[data-i='+i+']').animate({
+                        width:'0%',
+                        opacity:0
+                    }, 300);
+                    postNotificationsIcon();
+                }   
+            }
+        });
+        
+        
 	} else {
 		postPanelOutput(nonotes);	
 	}
@@ -2098,10 +2175,10 @@ function postNotification(id, text, action) {
 	}
 	if(npush == -1) {
 		notifications.push({id:id, text:text, action:action});
-		initService("main_Notifications", "Notifications ("+notifications.length+")", "<span class='fa fa-comment'></span>&nbsp;"+notifications.length);
+		postNotificationsIcon();
 	} else {
 		notifications[npush] = {id:id, text:text, action:action};
-		initService("main_Notifications", "Notifications ("+notifications.length+")", "<span class='fa fa-comment'></span>&nbsp;"+notifications.length);
+		postNotificationsIcon();
 	}
 }
 
@@ -2412,7 +2489,7 @@ function initMathjax() {
 Preview.callback = MathJax.Callback(["CreatePreview",Preview]);
 Preview.callback.autoReset = true;  // make sure it can run more than once
    
-//Initialize all the LaTeX attributes because they look ugly at first (this is seriously going to break sync though)
+//Initialize all the LaTeX attributes because they look ugly at first (this is seriously going to hurt sync though)
     $('.latex').each(function() {
         $(this).html($(this).attr('data-cmd'));
         console.log($(this).html());
@@ -2423,9 +2500,23 @@ Preview.callback.autoReset = true;  // make sure it can run more than once
         );
     });
 }
-/*
-function doNothing() {
+function postLatex(cmd, callbackFnc) {
+    if($('#latexdummy').length == 0) {
+        $('body').append("<span id='latexdummy' style='display:none'></span>");   
+    }
+    $('#latexdummy').html(cmd);
+    MathJax.Hub.Queue(["Typeset",MathJax.Hub,"latexdummy"], 'getLatex');
     
+    
+    
+//    setTimeout(function() { return $('.latexdummy').html() }, 200);
 }
-*/
+
+function getLatex() {
+    return $('#latexdummy').html();
+}
+
+//function doNothing() {
+//    
+//}
 

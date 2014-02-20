@@ -88,12 +88,23 @@ function animateContentPanel(p) {
 }
 function maximizePanel() {
     if($('.PanelMaximizeEvent').attr('data-status') == 0) {
+        //Maximize
         $('#panel_content').hide(200);
+        $('#panel_plugin').animate({
+            width:"100%",
+            marginLeft:"-10px"
+        }, 200);
         $('.PanelMaximizeEvent').attr('data-status', 1)
     } else {
+        //Minimize
         $('#panel_content').show(200);
+        $('#panel_plugin').animate({
+            width:"95%",
+            marginLeft:"0px"
+        }, 200);
         $('.PanelMaximizeEvent').attr('data-status', 0)
     }
+    $('.PanelMaximizeEvent').click();
 }
 function hidePanelPlugin() {
 	$('#PanelCloseEvent').click();
@@ -108,6 +119,7 @@ function hidePanelPlugin() {
 			stretchContentPanel();
 		}
 	);
+    $('#panel_content').show(200);
 	window.paneltitle = undefined;
 	paneloverride = [];
 }

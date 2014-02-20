@@ -741,6 +741,7 @@ var parsingdiv = false;
 var out = "";
 var breakk = false;
 console.error(object.paragraph_indent);
+console.log(b);
 //a.unshift(object.paragraph_indent);
 //$('body').append("<hr>");
 for(i in b) {

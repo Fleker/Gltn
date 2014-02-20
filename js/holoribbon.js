@@ -121,12 +121,12 @@ function ribbonGesture() {
 //The following is Gltn specific code, so you'll need to modify the colors
 function highlight(el) {
 	//console.log(jQuery(el).attr('class'));
-	jQuery(el).animate({
+	jQuery(el).stop().animate({
 		backgroundColor: theme.ribbonhighlight,
-	}, 175);
+	}, 75);
 }
 function unlight(el) {
-	jQuery(el).animate({
+	jQuery(el).stop().animate({
 		backgroundColor: theme.ribbonplain	
-	}, 175);
+	}, 75);
 }
