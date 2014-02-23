@@ -103,6 +103,7 @@ function ribbonSwitch(index, bool) {
 				marginLeft:(wid*index)+"px",
 				width:wid+"px"
 			}, (2*animation_time));
+            $(element).css('color', theme.ribbonhighlight);
 }
 function ribbonGesture() {			
 			var element = document.getElementsByClassName('header');
@@ -123,10 +124,10 @@ function highlight(el) {
 	//console.log(jQuery(el).attr('class'));
 	jQuery(el).stop().animate({
 		backgroundColor: theme.ribbonhighlight,
-	}, 75);
+	}, 25);
 }
 function unlight(el) {
 	jQuery(el).stop().animate({
 		backgroundColor: theme.ribbonplain	
-	}, 75);
+	}, 25);
 }

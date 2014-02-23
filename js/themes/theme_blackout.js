@@ -35,5 +35,6 @@ writeCss("@import url(http://fonts.googleapis.com/css?family=Roboto:400,100,100i
 	themeCss('font-family', '"Roboto", sans-serif');
 	themeCss('background-color', theme.normbg);
 	themeCss('color', theme.normcolor);
+setLoaderColor('255,255,255');
 //Theme parameters for content_textarea not necessary (unless we removed the reload requirement for themes - but for now it'll stay due to a lack of default parameters)
 	//$('.content_textarea').css('background-color', theme.normbg).css('color', theme.normcolor);

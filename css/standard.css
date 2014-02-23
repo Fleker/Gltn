@@ -23,7 +23,7 @@ body {
 	border-bottom:solid 1px #bbb;
 	left:0px;
 	width:100%;
-    z-index:99;
+    z-index:98;
 }	
 span, div, body {
 	column-span: all;
@@ -260,7 +260,7 @@ box-shadow:         0px -2px 1px rgba(0, 0, 0, 1);*/
 	left: 0px;
 	width: 45px;
 	height: 100%;
-	z-index:4;
+	z-index:100;
 	background-color:#eee;
 	text-align:center;
 	margin-top:1px;
@@ -446,48 +446,6 @@ text-decoration: none;
 	-webkit-animation: loader10d 3s ease-in-out infinite;
 			animation: loader10d 3s ease-in-out infinite;
 }
-
-@-webkit-keyframes loader10g{
-	0%{background-color: rgba(255, 255, 255, .2);}
-	25%{background-color: rgba(255, 255, 255, 1);}
-	50%{background-color: rgba(255, 255, 255, .2);}
-	75%{background-color: rgba(255, 255, 255, .2);}
-	100%{background-color: rgba(255, 255, 255, .2);}
-}
-@keyframes loader10g{
-	0%{background-color: rgba(255, 255, 255, .2);}
-	25%{background-color: rgba(255, 255, 255, 1);}
-	50%{background-color: rgba(255, 255, 255, .2);}
-	75%{background-color: rgba(255, 255, 255, .2);}
-	100%{background-color: rgba(255, 255, 255, .2);}
-}
-
-@-webkit-keyframes loader10m{
-	0%{background-color: rgba(255, 255, 255, .2);}
-	25%{background-color: rgba(255, 255, 255, .2);}
-	50%{background-color: rgba(255, 255, 255, 1);}
-	75%{background-color: rgba(255, 255, 255, .2);}
-	100%{background-color: rgba(255, 255, 255, .2);}
-}
-@keyframes loader10m{
-	0%{background-color: rgba(255, 255, 255, .2);}
-	25%{background-color: rgba(255, 255, 255, .2);}
-	50%{background-color: rgba(255, 255, 255, 1);}
-	75%{background-color: rgba(255, 255, 255, .2);}
-	100%{background-color: rgba(255, 255, 255, .2);}
-}
-
-@-webkit-keyframes loader10d{
-	0%{background-color: rgba(255, 255, 255, .2);}
-	25%{background-color: rgba(255, 255, 255, .2);}
-	50%{background-color: rgba(255, 255, 255, .2);}
-	75%{background-color: rgba(255, 255, 255, 1);}
-	100%{background-color: rgba(255, 255, 255, .2);}
-}
-@keyframes loader10d{
-	0%{background-color: rgba(255, 255, 255, .2);}
-	25%{background-color: rgba(255, 255, 255, .2);}
-	50%{background-color: rgba(255, 255, 255, .2);}
-	75%{background-color: rgba(255, 255, 255, 1);}
-	100%{background-color: rgba(255, 255, 255, .2);}
-}
+/**
+@-webkit-keyframes loader10d{0%{background-color: rgba(255, 255, 0, .2);}25%{background-color: rgba(255, 255, 0, .2);}50%{background-color:rgba(255, 255, 0, .2);}75%{background-color: rgba(255, 255, 0, 1);}100%{background-color: rgba(255, 255, 0, .2);}}
+**/

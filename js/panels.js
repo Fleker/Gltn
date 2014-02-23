@@ -99,9 +99,9 @@ function maximizePanel() {
         //Minimize
         $('#panel_content').show(200);
         $('#panel_plugin').animate({
-            width:"95%",
             marginLeft:"0px"
         }, 200);
+        animateContentPanel(100-panelwidth+'%');
         $('.PanelMaximizeEvent').attr('data-status', 0)
     }
     $('.PanelMaximizeEvent').click();
@@ -1017,7 +1017,7 @@ function RunPanelmain_Dictionary() {
 				var target = document.getElementById('DictionaryOut');
 				var spinner = new Spinner(opts).spin(target);*/
             if($('#DictionaryOut .loader10').length == 0)
-                $('#DictionaryOut').append("<span class='loader10'></span>");
+                $('#DictionaryOut').append(getLoader());
 			for(i in ajaxrequests) {
 				ajaxrequests[i].abort();	
 			}

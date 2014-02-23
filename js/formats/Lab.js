@@ -72,6 +72,8 @@ function onGetFormats() {
             out += "<tr>";
             for(j=0;j<col;j++) {
                 var v = table[(i-1)*c+j];
+                v = v.replace(/\\/g, "\\\\");
+                console.log(v);
                 try {
                 if(v.substr(0,1) == "=")
                     v = tableEvaluate(v.substr(1));

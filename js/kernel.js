@@ -805,7 +805,7 @@ function hideHovertag() {
 function fullscreen() {
 	window.fullscreenOn = true;	
 	hidePanelPlugin();
-	$('.content_textarea').css('z-index', 3).css('position', 'fixed');
+	$('.content_textarea').css('z-index', 99).css('position', 'fixed');
 		$('.content_textarea').stop().animate({
 			top: "-.1%",
 			left:"-.1%",
@@ -918,6 +918,12 @@ document.onkeydown = function(e) {
 	}
 		//saveFile();
 	switch(e.keyCode) {
+        case 81: /* Q - Quit */ 
+            if(e.altKey) {
+                hidePanelPlugin();
+                e.preventDefault();
+            }   
+        break;
 		case 32: /* Space */
 			//Word filtering
 			//Save
@@ -1127,6 +1133,9 @@ function InitPanelmain_Table() {
             return "<sup>"+str.toString()+"</sup>";   
         },
         LATEX: function(str) {
+            console.log(str);
+            str = str.replace(/\\/g, "\\");
+            console.log(str);
             postLatex(str);
             return getLatex();
         }
@@ -1138,7 +1147,7 @@ function InitPanelmain_Table() {
         
         SUP: {id: "Superscript", tags:"exponent sup superscript", cmd: "SUP(str)", param:[{id:"str", des:"The string to format in superscript"}], des:"Makes a string superscript"},
         
-        LATEX: {id: "LaTeX", tags:"latex math exponent text string subscript", cmd: "LATEX(cmd)", param:[{id:"cmd", des:"A LaTeX command as a string"}], des:"Displays a LaTeX formula"}
+        LATEX: {id: "LaTeX", tags:"latex math exponent text string subscript", cmd: "LATEX(cmd)", param:[{id:"cmd", des:"A LaTeX command as a string"}], des:"Displays a LaTeX formula. <br><b>Note:</b> Due to the way strings are managed in Javascript, you'll need to use two backslashes to count as one: \\\\bar{x}"}
     };
 }
 function GetPanelmain_Table() {
@@ -1180,7 +1189,7 @@ function RunPanelmain_Table() {
         console.log("Create a "+r+" x "+c+" table");
         
         var span = "<span style='font-size:9pt;opacity:.6'>";
-        var alpha = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"];
+        var alpha = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA"];
         
        // out = "&emsp;Title: <input type='text' id='tableTitle' value='"+t+"'><br><input type='number' id='tableRow' style='width:4em' value='"+r+"'>&nbsp;x&nbsp;<input type='number' id='tableCol' style='width:4em' value='"+c+"'><button id='tableSave'>Save</button>";
 //        out += "<br><table style='width:97%;border-spacing:initial'><tr><td></td>";
@@ -1289,6 +1298,10 @@ function RunPanelmain_Table() {
         }
         $('.tableCell').off().on('input', function() {
             saveArray();
+//            console.log(($(this).val().substring(0,1)));
+            if($(this).html().substring(0,1) == "=") {
+                $('#tableForm').focus().val('=');
+            }
             //generate();
         });
         
@@ -1319,6 +1332,10 @@ function RunPanelmain_Table() {
             if($('#'+current).attr('data-form') == $('#'+current).html())
                 $(this).val('');
         });
+        $('#tableForm').on('input', function() {
+            if($(this).val().substring(0,1) != "=")
+                $('#'+current).focus();
+        });
         $('#tableForm').focusout(function() {
             console.log("Formout "+current, $(this).val());
             var f = $(this).val();
@@ -1348,14 +1365,17 @@ function RunPanelmain_Table() {
         $('.table'+id).attr('data-title', $('#tableTitle').val()); 
     });
     
-    $('.PanelKeyEvent').on('click', function() {
+   /* $('.PanelKeyEvent').on('click', function() {
         if($(this).attr('data-keycode') == 187 && $(this).attr('data-shift')) {
             $(this).attr('data-keycode', '');   
             $('#tableForm').focus();
         }
     });
+    */
     $('#tableSave').on('click', function() {
         generate("C"); 
+        $('.table'+id).html($('.table'+id).attr('data-title'));
+        markAsDirty();
     });
 
     $('#tableHelp').on('click', function() {
@@ -1976,7 +1996,7 @@ function initTheme() {
 	theme.darkfsui = "rgb(41, 41, 41)";
 	theme.darkfsuicolor = 'white';
 	theme.normfsuicolor = 'black';
-	theme.ribbonhighlight = '#9999ff';
+	theme.ribbonhighlight = 'rgba(0,0,0,.35)';
 	theme.ribbonplain = 'rgba(0,0,0,0)';
 }
 initTheme();
@@ -2002,6 +2022,7 @@ function startThemer() {
 		url = b[2];
 	//}
 	//if not default insert JS
+        
 	if(url != undefined && b[0] != "default") {
 		console.log("Loading theme "+b[1]+" @ "+url);
 		console.log(window.offline != true)
@@ -2013,8 +2034,43 @@ function startThemer() {
 			setTimeout("localStorage['ztheme_"+id+"'] = $('#themeframe').contents().text();", 1000);
 		}
 		//JS will have same function and call that script
-	} else if(b[0] == "default")
+	} else if(b[0] == "default") {
 		initTheme();
+        setLoaderColor('32,32,32');
+    }
+}
+function setLoaderColor(col) {
+    writeCss('@-webkit-keyframes loader10g{	0%{background-color: rgba('+col+', .2);} 25%{background-color: rgba('+col+', 1);} 50%{background-color: rgba('+col+', .2);} 75%{background-color: rgba('+col+', .2);} 100%{background-color: rgba('+col+', .2);} }');
+    writeCss('@keyframes loader10g{0%{background-color: rgba('+col+', .2);} 25%{background-color: rgba('+col+', 1);} 50%{background-color: rgba('+col+', .2);} 75%{background-color: rgba('+col+', .2);} 100%{background-color: rgba('+col+', .2);} }');
+    
+     writeCss('@-webkit-keyframes loader10m{	0%{background-color: rgba('+col+', .2);}	25%{background-color: rgba('+col+', .2);}	50%{background-color: rgba('+col+', 1);}	75%{background-color: rgba('+col+', .2);}	100%{background-color: rgba('+col+', .2);}}');
+    writeCss('@keyframes loader10m{	0%{background-color: rgba('+col+', .2);}	25%{background-color: rgba('+col+', .2);}	50%{background-color: rgba('+col+', 1);}	75%{background-color: rgba('+col+', .2);}	100%{background-color: rgba('+col+', .2);}}');
+    
+     writeCss('@-webkit-keyframes loader10d{	0%{background-color: rgba('+col+', .2);}	25%{background-color: rgba('+col+', .2);}	50%{background-color: rgba('+col+', .2);}	75%{background-color: rgba('+col+', 1);}	100%{background-color: rgba('+col+', .2);}}');
+    writeCss('@keyframes loader10d{	0%{background-color: rgba('+col+', .2);}	25%{background-color: rgba('+col+', .2);}	50%{background-color: rgba('+col+', .2);}	75%{background-color: rgba('+col+', 1);}	100%{background-color: rgba('+col+', .2);}}');
+    /*
+@keyframes loader10m{
+	0%{background-color: rgba(255, 255, 255, .2);}
+	25%{background-color: rgba(255, 255, 255, .2);}
+	50%{background-color: rgba(255, 255, 255, 1);}
+	75%{background-color: rgba(255, 255, 255, .2);}
+	100%{background-color: rgba(255, 255, 255, .2);}
+}
+
+@-webkit-keyframes loader10d{
+	0%{background-color: rgba(255, 255, 255, .2);}
+	25%{background-color: rgba(255, 255, 255, .2);}
+	50%{background-color: rgba(255, 255, 255, .2);}
+	75%{background-color: rgba(255, 255, 255, 1);}
+	100%{background-color: rgba(255, 255, 255, .2);}
+}
+@keyframes loader10d{
+	0%{background-color: rgba(255, 255, 255, .2);}
+	25%{background-color: rgba(255, 255, 255, .2);}
+	50%{background-color: rgba(255, 255, 255, .2);}
+	75%{background-color: rgba(255, 255, 255, 1);}
+	100%{background-color: rgba(255, 255, 255, .2);}
+}');   */
 }
 function install_theme(id, name, url, icon) {
 	if(window.settings.theme.indexOf(id) == -1) {
@@ -2519,4 +2575,7 @@ function getLatex() {
 //function doNothing() {
 //    
 //}
+function getLoader() {
+    return "<div class='loader10'></div>"; 
+}
 

@@ -23,7 +23,13 @@ function startBuild(el) {
 		//$('.build_progress').css('display', 'block').css('position', 'fixed').css('width', '50%').css('height', '50%').css('top','25%').css('left','25%').css('background-color', 'rgba(0,0,0,0.3)').css('font-size','16pt').css('margin-top','10%');
 	initiatePopup({title:"Build Progress",bordercolor:"rgb(44, 145, 16)",ht:"<div id='build_progress' class='build_progress' style=''></div><div class='loader10' style='margin-top:12px'></div>"});
 	updateBuildProgress('Initiating Build...');
-	setTimeout('continueBuild("'+el+'")',500);
+	setTimeout(function() {
+        try {
+            continueBuild(el);  
+        } catch(e) {
+            updateBuildProgress("<span style='color:#c00'>Error Building: "+e.message+"</span>");
+        }
+    },500);
     
     //Search for all services and see if any of them support the ExportFile{panel} function which will let them add an export option
     var a = window.settings.panels.split(', ');
@@ -55,8 +61,8 @@ function add_export_button(title, icon, fnc) {
 function continueBuild(el) {
 	//Duplicate paper
 	var cta = false;
-	console.log(el, el == 'undefined');
-	if(el == 'undefined') {
+	console.log(el, el == undefined);
+	if(el == undefined) {
 		el = '.content_textarea';
 		cta = true;
 	}

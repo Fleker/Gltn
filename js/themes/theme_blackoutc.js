@@ -38,3 +38,4 @@ writeCss("@import url(http://fonts.googleapis.com/css?family=Roboto+Condensed:30
 	themeCss('color', theme.normcolor);
 //Theme parameters for content_textarea not necessary (unless we removed the reload requirement for themes - but for now it'll stay due to a lack of default parameters)
 	$('.content_textarea').css('background-color', theme.normbg).css('color', theme.normcolor);
+setLoaderColor('255,255,255');

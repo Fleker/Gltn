@@ -357,13 +357,13 @@ function post_toolbar(tools) {
 function highlight_tool(el) {
 	//console.log(jQuery(el).attr('class'));
 	jQuery(el).animate({
-		backgroundColor: '#33f',
-	}, 175);
+		backgroundColor: theme.ribbonhighlight
+	}, 25);
 }
 function unlight_tool(el) {
 	jQuery(el).animate({
-		backgroundColor: 'rgba(0,0,0,0)'	
-	}, 175);
+		backgroundColor: theme.ribbonplain	
+	}, 25);
 }
 window.fullscreenOn = false;
 /*$(window).resize(function () {*/
