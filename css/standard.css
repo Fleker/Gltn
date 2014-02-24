@@ -193,6 +193,7 @@ span, div, body {
 	background-color:#EEEEEE;
 	min-width:3in;
 	min-height:2in;
+    z-index:101;
 }
 .popuptitle {
 	font-size: 24pt;
@@ -430,6 +431,7 @@ text-decoration: none;
 	top: 46%;
 	left: 48%;
 	border-radius: 12px;
+    
 	-webkit-animation: loader10m 3s ease-in-out infinite;
 			animation: loader10m 3s ease-in-out infinite;
 }

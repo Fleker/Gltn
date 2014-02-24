@@ -92,12 +92,12 @@ function post_format() {
 	//Set up selection parameters
 			 document.getElementsByClassName("content_textarea")[0].onmouseup = function() {
 				 	if($('.content_textarea').html().length > 1) {				 
-						rangy.getSelection().expand("word", {
-						wordOptions: {
-							includeTrailingSpace: false,
-							wordRegex: /[a-z0-9]+(['\-][a-z0-9]+)*/gi
-						}
-                		});
+//						rangy.getSelection().expand("word", {
+//						wordOptions: {
+//							includeTrailingSpace: false,
+//							wordRegex: /[a-z0-9]+(['\-][a-z0-9]+)*/gi
+//						}
+//                		});
 					}
 					//postRange('click and select');
 			}
@@ -327,7 +327,7 @@ function post_toolbar(tools) {
 			break;
             case "reftext":
                 var rtid = $('.reftext').length;
-                contentAddSpan({node:"span", class:"reftext reftext"+stid});
+                contentAddSpan({node:"span", class:"reftext reftext"+rtid});
                 refTextDetails(rtid);
                 formatHovertag("reftext", "'Ref: '+$(this).attr('data-ref')", "'refTextDetails('+$(this).attr('data-id')+');'");
             break;
@@ -357,12 +357,14 @@ function post_toolbar(tools) {
 function highlight_tool(el) {
 	//console.log(jQuery(el).attr('class'));
 	jQuery(el).animate({
-		backgroundColor: theme.ribbonhighlight
+		backgroundColor: theme.ribbonhighlight,
+        color: theme.normbg
 	}, 25);
 }
 function unlight_tool(el) {
 	jQuery(el).animate({
-		backgroundColor: theme.ribbonplain	
+		backgroundColor: theme.ribbonplain,
+        color: theme.normcolor
 	}, 25);
 }
 window.fullscreenOn = false;

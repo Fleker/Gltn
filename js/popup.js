@@ -8,7 +8,7 @@ function initiatePopup(data) {
 	popupFocus = false;
 	//JSON data containing border color, title
 	//Opens popup, designs framework
-	var html = "<div class='fullscreen popupbg' style='z-index:0' onclick='if(!popupFocus) closePopup()'><div onclick='popupFocus = true;' class='popuptop' style='z-index:1;'></div></div>";
+	var html = "<div class='fullscreen popupbg' style='z-index:100' onclick='if(!popupFocus) closePopup()'><div onclick='popupFocus = true;' class='popuptop' style='z-index:101;'></div></div>";
 	$('.popup').html(html);
 	$('.popup').css('opacity', 0).css('display', 'block');
 	$('.popuptop').css('left', '30%').css('width', '0%').css('top', '40%').css('height', '0%');

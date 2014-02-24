@@ -109,6 +109,12 @@ function continueBuild(el) {
 	var finishdate = new Date().getTime();
 	//console.log(finishdate, builddate);
 	$('.buildtime').html('&emsp;Built in '+(finishdate - builddate)/1000+' seconds.');
+    var i = 0;
+    for(j in $('.pagebody').text().split(' ')) {
+        if($('.pagebody').text().split(' ')[j].length >= 1)
+            i++;
+    }
+    $('.buildtime').append('&emsp;Stats: '+i+' words, '+$('.pagebody').text().length+' chars');
 	//$('.build').css('display', 'block');
 }
 function updateBuildProgress(text) {
@@ -648,7 +654,7 @@ function post_content_formatting(object) {
 	var j = 0;
     $('.draft .img').each(function() {
 		$(this).html(imageFormatted(object.img,$(this),$(this).attr('data-figure-number')));
-        $('.smarttext[data-ref=img'+$(this).attr('data-id')+']').html($(this).attr('data-figure-number'));
+        $('.reftext[data-ref=img'+$(this).attr('data-id')+']').html($(this).attr('data-figure-number'));
           j++;
 		for(i=0;i<object.imgstyle.length;i+=2) {
 			$(this).css(object.imgstyle[i], object.imgstyle[i+1]);	
@@ -659,14 +665,17 @@ function post_content_formatting(object) {
 	$('.draft .table').each(function() {
 		$(this).css('background-color','white');
 		//var table = $.xml2json($(this).attr('data-xml'));
-		table = $(this).attr('data-arr');
+		var table = $(this).attr('data-arr');
 		var r = $(this).attr('data-row');
 		var c = $(this).attr('data-col');
 		//use XML to encode table into rows and columns? Place into data-table and then decode in a preview in the div.
 		console.log("x('"+table+"',"+r+","+c+");");
+        generateSpreadsheetVars(table.split('~~'), r, c);
 		$(this).html(eval(object.table+";x('"+table+"',"+r+","+c+");"));
 		$(this).attr('data-arr', "");
 		$(this).html(tableFormatted($(this).html(),$(this).attr('data-figure-number'),$(this).attr('data-title')));
+        $('.reftext[data-ref=table'+$(this).attr('data-id')+']').html($(this).attr('data-figure-number'));
+        
 	});
 	
 	//Now all formatting is complete. We shall port the content over to the actual paper
@@ -693,7 +702,11 @@ function post_content_formatting(object) {
 	window.cont = cont.replace(/<\/div><div><br><\/div><div>/g, "<br>"+object.paragraph_indent);
 	window.cont = cont.replace(/<div><br><\/div><div>/g, "<br>"+object.paragraph_indent);
 	window.cont = cont.replace(/<br><\/div>/g, "");
-    window.cont = cont.replace(/<\/div><div>/g, "<br>");
+    window.cont = cont.replace(/<\/div><div>/g, "<br>"+object.paragraph_indent);
+    window.cont = cont.replace(/<\/div> <div>/g, "<br>"+object.paragraph_indent);
+    window.cont = cont.replace(/<\/div><\/span><div>/g, "</div>"+object.paragraph_indent);
+    window.cont = cont.replace(/<\/div><div><br><div>/g, "<br>"+object.paragraph_indent);
+    window.cont = cont.replace(/<br><div>/g, ""+object.paragraph_indent);
 //	console.log(cont);
 	updateBuildProgress("Generating HTML...");
 	//cont = cont.replace(/<span[^<]+?>/g, "");
@@ -703,12 +716,13 @@ function post_content_formatting(object) {
 	
 	/*** Replace output function so that it places every item into an array instead of just outputting ***/
 function c(s) {
-	//console.log(s);	
+//	console.log(s);	
 	//s = s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 	//$('body').append(s+"<br>");
 }
 function output(e, tag, w) {
 	var out = "";
+    console.log(e, tag, w);
 	if(e.substr(-1) != ">")
 		e = e+">";
 	if(w.length) {
@@ -747,7 +761,7 @@ var parsingdiv = false;
 var out = "";
 var breakk = false;
 console.error(object.paragraph_indent);
-console.log(b);
+//console.log(b);
 //a.unshift(object.paragraph_indent);
 //$('body').append("<hr>");
 for(i in b) {
@@ -840,6 +854,8 @@ for(i in b) {
 		}
 	}
 }
+//console.warn(w);
+    output("","",w);
  /***/
 	 /*out = out + output(e, tag, w);
 		//$('body').append(tag+",<br>"+e+"; "+w+"<br>");
@@ -847,7 +863,7 @@ for(i in b) {
 		w = '';
 	//div splitter
 	out = out.replace(/---/g, ' ');*/
-
+console.log(d);
 	/*** *** Now implement the project **/
 	updateBuildProgress("Generating pages...");
 	maxh = $('.scale').height()*8.56; //Add 9+2 for body margins just because it works. Don't question it. (It probably has to do with the 1 in padding on the top and bottom, making total height 13 and body 11.

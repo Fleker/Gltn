@@ -264,7 +264,7 @@ function RunPanelmain_Character() {
 		character = data[0].val;
 		console.log(character);
 		
-		StylePanelClass('character_palette_character', new Array("cursor", "pointer", "border-bottom", "solid 1px #09f"));
+		StylePanelClass('character_palette_character', ["cursor", "pointer", "border-bottom", "solid 1px #09f"]);
 	}
 	$('#popup_character_search').on('input', function() {
 			var st = $('#popup_character_search').val().toLowerCase();
@@ -279,6 +279,7 @@ function RunPanelmain_Character() {
 					}
 				}
 			}	
+//            character = data[0].val;
 			createCharacterPalette(sr);
 		});	
 		
@@ -1017,7 +1018,7 @@ function RunPanelmain_Dictionary() {
 				var target = document.getElementById('DictionaryOut');
 				var spinner = new Spinner(opts).spin(target);*/
             if($('#DictionaryOut .loader10').length == 0)
-                $('#DictionaryOut').append(getLoader());
+                $('#DictionaryOut').append(getLoader(-20));
 			for(i in ajaxrequests) {
 				ajaxrequests[i].abort();	
 			}

@@ -1,7 +1,7 @@
 currentformat = "Lab";
 function onInitFormat() {
 	new_format();
-	new_format_item("text", {label: "Title", description: "", mtype:"w", max:9, id:"Title"});
+	new_format_item("text", {label: "Title", description: "", mtype:"w", max:12, id:"Title"});
 	new_format_item("text", {label: "Please type your name", id:"Author", description: "Separate multiple authors using commas"});
 	new_format_item("text", {label: "Class", id:"Class"});
     new_format_item("date", {label: "Date report is due", id:"DueDate"});

@@ -15,8 +15,8 @@ $check = get_headers('http://en.wiktionary.org/wiki/'.$w);
 //print_r($check);
 if(strpos($check[16], "404") === false && strpos($check[0], "404") === false) {
 	$out = file_get_contents('http://en.wiktionary.org/wiki/'.$w, false, $context);
-	$out = str_replace('<a href="//en.wikipedia.org/wiki/', '<a href="http://felkerdigitalmedia.com/gltn/dictionary_wiki.php?word=', $out);
-	$out = str_replace('<a href="/wiki/', '<a href="http://felkerdigitalmedia.com/gltn/dictionary_wik.php?word=', $out);
+	$out = str_replace('<a href="//en.wikipedia.org/wiki/', '<a href="http://felkerdigitalmedia.com/gltn/dictionaries/dictionary_wiki.php?word=', $out);
+	$out = str_replace('<a href="/wiki/', '<a href="http://felkerdigitalmedia.com/gltn/dictionaries/dictionary_wik.php?word=', $out);
 }
 else
 	$out = "404";	

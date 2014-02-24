@@ -810,7 +810,7 @@ function fullscreen() {
 			top: "-.1%",
 			left:"-.1%",
 			width:"95%",
-			width:window.innerWidth-80+"px",
+			width:window.innerWidth-55+"px",
 			/*width:"calc(100%-80px)",*/
 			height:window.innerHeight-35+"px",
 			/*height:"calc(100%-35px)",*/
@@ -1138,6 +1138,37 @@ function InitPanelmain_Table() {
             console.log(str);
             postLatex(str);
             return getLatex();
+        },
+        RANGE: function(c1, c2, r1, r2) {
+            //convert letters to numbers, run through two loops to grab all the data in an array, return it
+            var arr = [];
+            for(var index = r1; index<=r2; index++) {
+                console.log(Spreadsheet[c1+index]);
+                if(Spreadsheet[c1+index].substring(0,1) == "=")
+                    ans = Spreadsheet[c1+index].substring(1);
+                else
+                    ans = Spreadsheet[c1+index];
+                console.log(ans);
+                
+                try {
+                    ans = eval(ans);  
+                    console.log(ans);
+                    if(ans.toString().substring(0,1) == "=")
+                        ans = eval(ans.substring(1));
+                } catch(e) {
+                    console.error("RANGE: "+e.message);
+                }
+                console.log(ans);
+                arr.push(ans);
+            }
+            return arr;
+        },
+        SUM: function(arr) {
+            var sum = 0;
+            for(index in arr) {
+                sum += arr[index];
+            }
+            return sum;
         }
     };
     window.SpreadsheetAPI = {
@@ -1147,11 +1178,22 @@ function InitPanelmain_Table() {
         
         SUP: {id: "Superscript", tags:"exponent sup superscript", cmd: "SUP(str)", param:[{id:"str", des:"The string to format in superscript"}], des:"Makes a string superscript"},
         
-        LATEX: {id: "LaTeX", tags:"latex math exponent text string subscript", cmd: "LATEX(cmd)", param:[{id:"cmd", des:"A LaTeX command as a string"}], des:"Displays a LaTeX formula. <br><b>Note:</b> Due to the way strings are managed in Javascript, you'll need to use two backslashes to count as one: \\\\bar{x}"}
+        LATEX: {id: "LaTeX", tags:"latex math exponent text string subscript", cmd: "LATEX(cmd)", param:[{id:"cmd", des:"A LaTeX command as a string"}], des:"Displays a LaTeX formula. <br><b>Note:</b> Due to the way strings are managed in Javascript, you'll need to use two backslashes to count as one: \\\\bar{x}"},
+        
+        RANGE: {id: "Range", cmd: "RANGE(col1, col2, row1, row2)", param:[{id:"col1", des:"The first column"},{id:"col2", des:"The second column"},{id:"row1", des:"The first row"},{id:"row2", des:"The second row"}], des:"Returns an array of values for a given range", regin:"Spreadsheet.([A-Za-z]+)(\\d+):Spreadsheet.([A-Za-z]+)(\\d+)", regout:'eval(Spreadsheet.RANGE("$1","$3","$2","$4"))'}
     };
+    
+    window.alpha = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA"];
 }
 function GetPanelmain_Table() {
     return {title: "Spreadsheets", bordercolor:"#2cc36b", width: 50, maximize:true};   
+}
+function generateSpreadsheetVars(a, r, c) {
+    for(i=1;i<=r;i++) {
+        for(j=0;j<c;j++) {
+            Spreadsheet[alpha[j]+i] = a[(i-1)*c+j];
+        }
+    }   
 }
 function RunPanelmain_Table() {
     id = grab_panel_data().tid;
@@ -1189,7 +1231,7 @@ function RunPanelmain_Table() {
         console.log("Create a "+r+" x "+c+" table");
         
         var span = "<span style='font-size:9pt;opacity:.6'>";
-        var alpha = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA"];
+
         
        // out = "&emsp;Title: <input type='text' id='tableTitle' value='"+t+"'><br><input type='number' id='tableRow' style='width:4em' value='"+r+"'>&nbsp;x&nbsp;<input type='number' id='tableCol' style='width:4em' value='"+c+"'><button id='tableSave'>Save</button>";
 //        out += "<br><table style='width:97%;border-spacing:initial'><tr><td></td>";
@@ -1201,21 +1243,17 @@ function RunPanelmain_Table() {
         
         console.log("Preparing to rebuild");
         console.log(a);
-        for(i=1;i<=r;i++) {
-            for(j=0;j<c;j++) {
-                Spreadsheet[alpha[j]+i] = a[(i-1)*c+j];
-            }
-        }
+        generateSpreadsheetVars(a, r, c);
         
         for(i=1;i<=r;i++) {
             out += "<tr><td style='vertical-align:middle;text-align:right;padding-right:3px;'>"+span+i+"</span></td>";
             for(j=0;j<c;j++) {
                 var k = a[(i-1)*c+j];
-                var l = k;
-                var y = k;
                 console.log(k);
                 if(k == undefined || k == "undefined")
                     k = "";
+                var l = k;
+                var y = k;
 //                console.log(k);
                 console.log(i,j, (i-1), r, (i-1)*c, (i-1)*c+j,k);
                 //BG Colors
@@ -1256,6 +1294,7 @@ function RunPanelmain_Table() {
         $('#tableView').css('min-width', c*5+"em");
         $('#tableFrame').css('width', ($('.panel_plugin_content').width() - 30)+"px");  
         $('#tableView').html(out);
+        $('#'+current).focus();
         
         function saveArray() {
             var a = "";
@@ -1343,7 +1382,7 @@ function RunPanelmain_Table() {
                 f = undefined;
             $('#'+current).attr('data-form', tableFormOut($(this).val()));
             saveArray();
-                generate("D");
+//                generate("D");
             $('#tableForm').val('');
             setCurrent('tableCell_0_0');
         });
@@ -1431,7 +1470,16 @@ function tableEvaluate(k) {
     console.log(k);
     if(typeof(k) == "number")
         return k;
-    var r = new RegExp("(Spreadsheet.[\\w(,\\s><=$\\\\{}\\\"]*\\))|(Spreadsheet.[\\w]*)",'gi');
+    //Let's take any specially formatted text and format it using set regular expressions
+    for(ii in SpreadsheetAPI) {
+        if(SpreadsheetAPI[ii].regin != undefined && SpreadsheetAPI[ii].regout != undefined) {
+            var r = new RegExp(SpreadsheetAPI[ii].regin, 'g');
+            k = k.replace(r, SpreadsheetAPI[ii].regout); 
+        }
+    }
+    //Now we must iterate through the string to make sure we have all the parenthesis
+    var r = new RegExp("(Spreadsheet\\..+\\))|(Spreadsheet.[\\w]*)", 'g');
+//    var r = new RegExp("(Spreadsheet.[\\w(,\\s><=$\\\\{}\\\"]*\\))|(Spreadsheet.[\\w]*)",'gi');
     console.log(r);
 //    k = k.replace(r, "eval($1)");
     l = k.match(r);
@@ -1445,7 +1493,7 @@ function tableEvaluate(k) {
         console.log(m);
         var j = eval(m).toString();
         //Recursive?
-        j = j.replace(/=/g, "");
+//        j = j.replace(/=/g, "");
         console.log(j);
         var ra = new RegExp(m, 'g');
         console.log(ra);
@@ -1458,6 +1506,8 @@ function tableEvaluate(k) {
 //    console.log(k);
     var p = undefined;
     try {
+        if(n.substring(0,1) == "=")
+            n = n.substring(1);
         p = eval(n)   
     } catch(e) {
         console.error(e.message);
@@ -1601,11 +1651,20 @@ function refTextDetails(id) {
             out = "<table style='width:90%'>";
             var i = 0;
             $('.content_textarea .img').each(function() {
-                if(ind == i)
+                if(ind == i && $('.reftext'+id).attr('data-ref').indexOf('img') > -1)
                     bg = "rgba(0,255,0,.5)";
                 else
                     bg = "rgba(0,0,0,0)";
                 out += "<tr style='border:solid 1px black;background-color:"+bg+";cursor:pointer;' class='PopupImg' data-i='"+i+"'><td style='text-align:center'><img src='"+$(this).attr('data-src')+"' style='width:50%'></td><td style='vertical-align:center'>&emsp;"+$(this).attr('data-des')+"</td></tr>";     
+                i++;
+            });
+            i = 0;
+            $('.content_textarea .table').each(function() {
+                if(ind == i && $('.reftext'+id).attr('data-ref').indexOf('table') > -1)
+                    bg = "rgba(0,255,0,.5)";
+                else
+                    bg = "rgba(0,0,0,0)";
+                out += "<tr style='border:solid 1px black;background-color:"+bg+";cursor:pointer;' class='PopupTable' data-i='"+i+"'><td style='text-align:center'><td>"+$(this).attr('data-title')+"&emsp;<span style='font-size:10pt'>"+$(this).attr('data-col')+" x "+$(this).attr('data-row')+"</span></td></tr>";     
                 i++;
             });
             out += "</table><button class='PopupSave'>Save</button>";
@@ -1615,8 +1674,14 @@ function refTextDetails(id) {
                 $('.reftext'+id).attr('data-refid', $(this).attr('data-i')); 
                 populate($(this).attr('data-i'));
             });
+             $('.PopupTable').on('click', function() {
+                $('.reftext'+id).attr('data-ref', 'table'+$(this).attr('data-i')); 
+                $('.reftext'+id).attr('data-refid', $(this).attr('data-i')); 
+                populate($(this).attr('data-i'));
+            });
             $('.PopupSave').on('click', function() {
                 closePopup(); 
+                markAsDirty();
             });
         }
         if($('.reftext'+id).attr('data-ref') != undefined) {
@@ -1627,8 +1692,38 @@ function refTextDetails(id) {
     };
     initiatePopup({title: "Ref Text", bordercolor:"#09f", ht: ht, fnc: fnc});
 }
+
+function LatexGreek(char) {
+    return {id:char, keywords: char+" "+char.toLocaleLowerCase(), cmd:"\\"+char.toLowerCase(), param:[], des:"Displays the letter "+char};
+}
+
+ window.LatexAPI = {
+        /*** LATEX TEXT MARKUP ***/
+        Bar: {id:"Bar", keywords:"bar", cmd:"\\bar{x}", param:[{id:"x", des:"Value to get bar placed over it"}], des:"Places a bar over the input value"},
+        Subscript: {id:"Subscript", keywords:"element sub subscript", cmd:"_{exp}", param:[{id:"exp", des:"The expression you want subscripted"}], des:"Subscripts a specific input"},
+        Superscript: {id:"Superscript", keywords:"exponent sup superscript", cmd:"^{exp}", param:[{id:"exp", des:"The expression you want superscripted"}], des:"Superscripts a specific input"},
+        
+        /*** LATEX MATH MARKUP ***/
+        Fraction: {id:"Fraction", keywords:"frac, fraction, divide, division", cmd:"\\frac{n}{d}", param:[{id:"n", des:"Numerator"},{id:"d", des:"Denominator"}], des:"Displays a fraction"},
+        Sum: {id:"Sum", keywords:"sum, summation, sigma", cmd:"\\sum_{i}^{k}", param:[{id:"i", des:"The initial value"},{id:"k", des:"The final value"}],des:"Shows a summation using a sigma"},
+        Root: {id:"Root", keywords:"square root radical", cmd:"\\sqrt[root]{exp}", param:[{id:"root", des:"Opt. The root of the radical"},{id:"exp", des:"The expression you want under the radical"}], des:"Shows an expression under a radical"},
+            
+        /*** LATEX CONSTANTS: GREEK ***/
+            
+        Alpha: LatexGreek("Alpha"),
+        Pi: LatexGreek("Pi"),
+        Omega: LatexGreek("Omega"),
+        /*** LATEX SYMBOLS & CONSTANTS ***/
+        Times: {id:"Times", keywords:"multiplication multiply times", cmd:"\\times", param:[], des:"Displays the times symbol, often used for multiplication"},
+        Space: {id:"Space", keywords:"space tab whitespace", cmd:"\\, or \\: or \\;", param:[], des:"Displays a space that is thin, medium, or wide respectively."},
+        Bullet: {id:"Bullet", keywordS:"bullet dot times product", cmd:"\\bullet", param:[], des:"Displays a bullet"}
+};
+
+
+
+
 function latexDetails(id) {
-    ht = "<table style='width:100%'><tr><td style='vertical-align:top;width:50%;'>LaTeX is a form of markup that, among other features, allows for rich math formatting. <br><br>Reference Guide:&nbsp;<input type='search' style='width:50%' id='latexSearch' placeholder='Search for something...'><br><span style='font-size:9pt'>Note that mathematical formulas must be placed between \"$\"</span></td><td width:50%;>";
+    ht = "<table style='width:100%'><tr><td style='vertical-align:top;width:50%;'>LaTeX is a form of markup that, among other features, allows for rich math formatting. <br><br>Help:&nbsp;<input type='search' style='width:50%' id='latexSearch' placeholder='Search for something...'><br><span style='font-size:9pt'>Note that mathematical formulas must be placed between \"$\"</span></td><td width:50%;>";
     ht += "<div id='latexRef' style='display:none;background-color: rgba(255,255,255,.1);padding:5px;'></div></td></tr></table>";
    // ht += "<button id='latexPrev'>Preview</button>";
     ht += "<table style='width:99%'><tr><td style='width:50%'><div id='latexCmd' style='height:4em;width:95%;border: solid 1px rgba(0,129,255,1);background-color:"+theme.normfsui+";margin-top:5px;margin-left:5px;margin-bottom:10px;' contenteditable='true'></div></td>";
@@ -1682,29 +1777,7 @@ function latexDetails(id) {
             });
         }
         
-        window.LatexAPI = {
-            /*** LATEX TEXT MARKUP ***/
-            Bar: {id:"Bar", keywords:"bar", cmd:"\\bar{x}", param:[{id:"x", value:"Value to get bar placed over it"}], des:"Places a bar over the input value"},
-            Subscript: {id:"Subscript", keywords:"element sub subscript", cmd:"_{exp}", param:[{id:"exp", des:"The expression you want subscripted"}], des:"Subscripts a specific input"},
-            Superscript: {id:"Superscript", keywords:"exponent sup superscript", cmd:"^{exp}", param:[{id:"exp", des:"The expression you want superscripted"}], des:"Superscripts a specific input"},
-            
-            /*** LATEX MATH MARKUP ***/
-            Fraction: {id:"Fraction", keywords:"frac, fraction, divide, division", cmd:"\\frac{n}{d}", param:[{id:"n", value:"Numerator"},{id:"d", value:"Denominator"}], des:"Displays a fraction"},
-            Sum: {id:"Sum", keywords:"sum, summation, sigma", cmd:"\\sum_{i}^{k}", param:[{id:"i", value:"The initial value"},{id:"k", value:"The final value"}],des:"Shows a summation using a sigma"},
-            Root: {id:"Root", keywords:"square root radical", cmd:"\\sqrt[root]{exp}", param:[{id:"root", des:"Opt. The root of the radical"},{id:"exp", des:"The expression you want under the radical"}], des:"Shows an expression under a radical"},
-                
-            /*** LATEX CONSTANTS: GREEK ***/
-            LatexGreek: function(char) {
-                return {id:char, keywords: char, cmd:"\\"+char.toLowerCase(), param:[], des:"Displays the letter "+char};
-            },
-            Alpha: LatexAPI.LatexGreek("Alpha"),
-            Pi: LatexAPI.LatexGreek("Pi"),
-            Omega: LatexAPI.LatexGreek("Omega"),
-    
-            /*** LATEX SYMBOLS & CONSTANTS ***/
-            Times: {id:"Times", keywords:"multiplication multiply times", cmd:"\\times", param:[], des:"Displays the times symbol, often used for multiplication"},
-            Space: {id:"Space", keywords:"space tab whitespace", cmd:"\\, or \\: or \\;", param:[], des:"Displays a space that is thin, medium, or wide respectively."}
-        };
+
         
        
         
@@ -1724,7 +1797,7 @@ function showLatexReference(str) {
         out += "<span style='font-family:monospace'>"+item.cmd+"</span>";
         out += "<div style='margin-left:35px;font-size:10pt'><ul>";
         for(i in item.param) {
-            out += "<li>"+item.param[i].id+": "+item.param[i].value+"</li>";
+            out += "<li>"+item.param[i].id+": "+item.param[i].des+"</li>";
         }
         out += "</ul>"+item.des+"</div>";
         $('#latexRef').html(out);
@@ -1736,12 +1809,12 @@ function showLatexReference(str) {
         for(i in LatexAPI) {
             if(v == LatexAPI[i].id) {
 //                            console.log(v, console[i].id);
-                showLatexReference(LatexAPI[i]); 
+                showReference(LatexAPI[i]); 
                 return;
             }
             
             if(LatexAPI[i].keywords.indexOf(v) > -1) {
-                showLatexReference(LatexAPI[i]); 
+                showReference(LatexAPI[i]); 
                 return;
             }
         }
@@ -2337,6 +2410,7 @@ function contextMarkup() {
 	var syn = "Suggested Synonym";
 	var remove = "Remove Word";
 	var overuse = "Don't Overuse";
+    var chars = "Replace Characters";
 	/***/
 	var simplify = "Simplify your sentence by using just one word.";
 	var preposition = "You don't need a prepositional phrase to give a specific meaning.";
@@ -2379,6 +2453,9 @@ function contextMarkup() {
 	apply_context("[Tt]he foreseeable future", {type: revise, text: getStrunkTips("What is the definition of 'foreseeable'? This phrase is vague and should be replaced by something more specific.")});
 	apply_context("[Tt]ry and", {type: revise, replacement: "try to", text: getStrunkTips("If you're going to 'try and' do something else, then you're doing two separate actions. If so, 'try' isn't very specific and should be improved. If you're doing a single action, you'll 'try to' do that one thing.")});
 	apply_context("[Ee]ach and every one", {type: revise, text: getStrunkTips("Unless this is said in conversation, it should be removed. This phrase is very wordy and could easily be simplified to a single word.")});
+    
+    apply_context("--", {type: chars, text: "Use this character instead", replacement:"—"});
+   // apply_context("...", {type: chars, text: "Use this character instead", replacement:"…"});
 	
 	/***/
 	apply_context("[Vv]ery", {type: overuse, text: getStrunkTips(overusetip), limit: rare});
@@ -2575,7 +2652,10 @@ function getLatex() {
 //function doNothing() {
 //    
 //}
-function getLoader() {
-    return "<div class='loader10'></div>"; 
+function getLoader(mL) {
+    if(mL == undefined)
+        return "<div class='loader10'></div>"; 
+    else
+        return "<div class='loader10' style='margin-left:"+mL+"px'></div>"; 
 }
 

@@ -13,7 +13,8 @@ function initTheme() {
 	theme.darkfsui = "rgba(41,41,41)";
 	theme.darkfsuicolor = 'white';
 	theme.normfsuicolor = 'white';
-	theme.ribbonhighlight = '#05a';
+//	theme.ribbonhighlight = '#05a';
+    theme.ribbonhighlight = '#09f';
 	theme.ribbonplain = 'rgba(0,0,0,0)';
 	
 	$('.header').css('background-color', '#333').css('border-bottom', 'solid 1px rgba(255,255,255,0.4)');
