@@ -19,7 +19,7 @@ hovertagRegistrar = new Array();
 obj = {};
 currentformat = "";
 document.ready = function() {
-	console.log('Gltn has woken up: v 1.1.3.2');
+	console.log('Gltn has woken up: v 1.1.3.3');
     x = {};
     //Setup Filepicker
     filepicker.setKey("AePnevdApT62LvpkSSsiVz");
@@ -61,8 +61,13 @@ document.ready = function() {
 function startSaveFile() {
     //Will only sync if dirty -- else it syncs down instead
     //If not a cloud doc, saves as usual
-    if(isCloudSaved() && window.dirty)
-        saveFile();
+    if(isCloudSaved() && window.dirty) {
+        try {
+            saveFile();
+        } catch(e) {
+            cloudResave();
+        }
+    }
     else if(isCloudSaved()) {
         cloudRead(window.saved.inkblob_url, "RF2", x.file.last_modified);
     } else {
@@ -396,7 +401,7 @@ function newFile2() {
 function exportFile() {
 	falseBuild();
 	add_new_page();	
-    add_to_page("<br><button onclick='downloadXML()' style='font-size:14pt;display:none'><span class='fa fa-cloud-download'></span>&nbsp;Download</button><button onclick='cloudXML()' style='font-size:14pt'><span class='fa fa-cloud-upload'></span>&nbsp;Upload</button><button onclick='getShare()' style='font-size:14pt'><span class='fa fa-group'></span>&nbsp;Share</button> <br>");
+    add_to_page("<br><button onclick='downloadXML()' style='font-size:14pt;display:none'><span class='fa fa-cloud-download'></span>&nbsp;Download</button><button onclick='cloudXML()' style='font-size:14pt'><span class='fa fa-cloud-upload'></span>&nbsp;Upload to Cloud Service</button><button onclick='getShare()' style='font-size:14pt'><span class='fa fa-group'></span>&nbsp;Share</button> <br><br><br><br><br>");
 	add_to_page("File XML:<br><textarea style='width:95%;height:200px;'>"+localStorage[fileid]+"</textarea><br>");
 	add_to_page("Content HTML:<br><textarea style='width:95%;height:200px;'>"+localStorage[fileid+'_c']+"</textarea><br>");
 
@@ -611,9 +616,12 @@ function cloudRead(ink, callback, localMod) {
             var ht = data.substring(xmli);
             
             //Now sync the files. Then we read the file.
-            
-            localStorage[fileid] = xml;
-            localStorage[fileid+"_c"] = ht;
+            try {
+                localStorage[fileid] = xml;
+                localStorage[fileid+"_c"] = ht;
+            } catch(e) {
+                console.error("There is a pretty big issue here: "+e.message);
+            }
            // closePopup();
             console.log("Downloaded file.", c, localMod);
             restoreFile(callback == "RF2");
@@ -621,6 +629,29 @@ function cloudRead(ink, callback, localMod) {
         }
         return data;
     });   
+}
+function checkLocalStorage() {
+        localStorage.setItem("DATA", "m");
+    for(i=0 ; i<40 ; i++) {
+        var data = localStorage.getItem("DATA");
+        try { 
+            localStorage.setItem("DATA", data + data);
+        } catch(e) {
+            console.log("LIMIT REACHED: (" + i + ")");
+            console.log(e);
+        }
+    }
+    localStorage.removeItem("DATA");   
+}
+function getLocalStorageLength() {
+    return Math.round(10*unescape(encodeURIComponent(JSON.stringify(localStorage))).length/1024)/10;
+}
+function getLocalStorageOf(fileid) {
+    return Math.round(10*unescape(encodeURIComponent(JSON.stringify(localStorage[fileid]))).length/1024)/10 + Math.round(10*unescape(encodeURIComponent(JSON.stringify(localStorage[fileid+"_c"]))).length/1024)/10;
+
+}
+function checkLocalStorageLength() {
+    console.log("Max for Chrome is "+5223424+" and the current length is "+getLocalStorageLength()*1024);   
 }
 function getShare() {
     if(window.saved == undefined) {
@@ -638,6 +669,91 @@ function getShare() {
         initiatePopup({title:"Share...",ht:"You must export the document to a cloud service before you can share it."});
     }
     
+}
+//Using the Cloudconvert.org API
+function startConversion(output) {
+    if(output == undefined)
+        output = "pdf";
+    process = new FormData();
+    process.append('apikey', "7Y4JLPi-k-TWCMDuqs3YMD388TdVvJEAsyNzFvlNEEc7CM8g-CXDHJ7rekArn0Xj3aZuEmPL3TxTh6D402w6BQ");
+    process.append('inputformat', 'html');
+    process.append('outputformat', output);
+    $.ajax({
+        url: "https://api.cloudconvert.org/process",
+        type: "POST",
+        data: process,
+        contentType: false,
+        processData: false,
+        success: function(data){
+            console.log(data);
+            
+        
+        $('#build_blob').html('<form enctype="multipart/form-data" method="post" name="fileinfo" id="build_blob_form"></form><button id="build_blob_submit">S</button>');
+        //$('#build_blob').html('<form action="https:'+data+' method="POST" enctype="multipart/form-data" id="build_blob_form">        <input type="file" id="build_blob_file"><div type="text" name="file">555</div><input name="input" value="upload"><input name="outputformat" value="pdf"><input type="Submit" id="build_blob_submit"></form> ');
+        // <input type="file" name="file" id="build_blob_file">
+        $('#build_blob').css('display','none');
+            completeConversion(output, data);
+    }
+    }); 
+}
+function completeConversion(output, data) {
+    if(output == undefined)
+        output = "pdf";
+//    $('#build_blob_submit').click(function() {
+            //Do the actual POST
+            if($('#build_print').length == 0) {
+                $('body').append("<div id='build_print'></div>");   
+            }
+            $('#build_print').html($('#build').html());
+            $('#build_print .page').css('box-shadow', 'none').css('-webkit-box-shadow', 'none').css('font-family', 'Times').css('12pt');
+            $('#build_print .page').css('width', '6in').css('margin-left', '1in').css('margin-right', '1in').css('background-color', 'white').css('text-decoration', 'none');
+            $('#build_print hr, #build_print button, #build_print .noprint').css('display', 'none').css('opacity', 0);
+            $('#build_print .page0header').css('margin-top', '0.35in');
+            $('#build_print .pageheader').css('margin-top', '0.25in').css('height', '0.5in');
+            $('#build_print .pagebody').css('max-height', '8.57in');
+            $('#build_print .pagefooter').css('height', '0.5in').css('margin-bottom', '0.5in');
+            $('#build_print .noprint').remove();
+    
+            var formdata = new FormData($("#build_blob_form"));
+            formdata.append('input', 'upload');
+            var aFileParts = [$('#build_print').html()];
+            var oMyBlob = new Blob(aFileParts, {type : 'text/html'}); // the blob
+            formdata.append('file', oMyBlob);
+            formdata.append('outputformat', output);
+            formdata.append('filename', fileid+'.html');
+            console.log(fileid+'.html');
+            $('#build_print').css('display', 'none');
+    
+            $.ajax({
+                url: "https:"+data.url,
+                type: "POST",
+                data: formdata,
+                contentType: false,
+                processData: false,
+                success: function(d){
+                    console.log(d);
+                    var downloadr = setInterval(function() {
+                        $.ajax({
+                           url:"https:"+data.url,
+                            success: function(di) {
+                                console.log(di); 
+//                                console.log(di.output);
+                                if(di.output != undefined) {
+                                    if(di.output.url != undefined) {
+                                        var w = window.open(di.output.url, "_blank");
+                                        clearInterval(downloadr);
+                                        closePopup();
+                                        
+                                    }
+                                }
+                            }
+                        });
+                    }, 300);
+                    
+                }
+            });
+           return false; 
+//        });
 }
 //A Gltn Package is a single file containing all the data for a particular terminal. This is all files and associated data, plus all settings
 //First, we need a function to generate the data correctly

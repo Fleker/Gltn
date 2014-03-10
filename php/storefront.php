@@ -1,5 +1,5 @@
 <?php
-	$url = 'storebackend.xml';
+	$url = '../store/storebackend.xml';
 	
 	$fileContents = file_get_contents($url);
 	$fileContents = str_replace(array("\n", "\r", "\t"), '', $fileContents);

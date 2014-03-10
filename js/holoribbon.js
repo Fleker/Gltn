@@ -7,8 +7,8 @@ function newRibbon(element, ribbon) {
     $(element).html(out);
     out = '';
     keys = new Array();
-    i = 0
-	ribbon_count=0;
+    i = 0;
+	ribbon_count = 0;
     for(var k in ribbon) {
 		ribbon_count++;
 	}
@@ -48,10 +48,10 @@ function newRibbon(element, ribbon) {
 	$('.ribbongroup').css('margin-left','102%').css('display', 'inline-table').css('opacity', 0);
 	ribbonobj.index = -1;
 	//ribbonSwitch(0,false);
-	$('.ribbonbutton').mouseenter(function() {
+	$('.ribbonbutton, .ribbonheader').mouseenter(function() {
 		highlight(this);
 	});
-	$('.ribbonbutton').mouseleave(function() {
+	$('.ribbonbutton, .ribbonheader').mouseleave(function() {
 		unlight(this);
 	});
 }

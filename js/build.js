@@ -1,12 +1,14 @@
 builddate = 0;
+buildPrint = '<button onclick="window.print()" class="noprint"><span class="fa fa-print"></span></button><button onclick="printHelp()" class="noprint"><span class="fa fa-question"></span>&nbsp;Print Help</button><button onclick="convertDoc()" class="noprint">Convert</button>';
 function falseBuild(printr) {
 	window.section_name = "";
 	$('.build').fadeIn(500);
 	$('.body').fadeOut(500);
 	$('.header').fadeOut(500);
 	out = '<span class="buildRow"><button onclick="exitBuild()">Return to Editor</button>';
-	if(printr != true)
-		out += '<button onclick="window.print()" class="noprint" style="font-size:12pt;"><span class="fa fa-print"></span></button>';
+	if(printr != true) {
+		out += buildPrint;
+    }
     out += '</span>';
      $('.build').html(out);
 	console.log('fb');
@@ -19,9 +21,11 @@ function startBuild(el) {
 	//$('.page').css('width','8.5in');
 	window.section_name = "";
 	$('#searching').val('');
-	$('.build').html('<span class="buildRow"><button onclick="exitBuild()" class="noprint">Return to Editor</button><button onclick="window.print()" class="noprint" style="font-size:12pt;"><span class="fa fa-print"></span></button></span><span class="buildtime noprint" style="font-size:9pt"></span>');
+	$('.build').html('<span class="buildRow"><button onclick="exitBuild()" class="noprint">Return to Editor</button>'+buildPrint+'</span><span class="buildtime noprint" style="font-size:9pt"></span>');
+        
 		//$('.build_progress').css('display', 'block').css('position', 'fixed').css('width', '50%').css('height', '50%').css('top','25%').css('left','25%').css('background-color', 'rgba(0,0,0,0.3)').css('font-size','16pt').css('margin-top','10%');
-	initiatePopup({title:"Build Progress",bordercolor:"rgb(44, 145, 16)",ht:"<div id='build_progress' class='build_progress' style=''></div><div class='loader10' style='margin-top:12px'></div>"});
+	initiatePopup({title:"Build Progress",bordercolor:"rgb(44, 145, 16)",ht:"<div id='build_progress' class='build_progress' style=''></div>"});
+        setTimeout('getLoader("buildProgress")');
 	updateBuildProgress('Initiating Build...');
 	setTimeout(function() {
         try {
@@ -51,15 +55,41 @@ function startBuild(el) {
     }
 }
 function add_export_button(title, icon, fnc) {
-    $('.buildRow').append('<button class="export_'+title+'">'+icon+"&nbsp;"+title+"</button>"); 
+    $('.buildRow').append('<button class="export_'+title+'" style="width:60px">'+icon+"&nbsp;"+title+"</button>"); 
     $('.export_'+title).on('click', function() {
        eval(fnc+";x();"); 
         //Program to create an export then send to the FilePicker for saving
     });
 }
+function printHelp() {
+    ht = "Make sure your settings are set properly when printing from Gltn. In Chrome, for example, make sure the margins are set to 'None'. Sometimes, the last page will be blank. This is not an issue, just do not include that page in your document.<br><img src='images/chromeprint.png'></img>";
+    initiatePopup({ht: ht, title:"Help with Printing"});   
+}
+function convertDoc() {
+    function createConvertButton(format) {
+        return "<button class='convertButton' data-format='"+format+"' style='width:60px;text-align:center;'>" +format.substring(0,1).toUpperCase()+format.substring(1)+"</button><br>";
+    }
+    ht = "<div id='convertDocBox'><b>Choose a Format to Convert To:</b><br>(Note that this is currently in beta)<br>";
+    ht += createConvertButton('docx');
+    ht += createConvertButton('odt');
+    ht += createConvertButton('pdf');
+    ht += createConvertButton('epub'); 
+    ht += createConvertButton('mobi'); 
+    ht += createConvertButton('txt');
+//    ht += createConvertButton('html');
+    ht += "</div>";
+    fnc = function x() {
+        $('.convertButton').on('click', function() {
+            startConversion($(this).attr('data-format'));
+           $('#convertDocBox').html("<font size='12pt'>Please Wait</font><br>Your file will be converted and downloaded soon<br>"+getLoader()); 
+        });
+    };
+    initiatePopup({title: "Convert Document", ht: ht, fnc: fnc});
+}
 
 function continueBuild(el) {
-	//Duplicate paper
+	//Duplicate paper  
+    updateBuildProgress("Starting to Build...");
 	var cta = false;
 	console.log(el, el == undefined);
 	if(el == undefined) {
@@ -706,7 +736,11 @@ function post_content_formatting(object) {
     window.cont = cont.replace(/<\/div> <div>/g, "<br>"+object.paragraph_indent);
     window.cont = cont.replace(/<\/div><\/span><div>/g, "</div>"+object.paragraph_indent);
     window.cont = cont.replace(/<\/div><div><br><div>/g, "<br>"+object.paragraph_indent);
+     window.cont = cont.replace(/<div><br><div>/g, "</div>"+object.paragraph_indent);
     window.cont = cont.replace(/<br><div>/g, ""+object.paragraph_indent);
+    window.cont = cont.replace(/<br>&emsp;<kbd/g, "</div><br><kbd"+object.paragraph_indent);
+    
+   
 //	console.log(cont);
 	updateBuildProgress("Generating HTML...");
 	//cont = cont.replace(/<span[^<]+?>/g, "");
@@ -718,11 +752,11 @@ function post_content_formatting(object) {
 function c(s) {
 //	console.log(s);	
 	//s = s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-	//$('body').append(s+"<br>");
+//	$('body').append(s+"<br>");
 }
 function output(e, tag, w) {
 	var out = "";
-    console.log(e, tag, w);
+//    console.log(e+",", tag+",", w+",");
 	if(e.substr(-1) != ">")
 		e = e+">";
 	if(w.length) {
@@ -739,9 +773,14 @@ function output(e, tag, w) {
 		}
 	} else {
 		//return "";
+        if(e == "<kbd>") {
+            out = tag;   
+        }
 	}
 	if(out.length)
 		d.push(out);
+//    console.log(out);
+//    console.log(d);
 	return out;
 	
 }
@@ -888,6 +927,12 @@ console.log(d);
 		//TODO - Find a way to grab the current page, not necessarily the last one. This will be handy for things that are added after content
 		p = $('.page').length-1;
         var dspan = d[j]+' ';
+        if(dspan.indexOf('<kbd class="pagebreak"') > -1) {
+            console.warn("Found page break.");
+            add_new_page();
+            dspan = "";
+            continue;
+        }
         dspan = dspan.replace('</span>  ', '</span>');
 		add_to_page("<span class='hideme'>"+dspan +" "+"</span>", undefined, undefined, col_count);
 		//console.warn($('.page'+p+'body').height(), maxh);
@@ -926,14 +971,22 @@ console.log(d);
 	$('.pagebody').css('height', maxh+"px");
     
     //Do some LaTeX corrections to display properly
-    var frac = ($('.mfrac > span > span:last-child')[1]);
-    var num = $(frac).prev().prev().width();
-    var den = $(frac).prev().width();
-    if(num > den)
-        den = num;
-    var fracin = $(frac).children()[0];
-    $(fracin).css('width', den).css('color', 'black').css('border', 'solid').css('border-left', 'none').css('border-right', 'none').css('border-top', 'none');
+    window.fracArr = ($('.build .mfrac > span > span:last-child'));
+    console.log(fracArr);
+   for(j=0;j<fracArr.length;j++) {
+        frac = fracArr[j];
+        var num = $(frac).prev().prev().width();
+        var den = $(frac).prev().width();
+        if(num > den)
+            den = num;
+        //var fracin = frac;
+        //.children()[0];
+//        console.log("! FRAC");
+//        console.log(frac);
+        $(frac).css('width', den).css('color', 'black').css('border', 'solid 2px').css('background-color', 'black').css('top', '-1.096em').css('height', '11px');
     
+    }
+    $('.build .pagebreak').css('display','none');
 	/*if(column > 0) {
 		$('.pagebody').css('column-count', column).css('-webkit-column-count', column).css('-moz-column-count');	
 	}*/

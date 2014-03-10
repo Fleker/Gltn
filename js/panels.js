@@ -27,6 +27,8 @@ function initPanels() {
 				install_panel(b[0], b[1], b[2], b[3], b[4], b[5]);
 		}
 	}
+    //Now we do a bit of additional installs
+//    install_panel("main_PDF", "Export to PDF", ".", "", true, "");
 }
 function runPanel(panel_id_name) {
 	//Get Properties of the Panel First
@@ -250,11 +252,14 @@ function RunPanelmain_Character() {
 	
 	var out = "";
 	var searchbar = '<input type="search" id="popup_character_search" style="width:100%" placeholder="Search for Characters" ><br>';
-	out = out + searchbar;
-	out = out + "<div class='character_palette_display' id='CHARACTERPANELCHARACTERS'></div>";
+	out += searchbar;
+	out += "<div class='character_palette_display' id='CHARACTERPANELCHARACTERS'></div>";
 	postPanelOutput(out);
-	var character = "";
+	character = "";
+    list = [];
+    
 	function createCharacterPalette(data) {
+        list = data;
 		$('#popup_character_search').focus();
 		var out = "";
 		for(i=0;i<data.length;i++) {
@@ -287,7 +292,9 @@ function RunPanelmain_Character() {
 	$('.PanelKeyEvent').on('click', function() {
 			//console.log('click');
 			if($(this).attr('data-keycode') == 13) {
-				console.log(character);
+				console.log(list);
+                console.log(character);
+                
 				contentAddText(character);
 				$(this).attr('data-keycode', '');	
 				if(introdisabled) {
@@ -550,9 +557,9 @@ function RunPanelmain_Outline() {
 }
 function StylePanelmain_Outline() {
 	$('.Outline').css('border', 'solid 1px black').css('width', '85%');
-}
+} 
 function GetPanelmain_Filesys() {
-	return {title: '<span class="fa fa-folder-open" style="font-size:13pt"></span>&nbsp;My Documents', bordercolor: '#7f8c8d', width:15};
+	return {title: '<span class="fa fa-folder-open" style="font-size:13pt"></span>&nbsp;My Documents', bordercolor: '#7f8c8d', width:25};
 }
 function InitPanelmain_Filesys() {
 	$(document).on('keydown', function(e) {
@@ -676,27 +683,7 @@ function RunPanelmain_Filesys() {
 	}
     function resetFolder(term) {
 		//postPanelOutput("<div id='spin' style='margin-left:25%'></div>");
-		$('.panel_plugin_content').html("<div id='spin' style='margin-left:8%'></div>");
-			var opts = {
-			  lines: 7, // The number of lines to draw
-			  length: 10, // The length of each line
-			  width: 3, // The line thickness
-			  radius: 13, // The radius of the inner circle
-			  corners: 1, // Corner roundness (0..1)
-			  rotate: 0, // The rotation offset
-			  direction: 1, // 1: clockwise, -1: counterclockwise
-			  color: theme.normcolor, // #rgb or #rrggbb or array of colors
-			  speed: 0.7, // Rounds per second
-			  trail: 20, // Afterglow percentage
-			  shadow: false, // Whether to render a shadow
-			  hwaccel: false, // Whether to use hardware acceleration
-			  className: 'spinner', // The CSS class to assign to the spinner
-			  zIndex: 2e9, // The z-index (defaults to 2000000000)
-			  top: '30px', // Top position relative to parent in px
-			  left: '50%' // Left position relative to parent in px
-			};
-			var target = document.getElementById('spin');
-			var spinner = new Spinner(opts).spin(target);
+		$('.panel_plugin_content').html(getLoader(0,30));
 			
 		if(term == undefined)
 			sterm = "";
@@ -727,7 +714,7 @@ function RunPanelmain_Filesys() {
 				var fsci = localStorage[i+"_c"].length;
 				fstotal += fsi;
 				fstotal += fsci;
-				var fsout = Math.round((fsi+fsci)/100)/10+"KB";
+				var fsout = (getLocalStorageOf(i)+getLocalStorageOf(i+"_c"))+"KB";
 				//console.log(xx.file.tags.split(','),sterm)
 				if(sterm == undefined || (sterm != undefined  && (title.toLowerCase().indexOf(sterm) > -1) || i.toLowerCase().indexOf(sterm) > -1 || xx.file.tags.indexOf(sterm) > -1)) {
 					try {
@@ -765,7 +752,7 @@ function RunPanelmain_Filesys() {
 		}
 		out += "</table>";
 		fstotal += localStorage['settings'].length;
-		fstotalout = "<span style='font-size:10pt'>&emsp;"+Math.round(fstotal/100)/10+"KB stored</span>"
+		fstotalout = "<span style='font-size:10pt'>&emsp;"+getLocalStorageLength()+"KB stored</span>"
 		out += fstotalout;
 		post(out,term);
         jQuery("abbr.timeago").timeago();
@@ -1157,7 +1144,12 @@ function GetPanelmain_Themes() {
 function RunPanelmain_Themes() {
 	function loadThemes() {
 		var a = window.settings.theme.split(', ');
-		out = "";
+        try {
+            loadThemeSettings();
+		    out = "<button id='ThemeSettings'><span class='fa fa-cog'></span></button><br>";
+        } catch(e) {
+            
+        }
 		for(i in a) {
 			var b = window.settings['theme_'+a[i]].split(', ');
 			var bg = "rgba(255,0,0,.3)";
@@ -1176,6 +1168,14 @@ function RunPanelmain_Themes() {
 			selectTheme(c);
 			window.location.reload();
 		});
+        $('#ThemeSettings').on('click', function() {
+           var out = "<button id='ThemeCards'>X</button><br>"+loadThemeSettings();
+           postPanelOutput(out);
+            runThemeSettings();
+            $('#ThemeCards').on('click', function() {
+                loadThemes();
+            });
+        });
 	}
 	loadThemes();
 }
@@ -1191,7 +1191,7 @@ function launchStore() {
 }
 function launchStore2() {
 	console.log('ba');
-	$('.build').append("<div style='background-color: #f9f9f9;width: 94%;margin-left: 3%;margin-top: 10px;padding-top: 10px;padding-bottom: 40px;border: solid 1px #999;box-shadow: black 0px 0px 3px 0px;color:#000'><div style='font-size:18pt;color:#222;font-family:sans-serif;text-align:center;'>Gltn Plugin Store</div><div style='text-align:center; width:100% ;font-size:18pt; padding-bottom:20px;' class='fa-stack fa-lg'><span class='fa fa-circle-o fa-stack-2x'></span><span class='fa fa-shopping-cart fa-stack-1x'></span></div><input type='search' placeholder='Search for something...' style='width:75%;margin-left:15%;' id='store_search'><div id='build_inner' class='build_inner'></div></div>");
+	$('.build').append("<div style='background-color:"+theme.normbg+";width: 94%;margin-left: 3%;margin-top: 10px;padding-top: 10px;padding-bottom: 40px;border: solid 1px #999;box-shadow: black 0px 0px 3px 0px;color:"+theme.normcolor+"'><div style='font-size:18pt;color:"+theme.coloralt+"font-family:sans-serif;text-align:center;'>Gltn Plugin Store</div><div style='text-align:center; width:100% ;font-size:18pt; padding-bottom:20px;' class='fa-stack fa-lg'><span class='fa fa-circle-o fa-stack-2x'></span><span class='fa fa-shopping-cart fa-stack-1x'></span></div><input type='search' placeholder='Search for something...' style='width:75%;margin-left:15%;' id='store_search'><div id='build_inner' class='build_inner'>"+getLoader(0,20)+"</div></div>");
 	$('.build').css('line-height', '1em');
 	function getIcon(datum) {
 		if(datum.icon_fa != undefined) 
@@ -1206,10 +1206,8 @@ function launchStore2() {
 		return ((datum.type == "Panel" || datum.type == "Service") && window.settings.panels.indexOf(datum.id) > -1) || (datum.type == "Dictionary" && window.settings.dictionary.indexOf(datum.id) > -1) || (datum.type == "Theme" && window.settings.theme.indexOf(datum.id) > -1)
 	}
 	function getDownloadCount(number) {
-		if(number == 0)
-			return "Few downloads"
-		else if(number == 1)
-			return "Few downloads";
+		if(number < 10)
+			return "A few downloads";
 		else {
 			//console.log(getBaseLog(number, 10),Math.floor(getBaseLog(number, 10)),Math.pow(10, Math.floor(getBaseLog(number, 10))),Math.floor(number/Math.pow(10, Math.floor(getBaseLog(number, 10)))));
 			var n = Math.pow(10, Math.floor(getBaseLog(number, 10)))*Math.round(number/Math.pow(10, Math.floor(getBaseLog(number, 10))))
@@ -1227,33 +1225,16 @@ function launchStore2() {
 		return false;
 	}
 	
-			var opts = {
-				  lines: 7, // The number of lines to draw
-				  length: 10, // The length of each line
-				  width: 3, // The line thickness
-				  radius: 13, // The radius of the inner circle
-				  corners: 1, // Corner roundness (0..1)
-				  rotate: 0, // The rotation offset
-				  direction: 1, // 1: clockwise, -1: counterclockwise
-				  color: theme.normcolor, // #rgb or #rrggbb or array of colors
-				  speed: 0.7, // Rounds per second
-				  trail: 20, // Afterglow percentage
-				  shadow: false, // Whether to render a shadow
-				  hwaccel: false, // Whether to use hardware acceleration
-				  className: 'spinner', // The CSS class to assign to the spinner
-				  zIndex: 2e9, // The z-index (defaults to 2000000000)
-				  top: '30px', // Top position relative to parent in px
-				  left: '50' // Left position relative to parent in px
-				};
-				var target = document.getElementById('build_inner');
-				var spinner = new Spinner(opts).spin(target);
 	function grabStore() {	
-	$.get('http://felkerdigitalmedia.com/gltn/storefront.php', {}, function(data) {
+	$.get('http://felkerdigitalmedia.com/gltn/php/storefront.php', {}, function(data) {
 		d = $.parseJSON(data);
 		//console.log(d)
+        $('.loader10').remove();
+        //Panels, Dictionaries, Themes, Plugins
 		pout = "";
 		dout = "";
 		tout = "";
+        lout = "";
 		d = d.app;
 		window.store = d;
 		for(i in d) {
@@ -1268,23 +1249,25 @@ function launchStore2() {
 				}
 				out += "<br>&emsp;&emsp;<i style='font-size:10pt'>"+d[i].credit+"</i>";
 				if(d[i].description.length > 100)
-					out += "<div style='font-size:8pt;padding-left:5px;'>"+d[i].description.substring(0,100)+"...</div>";
+					out += "<div style='font-size:8pt;padding-left:5px;padding-right:5px;'>"+d[i].description.substring(0,100)+"...</div>";
 				else
-					out += "<div style='font-size:8pt;padding-left:5px;'>"+d[i].description+"...</div>";
+					out += "<div style='font-size:8pt;padding-left:5px;padding-right:5px;'>"+d[i].description+"</div>";
 				
-				outt = "<div style='border:solid 1px #222;cursor:pointer;background-color:white;padding-top:3px;margin-top:-1px' class='store_item' data-id='"+i+"'>"+out+"</div>";
+				outt = "<div style='border:solid 1px #222;cursor:pointer;background-color:white;padding-top:3px;margin-top:-1px;color:#222' class='store_item' data-id='"+i+"'>"+out+"</div>";
 				//console.log(i, outt);
-				if(d[i].type == "Panel" || d[i].type == "Service")
+				if(d[i].type == "Panel")
 					pout += outt;
 				else if(d[i].type == "Dictionary")
 					dout += outt;
+                else if(d[i].type == "Theme")
+                    tout += outt;
 				else	
-					tout += outt;
+					lout += outt;
 				}
 			//}
 		}
 		var nosearch = "<div style='text-align:center'>No results</div>";;
-		if(pout.length == 0 && dout.length == 0 && tout.length == 0)
+		if(pout.length == 0 && dout.length == 0 && tout.length == 0 && lout.length)
 			dout = "<br><br><b>Sorry. No results for that search were found.</b>";
 		else {
 			if(pout.length == 0)
@@ -1293,9 +1276,11 @@ function launchStore2() {
 				dout = nosearch;
 			if(tout.length == 0)
 				tout = nosearch;
+            if(lout.length == 0)
+				tout = nosearch;
 		}
 		
-		$('.build_inner').html("<table style='width:80%;margin-left:10%;'><tr><td style='width:33%;vertical-align:top;'><u class='centerOfAttention'>Panels/Services</u>"+pout+"</td><td style='width:33%;vertical-align:top;'><u class='centerOfAttention'>Dictionaries</u>"+dout+"</td><td style='width:33%;vertical-align:top;'><u class='centerOfAttention'>Themes</u>"+tout+"</td></tr></table><br><br><br><div class='store_submit' style='text-align:center; font-size:10pt; text-decoration:underline; cursor:pointer;'>Submit a Plugin</div>");
+		$('.build_inner').html("<div class='store_submit' style='text-align:center; font-size:10pt; text-decoration:underline; cursor:pointer;'>Submit a Plugin</div><br><table style='width:80%;margin-left:10%;'><tr><td style='width:25%;vertical-align:top;'><u class='centerOfAttention'>Panels/Services</u>"+pout+"</td><td style='width:25%;vertical-align:top;'><u class='centerOfAttention'>Dictionaries</u>"+dout+"</td><td style='width:25%;vertical-align:top;'><u class='centerOfAttention'>Themes</u>"+tout+"</td><td style='width:25%;vertical-align:top;'><u class='centerOfAttention'>Plugins</u>"+lout+"</td></tr></table><br><br><br>");
 		$('.store_item').on('click', function() {
 			var i = store[$(this).attr('data-id')];
 			title = getIcon(i)+"&emsp;"+i.name;

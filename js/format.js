@@ -102,7 +102,7 @@ function post_format() {
 					//postRange('click and select');
 			}
 			document.getElementsByClassName("content_textarea")[0].oninput = function() {
-				//postRange('oninput');
+				postRange('oninput');
 				//saveFile();
 			}	
 			document.getElementsByClassName("content_textarea")[0].onkeyup = function() {
@@ -242,6 +242,9 @@ function post_toolbar(tools) {
                 case "LaTeX":
                     tool_pretty = "LaTeX";
                 break;
+                case "break":
+                    tool_pretty = "Page Break";
+                break;
 			}
 		} else {
 			tool_pretty = tools[i].label;
@@ -336,6 +339,11 @@ function post_toolbar(tools) {
                 contentAddSpan({node:"kbd", class:"latex latex"+lid});
                 latexDetails(lid);
                 formatHovertag("latex", "$(this).attr('data-cmd')", "'latexDetails('+$(this).attr('data-id')+');'");
+            break;
+            case "break":
+                contentAddSpan({node:"kbd", class:"pagebreak"});
+                formatHovertag("pagebreak", "'Page Break'", 'null');
+                setTimeout("$('.pagebreak').empty();", 1000);
             break;
             
 			case 'overflow':

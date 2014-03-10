@@ -409,6 +409,12 @@ text-decoration: none;
 	text-align:center;	
 	padding-bottom:5px;
 }
+.pagebreak {
+    background-color:black;
+    display:block;
+    width:50%;
+    height:3px;
+}
 
 /* -------------- loader10 -------------- */
 
@@ -444,9 +450,13 @@ text-decoration: none;
 	left: 25px;
 	height: 10px;
 	width: 10px;
-	border-radius: 10px;
+	border-radius: 12px;
 	-webkit-animation: loader10d 3s ease-in-out infinite;
 			animation: loader10d 3s ease-in-out infinite;
+}
+.spinner {
+    padding-left:50%;
+    
 }
 /**
 @-webkit-keyframes loader10d{0%{background-color: rgba(255, 255, 0, .2);}25%{background-color: rgba(255, 255, 0, .2);}50%{background-color:rgba(255, 255, 0, .2);}75%{background-color: rgba(255, 255, 0, 1);}100%{background-color: rgba(255, 255, 0, .2);}}

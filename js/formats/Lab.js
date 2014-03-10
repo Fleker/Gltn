@@ -10,7 +10,7 @@ function onInitFormat() {
 	post_format();
 }
 function onInitToolbar() {
-    var tools = ["heading1", "heading2", "heading3", "image", "table", "reftext", "LaTeX", "citation"]; 
+    var tools = ["heading1", "heading2", "heading3", "image", "table", "reftext", "LaTeX", "citation", "break"]; 
     post_toolbar(tools);
 }
 function onStylePaper() {
@@ -50,7 +50,7 @@ function onGetFormats() {
 	obj.heading5 = "<div style='text-decoration:underline'>LIST1. TEXT</div>";
 	obj.paragraph_indent = "&emsp;";
     obj.img = "IMG Fig. FIGN. TEXT";
-	obj.imgstyle = "";
+	obj.imgstyle = "width:80%;text-align:center;";
     obj.figure = function x() {
 		var i = 1;
 		$('.draft .img').each(function() {

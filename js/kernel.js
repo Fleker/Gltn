@@ -1302,6 +1302,7 @@ function RunPanelmain_Table() {
                 for(j=0;j<c;j++) {
                    // var k = a[(i-1)*r+j-1];
                     var f = $('#tableCell_'+i+'_'+j).attr('data-form');
+                    f = f.replace(/\\/g, "\\\\");
                     if(f != undefined && f != "" && f != "undefined")
                         var k = f;
                     else
@@ -1493,7 +1494,7 @@ function tableEvaluate(k) {
         console.log(m);
         var j = eval(m).toString();
         //Recursive?
-//        j = j.replace(/=/g, "");
+        j = j.replace(/=Spreadsheet/g, "Spreadsheet");
         console.log(j);
         var ra = new RegExp(m, 'g');
         console.log(ra);
@@ -1858,8 +1859,8 @@ function setHeader() {
 		),
 		File: new Array(
 			{group: "File Name", value:"<input type='text' id='file_name' style='width:7em'><button id='file_name_con' disabled='true'>Save As</button><input type='hidden' id='file_name_internal'>"},
-			{text: 'Build', img: '<span style="font-size:18pt" class="fa fa-file"></span>', action: "startBuild();setTimeout('exitintro();', 1000);", key: "Alt+B"},
-			{text: 'Export', img: '<span style="font-size:18pt" class="fa fa-download"></span>', action: "exportFile();"}
+			{text: 'Publish & Export', img: '<span style="font-size:18pt" class="fa fa-file"></span>', action: "startBuild();setTimeout('exitintro();', 1000);", key: "Alt+B"},
+			{text: 'Share', img: '<span style="font-size:18pt" class="fa fa-code-fork"></span>', action: "exportFile();"}
 		),
 		Panels: new Array(
 			{text: 'Gltn Store', img: '<span style="font-size:18pt" class="fa fa-shopping-cart"/>', action: "launchStore()", key: "Alt+S"},
@@ -2652,10 +2653,56 @@ function getLatex() {
 //function doNothing() {
 //    
 //}
-function getLoader(mL) {
+function getLoaderOpts() {
+    return {
+          lines: 7, // The number of lines to draw
+          length: 7, // The length of each line
+          width: 8, // The line thickness
+          radius: 26, // The radius of the inner circle
+          corners: 1, // Corner roundness (0..1)
+          rotate: 12, // The rotation offset
+          direction: 1, // 1: clockwise, -1: counterclockwise
+          color: theme.coloralt, // #rgb or #rrggbb or array of colors
+          speed: 1.3, // Rounds per second
+          trail: 65, // Afterglow percentage
+          shadow: false, // Whether to render a shadow
+          hwaccel: false, // Whether to use hardware acceleration
+          className: 'spinner', // The CSS class to assign to the spinner
+          zIndex: 5, // The z-index (defaults to 2000000000)
+          top: 'auto', // Top position relative to parent in px
+          left: 'auto' // Left position relative to parent in px
+        };
+}   
+function getLoader(query, m) {
+    var opts = {
+          lines: 7, // The number of lines to draw
+          length: 7, // The length of each line
+          width: 8, // The line thickness
+          radius: 26, // The radius of the inner circle
+          corners: 1, // Corner roundness (0..1)
+          rotate: 12, // The rotation offset
+          direction: 1, // 1: clockwise, -1: counterclockwise
+          color: theme.coloralt, // #rgb or #rrggbb or array of colors
+          speed: 1.3, // Rounds per second
+          trail: 65, // Afterglow percentage
+          shadow: false, // Whether to render a shadow
+          hwaccel: false, // Whether to use hardware acceleration
+          className: 'spinner', // The CSS class to assign to the spinner
+          zIndex: 5, // The z-index (defaults to 2000000000)
+          top: 'auto', // Top position relative to parent in px
+          left: 'auto' // Left position relative to parent in px
+        };
+    var target = document.getElementById(query);
+    var spinner = new Spinner(opts).spin(target); 
+    /*
+    return null;
+    return new Spinner().spin().el.outerHTML; 
     if(mL == undefined)
         return "<div class='loader10'></div>"; 
-    else
+    else if(mT == undefined)
         return "<div class='loader10' style='margin-left:"+mL+"px'></div>"; 
+    else
+         return "<div class='loader10' style='margin-left:"+mL+"px;margin-top:"+mT+"'></div>";
+         */
 }
 

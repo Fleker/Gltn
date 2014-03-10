@@ -14,7 +14,7 @@ $file = fopen("D:/Hosting/2425934/html/gltn/storedata.txt","a+");
 fwrite($file,$_GET['action'].":  ".$_GET['item'].", ".time()."\n\r");
 */
 
-	$url = 'storebackend.xml';
+	$url = '../store/storebackend.xml';
 	
 	$fileContents = file_get_contents($url);
 	$fileContents = str_replace(array("\n", "\r", "\t"), '', $fileContents);
