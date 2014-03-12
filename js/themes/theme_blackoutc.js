@@ -61,4 +61,4 @@ writeCss("@import url(http://fonts.googleapis.com/css?family=Roboto+Condensed:30
 //Theme parameters for content_textarea not necessary (unless we removed the reload requirement for themes - but for now it'll stay due to a lack of default parameters)
 	$('.content_textarea').css('background-color', theme.normbg).css('color', theme.normcolor);
 setLoaderColor('255,255,255');
-writeCss("button {	background-color:white;	border-radius:3;	text-indent:0;	border:1px solid #888;	display:inline-block;	color:#333333;	font-weight:bold;	font-style:normal;	text-decoration:none;	text-align:center;padding:3px;min-width:20px;}button:hover {	background-color:#ddd;}button:active {	position:relative;	top:1px;}");
+writeCss("button {	background-color:white;	border-radius:3;	text-indent:0;	border:1px solid #888;	display:inline-block;	color:#333333;	font-weight:bold;	font-style:normal;	text-decoration:none;	text-align:center;padding:3px;min-width:30px;}button:hover {	background-color:#ddd;}button:active {	position:relative;	top:1px;}");

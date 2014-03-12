@@ -86,6 +86,12 @@ function post_format() {
 			});*/
 			setInterval("format_check_count("+i+")", 100);
 		}
+        $('#format_item_'+i).on('input', function() {
+           if($(this).val().length < 40)
+               $(this).css('width', 0.7*$(this).val().length+"em");
+            else
+               $(this).css('width', "40em");
+        });
 	}
 	onInitToolbar();
 	
@@ -311,13 +317,13 @@ function post_toolbar(tools) {
 			break;
 			case "image":
 				var imid = $('.img').length;
-				contentAddSpan({node:"div", class:"img inline img"+imid});
+				contentAddSpan({node:"div", class:"img inline img"+imid, ce: false});
 				imgDetails(imid);
 				formatHovertag("img", "'Image Details'", "'imgDetails('+$(this).attr('data-id')+');'");
 			break;
 			case "table":
 			var tid = $('.table').length;
-				contentAddSpan({node:"div", class:"table inline table"+tid});
+				contentAddSpan({node:"div", class:"table inline table"+tid, ce: false});
 				tableDetails(tid);
 				formatHovertag("table", "$(this).attr('data-title')", "'tableDetails('+$(this).attr('data-id')+');'");
 			break;
@@ -330,18 +336,18 @@ function post_toolbar(tools) {
 			break;
             case "reftext":
                 var rtid = $('.reftext').length;
-                contentAddSpan({node:"span", class:"reftext reftext"+rtid});
+                contentAddSpan({node:"span", class:"reftext reftext"+rtid, ce: false});
                 refTextDetails(rtid);
                 formatHovertag("reftext", "'Ref: '+$(this).attr('data-ref')", "'refTextDetails('+$(this).attr('data-id')+');'");
             break;
             case "LaTeX":
                 var lid = $('.latex').length;
-                contentAddSpan({node:"kbd", class:"latex latex"+lid});
+                contentAddSpan({node:"kbd", class:"latex latex"+lid, ce: false});
                 latexDetails(lid);
                 formatHovertag("latex", "$(this).attr('data-cmd')", "'latexDetails('+$(this).attr('data-id')+');'");
             break;
             case "break":
-                contentAddSpan({node:"kbd", class:"pagebreak"});
+                contentAddSpan({node:"kbd", class:"pagebreak", ce: false});
                 formatHovertag("pagebreak", "'Page Break'", 'null');
                 setTimeout("$('.pagebreak').empty();", 1000);
             break;

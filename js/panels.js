@@ -375,10 +375,10 @@ function GetPanelmain_Idea() {
 function RunPanelmain_Idea() {
 	function populateIdeas() {
 		
-		out = "<div style='background-color: white;border: solid 1px;padding-left: 12px;padding-right: 0px;border-color: #aaa;color: #333;padding-top: 6px;width: 94%;' id='PANELIDEA'><u>General Notes</u><br><textarea class='PanelIdea' data-id='-1'></textarea></div>";
+		out = "<div style='background-color: "+theme.normbg+";border: solid 1px;padding-left: 12px;padding-right: 0px;border-color: #aaa;color: "+theme.coloralt+";padding-top: 6px;width: 94%;' id='PANELIDEA'><u>General Notes</u><br><textarea class='PanelIdea' style='font-family:serif; background-color:"+theme.normbg+";color:"+theme.coloralt+"' data-id='-1'></textarea></div>";
 		for(i in citation) {
 			if(citation[i] != "undefined")
-				out = out+"<hr><div style='background-color: white;border: solid 1px;padding-left: 12px;padding-right: 0px;border-color: #aaa;color: #333;padding-top: 6px;width: 94%;'><u>"+citation[i].Title+"</u><br><textarea class='PanelIdea' data-id='"+i+"'></textarea></div>";
+				out = out+"<hr><div style='background-color: "+theme.normbg+";border: solid 1px;padding-left: 12px;padding-right: 0px;border-color: #aaa;color:"+theme.coloralt+";padding-top: 6px;width: 94%;'><u>"+citation[i].Title+"</u><br><textarea class='PanelIdea' data-id='"+i+"' style='font-family:serif; background-color:"+theme.normbg+";color:"+theme.coloralt+"'></textarea></div>";
 		}
 		postPanelOutput(out);
 		//Now we have to fill in our content
@@ -413,7 +413,7 @@ function RunPanelmain_Outline() {
 	raw = "";
 	formatted = "";
 	try {
-			outline = x.saved.main_outline.replace(/&gt;/g, ">").replace(/&lt;/g, "<");
+			outline = getFileData('main_outline');
 		} catch(e) {
 			outline = "-";
 		}

@@ -422,7 +422,7 @@ function citationFormatted(string, i, id, page, cob) {
 		else
 			string = string.replace(/cMEDIUM/g, "");
 		if(citation[id].Publisher.length)
-			string = string.replace(/cPUBCOMP/, cob.pubcomp.replace(/PUBCOMP/, citation[id].Publisher));
+			string = string.replace(/cPUBCOMP/, cob.publisher.replace(/PUBCOMP/, citation[id].Publisher));
 		else
 			string = string.replace(/cPUBCOMP/g, "");
 		if(citation[id].Title.length)
@@ -495,7 +495,7 @@ function citationFormatted(string, i, id, page, cob) {
 			string = string.replace(/cACCDATE/g, cob.accdate.replace(/ACCDATE/g, dueout));
 		} else
 			string = string.replace(/cACCDATE/g, "");
-		if(page != undefined)
+		if(page != undefined && cob.page != undefined)
 			string = string.replace(/cPAGE/g, cob.page.replace(/PAGE/g, page));
 		else
 			string = string.replace(/cPAGE/g, "");
@@ -726,9 +726,11 @@ function post_content_formatting(object) {
 	$('.draft > div').each(function() {
 		$(this).html( $(this).html().replace(/ /g, '===').replace(/ /g,"~~~"));
 	});*/
+    /*** PARAGRAPH DETECTION ***/
 	if(object.paragraph_indent == undefined)
 		object.paragraph_indent = "";
 	window.cont = $('.draft').html().replace(/&nbsp;/g, " ");
+    window.cont = $('.draft').html().replace(/<div><\/div>/g, " ");
 	window.cont = cont.replace(/<\/div><div><br><\/div><div>/g, "<br>"+object.paragraph_indent);
 	window.cont = cont.replace(/<div><br><\/div><div>/g, "<br>"+object.paragraph_indent);
 	window.cont = cont.replace(/<br><\/div>/g, "");

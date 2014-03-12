@@ -230,7 +230,13 @@ function initiateCitationEditor(q, hovertag, h2) {
 			var today =  new Date();
 			today = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
 			new Array('Article Online', 'Book - Print', 'Book - Online', 'Book - eBook Reader', 'Book - Database', 'Dictionary', 'eBook', 'Encyclopedia', 'Musical', 'Online Article', 'Newspaper', 'Play', 'Podcast', 'Website - Blog', 'Website - Book','Website - Image');
-			out = 'What do you want to cite?<br><input class="citelist" type="text" list="citelist" id="citationEditorIType">';
+            try {
+                if(window.quoteout != undefined)
+                    window.quoteout = $('#citation'+citei).html().replace(/"/g,'&quot;');
+            } catch(e) {
+                window.quoteout = '" "';   
+            }
+			out = 'Quote: <input id="citationQuote" style="width:74%;margin-left:13%;" value="'+window.quoteout+'"><br>What do you want to cite?<br><input class="citelist" type="text" list="citelist" id="citationEditorIType">';
 			out = out + '<datalist id="citelist">'
 			for(i in citetypes) {
 				out = out + '<option value="'+citetypes[i].val+'" label="'+citetypes[i].format+'">';
@@ -250,14 +256,15 @@ function initiateCitationEditor(q, hovertag, h2) {
 			ht = ht + "<div class='citationEditorAccdate citationInput'> Accessed On: &nbsp;<input type='date' id='citationEditorIAccdate'></div>";	
 			ht = ht + "<div class='citationEditorBible citationInput'> <input placeholder='Book' id='citationEditorIBiblebook'><input placeholder='Chapter' id='citationEditorIBiblechapter'><input placeholder='Verse' id='citationEditorIBibleverse'></div>";
 			ht = ht + "<div class='citationEditorMedium citationInput'> <input placeholder='Medium' id='citationEditorIMedium'></div>";
-			ht = ht + "<div class='citationEditorAbstract citationInput'>Type a summary of this work and how you used it in writing your document.<br><div contenteditable id='citationEditorIAbstract' style='background-color:white;height:3em;border:solid 1px #999;'></div></div>";
+			ht = ht + "<div class='citationEditorAbstract citationInput'>Type a summary of this work and how you used it in writing your document.<br><div contenteditable id='citationEditorIAbstract' style='height:3em;border:solid 1px #999;'></div></div>";
 			ht = ht + "<datalist id='citationContributorTypes'><option>Author</option><option>Editor</option><option>Translator</option></datalist><datalist id='citationAutoTitle'></datalist>"			
 			ht = ht + "<button style='' id='citationEditorSave'>Save</button>";
 		
 		var fnc = function x() {
+            $('#citationEditorIType').focus();
 			$('#citationEditorIType').on('input', function() {
 				//console.log('!');
-				introJsStart(14);
+//				introJsStart(14);
 				citationReformat();
 			});
 			$('#citationEditorSave').on('click', function() {
@@ -430,6 +437,8 @@ function initiateCitationEditor(q, hovertag, h2) {
 				$('#citation'+citei).attr('data-i', citei);
 				citationHovertag();
 				closePopup();
+                $('#citation'+citei).html($('#citationQuote').val());
+                window.quoteout = undefined;
 				introJsStart(16);
 			}
 			function citationRestore() {
@@ -468,7 +477,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 			}
 		};
 	
-			initiatePopup({title: "Citations", bordercolor: "#09f", ht: ht, fnc: fnc});
+			initiatePopup({title: "Citations", bordercolor: "#09f", ht: ht, fnc: fnc, size: "large"});
 }
 
 function citationHovertag(recall) {
@@ -614,6 +623,8 @@ function contentAddSpan(t) {
 		var el = document.createElement(t.node);
 		el.className = t.class;
 		el.setAttribute("id", t.id);
+        if(t.ce != undefined) 
+            el.contentEditable = t.ce;
 		if(!t.leading_quote && t.class == "citation")
 			el.textContent = '" ';
 		/*else if(t.leading_quote)
@@ -802,7 +813,30 @@ function hideHovertag() {
 		$('.hovertag').css('left', '110%').css('top', '110%');	
 	});
 }
+function launchFullscreen(element) {
+  if(element.requestFullscreen) {
+    element.requestFullscreen();
+  } else if(element.mozRequestFullScreen) {
+    element.mozRequestFullScreen();
+  } else if(element.webkitRequestFullscreen) {
+    element.webkitRequestFullscreen();
+  } else if(element.msRequestFullscreen) {
+    element.msRequestFullscreen();
+  }
+}
+//Whack fullscreen
+function exitFullscreen() {
+  if(document.exitFullscreen) {
+    document.exitFullscreen();
+  } else if(document.mozCancelFullScreen) {
+    document.mozCancelFullScreen();
+  } else if(document.webkitExitFullscreen) {
+    document.webkitExitFullscreen();
+  }
+}
 function fullscreen() {
+    launchFullscreen(document.documentElement);
+    setTimeout(function() {
 	window.fullscreenOn = true;	
 	hidePanelPlugin();
 	$('.content_textarea').css('z-index', 99).css('position', 'fixed');
@@ -823,7 +857,8 @@ function fullscreen() {
 		});
 	$('.fullscreenui').fadeIn(500);
 	window.fsuo = theme.normfsui;
-	setTimeout("$('.fullscreenui').css('opacity','.1').css('background-color', '"+theme.normfsui+"')", 510);
+	setTimeout("$('.fullscreenui').css('opacity','.1').css('background-color', '"+theme.normfsui+"')", 510);  
+    }, 300);
 }
 function normalscreen() {
 	window.fullscreenOn = false;	
@@ -838,6 +873,7 @@ function normalscreen() {
 		},1000);
 		nightscreen(1);
 		$('.fullscreenui').fadeOut(100);
+    exitFullscreen();
 }
 function nightscreen(option) {
 	console.log($('.content_textarea').css('background-color'), theme.darkbg);
@@ -868,13 +904,13 @@ function nightscreen(option) {
 window.introdisabled = false;
 function checkIntro() {
 	//console.log(localStorage['autointro']);
-	if(localStorage['autointro'] == undefined) {
+	if(localStorage['autointro'] == undefined && false) {
 		introdisabled = true;
 		localStorage['autointro'] = true;
 		introJsStart();
 	}	
 }
-setTimeout("checkIntro()", 1000);
+//setTimeout("checkIntro()", 1000);
 function introJsStart(id) {
 	if(id == undefined)
 		id = 1;
@@ -882,7 +918,7 @@ var intro = introJs();
 //intro.setOptions({steps: [{element: '#temp_header', intro: "Welcome to the Project Gluten. I hope that you are impressed from the work that has been done so far. There's a lot more to go, but there's a lot of potential here already for a great service.<br><br>-Nick Felker"}, {element:'#file_format', intro:"In this demo, we'll be using the APA format. Do you know how to use this format in a paper? The bigger question is, do you <i>need</i> to know how to use this format. Gluten lets the user focus on the art of writing, and formats the paper behind the scenes. How? Let's take a closer look."},{element:'#file_language', intro:"Near the top of the page, you see a bunch of input boxes. You can alter the contents for each box."},{element:'#format_item_0', intro:"The types of input are based on the format. In APA format, the 'Running Head' is a title that displays in the header."},{element:'#format_item_1', intro:"Well, did you try typing in a title? Why not? The format can set a min and/or a max number of characters/words. See the counter below? The title should not be more than 12 words."},{element:'#format_item_2', intro:"Do you see how the word count above changed? If over or under the set limit, the user is alerted. Go back and check it out."},{element:document.querySelectorAll('.content_textarea')[0],intro:'This is the main part of your paper. Here you can write your content and add rich formatting.'},  {element:"#ADDCITATIONBUTTON", intro:"You can add a citation to your paper as easily as clicking this button. What are you waiting for?", position:"top"},  {element:"#citationEditorIType", intro:"This popup appears giving you the option to cite a variety of different sources. Choose one. (Click 'Skip')"},  {element:'#citationEditorITitle', intro:'You can enter the source title, author, and plenty of other stuff.'},  {element:'#citationEditorIAuthorLast', intro:'Type Smith here. Then we can save this source. (Click "Skip")'},  {element:'#citation0',intro:"Now the citation appears in your essay. Hovering over it tells you the title of the source, and clicking on that hover sends you back to the editor. What if you want to see all your sources?"},  {element:'#CITATIONPANEL', intro:"Panels are a way for 3rd party developers to improve the functionality of the editor. The panel framework is documented on GitHub. Let's check it out.", position:"top"},  {element:'#CITATIONPANEL', intro:'All your citations will be listed in this panel. You can edit them by clicking on the one you want.', position:"top"},  {element:'#IDEAPANEL', intro:"Click on me next!", position:"top"},  {element:'#IDEAPANEL', intro:'What if you are taking notes for your paper? It is easy with the Ideas Panel. Write general notes or for each source you have. The panel scrolls with you, so you can take a look at notes while you write.', position:"top"},  {element:'#BUILDBUTTON', intro:"After adding all of this rich information, you will need to 'build' the paper. This is when the software puts everything together.", position:"top"}]});
 intro.setOptions({steps: [{element: '#temp_header', intro:"Welcome to Project Gluten. I hope you find this application useful and you continue to support it with your time."},{element:'#iFILESYS', intro:'In the future, you can open, create, and upload new files using this interface. For now, let us just stick with this document.'},{element: '#file_format', intro:"The system is modular; it revolves around formats. You can write your paper the same way, but you can format it anyway you want. This allows for a consistent and better user experience.<br><br>For this demo we're going to choose 'MLA', so type that option in this field."},{element:'#format_item_0', intro:"Right away you see a bunch of input fields. This makes it easier to add things that are straightforward. Type in your name, just once, and it can be used anywhere. Isn't that easy?"},{element:'#format_item_1', intro:"Give this document a title."},{element:'#format_item_2', intro:"This input fields make it easier for you and for developers. I mean, you type in the professor's name here, and a developer gets it with `valMetadata('Professor')`. It's literally that easy."},{element:'#format_item_4', intro:"A format can contain a couple of input types, such as a date. Pick a day, such as today, for this demo."},{element:'.content_textarea', position:"top", intro:"Awesome, now we're finally at the content. This is where you'll write your body. Don't worry about adding paragraph indents. Just separate each one by a blank line."},{element:'#CHARACTERPANEL', intro:"Let's look at the toolbar just above. Click the 'Character' tool."},{element:'#popup_character_search', position:'left', intro:"This is a panel. It's a plugin which can run by itself or integrate into the content somehow. Think of it like an app. This one is a character map. Type in the character you want, like 'pi', and then press enter."},{element:'.content_textarea', position:"top", intro:"It adds the character to your panel, inline. Wasn't that easy? You didn't have to use the mouse or navigate through menus. If you want to open it later, you can use the shortcut Alt+C"},{element:'span[data-t="citation"]', intro:"Now let's add citations. Citations are seen as the hardest thing to add in a paper. There are dozens of rules for adding citations inline and how to organize a bibliography. Thankfully, all this is now automated. You don't even need to copy and paste. What are you waiting for? Click the 'Citation' tool below."},{element:'#citationEditorIType',intro:"This popup gives you the option to cite a variety of different sources. Choose one. (Click 'Skip' first)"},{element:'#citationEditorITitle', intro:"You can enter the source's title, author, and plenty of other stuff."}, {element:'#citationEditorIAuthorLast', intro:'Click skip. Type Smith here then save the source.'},{element:'#citation0', intro:"Now the citation appears in your essay. You can add content inside the quotation marks. By hovering over the cyan line, you can see the title of your source. If you click on this 'hovertag', you are able to edit the source even further."},{element:'#temp_header', intro:"This is the tip of the iceburg. There's plenty more stuff you are able to explore, but to appreciate it, you must explore on your own. Keep exploring. Before I depart, one more task. Above me, click 'File' and then 'Build'. You'll see how fast and how accurate your paper is. <br><br>Thanks, Nick Felker"}
 ]});	
-if(window.introdisabled != false)
+if(window.introdisabled != false && false)
 	intro.goToStep(id).start();
 }
 function exitintro() {
@@ -2341,6 +2377,10 @@ function parseCT() {
 		saveSelection();
 		var a = $('.content_textarea').html();
    		a = a.replace(r, '$1');
+        a = a.replace(/<\/span><\/div>/g, "</span>&nbsp;</div>");
+        a = a.replace(/<\/span>([\w])/g, "</span>&nbsp;$1");
+        a = a.replace(/<\/kbd><\/div>/g, "</kbd>&nbsp;</div>");
+        a = a.replace(/<\/div><\/div>/g, "</div>&nbsp;</div>");
 		$('.content_textarea').html(a);
 //		console.log(a, r);
 	} catch(e) {
@@ -2452,7 +2492,7 @@ function contextMarkup() {
 	apply_context("[Ff]olk", {type: revise, text: getStrunkTips("This word is very colloquial. You should consider changing the word to be more sophisticated.")});
 	apply_context("[Pp]ersonalize", {type: revise, text: getStrunkTips("You should consider changing the word. It has a pretentious connontation.")});
 	apply_context("[Tt]he foreseeable future", {type: revise, text: getStrunkTips("What is the definition of 'foreseeable'? This phrase is vague and should be replaced by something more specific.")});
-	apply_context("[Tt]ry and", {type: revise, replacement: "try to", text: getStrunkTips("If you're going to 'try and' do something else, then you're doing two separate actions. If so, 'try' isn't very specific and should be improved. If you're doing a single action, you'll 'try to' do that one thing.")});
+	apply_context(" [Tt]ry and", {type: revise, replacement: "try to", text: getStrunkTips("If you're going to 'try and' do something else, then you're doing two separate actions. If so, 'try' isn't very specific and should be improved. If you're doing a single action, you'll 'try to' do that one thing.")});
 	apply_context("[Ee]ach and every one", {type: revise, text: getStrunkTips("Unless this is said in conversation, it should be removed. This phrase is very wordy and could easily be simplified to a single word.")});
     
     apply_context("--", {type: chars, text: "Use this character instead", replacement:"—"});
@@ -2682,7 +2722,7 @@ function getLoader(query, m) {
           corners: 1, // Corner roundness (0..1)
           rotate: 12, // The rotation offset
           direction: 1, // 1: clockwise, -1: counterclockwise
-          color: theme.coloralt, // #rgb or #rrggbb or array of colors
+          color: "#f00", // #rgb or #rrggbb or array of colors
           speed: 1.3, // Rounds per second
           trail: 65, // Afterglow percentage
           shadow: false, // Whether to render a shadow

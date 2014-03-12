@@ -19,7 +19,7 @@ hovertagRegistrar = new Array();
 obj = {};
 currentformat = "";
 document.ready = function() {
-	console.log('Gltn has woken up: v 1.1.3.3');
+	console.log('Gltn has woken up: v 1.1.4.3');
     x = {};
     //Setup Filepicker
     filepicker.setKey("AePnevdApT62LvpkSSsiVz");
@@ -208,7 +208,8 @@ function restoreFile(full) {
 	} catch(e) {
 		console.error(e.message);
 		var z = confirm("This document has improper XML. Click okay to send a bug report.");
-		var y = confirm("Click okay to delete all metadata. This removes citations, but keeps the main content.");	
+		var y = confirm("Click okay to delete all metadata. This removes citations, but keeps the main content.");
+        console.warn("You chose "+z+", "+y);
 		if(z == true)
 			window.location = "mailto:handnf+gltn@gmail.com?subject=File%20"+fileid+"%20Broken&body="+encodeURIComponent(localStorage[fileid]);
 		if(y == true) 
@@ -253,7 +254,7 @@ function restoreFile(full) {
 		if(x.saved != undefined) {
 			window.saved = {};
 			for(i in x.saved) {
-				window.saved[i] = x.saved[i].replace(/&gt;/g, ">").replace(/&lt;/g, "<");	
+				window.saved[i] = decodeURIComponent(x.saved[i]);	
 			}
 		}
 		
@@ -407,10 +408,14 @@ function exportFile() {
 
 	//add_to_page('Execute this code in a web console to transfer the files over to a different computer:<br><textarea style="width:95%;height:200px;">localStorage["'+fileid+'5"] = \042'+localStorage[fileid].replace(/"/g, '\\"')+'\042;localStorage["'+fileid+'5_c"] = \042'+localStorage[fileid+"_c"].replace(/"/g, '\\"')+'\042;</textarea>');
 }
-
+function getFileData(att) {
+    return window.saved[att];   
+}
 function writeToSaved(att, val) {
 	if(val != undefined && att != undefined) {
-		val = val.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/&nbsp;/g, " ").replace(/&emsp;/g, ' ');
+//		val = val.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/&nbsp;/g, " ").replace(/&emsp;/g, ' ');
+        val = decodeURIComponent(val);
+        val = encodeURIComponent(val);
 		//console.log(val);
 		if(window.saved != undefined)
 			window.saved[att] = val;
@@ -422,6 +427,9 @@ function writeToSaved(att, val) {
 }
 function writeToFile(att, val) {
 	writeToSaved(att, val);	
+}
+function getSettings(att) {
+    return window.setings[att];   
 }
 function writeToSettings(att, val) {
 	if(val != undefined && att != undefined) {
