@@ -204,7 +204,8 @@ function restoreFile(full) {
 	
 	//var x = xml2json(jQuery.parseHTML(localStorage[fileid]),"  ");
 	try {
-	x = jQuery.xml2json(localStorage[fileid]);
+        console.log('"'+localStorage[fileid]+'"');
+	x = $.xml2json(localStorage[fileid].trim().replace(/'/g,"&039;"));
 	} catch(e) {
 		console.error(e.message);
 		var z = confirm("This document has improper XML. Click okay to send a bug report.");
