@@ -34,3 +34,5 @@ past the boring stuff of writing - formatting and citations and everything else 
 
 #### Third-Party Developers
 You can edit the source files or develop plugins using the various frameworks available in Gltn. Go to the Wiki page to learn more about developing plugins.
+
+http://felkerdigitalmedia.com/Fleker/Gltn/Wiki
