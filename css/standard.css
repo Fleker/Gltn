@@ -11,14 +11,16 @@
 body {
 	background-color: #ddd;
 	color: #000;
-	/*overflow-x:hidden;*/
+	overflow-x:hidden;
+	margin: -2px;
+	width: calc(100% + 4px);
 }
 .body {
-	padding-top:100px;	
+	padding-top:102px;	
 }
 .header {
 	position:fixed;
-	background-color:#ddd;
+	background-color:#eee;
 	top:0px;
 	border-bottom:solid 1px #bbb;
 	left:0px;
@@ -33,7 +35,7 @@ span, div, body {
 	height: 100px;
 }
 .panel {
-
+	display:inline-block;
 }
 .toolbar_button {
 	cursor:pointer;	
@@ -56,9 +58,8 @@ span, div, body {
 	background-color:#eee;
 	border:solid 1px black;
 	padding-left: .6em;
-	padding-top: 0.5em;
+	padding-top: 0.7em;
 	padding-right: 0.3em;
-	border-left-width:0px;
 }
 .panel_plugin_title {
 	font-weight:bold;	
@@ -86,18 +87,25 @@ span, div, body {
 }
 .content {
 	border: solid 2px #444;
+	height: 23px;
+	padding-top: 2px;
+	margin-left: 2px;
+	width: calc(100% - -12px);
 }
 .content_textarea {
-	width:98%;
-	margin-right: -4px;	
+	width: calc(100% - 1px);	
 	height: 100%;
 	overflow-x:hidden;
-	overflow-y:auto
+	overflow-y:auto;
+	padding-left: 6px;
+	padding-right:6px;
+	padding-top:0px;
+	line-height: 1.3em;
 }
 .toolbar {
 	background-color: #aaa;
 	margin-bottom: -4px;
-	width:98%;
+	
 }	
 .overflow {
 	background-color: #aaa;
@@ -450,13 +458,9 @@ text-decoration: none;
 	left: 25px;
 	height: 10px;
 	width: 10px;
-	border-radius: 12px;
+	border-radius: 10px;
 	-webkit-animation: loader10d 3s ease-in-out infinite;
 			animation: loader10d 3s ease-in-out infinite;
-}
-.spinner {
-    padding-left:50%;
-    
 }
 /**
 @-webkit-keyframes loader10d{0%{background-color: rgba(255, 255, 0, .2);}25%{background-color: rgba(255, 255, 0, .2);}50%{background-color:rgba(255, 255, 0, .2);}75%{background-color: rgba(255, 255, 0, 1);}100%{background-color: rgba(255, 255, 0, .2);}}

@@ -49,6 +49,14 @@ function set_up_format(name, property) {
 		break;
 	}
 }
+function setFormatItemWidth(indeX) {
+	if($('#format_item_'+index).val().length < 5)
+		$('#format_item_'+index).css('width', '5em');
+	else if($('#format_item_'+index).val().length > 40)
+		$('#format_item_'+index).css('width', '40em');
+	else
+		$('#format_item_'+index).css('width', 0.5*$('#format_item_'+index).val().length+"em");
+}
 function post_format() {
 	var out = ""
 	for(i=0;i<=format_js_index;i++) {
@@ -84,14 +92,27 @@ function post_format() {
 			$(e).on('input', function() {
 				format_check_count(i);
 			});*/
-			setInterval("format_check_count("+i+")", 100);
+			setInterval("format_check_count("+i+")", 800);
 		}
-        $('#format_item_'+i).on('input', function() {
-           if($(this).val().length < 40)
-               $(this).css('width', 0.7*$(this).val().length+"em");
-            else
-               $(this).css('width', "40em");
-        });
+		
+		if($('#format_item_'+i).val() != undefined) {
+			if($('#format_item_'+i).val().length < 20)
+				$('#format_item_'+i).css('width', '10em');
+			else if($('#format_item_'+i).val().length > 80)
+				$('#format_item_'+i).css('width', '40em');
+			else
+				$('#format_item_'+i).css('width', 0.5*$('#format_item_'+index).val().length+"em");
+		}
+
+       		$('#format_item_'+i).on('input, click', function() {
+			if($(this).val().length < 20)
+				$(this).css('width', '10em');
+			else if($(this).val().length > 80)
+				$(this).css('width', '40em');
+			else
+				$(this).css('width', 0.5*$(this).val().length+"em");
+
+        	});
 	}
 	onInitToolbar();
 	
@@ -199,9 +220,9 @@ function post_format_mltext(m) {
 }
 function post_format_content(m) {
 	var out = "";
-	out = "<div class='content overflow'></div>";
+	out = "<div class='content_wrapper'><div class='content overflow'></div>";
 	out += "<div class='content toolbar'></div>";
-	out = out + "<div contenteditable='true' class='content content_textarea' onmouseleave='/*hideHovertag()*/' onfocus='/*restoreSelection()*/'></div>";
+	out = out + "<div contenteditable='true' class='content content_textarea' onmouseleave='/*hideHovertag()*/' onfocus='/*restoreSelection()*/'></div></div>";
 	out = out + "<table class='content_wordcount'><tr id='content_row'><td class='content_word'></td><td class='content_character'></td><td class='content_save '>&emsp;</td></tr></table>";
 	return out;	
 }
@@ -210,7 +231,7 @@ function post_toolbar(tools) {
 	var overflow = false;
 	$('.toolbar').empty();
 	$('.overflow').empty();
-	$('.toolbar').append("<div class='toolbar_options' style='display:inline'>&emsp;<span class='toolbar_button' data-t='character' id='CHARACTERPANEL'>Character</span>&emsp;|&emsp;");
+	$('.toolbar').append("<div class='toolbar_options' style='display:inline'><span class='toolbar_button' data-t='character' id='CHARACTERPANEL'>&emsp;Character&emsp;</span>|");
 	//TODO - Use labels to make prettier, maybe "new_toolbar/new_toolbar_item"
 	//TODO - Use JSON objects to enable more powerful, third-party tools
 	for(i=0;i<tools.length;i++) {
@@ -269,14 +290,14 @@ function post_toolbar(tools) {
 			$('.toolbar_options').append("<div class='toolbar_button' data-t='overflow' style='display:inline-block'>&nbsp;&nbsp;&nbsp;<span class='fa fa-ellipsis-v'></span>&nbsp;&nbsp;&nbsp;</div>|&emsp;");
 		}	
 		if(overflow)
-			$('.overflow').append("<span class='toolbar_button' data-t='"+tool_t+"'>"+tool_pretty+"</span>&emsp;|&emsp;");
+			$('.overflow').append("<span class='toolbar_button' data-t='"+tool_t+"'> &emsp; "+tool_pretty+"&emsp;</span>|");
 		else
-			$('.toolbar_options').append("<span class='toolbar_button' data-t='"+tool_t+"'>"+tool_pretty+"</span>&emsp;|&emsp;");
+			$('.toolbar_options').append("<span class='toolbar_button' data-t='"+tool_t+"'>&emsp;"+tool_pretty+"&emsp;</span>|");
 	}
 	if(overflow)
-		$('.overflow').prepend("&emsp;<span class='toolbar_button fa fa-expand' data-t='fullscreen'></span>&emsp;|&emsp;</div>");
+		$('.overflow').prepend("<span class='toolbar_button' data-t='fullscreen'>&emsp;<span class='fa fa-expand'></span>&emsp;</span>|</div>");
 	else
-		$('.toolbar_options').append("<span class='toolbar_button fa fa-expand' data-t='fullscreen'></span>&emsp;|&emsp;</div>");
+		$('.toolbar_options').append("<span class='toolbar_button' data-t='fullscreen'>&emsp;<span class='fa fa-expand'></span>&emsp;</span>|</div>");
 	//if(overflow) 
 		//out += "</span></div>";
 	
@@ -391,37 +412,12 @@ function update_toolbar_style() {
 		appendHoloSelection();	
 	}*/
 	//$('.toolbar').width(.94*window.innerWidth);
-	if(toolbar_width != $('.toolbar').width()) {
-		//$('.toolbar').width(.94*window.innerWidth);
-		//tw = window.innerWidth - 75;
-		//toolbar_width = tw;
-		toolbar_width = $('.toolbar').width();
-		//console.log(toolbar_width+" ",$('.toolbar').width());
-		if(window.fullscreenOn == false) {
-			//tw = window.innerWidth - 75;
-			/**/tw = $('.toolbar').width();
-			$('.content_textarea').width(tw);
-			$('.overflow').width(tw);
-			bh = window.innerHeight;
-			$('.content_textarea').height(2*bh/3);
-			$('.content_textarea').css('z-index', 0).css('position', 'inherit');
-			onInitToolbar();
-			/*$('.content_textarea').animate({
-				top: -.1%,
-				left:-.1%;
-				width:100.2%;
-				height:100.2%;
-			});*/
-		} else {
-			//$('.content_textarea').css('z-index', 3).css('position', 'fixed')/*.css('background-color', 'white')*/;
-		}	
-		
-		//Update Header
-		ribbonSwitch(ribbon_index, true);
-	}
+	
 
 	//Use this for other dynamic styling stuff
-	
+	/*if(toolbar_width != $('.toolbar').width()) {
+		refreshBodyDesign();
+	}*/
 	
 	
 	var sy = scrollY-10/*-110*/;
@@ -432,7 +428,7 @@ function update_toolbar_style() {
 	if(sy != sy_save) {
 		$('#panel_plugin').animate({
 			marginTop: sy
-		},20);
+		},80);
 		sy_save = sy;
 	}
 	$('.introjs-overlay').css('display', 'none');
@@ -442,3 +438,29 @@ function update_toolbar_style() {
 	//$('#panel_plugin').css('height', window.innerHeight);
 	
 }
+function refreshBodyDesign() {
+	toolbar_width = $('.toolbar').width();
+	if(window.paneltitle == undefined) {
+		console.log("Change without panel");
+		if(window.fullscreenOn == false) {
+			var h = (window.innerHeight-100)*.85;
+			var w = window.innerWidth-25;
+			$('.content_wrapper').css('width', w+'px').css('margin-bottom', '-3px').css('margin-left', '-13px')/*.css('overflow-x', 'hidden')*/;
+			$('.content_textarea').css('height', h+'px').css('width', w+'px');	
+		}	
+		
+		//Update Header
+		ribbonSwitch(ribbon_index, true);
+	} else if(window.paneltitle != undefined) {
+		console.log("Change with panel");
+		$('.content_wrapper').css('width', 'calc(100% - 2px)');
+		sizePanel(panelwidth, false);
+		$('.content_textarea').css('width', '100%').css('margin-left', '0px');
+	}
+	setTimeout("onInitToolbar();", 100);
+}
+$( window ).resize(function() {
+  refreshBodyDesign();
+  ribbonSwitch(ribbon_index, true);
+	//console.log(1);
+});

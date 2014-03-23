@@ -13,7 +13,7 @@ function initTheme() {
 	theme.darkfsui = "rgba(41,41,41)";
 	theme.darkfsuicolor = 'white';
 	theme.normfsuicolor = 'white';
-	theme.ribbonhighlight = '#05a';
+	theme.ribbonhighlight = '#3498db';
 	theme.ribbonplain = 'rgba(0,0,0,0)';
 	$('.header').css('background-color', '#333').css('border-bottom', 'solid 0px #555');
 	$('#panel_content').css('background-color', '#333');
@@ -36,5 +36,6 @@ writeCss("@import url(http://fonts.googleapis.com/css?family=Roboto:400,100,100i
 	themeCss('background-color', theme.normbg);
 	themeCss('color', theme.normcolor);
 setLoaderColor('255,255,255');
+writeCss("button { font-family:Roboto;background-color:rgba(255,255,255,0.01);border-radius:3;text-indent:0;border:1px solid #888;display:inline-block;color:#ccc;font-weight:bold;font-style:normal;text-decoration:none;text-align:center;padding:5px;min-width:30px;} button:hover { background-color: "+theme.ribbonhighlight+"; color: #222; } button:active {position:relative;top:1px;}");
 //Theme parameters for content_textarea not necessary (unless we removed the reload requirement for themes - but for now it'll stay due to a lack of default parameters)
 	//$('.content_textarea').css('background-color', theme.normbg).css('color', theme.normcolor);

@@ -1,4 +1,4 @@
-	// JavaScript Document
+﻿	// JavaScript Document
 mainpanels = "main_Character, main_Idea, main_Citation, main_Find, main_Filesys, main_Notifications";
 //Other panels are here by default, but don't need to be called on init
 function initPanels() {
@@ -42,7 +42,7 @@ function runPanel(panel_id_name) {
     }
     console.log(max);
 	$('.panel_plugin_title').html(lcr_split(p.title+'&emsp;<span class="PanelPopupEvent"></span><span class="PanelKeyEvent" data-keycode="" data-alt="" data-ctrl="" data-shift=""></span><span id="PanelCloseEvent"></span>', '', max+'<button onclick="hidePanelPlugin()" data-step="22" data-intro="Click me to hide the panel.">'+closeButton()+'</button>'));
-	$('#panel_plugin').css("border-color", p.bordercolor);
+	$('#panel_plugin').css("border-color", p.bordercolor).css('display', 'inline-table');
 	window.paneloverride = p.override;
     window.panelwidth = p.width;
 	//$('#panel_plugin').css('margin-top');
@@ -50,25 +50,38 @@ function runPanel(panel_id_name) {
 	//for a phone, do a type of check so that it isn't too small. 
 	//Like, make the minimum width 2 inches; 3in is 25% of screen, but that may not look great on phones.
 	//for now, relative to a 13.3" screen (11.59" wide)
-	var min = 11.59*p.width;
+	var min = 11.19*p.width;
 	if(min > 2)
 		min = 2;
 	window.paneltitle = panel_id_name;
 	openPanelPlugin(p.width, min, panel_id_name);
 }
 function openPanelPlugin(percent, min, panel_id_name) {
-	$('#panel_plugin').css('display', 'block').css('opacity', 0).css('width', '1px');
-	animateContentPanel(100-percent+'%');
+	$('#panel_plugin').css('opacity', 0).css('width', '1px');
+	sizePanel(percent);
+	setTimeout(function() {
+		populatePanelPlugin(panel_id_name);
+		/*$('#panel_plugin').animate({
+			minWidth: min+"in"
+		}, 360);*/
+	},80);
+}
+function sizePanel(percent, refresh) {
+	//animateContentPanel((97-percent)+"%");
 	$('#panel_plugin').animate({
-		/*width: percent+"%",*/
-		width:'95%',
-		minWidth: min+"in",
+		width:(percent)+'%',
 		opacity: 1,
-		marginLeft: 0
+		marginLeft: '-3px'
 		}, 70, function() {
-			setTimeout("populatePanelPlugin('"+panel_id_name+"');",10);	
+			animateContentPanel((window.innerWidth - $('#panel_plugin').width() - 35)+"px");
+			$('.panel_plugin_content').css('height', (window.innerHeight-127)+"px").css('overflow-y', 'auto');
+			if(refresh != false)
+				refreshBodyDesign();
 		}
 	);
+	$('#panel_content').css('width', (97-percent)+"%");
+	//animateContentPanel((window.innerWidth - $('#panel_plugin').width() - 35)+"px");
+			
 }
 function squeezeContentPanel() {
 	animateContentPanel("50%");
@@ -94,16 +107,13 @@ function maximizePanel() {
         $('#panel_content').hide(200);
         $('#panel_plugin').animate({
             width:"100%",
-            marginLeft:"-10px"
+            marginLeft:"0px"
         }, 200);
         $('.PanelMaximizeEvent').attr('data-status', 1)
     } else {
         //Minimize
         $('#panel_content').show(200);
-        $('#panel_plugin').animate({
-            marginLeft:"0px"
-        }, 200);
-        animateContentPanel(100-panelwidth+'%');
+        sizePanel(panelwidth);
         $('.PanelMaximizeEvent').attr('data-status', 0)
     }
     $('.PanelMaximizeEvent').click();
@@ -115,10 +125,10 @@ function hidePanelPlugin() {
 		width: "0%",
 		minWidth: "0in",
 		opacity: 0,
-		marginLeft:"100%"
-		}, 500, function() {
+		}, 100, function() {
 			$('#panel_plugin').css('display', 'none');
 			stretchContentPanel();
+			refreshBodyDesign();
 		}
 	);
     $('#panel_content').show(200);
@@ -136,7 +146,7 @@ function populatePanelPlugin(panel_id_name) {
 	} catch(e) {
 		
 	}
-	$('.panel_plugin_content').css('height', (window.innerHeight-137)+"px").css('overflow-y', 'auto');
+	$('.panel_plugin_content').css('height', (window.innerHeight-127)+"px").css('overflow-y', 'auto');
 }
 function openPanelResearch() {
 	initResearch();	
@@ -335,7 +345,7 @@ function RunPanelmain_Citation() {
 			if(citation[i] != undefined && citation[i] != "undefined") {
 				c = citation[i];
 				console.warn(c);
-				out = out + "<div class='citationPanel_citation' data-id='"+i+"' style='background-color:white;border: solid 1px;padding-left: 5px;padding-right: 10px;border-color: #aaa;color: #333;' id='CITATIONPANELEXAMPLE'>"
+				out = out + "<div class='citationPanel_citation' data-id='"+i+"' style='background-color:"+theme.normbg+"; border: solid 1px "+theme.coloralt+";padding-left: 5px;padding-right: 10px;border-color: #aaa;color: "+theme.normcolor+";' id='CITATIONPANELEXAMPLE'>"
 				try {
 					out = out + c['Title']+"<br>&emsp;";
 					out = out + "<i>"+c['AuthorFirst']+" "+c['AuthorLast']+"</i><br>&emsp;<span style='font-size:10pt'>Vol. "+c['Volume']+" "+c['Edition']+" ed.</span>";
@@ -375,24 +385,32 @@ function GetPanelmain_Idea() {
 function RunPanelmain_Idea() {
 	function populateIdeas() {
 		
-		out = "<div style='background-color: "+theme.normbg+";border: solid 1px;padding-left: 12px;padding-right: 0px;border-color: #aaa;color: "+theme.coloralt+";padding-top: 6px;width: 94%;' id='PANELIDEA'><u>General Notes</u><br><textarea class='PanelIdea' style='font-family:serif; background-color:"+theme.normbg+";color:"+theme.coloralt+"' data-id='-1'></textarea></div>";
+		out = "<div style='background-color: "+theme.normbg+";border: solid 1px;padding-left: 12px;padding-right: 0px;border-color: #aaa;color: "+theme.coloralt+";padding-top: 6px;width: 94%;' id='PANELIDEA'><u>General Notes</u><br><textarea class='PanelIdea' style='font-family:serif; background-color:"+theme.normbg+";color:"+theme.coloralt+";' data-id='-1'></textarea></div>";
 		for(i in citation) {
 			if(citation[i] != "undefined")
 				out = out+"<hr><div style='background-color: "+theme.normbg+";border: solid 1px;padding-left: 12px;padding-right: 0px;border-color: #aaa;color:"+theme.coloralt+";padding-top: 6px;width: 94%;'><u>"+citation[i].Title+"</u><br><textarea class='PanelIdea' data-id='"+i+"' style='font-family:serif; background-color:"+theme.normbg+";color:"+theme.coloralt+"'></textarea></div>";
 		}
 		postPanelOutput(out);
 		//Now we have to fill in our content
-		$('.PanelIdea[data-id=-1]').val(ideadefault);
+		$('.PanelIdea[data-id=-1]').val(decodeURIComponent(ideadefault));
+		$('.PanelIdea[data-id=-1]').css('height', decodeURIComponent(ideadefault).split(' ').length/15+"em");
 		for(i in citation) {
-			$('.PanelIdea[data-id='+i+']').val(idea[i]);
+			var v = decodeURIComponent(idea[i]);
+			if(v == undefined || v == "undefined")
+				v = "";
+			var h = v.split(' ').length/15;
+			if(h < 2)
+				h = 2;
+			$('.PanelIdea[data-id='+i+']').val(v);
+			$('.PanelIdea[data-id='+i+']').css('height', h+"em");
 		}
 	
 		$('.PanelIdea').on('input', function() {
 			var id = $(this).attr('data-id');
 			if(id >= 0) 
-				idea[id] = $(this).val();
+				idea[id] = encodeURIComponent($(this).val());
 			else if(id == -1)
-				ideadefault = $(this).val();
+				ideadefault = encodeURIComponent($(this).val());
 		});
 	}
 	$('.PanelPopupEvent').on('click', function() {
@@ -785,6 +803,7 @@ function RunPanelmain_Find() {
 	window.cta = $('.content_textarea').html();
 	window.cta2 = $('.content_textarea').html();	
 	initFind();
+	$('#FindIn').focus();
 	$('#FindIn').on('input', function() {
 		
 	})
@@ -1005,7 +1024,7 @@ function RunPanelmain_Dictionary() {
 				var target = document.getElementById('DictionaryOut');
 				var spinner = new Spinner(opts).spin(target);*/
             if($('#DictionaryOut .loader10').length == 0)
-                $('#DictionaryOut').append(getLoader(-20));
+                getLoader("DictionaryOut");
 			for(i in ajaxrequests) {
 				ajaxrequests[i].abort();	
 			}
@@ -1148,7 +1167,7 @@ function RunPanelmain_Themes() {
             loadThemeSettings();
 		    out = "<button id='ThemeSettings'><span class='fa fa-cog'></span></button><br>";
         } catch(e) {
-            
+            out = "";
         }
 		for(i in a) {
 			var b = window.settings['theme_'+a[i]].split(', ');
@@ -1178,198 +1197,4 @@ function RunPanelmain_Themes() {
         });
 	}
 	loadThemes();
-}
-
-//*** Store-Related Code ***/
-function getBaseLog(y, x) {
-    return Math.log(y) / Math.log(x);
-}
-function launchStore() {
-	//Grab store data
-	falseBuild(true);
-	setTimeout('launchStore2()', 251);
-}
-function launchStore2() {
-	console.log('ba');
-	$('.build').append("<div style='background-color:"+theme.normbg+";width: 94%;margin-left: 3%;margin-top: 10px;padding-top: 10px;padding-bottom: 40px;border: solid 1px #999;box-shadow: black 0px 0px 3px 0px;color:"+theme.normcolor+"'><div style='font-size:18pt;color:"+theme.coloralt+"font-family:sans-serif;text-align:center;'>Gltn Plugin Store</div><div style='text-align:center; width:100% ;font-size:18pt; padding-bottom:20px;' class='fa-stack fa-lg'><span class='fa fa-circle-o fa-stack-2x'></span><span class='fa fa-shopping-cart fa-stack-1x'></span></div><input type='search' placeholder='Search for something...' style='width:75%;margin-left:15%;' id='store_search'><div id='build_inner' class='build_inner'>"+getLoader(0,20)+"</div></div>");
-	$('.build').css('line-height', '1em');
-	function getIcon(datum) {
-		if(datum.icon_fa != undefined) 
-			return "<span class='fa fa-"+datum.icon_fa+"'></span>";
-		else if(datum.icon_url != undefined)
-			return "<img src='"+datum.icon_url+"'>";
-		else if(datum.icon_text != undefined)
-			return "&emsp;"+datum.icon_text+"&nbsp;";
-		return "";
-	}
-	function isInstalled(datum) {
-		return ((datum.type == "Panel" || datum.type == "Service") && window.settings.panels.indexOf(datum.id) > -1) || (datum.type == "Dictionary" && window.settings.dictionary.indexOf(datum.id) > -1) || (datum.type == "Theme" && window.settings.theme.indexOf(datum.id) > -1)
-	}
-	function getDownloadCount(number) {
-		if(number < 10)
-			return "A few downloads";
-		else {
-			//console.log(getBaseLog(number, 10),Math.floor(getBaseLog(number, 10)),Math.pow(10, Math.floor(getBaseLog(number, 10))),Math.floor(number/Math.pow(10, Math.floor(getBaseLog(number, 10)))));
-			var n = Math.pow(10, Math.floor(getBaseLog(number, 10)))*Math.round(number/Math.pow(10, Math.floor(getBaseLog(number, 10))))
-			return "About "+ n + " downloads";
-			//Math.round(10*(n/Math.pow(10, Math.floor(getBaseLog(n,10)))))	
-		}
-	}
-	function searchTermed(datum) {
-		n = $('#store_search').val().toLowerCase();
-		if(datum.name.toLowerCase().indexOf(n) > -1)
-			return true;
-		else if(datum.credit.toLowerCase().indexOf(n) > -1)
-			return true;
-		
-		return false;
-	}
-	
-	function grabStore() {	
-	$.get('http://felkerdigitalmedia.com/gltn/php/storefront.php', {}, function(data) {
-		d = $.parseJSON(data);
-		//console.log(d)
-        $('.loader10').remove();
-        //Panels, Dictionaries, Themes, Plugins
-		pout = "";
-		dout = "";
-		tout = "";
-        lout = "";
-		d = d.app;
-		window.store = d;
-		for(i in d) {
-			out = "";
-			//console.log(d[i], d[i].parent);
-			//if(d[i].parent == "app") {
-				if(searchTermed(d[i])) {
-				out += "&emsp;"+getIcon(d[i]);
-				out += "&nbsp;<b>"+d[i].name+"</b>";
-				if(isInstalled(d[i])) {
-					out += "&emsp;<span style='color:green;font-size:8pt' class='fa fa-check'></span><span style='font-size:6pt;color:green'>ADDED</span>";	
-				}
-				out += "<br>&emsp;&emsp;<i style='font-size:10pt'>"+d[i].credit+"</i>";
-				if(d[i].description.length > 100)
-					out += "<div style='font-size:8pt;padding-left:5px;padding-right:5px;'>"+d[i].description.substring(0,100)+"...</div>";
-				else
-					out += "<div style='font-size:8pt;padding-left:5px;padding-right:5px;'>"+d[i].description+"</div>";
-				
-				outt = "<div style='border:solid 1px #222;cursor:pointer;background-color:white;padding-top:3px;margin-top:-1px;color:#222' class='store_item' data-id='"+i+"'>"+out+"</div>";
-				//console.log(i, outt);
-				if(d[i].type == "Panel")
-					pout += outt;
-				else if(d[i].type == "Dictionary")
-					dout += outt;
-                else if(d[i].type == "Theme")
-                    tout += outt;
-				else	
-					lout += outt;
-				}
-			//}
-		}
-		var nosearch = "<div style='text-align:center'>No results</div>";;
-		if(pout.length == 0 && dout.length == 0 && tout.length == 0 && lout.length)
-			dout = "<br><br><b>Sorry. No results for that search were found.</b>";
-		else {
-			if(pout.length == 0)
-				pout = nosearch;
-			if(dout.length == 0)
-				dout = nosearch;
-			if(tout.length == 0)
-				tout = nosearch;
-            if(lout.length == 0)
-				tout = nosearch;
-		}
-		
-		$('.build_inner').html("<div class='store_submit' style='text-align:center; font-size:10pt; text-decoration:underline; cursor:pointer;'>Submit a Plugin</div><br><table style='width:80%;margin-left:10%;'><tr><td style='width:25%;vertical-align:top;'><u class='centerOfAttention'>Panels/Services</u>"+pout+"</td><td style='width:25%;vertical-align:top;'><u class='centerOfAttention'>Dictionaries</u>"+dout+"</td><td style='width:25%;vertical-align:top;'><u class='centerOfAttention'>Themes</u>"+tout+"</td><td style='width:25%;vertical-align:top;'><u class='centerOfAttention'>Plugins</u>"+lout+"</td></tr></table><br><br><br>");
-		$('.store_item').on('click', function() {
-			var i = store[$(this).attr('data-id')];
-			title = getIcon(i)+"&emsp;"+i.name;
-			//subtitle = i.type+"<br><i>&emsp;&emsp;"+i.credit+"</i>";
-			ht = threeColumnText("<div style='padding-left:16px;color:#999'>"+i.type+"<br>"+i.credit+"</div>", "<div style='font-size:9pt;color:#999'>v "+i.version+"<br>"+getDownloadCount(i.install)+"</div>", "")+"<br>";
-			ht += "<div style='margin-left:10%;width:80%;font-size:12pt;'>"+i.description+"</div>";
-			//ht += "<br><span style='font-size:9pt;color:#999;padding-left:10%'>v "+i.version+"</span>";
-			//ht += "<br><span style='font-size:9pt;color:#999;padding-left:10%'>"+getDownloadCount(i.install)+"</span>";
-			if(isInstalled(i)) 
-				ht += "<br><br><br>&emsp;<span style='color:green;font-size:12pt' class='fa fa-check'></span><span style='font-size:10pt;color:green'>&nbsp;You've already installed this.</span><br><button class='store_uninstall' data-id='"+$(this).attr('data-id')+"'>Uninstall</button>";	
-			else
-				ht += "<br><br><br>&emsp;<button class='store_install' data-id='"+$(this).attr('data-id')+"'>Install Now</button>";
-			initiatePopup({title: title, ht: ht, bordercolor: '#222'});
-			$('.store_install').on('click', function() {
-				var i = store[$(this).attr('data-id')];
-				y = confirm("Install "+i.name+"?");
-				if(y == true) {
-					if(i.type == "Panel" || i.type == "Service") {
-						install_panel(i.id, i.name, getIcon(i), i.url, (i.type == "Service"), i.key);
-						$.get('storepost.php', {item: i.id, action: 'Download'}, function() {
-							console.log('Panel installed');
-						});
-						alert('Panel installed');
-					}
-					else if(i.type == "Dictionary") {
-						install_dictionary(i.type_d, i.url, i.name, i.id, getIcon(i));	
-						$.get('storepost.php', {item: i.id, action: 'Download'}, function() {
-							console.log('Dictionary installed');
-						});
-						alert('Dictionary added')
-					}
-					else if(i.type == "Theme") {
-						install_theme(i.id, i.name, i.url, getIcon(i));
-						$.get('storepost.php', {item: i.id, action: 'Download'}, function() {
-							console.log('Theme installed');
-						});
-						alert('Theme added');
-					} else
-						alert('Unknown data');
-					closePopup();
-					grabStore();
-				}
-			});
-			$('.store_uninstall').on('click', function() {
-				var i = store[$(this).attr('data-id')];
-				y = confirm("Are you sure that you wish to uninstall "+i.name+"?");
-				if(y == true) {
-					if(i.type == "Panel" || i.type == "Service") {
-						//install_panel(i.id, i.name, getIcon(i), i.url);
-						uninstall_panel(i.id);
-						$.get('storepost.php', {item: i.id, action: 'Uninstall'}, function() {
-							console.log('Panel uninstalled');
-						});
-						alert('The panel was uninstalled.');
-					}
-					else if(i.type == "Dictionary") {
-						uninstall_dictionary(i.id);	
-						$.get('storepost.php', {item: i.id, action: 'Uninstall'}, function() {
-							console.log('Dictionary uninstalled');
-						});
-						alert('The dictionary was removed.')
-					}
-					else if(i.type == "Theme") {
-						uninstall_theme(i.id);
-						$.get('storepost.php', {item: i.id, action: 'Uninstall'}, function() {
-							console.log('Theme uninstalled');
-						});
-						alert('The theme was removed.');
-					}
-					else
-						alert('Unknown data');
-					closePopup();
-					grabStore();
-				}
-			});
-		});
-		$('.store_submit').on('click', function() {
-			//alert('Open rules');
-			out = "<div style='margin-left:5%'>The plugin you submit must be uncondensed javascript so it may be reviewed. Your plugin must meet the following guidelines. Keep in mind that they may seem vague, and there is room to compromise.<br><ul><li><b>1. Integration</b> Your plugin may not secretly manipulate user data. This includes but isn't limited to deleting settings and files as well as adding settings and files without the user's consent or knowledge. Also, your plugin should use the APIs and procedures recommened.</li><li><b>2. Function</b> Your plugin must meet its specified function and not secretly run other code. This includes but isn't limited to attacking servers, running malicious code, or interfering with the user in a malicious way.</li><li><b>3. Classiness</b> Your plugin must be tastefully presented. This includes but isn't limited to showing pornography, insulting the user or any other individual, and presenting information in a tasteful manner.</li></ul></div><br>If your plugin meets these guidelines, <a href='mailto:handnf+gltn@gmail.com?subject=Gltn%20Store%20Submission&body=Please%20fill%20out%20the%20following%20information%20for%20appearing%20in%20the%20store%3A%0A%0AProject%20Name%3A%0AProject%20ID%3A%0ADeveloper%20Name%3A%0AIcon%20(Font-Awesome%2C%20IMG%2C%20or%20Text)%3A%0AGive%20a%20brief%20description%20of%20the%20project%3A'> Send an email</a> with the code attached for review.";
-			initiatePopup({title: "Submit to Store", ht: out, bordercolor: '#222'});
-		});
-	})	
-	.fail(function() {
-		out = "<span style='font-size:20pt'>Sorry</span><br>The store is not available right now. Please try later.";
-		$('.build_inner').html(out);
-	});
-	}
-	grabStore();
-	$('#store_search').on('input', function() {
-		grabStore();
-	});	
 }	
