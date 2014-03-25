@@ -100,7 +100,7 @@ function ribbonSwitch(index, bool) {
     });
 	element = $('.ribbonstreameritem')[0];
 			$(element).animate({ 
-				marginLeft:(wid*index)+"px",
+				marginLeft:((wid+2)*index)+"px",
 				width:wid+"px"
 			}, (2*animation_time));
             $(element).css('background-color', theme.ribbonhighlight);
