@@ -314,8 +314,9 @@ button {
 	left:0%;
 }	
 .ribbonhead {
-	width:102%;
-	margin-left:-1%;	
+	width: calc(100% + 19px);
+margin-left: -2px;
+display: block;	
 }
 /* Build Templates */
 .page {
