@@ -69,7 +69,7 @@ function openPanelPlugin(percent, min, panel_id_name) {
 function sizePanel(percent, refresh) {
 	//animateContentPanel((97-percent)+"%");
 	$('#panel_plugin').animate({
-		width:(percent)+'%',
+		width:(percent-.7)+'%',
 		opacity: 1,
 		marginLeft: '-3px'
 		}, 70, function() {
