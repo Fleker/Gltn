@@ -1158,7 +1158,7 @@ function imgDetails(pid) {
 	};
     
      if($('.img'+pid).attr('data-src') != undefined && $('.img'+pid).attr('data-src') != "undefined") { 
-        initiatePopup({title:"Image Details", bordercolor:'#B54E7C', ht: ht, fnc: fnc});
+        initiatePopup({title:"Image Details", bordercolor:'#B54E7C', ht: ht, fnc: fnc, size:"large"});
     } else {
         filepicker.pick({
                 mimetype: "image/*"

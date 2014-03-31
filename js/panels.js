@@ -69,13 +69,13 @@ function openPanelPlugin(percent, min, panel_id_name) {
 function sizePanel(percent, refresh) {
 	//animateContentPanel((97-percent)+"%");
 	$('#panel_plugin').animate({
-		width:(percent-.7)+'%',
+		width:(percent-2)+'%',
 		opacity: 1,
 		marginLeft: '-3px'
 		}, 70, function() {
 			animateContentPanel((window.innerWidth - $('#panel_plugin').width() - 35)+"px");
 			$('.panel_plugin_content').css('height', (window.innerHeight-127)+"px").css('overflow-y', 'auto');
-			if(refresh != false)
+			if(refresh != false) 
 				refreshBodyDesign();
 		}
 	);
@@ -98,7 +98,9 @@ function stretchContentPanel() {
 function animateContentPanel(p) {
 	$('#panel_content').animate({
 		width: p
-		}, 100
+		}, 100, function() {
+            $('#panel_content').width($('#panel_content').width()-35);   
+        }
 	);
 }
 function maximizePanel() {
