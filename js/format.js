@@ -49,7 +49,7 @@ function set_up_format(name, property) {
 		break;
 	}
 }
-function setFormatItemWidth(indeX) {
+function setFormatItemWidth(index) {
 	if($('#format_item_'+index).val().length < 5)
 		$('#format_item_'+index).css('width', '5em');
 	else if($('#format_item_'+index).val().length > 40)
@@ -453,7 +453,7 @@ function refreshBodyDesign() {
 		ribbonSwitch(ribbon_index, true);
 	} else if(window.paneltitle != undefined) {
 		console.log("Change with panel");
-		$('.content_wrapper').css('width', 'calc(100% - 2px)');
+		$('.content_wrapper').css('width', 'calc(100% - 1px)');
 		sizePanel(panelwidth, false);
 		$('.content_textarea').css('width', '100%').css('margin-left', '0px');
 	}

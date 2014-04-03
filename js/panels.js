@@ -1,32 +1,40 @@
 ﻿	// JavaScript Document
 mainpanels = "main_Character, main_Idea, main_Citation, main_Find, main_Filesys, main_Notifications";
 //Other panels are here by default, but don't need to be called on init
-function initPanels() {
-	if(window.settings.panels == undefined) {
+function initPanels(num) {
+    if(num == undefined)
+        num = 0;
+   if(window.settings.panels == undefined) {
 		window.settings.panels = mainpanels;	
 	}
 	var a = window.settings.panels.split(', ');
-	for(i in a) {
-		if(a[i].indexOf('main') > -1) {
+    console.log("Initializing Panel #"+num+": "+a[num]);
+    if(num == NaN)
+        return null;
+    if(a.length - 1 < num)
+        return null;
+//	for(i in a) {
+		if(a[num].indexOf('main') > -1) {
 			try {
 				//
-				eval('InitPanel'+a[i]+'();');	
-				console.log('InitPanel'+a[i]);
+				eval('InitPanel'+a[num]+'();');	
+				console.log('InitPanel'+a[num]);
 			} catch(e) {
 				//console.error(e.message);
 			}
-            InitPanelmain_Table();
+            initPanels(num+1);
 		} else {
 			//Need to add script
-			var b = window.settings['panels_'+a[i]].split(', ');
+			var b = window.settings['panels_'+a[num]].split(', ');
 			if(b.length == 4)
-				install_panel(b[0], b[1], b[2], b[3]);
+				install_panel(b[0], b[1], b[2], b[3], false, " ", num);
 			else if(b.length == 5)
-				install_panel(b[0], b[1], b[2], b[3], b[4]);
+				install_panel(b[0], b[1], b[2], b[3], b[4], " ", num);
 			else if(b.length == 6)
-				install_panel(b[0], b[1], b[2], b[3], b[4], b[5]);
+				install_panel(b[0], b[1], b[2], b[3], b[4], b[5], num);
 		}
-	}
+    InitPanelmain_Table();
+//	}
     //Now we do a bit of additional installs
 //    install_panel("main_PDF", "Export to PDF", ".", "", true, "");
 }
@@ -35,13 +43,15 @@ function runPanel(panel_id_name) {
 	var p = eval("GetPanel"+panel_id_name+"();");
 	//$('.panel_plugin_title').html();
     var max = "";
-    console.warn(p.maximize);
+//    console.warn(p.maximize);
+    if(p.bordercolor == undefined)
+        p.bordercolor = theme.coloralt;
     if(p.maximize == true) {
         
         max = "<span class='PanelMaximizeEvent' data-status='0'></span><button onclick='maximizePanel()'><span class='fa fa-arrows-alt'></span></button>";
     }
     console.log(max);
-	$('.panel_plugin_title').html(lcr_split(p.title+'&emsp;<span class="PanelPopupEvent"></span><span class="PanelKeyEvent" data-keycode="" data-alt="" data-ctrl="" data-shift=""></span><span id="PanelCloseEvent"></span>', '', max+'<button onclick="hidePanelPlugin()" data-step="22" data-intro="Click me to hide the panel.">'+closeButton()+'</button>'));
+	$('.panel_plugin_title').html(lcr_split(p.title+'&emsp;<span class="PanelPopupEvent"></span><span class="PanelKeyEvent" data-keycode="" data-alt="" data-ctrl="" data-shift=""></span><span id="PanelCloseEvent"></span><span id="PanelBuildEvent"></span>', '', max+'<button onclick="hidePanelPlugin()" data-step="22" data-intro="Click me to hide the panel.">'+closeButton()+'</button>'));
 	$('#panel_plugin').css("border-color", p.bordercolor).css('display', 'inline-table');
 	window.paneloverride = p.override;
     window.panelwidth = p.width;
@@ -73,7 +83,7 @@ function sizePanel(percent, refresh) {
 		opacity: 1,
 		marginLeft: '-3px'
 		}, 70, function() {
-			animateContentPanel((window.innerWidth - $('#panel_plugin').width() - 35)+"px");
+			animateContentPanel((window.innerWidth - $('#panel_plugin').width() - 55)+"px");
 			$('.panel_plugin_content').css('height', (window.innerHeight-127)+"px").css('overflow-y', 'auto');
 			if(refresh != false) 
 				refreshBodyDesign();
@@ -99,7 +109,7 @@ function animateContentPanel(p) {
 	$('#panel_content').animate({
 		width: p
 		}, 100, function() {
-            $('#panel_content').width($('#panel_content').width()-35);   
+//            $('#panel_content').width($('#panel_content').width()-35);   
         }
 	);
 }
@@ -588,6 +598,50 @@ function InitPanelmain_Filesys() {
 		}
 	});
 }
+function createNewFile() {
+   /* localStorage['untitled'] = "";
+    localStorage['untitled_c'] = "";
+    alert("Please change the filename before continuing.");
+    window.location = "?file=untitled";*/
+    
+    ht = "<input id='FileName' value='untitled'>&nbsp;.gltn<br>";
+    ht += "<input type='search' id='FormatFinder'><button id='FormatOk'>Create</button><br>&emsp;Search for a Format<br><div id='FormatSearch'><div>";
+    fnc = function x() {
+        function search(v) {
+            arr = [];
+            out = "";
+            if(v == undefined)
+                v = "";
+            for(i in window.formats) {
+                if(formats[i].type != "IN BETA") {
+                    if(formats[i].type.indexOf(v) > -1 || formats[i].name.indexOf(v) > -1) {
+                        //Add to the grid
+                        arr.push(formats[i]);
+                        out += "<div class='fileformat' data-name='"+formats[i].name+"' style='width:8em;height:4em;display:inline-table;border:solid 2px "+theme.coloralt+";background-color:"+theme.ribbonhighlight+";color:"+theme.darkcolor+";font-size:18pt;text-align:center;'>"+formats[i].name+"<div style='text-align:center;font-size:14pt;'>"+formats[i].name+"&nbsp;"+formats[i].type+"</div></div>";
+                        if(arr.length % 4 == 0)
+                            out += "<br>";
+                    }
+                }
+            }
+            $('#FormatSearch').html(out);
+            $('.fileformat').on('click', function() {
+                $('#FormatFinder').val($(this).attr('data-name')); 
+                $('#FormatFinder').trigger('input');
+            });
+        }
+        search();
+        $('#FormatFinder').on('input', function() {
+            search($(this).val());                   
+        });
+        $('#FormatOk').on('click', function() {
+            nFileid = $('#FileName').val();
+            localStorage[nFileid] = "";
+            localStorage[nFileid+"_c"] = "";
+            window.location = "?file="+nFileid+"&format="+$('#FormatFinder').val();
+        });
+    }
+    initiatePopup({title: "New File", ht:ht, fnc:fnc,size:"large"});
+}
 function RunPanelmain_Filesys() {
 	function c(i) {
 		//console.log(i);	
@@ -620,10 +674,7 @@ function RunPanelmain_Filesys() {
 				wl($(this).attr('data-v'));
 		});
 		$('#filesys_new').on('click', function() {
-			localStorage['untitled'] = "";
-			localStorage['untitled_c'] = "";
-			alert("Please change the filename before continuing.");
-			wl('untitled');
+			createNewFile();
 		});
 		$('#filesys_up').on('click', function() {
             cloudImport("HFS");

@@ -31,7 +31,7 @@ function onBuildFormat() {
 		var duedate = Date.parse(due);
 		var duedate = new Date(duedate);
 		var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-		var dueout = (duedate.getDate()+1) + " " + months[duedate.getMonth()] + " " + duedate.getFullYear();
+		var dueout = (duedate.getUTCDate()) + " " + months[duedate.getUTCMonth()] + " " + duedate.getUTCFullYear();
 		add_to_page(dueout+"<br>");
 		add_to_page(centerText(valMetadata("Title")));
 //		paste_content();

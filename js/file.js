@@ -6,12 +6,22 @@ citationi = 0;
 
 idea = new Array();
 ideadefault = "";
+fileid = "scratchpad";
+shareid = "";
+formatid = "";
 //Handle GET parameters
-GET = window.location.search;
+GET = window.location.search.substring(1);
 GETarr = GET.split("&");
 for(i in GETarr) {
     GETparam = GETarr[i].split("=")[0]; 
     GETval = GETarr[i].split("=")[1];
+    
+    if(GETparam == "file")
+        fileid = GETval;
+    if(GETparam == "share")
+        shareid = GETval;
+    if(GETparam == "format")
+        formatid = GETval;
 }
 /*
 fileid = window.location.search.substr(6);
@@ -59,8 +69,8 @@ document.ready = function() {
         }
     } else {
         if(window.location.href.indexOf("&share=") > -1) {
-            var c = window.location.href.substr(window.location.href.indexOf("&share=")+7);
-            cloudRead("https://www.filepicker.io/api/file/"+c, "RF", fileid);
+//            var c = window.location.href.substr(window.location.href.indexOf("&share=")+7);
+            cloudRead("https://www.filepicker.io/api/file/"+shareid, "RF", fileid);
         }
         else
             restoreFile();
@@ -245,6 +255,7 @@ function restoreFile(full) {
 		min_word = x.file.min_word;
 		max_word = x.file.max_word;
 		//console.error(x.citation);
+        citation = [];
 		if(x.citation == undefined) {
 			//do nothing
 		} else {
@@ -256,7 +267,7 @@ function restoreFile(full) {
 			}
 		}
 		citationi = x.citationi;
-		
+		idea  = [];
 		if(x.idea != undefined)	
 			idea = x.idea;
 		ideadefault = x.ideadefault;
@@ -360,6 +371,7 @@ function finishRestore2(full) {
         if(include)
             hovertagRegistrarTemp.push(hovertagRegistrar[i]);
     }
+    //Prevent leak by cleaning up tags
     hovertagRegistrar = hovertagRegistrarTemp;
     console.log("The temp registrar contains "+hovertagRegistrarTemp.length+" items");
 	recallHovertags(hovertagRegistrar);
@@ -389,7 +401,10 @@ function finishRestore2(full) {
 }
 function newFile(x,xc) {
 	console.log('No file found for this name.');
-	$('#file_format').val("MLA");
+    if(formatid)
+       $('#file_format').val(formatid); 
+    else
+	   $('#file_format').val("MLA");
 	$('#file_name').val(fileid);
 		x.file = {};
 	formatShift();

@@ -422,10 +422,9 @@ function setHeader() {
 
 		Home: new Array(
 
-            {text: "Start the Tour", img: "<span class='fa fa-home' style='font-size:18pt'></span>", action: "alert('TBD')", key:"Alt+T"}, 
-
+//            {text: "Start the Tour", img: "<span class='fa fa-home' style='font-size:18pt'></span>", action: "alert('TBD')", key:"Alt+T"}, 
+            {text: "Create a File", img: "<span class='fa fa-file' style='font-size:18pt'></span>", action: "createNewFile()", key:"Alt+T"},
             {group: "", value:"<span style='font-size:16pt'>Welcome to Gltn!</span>"},
-
             {text: "Explore Files", img: "<span class='fa fa-folder-open' style='font-size:18pt'></span>", action: "runPanel('main_Filesys')", key: "Alt+O"} 
 
 		//	{group: '', value: '<font size="4" id="temp_header" >Welcome to Gluten!</font><br><table style=\'width:40%;margin-left:30%\'><tr><td><button onclick="window.introdisabled = true;introJsStart();"><span class=\'fa fa-home\'></span>&nbsp;Start the Tour!</button></td><td><button id="iFILESYS" onclick="runPanel(\'main_Filesys\')"><span class=\'fa fa-folder-open\'></span>&nbsp;Explore Files</button></td></tr></table>'}
@@ -576,47 +575,27 @@ function postLegal() {
 
 currentpanel = "";
 
-function install_panel(id, name, img, url, service, key) {
-
+function install_panel(id, name, img, url, service, key, num) {
 	if(service == undefined)
-
 		service = false;
-
 	if(key == undefined)
-
 		key = " ";
-
 	img = img.replace(/&gt;/g, ">").replace(/&lt;/g, "<");
-
 	if(service != true) {
-
 		if(key != undefined && key.length > 0 && key != "[object Object]")
-
-			holoribbon_std['Panels'].push({text: name, img: img, action: "runPanel('"+id+"')", key:key});
-
+            holoribbon_std['Panels'].push({text: name, img: img, action: "runPanel('"+id+"')", key:key});
 		else
-
 			holoribbon_std['Panels'].push({text: name, img: img, action: "runPanel('"+id+"')"});
-
 		newRibbon('.header', holoribbon_std);
-
-		console.log("Installing "+name+"...");
-
+		console.log("Installing "+name+"...  "+num);
 		ribbonSwitch(ribbon_index,false);
-
 		ribbonLoad();
-
 	}
-
+    service = service.replace(/,/, "");
 	if(window.settings.panels.indexOf(id) == -1) {
-
 		window.settings.panels += ", "+id;
-
 	}
-
 	window.settings['panels_'+id] = id+", "+name+", "+img+", "+url+", "+service+", "+key;
-
-	
 
 	if(window.offline != true) {
 
@@ -628,7 +607,7 @@ function install_panel(id, name, img, url, service, key) {
 
 		$('#themeframe').attr('src', url);
 
-        window.setTimeout(function() {download_panel(id)}, 200);
+        window.setTimeout(function() {download_panel(id,num)}, 200);
 
         
 
@@ -639,33 +618,21 @@ function install_panel(id, name, img, url, service, key) {
 	//} else {
 
 	}
-
-	console.log("eval('InitPanel"+id+"();');");
-
-	setTimeout("eval('InitPanel"+id+"();');", 500);	
-
 }
 
-function download_panel(id) {
-
- if(currentpanel != id) {
-
-    console.log(id, currentpanel);
-
-     if(!currentpanel.length)
-
-         return;
-
-      window.setTimeout(function() {download_panel(id)}, 200);
-
- } else {
-
-     console.log("Installed");
-
-     localStorage['zpanels_'+id] = $('#themeframe').contents().text();   
-
- }
-
+function download_panel(id,num) {
+    if(currentpanel != id) {
+        console.log(id, currentpanel);
+        if(!currentpanel.length)
+            return;
+        window.setTimeout(function() {download_panel(id,num)}, 100);
+    } else {
+        console.log("Installed");
+        localStorage['zpanels_'+id] = $('#themeframe').contents().text();  
+        console.log("eval('InitPanel"+id+"();');  "+num);
+	    setTimeout("eval('InitPanel"+id+"();');", 100);	
+        initPanels(num+1)
+    }
 }
 
 function uninstall_panel(id) {
@@ -1348,71 +1315,44 @@ function postNotification(id, text, action) {
 
 
 /*** Context API ***/
-
 function initContext() {
-
 	if(window.context == undefined)
-
 		window.context = new Array();
-
 	parseCT();
-
 		//formatHovertag("img", "'Image Details'", "'imgDetails('+$(this).attr('data-id')+');'");
-
 	$('.content_textarea').on('keydown', function( event ) {
-
 	  if ( event.which == 32 ) {
-
 	  	parseCT();
-
 		//contentAddText(' ');
-
 	  	//event.preventDefault();
-
 	  }
-
 	});
-
     
-
     var exists = false;
-
     for(i in hovertagRegistrar) {
-
 //        console.log(hovertagRegistrar[i].classname);
-
         if(hovertagRegistrar[i].classname == "context")
-
             exists = true;
-
     }
-
     if(!exists)
-
         formatHovertag('context', "window.context[parseInt($(this).attr('data-i'))].type", "'contextPanel('+$(this).attr('data-i')+')'");
-
 }
 
 function parseCT() {
-
 	var r = new RegExp('<span class="context" [^>]*>([\\s\\S]+?)</span>', 'gi');
-
 	try {
-
 		saveSelection();
-
 		var a = $('.content_textarea').html();
-		console.log(a);
-
+        console.log(a);
    		a = a.replace(r, '$1');
-
        		a = a.replace(/<\/span><\/div>/g, "</span>&nbsp;</div>");
-
+       		a = a.replace(/<\/span><\/kbd>/g, "</span>&nbsp;</kbd>");
+       		a = a.replace(/<\/kbd><\/kbd>/g, "</kbd>&nbsp;</kbd>");
         	a = a.replace(/<\/span>([\w])/g, "</span>&nbsp;$1");
+        	a = a.replace(/<\/kbd>([\w])/g, "</span>&nbsp;$1");
+        	a = a.replace(/<\/div>([\w])/g, "</span>&nbsp;$1");
 		a = a.replace(/(<span [^<]+? class="rangySelectionBoundary" [^<]+?>........)&nbsp;/g, "$1"); 
-
         	a = a.replace(/<\/kbd><\/div>/g, "</kbd>&nbsp;</div>");
-
         	a = a.replace(/<\/div><\/div>/g, "</div>&nbsp;</div>");
 
 		$('.content_textarea').html(a);
@@ -1576,151 +1516,80 @@ function contextMarkup() {
 	
 
 	apply_context("[sS]tudent [bB]ody", {type:"Consider Revising", replacement:"studentry", text: getStrunkTips("Use the word studentry instead of the two word phrase 'student body'. It is cleaner.")});
-
 	apply_context("[Tt]he question as to whether", {type: "Consider Revising", replacement:"whether", text: getStrunkTips(simplify)});
-
 	apply_context("[Tt]he fact that", {type: "Consider Revising", replacement:"", text: getStrunkTips("Don't overcomplicate your sentence. Get rid of this phrase. You don't need it.")});
-
 	apply_context("[Nn]ot honest", {type: "Consider Revising", replacement:"Dishonest", text: getStrunkTips(simplify)});
-
 	apply_context("[Nn]ot important", {type: revise, replacement: "trifling", text: getStrunkTips(simplify)});
-
 	apply_context("[Dd]id not remember", {type: revise, replacement: "forgot", text: getStrunkTips(simplify)});
-
 	apply_context("[Dd]id not pay any attention to", {type: revise, replacement: "ignored", text: getStrunkTips(simplify)});
-
 	apply_context("[Dd]id not have any confidence in", {type: revise, replacement: "distrusted", text: getStrunkTips(simplify)});
-
 	apply_context("[Hh]e is a man who", {type: revise, replacement: "he", text: getStrunkTips(simplify)});
-
 	apply_context("[Tt]here is no doubt but that|[Tt]here is no doubt that", {type: revise, replacement: "no doubt", text: getStrunkTips("You can simplify this phrase by stating 'no doubt' or 'doubtless'.")});
-
 	apply_context("[Ii]n a hasty manner", {type: revise, replacement: "hastily", text: getStrunkTips(simplify)});
-
 	apply_context("[Tt]he reason why is that", {type: revise, replacement: "because", text: getStrunkTips(simplify)});
-
 	apply_context("[Tt]his is a reason that", {type: revise, replacement:"this subject", text: getStrunkTips(simplify)});
 
-	
-
-	apply_context("[Cc]ope", {type: syn, replacement:"cope with", text: getStrunkTips("Including 'with' will improve the sentence's flow.")});
-
+    apply_context("[Cc]ope", {type: syn, replacement:"cope with", text: getStrunkTips("Including 'with' will improve the sentence's flow.")});
 	apply_context("[Aa]nticipate", {type: syn, replacement:"expect", text: getStrunkTips("Don't use fancy words when a simpler word works much better.")});
-
 	apply_context("[Uu]tilize", {type: syn, replacement: "use", text: getStrunkTips("Don't use fancy words when a simpler word works much better.")});
-
 	apply_context("[Oo]wing to the fact that", {type: revise, replacement: "since", text: getStrunkTips("This phrase can be replaced with 'since' or 'because' and retain the same meaning.")});
-
 	apply_context("[Ii]n spite of the fact that", {type: revise, replacement: "although", text: getStrunkTips(simplify)});
-
 	apply_context("[Cc]all your attention to the fact that", {type: revise, replacement: "remind you", text: getStrunkTips("You can easily replace that whole phrase with two words. Why overcomplicate things?")});
-
 	apply_context("I was unaware of the fact that", {type: revise, replacement: "I was unaware that", text: getStrunkTips("You can remove the phrase 'of the fact' and the meaning won't change.")});
-
 	apply_context("[Tt]he fact that he had not succeeded", {type: revise, replacement: "his failure", text: getStrunkTips("Be direct with your sentences. Don't overcomplicate things.")});
-
 	apply_context("[Tt]he fact that I had arrived", {type: revise, replacement: "my arrival", text: getStrunkTips("Don't state 'the fact that' because it becomes too wordy. 'My arrival' has the same meaning.")});
-
 	apply_context("[Ww]ho is a member of", {type: revise, replacement: "a member of", text: getStrunkTips("Using the word 'who' in a non-question makes the sentence overly complicated.")});
-
 	apply_context("[Aa]s to whether", {type: revise, replacement: "whether", text: getStrunkTips(preposition)});
-
 	apply_context("[Aa]s yet|[Aa]s of yet", {type: revise, replacement: "yet", text: getStrunkTips(preposition)});
-
 	apply_context("[Ee]nthuse", {type: remove, replacement: "", text: getStrunkTips(nouning)});
-
 	apply_context("[Ff]acility", {type: revise, text: getStrunkTips("This is a very broad word. You should consider being more specific to help the reader understand and create more sophisticated imagery.")});
-
 	apply_context("[Ff]olk", {type: revise, text: getStrunkTips("This word is very colloquial. You should consider changing the word to be more sophisticated.")});
-
 	apply_context("[Pp]ersonalize", {type: revise, text: getStrunkTips("You should consider changing the word. It has a pretentious connontation.")});
-
 	apply_context("[Tt]he foreseeable future", {type: revise, text: getStrunkTips("What is the definition of 'foreseeable'? This phrase is vague and should be replaced by something more specific.")});
-
 	apply_context(" [Tt]ry and", {type: revise, replacement: "try to", text: getStrunkTips("If you're going to 'try and' do something else, then you're doing two separate actions. If so, 'try' isn't very specific and should be improved. If you're doing a single action, you'll 'try to' do that one thing.")});
-
 	apply_context("[Ee]ach and every one", {type: revise, text: getStrunkTips("Unless this is said in conversation, it should be removed. This phrase is very wordy and could easily be simplified to a single word.")});
+    apply_context("--", {type: chars, text: "Use this character instead", replacement:"—"});
+    apply_context("[.][.][.]", {type: chars, text: "Use this character instead", replacement:"…"});
 
-    
-
-    apply_context("--", {type: chars, text: "Use this character instead", replacement:"�"});
-
-   // apply_context("...", {type: chars, text: "Use this character instead", replacement:"�"});
-
-	
-
-	/***/
-
+    /*** Overused Words ***/
 	apply_context("[Vv]ery", {type: overuse, text: getStrunkTips(overusetip), limit: rare});
-
 	apply_context("[Pp]rodigious", {type: overuse, text: getStrunkTips(overusetip), limit: rare});
-
 	apply_context("[Cc]urvaceous", {type: overuse, text: getStrunkTips(overusetip), limit: rare});
-
 	apply_context("[Dd]iscombobulate", {type: overuse, text: getStrunkTips(overusetip), limit: urare});
-
 	apply_context("[Rr]eally", {type: overuse, text: getStrunkTips(overusetip), limit: rare});
-
 	apply_context("[Ii]ncredibly", {type: overuse, text: getStrunkTips(overusetip), limit: rare});
-
 }
 
 function GetPanelmain_Context() {	
-
 	return {title: "Writing Tips", bordercolor:"#16a085", width:25};	
-
 }
 
 function RunPanelmain_Context() {
-
 	var d = grab_panel_data();	
-
 	var e = window.context[d.index];
-
 	out = '<br><span style="font-size:15pt;font-style:italics;">"'+d.html+'"</span>';
-
 	out += '<br>&emsp;(<b style="font-size:10pt">'+e.type+'</b>)<br><br>'+e.text+'<br>';
 
 	if(e.replacement != undefined) {
-
 		//Create option to replace all values (or just that one)
-
 		//$('span[data-i=0]')
-
 		out += '<br><br><br><b>What to Do</b><br>&emsp;<span style="font-size:11pt; cursor:pointer;border-bottom:solid 1px '+theme.normcolor+'" class="contextReplaceA">Replace all with "'+e.replacement+'"</span>';	
-
 		//<span style="font-size:11pt; cursor:pointer;border-bottom:solid 1px '+theme.normcolor+'" class="contextReplace">Replace this with "'+e.replacement+'"</span><br><br>&emsp;
-
 	}
-
 	postPanelOutput(out);
-
 	$('.contextReplace').on('click', function() {
-
 		//Global and singular
-
 		console.log($('.context[data-i='+d.index+']'));
-
 		$('.context[data-i='+d.index+']').html(e.replacement);
-
 		parseCT();
-
 	});
-
 	$('.contextReplaceA').on('click', function() {
-
 		//Global and singular
-
 		var re = new RegExp(d.html, 'gi');
-
 		console.log(re, e.replacement);
-
 		findTextReplaceText(re, e.replacement);
-
 		parseCT();
-
 	});
-
 }
 
 /*** Still Important Div Cursor Restore

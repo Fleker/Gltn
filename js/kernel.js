@@ -479,20 +479,23 @@ function initiateCitationEditor(q, hovertag, h2) {
 				
 				if(typeof(citation[citeid]['ContributorsLast']) == "string")
 					citation[citeid]['ContributorsLast'] = [citation[citeid]['ContributorsLast']];
-
-
-				for(i=0;i<citation[citeid]['Contributors'].length-1;i++) {
-					$('#citationAddContributor').click();
-					var c = $('.citationEditorIAuthorType')[i];
-						var cf = $('.citationEditorIAuthorFirst')[i+1];
-						var cm = $('.citationEditorIAuthorMiddle')[i+1];
-						var cl = $('.citationEditorIAuthorLast')[i+1];
-					console.log(c, cf, cm, cl);
-					$(c).val(citation[citeid]['Contributors'][i+1]);
-					$(cf).val(citation[citeid]['ContributorsFirst'][i]);
-					$(cm).val(citation[citeid]['ContributorsMiddle'][i]);
-					$(cl).val(citation[citeid]['ContributorsLast'][i]);
-				}	
+                
+                if(typeof(citation[citeid]['Contributors']) != "string") {
+                    for(i=0;i<citation[citeid]['Contributors'].length-1;i++) {
+                        $('#citationAddContributor').click();
+                        var c = $('.citationEditorIAuthorType')[i];
+                            var cf = $('.citationEditorIAuthorFirst')[i+1];
+                            var cm = $('.citationEditorIAuthorMiddle')[i+1];
+                            var cl = $('.citationEditorIAuthorLast')[i+1];
+                        console.log(c, cf, cm, cl);
+                        $(c).val(citation[citeid]['Contributors'][i+1]);
+                        if(citation[citeid]['ContributorsFirst'] != undefined) {
+                           $(cf).val(citation[citeid]['ContributorsFirst'][i]);
+                           $(cm).val(citation[citeid]['ContributorsMiddle'][i]);
+                           $(cl).val(citation[citeid]['ContributorsLast'][i]);
+                        }
+                    }	
+                }
 			}
 			//Do this last
 			if(window.citationrestore == true) {

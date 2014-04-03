@@ -145,6 +145,7 @@ function continueBuild(el) {
             i++;
     }
     $('.buildtime').append('&emsp;Stats: '+i+' words, '+$('.pagebody').text().length+' chars');
+    $("#PanelBuildEvent").click();
 	//$('.build').css('display', 'block');
 }
 function updateBuildProgress(text) {
@@ -333,6 +334,8 @@ function citationFormatted(string, i, id, page, cob) {
 		//page = page.split("|")[0];
 	//}
 	try {
+        if(typeof(citation[id].Contributors) == "string")
+            citation[id]["Contributors"] = [citation[id]['Contributors']];
 	if(cob != undefined) {
 		var ln = new Array();
 		var fn = new Array();
@@ -356,7 +359,7 @@ function citationFormatted(string, i, id, page, cob) {
 		//Get the number of authors for this source
 			var sourceauthors = 0;
 			var sourceauthorsarray = new Array();
-			for(j=0;j<citation[id].Contributors.length;j++) {
+			for(j=1;j<=citation[id].Contributors.length;j++) {
 				if(citation[id].Contributors[j] == "Author") {
 					sourceauthorsarray.push({F: citation[id].ContributorsFirst[j], M: citation[id].ContributorsMiddle[j], L: citation[id].ContributorsLast[j]});
 					sourceauthors++;
@@ -365,7 +368,7 @@ function citationFormatted(string, i, id, page, cob) {
 		//Get the number of translators for this source
 			var sourcetranslators = 0;
 			var sourcetranslatorsarray = new Array();
-			for(j=0;j<citation[id].Contributors.length;j++) {
+			for(j=1;j<=citation[id].Contributors.length;j++) {
 				if(citation[id].Contributors[j] == "Translator") {
 					sourcetranslatorsarray.push({F: citation[id].ContributorsFirst[j], M: citation[id].ContributorsMiddle[j], L: citation[id].ContributorsLast[j]});
 					sourcetranslators++;
@@ -374,7 +377,7 @@ function citationFormatted(string, i, id, page, cob) {
 		//Get the number of editors for this source
 			var sourceeditors = 0;
 			var sourceeditorsarray = new Array();
-			for(j=0;j<citation[id].Contributors.length;j++) {
+			for(j=1;j<=citation[id].Contributors.length;j++) {
 				if(citation[id].Contributors[j] == "Translator") {
 					sourceeditorsarray.push({F: citation[id].ContributorsFirst[j], M: citation[id].ContributorsMiddle[j], L: citation[id].ContributorsLast[j]});
 					sourceeditors++;
@@ -496,7 +499,7 @@ function citationFormatted(string, i, id, page, cob) {
 			var duedate = Date.parse(citation[id].Accdate);
 			var duedate = new Date(duedate);
 			var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-			var dueout = (duedate.getDate()+1) + " " + months[duedate.getMonth()] + " " + duedate.getFullYear();
+			var dueout = (duedate.getUTCDate()) + " " + months[duedate.getUTCMonth()] + " " + duedate.getUTCFullYear();
 			string = string.replace(/cACCDATE/g, cob.accdate.replace(/ACCDATE/g, dueout));
 		} else
 			string = string.replace(/cACCDATE/g, "");
@@ -512,8 +515,7 @@ function citationFormatted(string, i, id, page, cob) {
 					citation[id]['ContributorsMiddle'] = [citation[id]['ContributorsMiddle']];
 				
 				if(typeof(citation[id]['ContributorsLast']) == "string")
-					citation[id]['ContributorsLast'] = [citation[id]['ContributorsLast']];
-
+                        citation[id]['ContributorsLast'] = [citation[id]['ContributorsLast']];
 	for(i=0;i<citation[id].Contributors.length;i++) {
 		if(i == 0) {
 			string = string.replace(/AUTHOR_FIRST_I/, citation[id].AuthorFirst.substr(0,1));
@@ -535,7 +537,7 @@ function citationFormatted(string, i, id, page, cob) {
 	string = string.replace(/VOLUME/g, citation[id].Volume);
 	string = string.replace(/URL/g, citation[id].Url);
 	string = string.replace(/YEAR/g, citation[id].Year);
-	if(page)	
+	if(page != undefined && page.length > 0)	
 		string = string.replace(/PAGE/g, page);	
 	else
 		string = string.replace(/ PAGE/g, "");
@@ -1007,7 +1009,7 @@ console.log(d);
         //.children()[0];
 //        console.log("! FRAC");
 //        console.log(frac);
-        $(frac).css('width', den).css('color', 'black').css('border', 'solid 2px').css('background-color', 'black').css('top', '-1.296em').css('height', '13px');
+        $(frac).css('width', den).css('color', 'black').css('border', 'solid 2px').css('background-color', 'black').css('top', '-1.096em').css('height', '11px');
 //        .css('top', '-1.096em').css('height', '11px');
     
     }
