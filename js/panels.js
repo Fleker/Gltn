@@ -85,7 +85,7 @@ function sizePanel(percent, refresh) {
 		}, 70, function() {
 			animateContentPanel((window.innerWidth - $('#panel_plugin').width() - 55)+"px");
 			$('.panel_plugin_content').css('height', (window.innerHeight-127)+"px").css('overflow-y', 'auto');
-			if(refresh != false) 
+			if(refresh !== false) 
 				refreshBodyDesign();
 		}
 	);
@@ -114,14 +114,14 @@ function animateContentPanel(p) {
 	);
 }
 function maximizePanel() {
-    if($('.PanelMaximizeEvent').attr('data-status') == 0) {
+    if($('.PanelMaximizeEvent').attr('data-status') === 0) {
         //Maximize
         $('#panel_content').hide(200);
         $('#panel_plugin').animate({
             width:"100%",
             marginLeft:"0px"
         }, 200);
-        $('.PanelMaximizeEvent').attr('data-status', 1)
+        $('.PanelMaximizeEvent').attr('data-status', 1);
     } else {
         //Minimize
         $('#panel_content').show(200);
@@ -360,7 +360,11 @@ function RunPanelmain_Citation() {
 				out = out + "<div class='citationPanel_citation' data-id='"+i+"' style='background-color:"+theme.normbg+"; border: solid 1px "+theme.coloralt+";padding-left: 5px;padding-right: 10px;border-color: #aaa;color: "+theme.normcolor+";' id='CITATIONPANELEXAMPLE'>"
 				try {
 					out = out + c['Title']+"<br>&emsp;";
-					out = out + "<i>"+c['AuthorFirst']+" "+c['AuthorLast']+"</i><br>&emsp;<span style='font-size:10pt'>Vol. "+c['Volume']+" "+c['Edition']+" ed.</span>";
+					out = out + "<i>"+c['AuthorFirst']+" "+c['AuthorLast']+"</i>";
+                    if(c['Volume'].length > 0)
+                        out += "<br>&emsp;<span style='font-size:10pt'>Vol. "+c['Volume']+" "+c['Edition']+" ed.</span>";
+                    if(c['Url'].length > 0)
+                        out += "<br>&emsp;<span class='PanelUrl' data-url='"+c['Url']+"' style='font-size:10pt;border-bottom:dashed 1px black;text-decoration:none;cursor:pointer;color:"+theme.normcolor+"'><span class='fa fa-link'></span>&nbsp;Vist Site</span></span>";
 				} catch(e) {
 					console.error(e);
 					if(c['Title'] != undefined)
@@ -374,8 +378,11 @@ function RunPanelmain_Citation() {
 		if(citation.length == 0)
 			out += "<span style='font-size:20pt'>:(</span><br>You haven't added any citations.";
 		postPanelOutput(out);
-		$('.citationPanel_citation').on('click', function() {
-			getCitationI($(this).attr('data-id'));
+		$('.citationPanel_citation, .PanelUrl').on('click', function() {
+            if($(this).attr('data-url') != undefined)
+                window.open($(this).attr('data-url'), '_blank');
+            else
+                getCitationI($(this).attr('data-id'));
 		});
 		$('.citationPanel_new').on('click', function() {
 			initiateCitationEditor("panelonly");
@@ -397,13 +404,13 @@ function GetPanelmain_Idea() {
 function RunPanelmain_Idea() {
 	function populateIdeas() {
 		
-		out = "<div style='background-color: "+theme.normbg+";border: solid 1px;padding-left: 12px;padding-right: 0px;border-color: #aaa;color: "+theme.coloralt+";padding-top: 6px;width: 94%;' id='PANELIDEA'><u>General Notes</u><br><textarea class='PanelIdea' style='font-family:serif; background-color:"+theme.normbg+";color:"+theme.coloralt+";' data-id='-1'></textarea></div>";
+		out = "<div style='background-color: "+theme.normbg+";border: solid 1px;padding-left: 12px;padding-right: 0px;border-color: #aaa;color: "+theme.coloralt+";padding-top: 6px;width: 94%;' id='PANELIDEA'><u>General Notes</u><br><textarea class='PanelIdea' style='font-family:serif; background-color:"+theme.normbg+";color:"+theme.coloralt+";min-height:2em;' data-id='-1'></textarea></div>";
 		for(i in citation) {
 			if(citation[i] != "undefined")
 				out = out+"<hr><div style='background-color: "+theme.normbg+";border: solid 1px;padding-left: 12px;padding-right: 0px;border-color: #aaa;color:"+theme.coloralt+";padding-top: 6px;width: 94%;'><u>"+citation[i].Title+"</u><br><textarea class='PanelIdea' data-id='"+i+"' style='font-family:serif; background-color:"+theme.normbg+";color:"+theme.coloralt+"'></textarea></div>";
 		}
 		postPanelOutput(out);
-		//Now we have to fill in our content
+		//Now we have to fill in our contentfilesy
 		$('.PanelIdea[data-id=-1]').val(decodeURIComponent(ideadefault));
 		$('.PanelIdea[data-id=-1]').css('height', decodeURIComponent(ideadefault).split(' ').length/15+"em");
 		for(i in citation) {
@@ -599,13 +606,8 @@ function InitPanelmain_Filesys() {
 	});
 }
 function createNewFile() {
-   /* localStorage['untitled'] = "";
-    localStorage['untitled_c'] = "";
-    alert("Please change the filename before continuing.");
-    window.location = "?file=untitled";*/
-    
-    ht = "<input id='FileName' value='untitled'>&nbsp;.gltn<br>";
-    ht += "<input type='search' id='FormatFinder'><button id='FormatOk'>Create</button><br>&emsp;Search for a Format<br><div id='FormatSearch'><div>";
+    ht = "<input id='FileName' value='untitled'>&nbsp;.gltn&emsp;";
+    ht += "<input type='search' id='FormatFinder' placeholder='Choose a Format'><button id='FormatOk'>Create</button><br><span style='font-size:14pt;'>&emsp;Search for a Format</span><br><div id='FormatSearch' style='text-align:center'><div>";
     fnc = function x() {
         function search(v) {
             arr = [];
@@ -614,10 +616,10 @@ function createNewFile() {
                 v = "";
             for(i in window.formats) {
                 if(formats[i].type != "IN BETA") {
-                    if(formats[i].type.indexOf(v) > -1 || formats[i].name.indexOf(v) > -1) {
+                    if(formats[i].type.toLowerCase().indexOf(v.toLowerCase()) > -1 || formats[i].name.toLowerCase().indexOf(v.toLowerCase()) > -1) {
                         //Add to the grid
                         arr.push(formats[i]);
-                        out += "<div class='fileformat' data-name='"+formats[i].name+"' style='width:8em;height:4em;display:inline-table;border:solid 2px "+theme.coloralt+";background-color:"+theme.ribbonhighlight+";color:"+theme.darkcolor+";font-size:18pt;text-align:center;'>"+formats[i].name+"<div style='text-align:center;font-size:14pt;'>"+formats[i].name+"&nbsp;"+formats[i].type+"</div></div>";
+                        out += "<div class='fileformat' data-name='"+formats[i].name+"' style='width:8em;height:4em;display:inline-table;text-align:center;'><div style='width:8em;height:4em;display:inline-table;border:solid 2px "+theme.coloralt+";background-color:"+theme.ribbonhighlight+";color:"+theme.darkcolor+";font-size:18pt;text-align:center;'>"+formats[i].name+"</div><div style='text-align:center;font-size:14pt;'>"+formats[i].name+"&nbsp;"+formats[i].type+"</div></div>";
                         if(arr.length % 4 == 0)
                             out += "<br>";
                     }
@@ -815,8 +817,14 @@ function RunPanelmain_Filesys() {
 						out += "<div style='margin-left:3px'><b>"+title+"</b></div>";	
 					out += "<span style='font-size:8pt'>&emsp;"+xx.file.format+"&nbsp;&nbsp;"+xx.file.language+"&nbsp;&nbsp;"+fsout+"</span><br>";
                     time = "";
+                    out += "&emsp;";
+                    if(xx.saved != undefined) {
+                        if(xx.saved.inkblob_url != undefined)
+                            out += "<span class='fa fa-cloud' style='font-size:7pt'></span>&nbsp;";
+                    }
+                        
                     if(timeiso != undefined)
-                        out += "<span style='font-size:7pt'>&emsp;Last edited <abbr class='timeago' title='"+timeiso+"'></abbr>"+time+"</span>";
+                        out += "<span style='font-size:7pt'>Last edited <abbr class='timeago' title='"+timeiso+"'></abbr>"+time+"</span>";
 					out += "</td></tr>";	
 				}
 			}	

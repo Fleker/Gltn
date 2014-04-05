@@ -50,8 +50,8 @@ function set_up_format(name, property) {
 	}
 }
 function setFormatItemWidth(index) {
-	if($('#format_item_'+index).val().length < 5)
-		$('#format_item_'+index).css('width', '5em');
+	if($('#format_item_'+index).val().length < 20)
+		$('#format_item_'+index).css('width', '10 em');
 	else if($('#format_item_'+index).val().length > 40)
 		$('#format_item_'+index).css('width', '40em');
 	else
@@ -95,23 +95,18 @@ function post_format() {
 			setInterval("format_check_count("+i+")", 800);
 		}
 		
-		if($('#format_item_'+i).val() != undefined) {
+		/*if($('#format_item_'+i).val() != undefined) {
 			if($('#format_item_'+i).val().length < 20)
 				$('#format_item_'+i).css('width', '10em');
 			else if($('#format_item_'+i).val().length > 80)
 				$('#format_item_'+i).css('width', '40em');
 			else
-				$('#format_item_'+i).css('width', 0.5*$('#format_item_'+index).val().length+"em");
-		}
+				$('#format_item_'+i).css('width', 0.5*$('#format_item_'+i).val().length+"em");
+		}*/
 
-       		$('#format_item_'+i).on('input, click', function() {
-			if($(this).val().length < 20)
-				$(this).css('width', '10em');
-			else if($(this).val().length > 80)
-				$(this).css('width', '40em');
-			else
-				$(this).css('width', 0.5*$(this).val().length+"em");
-
+        setTimeout("setFormatItemWidth("+i+");", 1000);
+       		$('#format_item_'+i).on('input', function() {
+			     setFormatItemWidth(i);
         	});
 	}
 	onInitToolbar();

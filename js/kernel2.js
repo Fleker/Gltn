@@ -21,37 +21,28 @@ function refTextDetails(id) {
             var i = 0;
 
             $('.content_textarea .img').each(function() {
-
                 if(ind == i && $('.reftext'+id).attr('data-ref').indexOf('img') > -1)
-
                     bg = "rgba(0,255,0,.5)";
-
                 else
-
                     bg = "rgba(0,0,0,0)";
-
                 out += "<tr style='border:solid 1px black;background-color:"+bg+";cursor:pointer;' class='PopupImg' data-i='"+i+"'><td style='text-align:center'><img src='"+$(this).attr('data-src')+"' style='width:50%'></td><td style='vertical-align:center'>&emsp;"+$(this).attr('data-des')+"</td></tr>";     
-
                 i++;
-
             });
-
             i = 0;
-
             $('.content_textarea .table').each(function() {
-
                 if(ind == i && $('.reftext'+id).attr('data-ref').indexOf('table') > -1)
-
                     bg = "rgba(0,255,0,.5)";
-
                 else
-
                     bg = "rgba(0,0,0,0)";
-
                 out += "<tr style='border:solid 1px black;background-color:"+bg+";cursor:pointer;' class='PopupTable' data-i='"+i+"'><td style='text-align:center'><td>"+$(this).attr('data-title')+"&emsp;<span style='font-size:10pt'>"+$(this).attr('data-col')+" x "+$(this).attr('data-row')+"</span></td></tr>";     
-
                 i++;
-
+            });$('.content_textarea .latex').each(function() {
+                if(ind == i && $('.reftext'+id).attr('data-ref').indexOf('latex') > -1)
+                    bg = "rgba(0,255,0,.5)";
+                else
+                    bg = "rgba(0,0,0,0)";
+                out += "<tr style='border:solid 1px black;background-color:"+bg+";cursor:pointer;' class='PopupLatex' data-i='"+i+"'><td style='text-align:center'><td>"+$(this).html()+"</span></td></tr>";     
+                i++;
             });
 
             out += "</table><button class='PopupSave'>Save</button>";
@@ -59,23 +50,19 @@ function refTextDetails(id) {
             $('#Popup').html(out);
 
             $('.PopupImg').on('click', function() {
-
                 $('.reftext'+id).attr('data-ref', 'img'+$(this).attr('data-i')); 
-
                 $('.reftext'+id).attr('data-refid', $(this).attr('data-i')); 
-
                 populate($(this).attr('data-i'));
-
             });
-
-             $('.PopupTable').on('click', function() {
-
+            $('.PopupTable').on('click', function() {
                 $('.reftext'+id).attr('data-ref', 'table'+$(this).attr('data-i')); 
-
                 $('.reftext'+id).attr('data-refid', $(this).attr('data-i')); 
-
                 populate($(this).attr('data-i'));
-
+            });
+            $('.PopupLatex').on('click', function() {
+                $('.reftext'+id).attr('data-ref', 'latex'+$(this).attr('data-i')); 
+                $('.reftext'+id).attr('data-refid', $(this).attr('data-i')); 
+                populate($(this).attr('data-i'));
             });
 
             $('.PopupSave').on('click', function() {
@@ -130,7 +117,7 @@ function LatexGreek(char) {
 
         Fraction: {id:"Fraction", keywords:"frac, fraction, divide, division", cmd:"\\frac{n}{d}", param:[{id:"n", des:"Numerator"},{id:"d", des:"Denominator"}], des:"Displays a fraction"},
 
-        Sum: {id:"Sum", keywords:"sum, summation, sigma", cmd:"\\sum_{i}^{k}", param:[{id:"i", des:"The initial value"},{id:"k", des:"The final value"}],des:"Shows a summation using a sigma"},
+        Sum: {id:"Sum", keywords:"sum, summation, sigma", cmd:"\\sum\\limits_{i}^{k}", param:[{id:"i", des:"The initial value"},{id:"k", des:"The final value"}],des:"Shows a summation using a sigma"},
 
         Root: {id:"Root", keywords:"square root radical", cmd:"\\sqrt[root]{exp}", param:[{id:"root", des:"Opt. The root of the radical"},{id:"exp", des:"The expression you want under the radical"}], des:"Shows an expression under a radical"},
 
@@ -423,7 +410,7 @@ function setHeader() {
 		Home: new Array(
 
 //            {text: "Start the Tour", img: "<span class='fa fa-home' style='font-size:18pt'></span>", action: "alert('TBD')", key:"Alt+T"}, 
-            {text: "Create a File", img: "<span class='fa fa-file' style='font-size:18pt'></span>", action: "createNewFile()", key:"Alt+T"},
+            {text: "Create a File", img: "<span class='fa fa-file' style='font-size:18pt'></span>", action: "createNewFile()", key:"Alt+N"},
             {group: "", value:"<span style='font-size:16pt'>Welcome to Gltn!</span>"},
             {text: "Explore Files", img: "<span class='fa fa-folder-open' style='font-size:18pt'></span>", action: "runPanel('main_Filesys')", key: "Alt+O"} 
 
@@ -591,7 +578,8 @@ function install_panel(id, name, img, url, service, key, num) {
 		ribbonSwitch(ribbon_index,false);
 		ribbonLoad();
 	}
-    service = service.replace(/,/, "");
+    if(typeof(service) == "string")
+        service = service.replace(/,/, "");
 	if(window.settings.panels.indexOf(id) == -1) {
 		window.settings.panels += ", "+id;
 	}
@@ -1321,8 +1309,10 @@ function initContext() {
 	parseCT();
 		//formatHovertag("img", "'Image Details'", "'imgDetails('+$(this).attr('data-id')+');'");
 	$('.content_textarea').on('keydown', function( event ) {
-	  if ( event.which == 32 ) {
-	  	parseCT();
+        console.log("Keyin "+event.which);
+	  if (event.which == 32 || event.which == 8 || event.which == 46 || event.which == 13) {
+          console.log("parse context");
+	  	setTimeout("parseCT();",20);
 		//contentAddText(' ');
 	  	//event.preventDefault();
 	  }
@@ -1343,8 +1333,10 @@ function parseCT() {
 	try {
 		saveSelection();
 		var a = $('.content_textarea').html();
-        console.log(a);
+//        console.log(a);
    		a = a.replace(r, '$1');
+        //Infamous White background bug DIES
+        a = a.replace(/<span style="line-height: 1.3em; background-color: white;">([^<]*)<\/span>/g, "$1");
        		a = a.replace(/<\/span><\/div>/g, "</span>&nbsp;</div>");
        		a = a.replace(/<\/span><\/kbd>/g, "</span>&nbsp;</kbd>");
        		a = a.replace(/<\/kbd><\/kbd>/g, "</kbd>&nbsp;</kbd>");
@@ -1357,7 +1349,7 @@ function parseCT() {
 
 		$('.content_textarea').html(a);
 
-		console.log(a, r);
+//		console.log(a, r);
 
 	} catch(e) {
 
@@ -1373,7 +1365,7 @@ function parseCT() {
 
 	//findTextReplaceText(r, '$1');
 
-	//Now we ping other functions, one internal and one by {format}.js to set up stuff
+	//Now we ping other functions, one internal and one by {fofrmat}.js to set up stuff
 
 	contextMarkup();
 
@@ -1459,7 +1451,7 @@ function apply_context(text, d) {
 
 				}
 
-				console.log(ac.length, wc, (ac.length/wc),d.limit);
+//				console.log(ac.length, wc, (ac.length/wc),d.limit);
 
 			}
 

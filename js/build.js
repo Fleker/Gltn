@@ -32,6 +32,7 @@ function startBuild(el) {
             continueBuild(el);  
         } catch(e) {
             updateBuildProgress("<span style='color:#c00'>Error Building: "+e.message+"</span>");
+            console.error(e.message);
         }
     },500);
     
@@ -149,31 +150,9 @@ function continueBuild(el) {
 	//$('.build').css('display', 'block');
 }
 function updateBuildProgress(text) {
-	$('.build_progress').empty();
-/*var opts = {
-  lines: 7, // The number of lines to draw
-  length: 10, // The length of each line
-  width: 3, // The line thickness
-  radius: 13, // The radius of the inner circle
-  corners: 1, // Corner roundness (0..1)
-  rotate: 0, // The rotation offset
-  direction: 1, // 1: clockwise, -1: counterclockwise
-  color: theme.normcolor, // #rgb or #rrggbb or array of colors
-  speed: 0.7, // Rounds per second
-  trail: 20, // Afterglow percentage
-  shadow: false, // Whether to render a shadow
-  hwaccel: false, // Whether to use hardware acceleration
-  className: 'spinner', // The CSS class to assign to the spinner
-  zIndex: 2e9, // The z-index (defaults to 2000000000)
-  top: '30px', // Top position relative to parent in px
-  left: '50%' // Left position relative to parent in px
-};
-var target = document.getElementById('build_progress');
-var spinner = new Spinner(opts).spin(target);*/
-$('.build_progress').append(text);
-//$('.spinner').css('top','55px').css('left','50%');
-
-//target.appendChild(spinner.el);
+    setTimeout(function() {
+	   $('.build_progress').empty();
+        $('.build_progress').append(text);}, 10);
 }
 function finishBuild() {
 	//$('.build_progress').css('display', 'none');
@@ -575,6 +554,14 @@ function tableFormatted(input,fig,title) {
 	string = string.replace(/TEXT/g, title);
 	return string;
 }
+function latexFormatted(input,eqn,fig,title) {
+	var string = input;
+	string = string.replace(/FIGN/g, fig);
+	string = string.replace(/TEXT%sc/g, smallcaps(title));
+	string = string.replace(/TEXT/g, title);
+    string = string.replace(/EQN/g, eqn);
+	return string;
+}
 function smallcaps(inp) {
 	//console.warn(inp);
     if(inp == undefined)
@@ -722,11 +709,19 @@ function post_content_formatting(object) {
 		var c = $(this).attr('data-col');
 		//use XML to encode table into rows and columns? Place into data-table and then decode in a preview in the div.
 		console.log("x('"+table+"',"+r+","+c+");");
-        generateSpreadsheetVars(table.split('~~'), r, c);
+        generateSpreadsheetVars(table.split(';').join("").split(','), r, c);
 		$(this).html(eval(object.table+";x('"+table+"',"+r+","+c+");"));
 		$(this).attr('data-arr', "");
 		$(this).html(tableFormatted($(this).html(),$(this).attr('data-figure-number'),$(this).attr('data-title')));
         $('.reftext[data-ref=table'+$(this).attr('data-id')+']').html($(this).attr('data-figure-number'));
+        
+	});
+    if(object.latex == undefined)
+        object.latex = "EQN";
+    $('.draft .latex').each(function() {
+        //Include a title
+		$(this).html(latexFormatted(object.latex,$(this).html(),$(this).attr('data-figure-number'),$(this).attr('data-figure-number')));
+        $('.reftext[data-ref=latex'+$(this).attr('data-id')+']').html($(this).attr('data-figure-number'));
         
 	});
 	
@@ -749,23 +744,26 @@ function post_content_formatting(object) {
 		$(this).html( $(this).html().replace(/ /g, '===').replace(/ /g,"~~~"));
 	});*/
     /*** PARAGRAPH DETECTION ***/
+    console.log($('.draft').html());
 	if(object.paragraph_indent == undefined)
 		object.paragraph_indent = "";
 	window.cont = $('.draft').html().replace(/&nbsp;/g, " ");
     window.cont = $('.draft').html().replace(/<div><\/div>/g, " ");
+    window.cont = cont.replace(/<div><br>/g, "<div>");
 	window.cont = cont.replace(/<\/div><div><br><\/div><div>/g, "<br>"+object.paragraph_indent);
 	window.cont = cont.replace(/<div><br><\/div><div>/g, "<br>"+object.paragraph_indent);
-	window.cont = cont.replace(/<br><\/div>/g, "");
+//	window.cont = cont.replace(/<br><\/div>/g, "");
     window.cont = cont.replace(/<\/div><div>/g, "<br>"+object.paragraph_indent);
     window.cont = cont.replace(/<\/div> <div>/g, "<br>"+object.paragraph_indent);
     window.cont = cont.replace(/<\/div><\/span><div>/g, "</div>"+object.paragraph_indent);
     window.cont = cont.replace(/<\/div><div><br><div>/g, "<br>"+object.paragraph_indent);
      window.cont = cont.replace(/<div><br><div>/g, "</div>"+object.paragraph_indent);
     window.cont = cont.replace(/<br><div>/g, ""+object.paragraph_indent);
-    window.cont = cont.replace(/<br>&emsp;<kbd/g, "</div><br><kbd"+object.paragraph_indent);
+    window.cont = cont.replace(/<br>&emsp;<kbd/g, "</div><br>"+object.paragraph_indent+"<kbd");
+    
     
    
-//	console.log(cont);
+	console.log(cont);
 	updateBuildProgress("Generating HTML...");
 	//cont = cont.replace(/<span[^<]+?>/g, "");
 	//cont = cont.replace("</span>", "",'g');

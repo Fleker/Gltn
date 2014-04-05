@@ -63,10 +63,14 @@ function onGetFormats() {
 			$(this).attr('data-figure-number', i);
 			i++;
 		});
+        $('.draft .latex').each(function() {
+			$(this).attr('data-figure-number', i);
+			i++;
+		});
 	};
     obj.table = function x(table,row,col) {
         console.log(table);
-        table = table.split("~~");
+        table = table.split(";").join("").split(",");
 		out = "<br><span style='display:block;text-align:center'>Table FIGN. TEXT</span><table style='border-collapse:collapse;border:solid 1px black;width:100%;'>";
 		for(i=1;i<=row;i++) {
             out += "<tr>";

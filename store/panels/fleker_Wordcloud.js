@@ -4,18 +4,22 @@ function GetPanelfleker_Wordcloud() {
 }
 function RunPanelfleker_Wordcloud() {
     //Grab the content, split into words, and tally them
-    var arr = $('.content_textarea').text().toLowerCase().trim().split(' ');
+    var arr = $('.content_textarea').html().toLowerCase().trim().replace(/<[^>]*>/g, "").replace(/"/g, "").replace(/&nbsp;/g, " ").split(' ');
     var obj = {};
     for(i in arr) {
-        if(obj[arr[i].toLowerCase()] == undefined)
-            obj[arr[i].toLowerCase()] = 1;
+        if(arr[i].length < 1)
+            continue;
+        if(obj[arr[i].toLowerCase().trim()] == undefined)
+            obj[arr[i].toLowerCase().trim()] = 1;
         else
-            obj[arr[i].toLowerCase()] = obj[arr[i].toLowerCase()] + 1;
+            obj[arr[i].toLowerCase().trim()] = obj[arr[i].toLowerCase().trim()] + 1;
     }
     
     var sortable = [];
-    for (var vehicle in obj)
-        sortable.push([vehicle, obj[vehicle]])
+    for (var vehicle in obj) {
+//        console.log(vehicle, obj[vehicle]);
+        sortable.push([vehicle, obj[vehicle]]);
+    }
     sortable.sort(function(a, b) {return b[1] - a[1]})
     
     out = "";

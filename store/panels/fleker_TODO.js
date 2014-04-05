@@ -5,7 +5,7 @@ function GetPanelfleker_TODO() {
 function RunPanelfleker_TODO() {
     function restart() {
         out = "Write {TODO ...} or {FUTURE ...} to take a note. These notes will be collected here. You can also @ someone to designate a role.<br><br>";
-        input = $('.content_textarea').text();
+        input = $('.content_textarea').html();
         arr = input.match(/{(TODO|FUTURE) [^}]*}/g);
         out += "<table style='width:95%'>";
 //        console.log(arr);
