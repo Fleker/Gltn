@@ -10,12 +10,25 @@ function RunPanelfleker_TTS() {
 //    window.tts = new GoogleTTS('');
     postPanelOutput("It helps a writer when one's writing is spoken. This allows a better understanding of flow and perspective to one's audience. If you want, your computer can speak your essay. Just sit back and listen.<br><br><button id='startTTS'>Start Speaking</button>");
     $('#startTTS').on('click', function() {
-//        startBuild(); 
-//        window.tts.play($('.content_textarea').text()); 
-        var msg = new SpeechSynthesisUtterance($('.content_textarea').text());
-        window.speechSynthesis.speak(msg);
+        speechSynthesis.cancel();
+        var output = $('.content_textarea').html().toLowerCase().trim().replace(/<kbd class="latex.*<\/kbd>/g, "").replace(/></g, "> <").replace(/<[^>]*>/g, "").replace(/"/g, "").replace(/&nbsp;/g, " ");
+        var outarr = [];
+        
+        for(i=0;i<output.length;i+=200) {
+            outarr.push(output.substring(i,i+200));
+        }
+        readMessage(outarr, 0);
     });
     $('#PanelBuildEvent').on('click', function() {
-        window.tts.play($('.content_textarea').text()); 
+//        window.tts.play($('.content_textarea').text()); 
     });
+}
+function readMessage(outarr, i) {
+    if(outarr[i] == undefined)
+        return;
+    var msg = new SpeechSynthesisUtterance(outarr[i]);
+    window.speechSynthesis.speak(msg);     
+    msg.onend = function(e) {
+        readMessage(outarr, i+1);  
+    };
 }

@@ -4,7 +4,7 @@ function GetPanelfleker_Wordcloud() {
 }
 function RunPanelfleker_Wordcloud() {
     //Grab the content, split into words, and tally them
-    var arr = $('.content_textarea').html().toLowerCase().trim().replace(/<[^>]*>/g, "").replace(/"/g, "").replace(/&nbsp;/g, " ").split(' ');
+    var arr = $('.content_textarea').html().toLowerCase().trim().replace(/<kbd class="latex.*<\/kbd>/g, "").replace(/></g, "> <").replace(/<[^>]*>/g, "").replace(/"/g, "").replace(/&nbsp;/g, " ").split(' ');
     var obj = {};
     for(i in arr) {
         if(arr[i].length < 1)
@@ -28,15 +28,14 @@ function RunPanelfleker_Wordcloud() {
         //Get percent to determine size
         out += "&emsp;&emsp;<span style='border-bottom:solid 1px "+theme.coloralt+";border-bottom-style:outset;font-size:";
         var a = sortable[i][1] / arr.length*10;
+        console.log(sortable[i][0], a);
 //        console.log(sortable[i][1], a);
         if(a > 10)
             out += 40;
         else if(a > 5)
             out += 32;
-        else if(a > 2)
-            out += 28;
         else if(a > 1)
-            out += 26;
+            out += 28;
         else if(a > 0.7)
             out += 24;
         else if(a > 0.5)
@@ -50,7 +49,7 @@ function RunPanelfleker_Wordcloud() {
         else
             out += 8;
         
-        out += "pt' title='"+sortable[i][1]+" instance(s)"+"'>"+sortable[i][0]+"</span>       ";
+        out += "pt' title='"+sortable[i][1]+" "+((sortable[i][1] > 1) ? "instances" : "instance") +"'>"+sortable[i][0]+"</span>       ";
     }
     postPanelOutput(out);
 }

@@ -824,7 +824,7 @@ function displayHovertag(text, data, fnc) {
 		xpos = 0;
 	else
 		xpos = mousex-($('.hovertag').width()/2);
-	$('.hovertag').css('left', xpos).css('top', ypos+20).css('opacity', 0).animate({
+	$('.hovertag').css('left', xpos).css('top', ypos).css('opacity', 0).animate({
 		opacity: 1}, 100, function() {
 			$('.hovertag').html(text);	
 		});
@@ -1073,20 +1073,25 @@ document.onkeydown = function(e) {
 		}
 	}
 };
+
+//Gets an array of words in the body
+function getWords() {
+    $('.content_textarea').html().toLowerCase().trim().replace(/<kbd class="latex.*<\/kbd>/g, "").replace(/></g, "> <").replace(/<[^>]*>/g, "").replace(/"/g, "").replace(/&nbsp;/g, " ").split(' ');
+}
 function postWordCount() {
 	//Right now, this only does the words in the content_textarea; it should get the build count
 	//Get input - Right now the text
-	var a = $('.content_textarea').text();
-	var char = a.replace(/ /g, '').length;
+	var a = getWords();
+	var char = a.join('').length;
 	var word = 0;
 	if(char == 0)
-		return
+		return;
 	/*for(i in a.split(' ')) {
 		if(a[i] != ' ' && a[i].length) {
 			word++;	
 		}
 	}*/
-	word = a.split(' ').length;
+	word = a.length;
 	$('.fullscreencount').html(char+" c<br>"+word+" w");
 	//Interpret
 		//Get min/max inputs
@@ -1317,6 +1322,8 @@ function RunPanelmain_Table() {
            var a = $('.table'+id).attr('data-arr').split(";").join("").split(",");
         else
             var a = ["0"];
+        for(i in a)
+            a[i] = decodeURIComponent(a[i]);
         console.log("Create a "+r+" x "+c+" table");
         
         var span = "<span style='font-size:9pt;opacity:.6'>";
@@ -1396,6 +1403,7 @@ function RunPanelmain_Table() {
                         var k = f;
                     else
                         var k = $('#tableCell_'+i+'_'+j).html();
+                    k = encodeURIComponent(k);
                     a += k+",";
                 }
                 //end of row

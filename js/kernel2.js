@@ -419,55 +419,34 @@ function setHeader() {
 		),
 
 		File: new Array(
-
 			{group: "File Name", value:"<input type='text' id='file_name' style='width:7em'><button id='file_name_con' disabled='true'>Save As</button><input type='hidden' id='file_name_internal'>"},
-
-			{text: 'Publish & Export', img: '<span style="font-size:18pt" class="fa fa-file"></span>', action: "startBuild();setTimeout('exitintro();', 1000);", key: "Alt+B"},
-
-			{text: 'Share', img: '<span style="font-size:18pt" class="fa fa-code-fork"></span>', action: "exportFile();"}
-
+			{text: 'Compile & Export', img: '<span style="font-size:18pt" class="fa fa-file"></span>', action: "startBuild();setTimeout('exitintro();', 1000);", key: "Alt+B"},
+			{text: 'Share', img: '<span style="font-size:18pt" class="fa fa-code-fork"></span>', action: "getShare();"}
 		),
 
 		Panels: new Array(
-
 			{text: 'Gltn Store', img: '<span style="font-size:18pt" class="fa fa-shopping-cart"/>', action: "launchStore()", key: "Alt+S"},
-
 			{text: 'Outline', img: '<span style="font-size:18pt" class="fa fa-list"></span>', action: "runPanel('main_Outline');"},
-
 			{text: 'Citations', img: '<span style="font-size:18pt" class="fa fa-book"></span>', action: "runPanel('main_Citation');"},
-
 			{text: 'Ideas', img: '<span style="font-size:18pt" class="fa fa-lightbulb-o"></span>', action: "runPanel('main_Idea');"},
-
 			{text: 'Style Guide', img: '<span style="font-size:18pt" class="fa fa-info-circle"/>', action: "runPanel('main_Guide');"}
-
 		),
 
 		Tools: new Array(
-
 			{text: 'Find', img: '<span style="font-size:18pt" class="fa fa-search"></span>', action: "runPanel('main_Find');", key: "Alt+F"},
-
 			{text: 'Dictionary', key:"Alt+D", img: '<span style="font-size:18pt" class="fa fa-quote-left"></span>', action: "runPanel('main_Dictionary');"},
-
 			{text: 'Themes', img: '<span style="font-size:18pt" class="fa fa-picture-o"></span>', action: "runPanel('main_Themes')"}
-
 		),
 
 		About: new Array(
-
 			{text: 'Open Source', img: '<span style="font-size:18pt" class="fa fa-github-alt"></span>', action: "window.location='http://www.github.com/fleker/gltn'"},
-
 			{text: 'Send Feedback', img: '<span style="font-size:18pt" class="fa fa-envelope"></span>', action: "window.location='mailto:handnf+gltn@gmail.com'"},
-
 			{text: 'Gltn Blog', img: '<span style="font-size:18pt" class="fa fa-bullhorn"></span>', action:"window.location='http://gltndev.wordpress.com/'"},
-
 			{text: 'Credits', img: '<span style="font-size:18pt" class="fa fa-legal"></span>', action: 'postLegal()'}
-
 		),
 
 		Me: new Array(
-
 			{group: 'Name', value:'<input id="me_name" type="text">'}
-
 		)
 
 	};
@@ -515,17 +494,13 @@ function ribbonLoad() {
 		}
 
 		if(ovr) {
-
 			if(v.substr(-2) == "_c")
-
 				v = v.substr(0,v.length-2)+"c";
-
 			$('#file_name_con').attr('disabled', true);
-
 			$('#file_name_internal').val(v);
-
+            localStorage[v] = localStorage[fileid]
+            localStorage[v+"_c"] = localStorage[fileid+"_c"];
 			setTimeout('window.location = "?file='+v+'";', 250);
-
 		}
 
 	});
@@ -786,122 +761,71 @@ function closeButton(i) {
 /*** Custom Theming ***/
 
 function initTheme() {
-
-	window.theme = {};	
-
+    window.theme = {};	
 	//set theme colors/css
-
 	//set theme variables
-
 	//fullscreen variables
-
 	theme.darkbg = "rgb(0, 0, 0)";
-
 	theme.normcolor = "rgb(0, 0, 0)";
-
 	theme.normbg = "rgb(255, 255, 255)";
-
 	theme.darkcolor = "rgb(200, 200, 200)";
-
 	theme.coloralt = '#222';
-
 	theme.normfsui = "rgb(204, 204, 204)";
-
 	theme.darkfsui = "rgb(41, 41, 41)";
-
 	theme.darkfsuicolor = 'white';
-
 	theme.normfsuicolor = 'black';
-
 	theme.ribbonhighlight = 'rgba(44, 62, 80,1.0)';
-
 	theme.ribbonplain = 'rgba(0,0,0,0)';
-	$('.popupcontent').css('padding-left','15px');
-
+    $('.popupcontent').css('padding-left','15px');
 }
 
 initTheme();
 
 function themeCss(rule, val) {
-
 	$('body').css(rule, val);	
-
 }
 
 function writeCss(rules) {
-
 	$('body').append('<style>'+rules+'</style>');
-
 }
 
 function startThemer() {
-
 	//isn't called until settings are grabbed because otherwise window.settings.theme wouldn't exist
-
 	//grab current theme
-
 	//if not set reset themes
-
 	var url = undefined;
-
 	if(window.settings.theme == undefined) {
-
 		window.settings.theme = "default, blackout";
-
 		window.settings.currenttheme = "default";
-
 		window.settings.theme_default = "default, Default, js/themes/kernel.js, <span class='fa fa-heart-o'></span>";
-
 		window.settings.theme_blackout = "blackout, Blackout, js/themes/theme_blackout.js, <span class='fa fa-heart'></span>";
-
 	} //else {
 
-		var a = window.settings.theme.split(', ');
-
-		var b = window.settings['theme_'+window.settings.currenttheme].split(', ');
-
+	var a = window.settings.theme.split(', ');
+	var b = window.settings['theme_'+window.settings.currenttheme].split(', ');
 		url = b[2];
-
 	//}
 
 	//if not default insert JS
-
-        
-
 	if(url != undefined && b[0] != "default") {
-
 		console.log("Loading theme "+b[1]+" @ "+url);
-
 		console.log(window.offline != true)
-
 		if(window.offline != true) {
-
 			loadjscssfile(url, 'js');
-
 			//Load script and save it
-
 			//Now store script offline - this really sucks though
-
 			$('#themeframe').attr('src', url);		
-
 			setTimeout("localStorage['ztheme_"+id+"'] = $('#themeframe').contents().text();", 1000);
-
 		}
-
 		//JS will have same function and call that script
-
 	} else if(b[0] == "default") {
-
 		initTheme();
-
       		 setLoaderColor('32,32,32');
-		writeCss('@import url(http://fonts.googleapis.com/css?family=Lato:100,300,400);');
+        writeCss('@import url(http://fonts.googleapis.com/css?family=Lato:100,300,400);');
 		themeCss('font-family', '"Lato", sans-serif');
 		themeCss('font-size', '10pt');
-		writeCss("button { font-family:Lato,sans-serif;background-color:rgba(255,255,255,0.01);border-radius:3;text-indent:0;border:0px solid #888;display:inline-block;color:#333333;font-weight:bold;font-style:normal;text-decoration:none;text-align:center;padding:5px;min-width:30px;} button:hover { background-color: #34495e; color: #ecf0f1; } button:active {position:relative;top:1px;}");
-
+		writeCss("button { font-family:Lato,sans-serif;background-color:rgba(255,255,255,0.00);border-radius:3;text-indent:0;border:0px solid #888;display:inline-block;color:#333333;font-weight:bold;font-style:normal;text-decoration:none;text-align:center;padding:5px;min-width:30px;} button:hover { background-color: #34495e; color: #ecf0f1; } button:active {position:relative;top:1px;}");
     	}
-
 }
 
 function setLoaderColor(col) {
@@ -1335,8 +1259,9 @@ function parseCT() {
 		var a = $('.content_textarea').html();
 //        console.log(a);
    		a = a.replace(r, '$1');
-        //Infamous White background bug DIES
-        a = a.replace(/<span style="line-height: 1.3em; background-color: white;">([^<]*)<\/span>/g, "$1");
+        //Infamous White background bug and similar DIES
+//        a = a.replace(/<span [^c][^l][^a][^s][^s][^>]*>(.*)<\/span>/g, "$1");
+        $('.content_textarea span').each(function() { if($(this).attr('class') == undefined) $(this).css('line-height','inherit').css('background-color','inherit').css('font-size','inherit') })
        		a = a.replace(/<\/span><\/div>/g, "</span>&nbsp;</div>");
        		a = a.replace(/<\/span><\/kbd>/g, "</span>&nbsp;</kbd>");
        		a = a.replace(/<\/kbd><\/kbd>/g, "</kbd>&nbsp;</kbd>");
@@ -1986,7 +1911,18 @@ function getLoader(query, m) {
 	$('.spinner').css('position', 'relative').css('left', '50%').css('top', '95px');
 	return "";
 }
-
+function truncateFloat(floater) {
+    /*
+        res.toPrecision(15)
+        "15.5000000000000"
+        parseFloat(res.toPrecision(15))
+        15.5
+    */
+    return parseFloat(floater.toPrecision(15));
+}
+function openTab(url) {
+    window.open($(this).attr('data-url'), '_blank');   
+}
     /*
 
     return null;

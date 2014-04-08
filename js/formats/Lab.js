@@ -70,7 +70,7 @@ function onGetFormats() {
 	};
     obj.table = function x(table,row,col) {
         console.log(table);
-        table = table.split(";").join("").split(",");
+        table = decodeURIComponent(table).split(";").join("").split(",");
 		out = "<br><span style='display:block;text-align:center'>Table FIGN. TEXT</span><table style='border-collapse:collapse;border:solid 1px black;width:100%;'>";
 		for(i=1;i<=row;i++) {
             out += "<tr>";

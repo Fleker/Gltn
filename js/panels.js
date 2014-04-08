@@ -114,7 +114,7 @@ function animateContentPanel(p) {
 	);
 }
 function maximizePanel() {
-    if($('.PanelMaximizeEvent').attr('data-status') === 0) {
+    if($('.PanelMaximizeEvent').attr('data-status') == 0) {
         //Maximize
         $('#panel_content').hide(200);
         $('#panel_plugin').animate({
@@ -787,7 +787,7 @@ function RunPanelmain_Filesys() {
 				var fsci = localStorage[i+"_c"].length;
 				fstotal += fsi;
 				fstotal += fsci;
-				var fsout = (getLocalStorageOf(i)+getLocalStorageOf(i+"_c"))+"KB";
+				var fsout = truncateFloat(getLocalStorageOf(i)+getLocalStorageOf(i+"_c"))+"KB";
 				//console.log(xx.file.tags.split(','),sterm)
 				if(sterm == undefined || (sterm != undefined  && (title.toLowerCase().indexOf(sterm) > -1) || i.toLowerCase().indexOf(sterm) > -1 || xx.file.tags.indexOf(sterm) > -1)) {
 					try {

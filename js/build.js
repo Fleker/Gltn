@@ -24,9 +24,9 @@ function startBuild(el) {
 	$('.build').html('<span class="buildRow"><button onclick="exitBuild()"><span class="fa fa-angle-left"></span>&nbsp;Editor</button>'+buildPrint+'</span><span class="buildtime noprint" style="font-size:9pt"></span>');
         
 		//$('.build_progress').css('display', 'block').css('position', 'fixed').css('width', '50%').css('height', '50%').css('top','25%').css('left','25%').css('background-color', 'rgba(0,0,0,0.3)').css('font-size','16pt').css('margin-top','10%');
-	initiatePopup({title:"Build Progress",bordercolor:"rgb(44, 145, 16)",ht:"<div id='build_progress' class='build_progress' style=''></div>"});
+	initiatePopup({title:"Compilation Progress",bordercolor:"rgb(44, 145, 16)",ht:"<div id='build_progress' class='build_progress' style=''></div>"});
         setTimeout('getLoader("buildProgress")');
-	updateBuildProgress('Initiating Build...');
+	updateBuildProgress('Beginning to Compile...');
 	setTimeout(function() {
         try {
             continueBuild(el);  
@@ -1007,7 +1007,7 @@ console.log(d);
         //.children()[0];
 //        console.log("! FRAC");
 //        console.log(frac);
-        $(frac).css('width', den).css('color', 'black').css('border', 'solid 2px').css('background-color', 'black').css('top', '-1.096em').css('height', '11px');
+        $(frac).css('width', den).css('color', 'black').css('border', 'solid 2px').css('background-color', 'black').css('top', '-1.096em').css('height', '13px');
 //        .css('top', '-1.096em').css('height', '11px');
     
     }

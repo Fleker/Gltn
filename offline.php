@@ -6,7 +6,7 @@ echo "CACHE MANIFEST\n";
 echo "# version 1.1.1.71k".count($_GET)."\n\n";
 echo "CACHE:\n";
 
-//echo "js/formats/APA.js\n";
+    echo "js/formats/APA.js\n";
 //			echo "null.js\n";
 //	echo "js/build.js\n";
 //	echo "js/file.js\n";
@@ -16,15 +16,17 @@ echo "js/holoribbon.js\n";
 echo "js/IntroJS/intro.js\n";
 echo "js/IntroJS/introjs.min.css\n";
 echo "js/json2xml.js\n";
-//	echo "kernel.js\n";
+//	echo "js/kernel.js\n";
+//	echo "js/gltnstore.js\n";
+//	echo "js/kernel2.js\n";
 echo "js/formats/MLA.js\n";
 //	echo "js/panels.js\n";
-	echo "js/popup.js\n";
-//echo "standard.css\n";
+//	echo "js/popup.js\n";
+echo "css/standard.css\n";
 echo "js/xmlToJson.js\n";
 
 /* Other Javascript Files loaded elsewhere */
-echo "http://code.jquery.com/jquery-2.0.3.min.js\n";
+echo "http://code.jquery.com/jquery-2.1.0.min.js\n";
 echo "http://code.jquery.com/color/jquery.color-2.1.2.min.js\n";
 echo "js/rangy-1.3alpha.772/rangy-core.js\n";
 echo "js/rangy-1.3alpha.772/rangy-cssclassapplier.js\n";

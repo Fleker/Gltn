@@ -188,6 +188,7 @@ function restoreFile(full) {
         full = true;
     else
         full = false;
+    
 	$("#file_format").on("input", function() {
 		console.log($(this).val());
 		formatShift();
@@ -221,6 +222,7 @@ function restoreFile(full) {
 	}
 	
 	//var x = xml2json(jQuery.parseHTML(localStorage[fileid]),"  ");
+    if(localStorage[fileid]) {
 	try {
         console.log('"'+localStorage[fileid]+'"');
 	x = $.xml2json(localStorage[fileid].trim());
@@ -234,6 +236,10 @@ function restoreFile(full) {
 		if(y == true) 
 			localStorage.removeItem(fileid);
 	}
+    } else {
+        xc = localStorage[fileid+"_c"];
+        newFile(x, xc);
+    }
 	//$.xml2json(xml);
 	xc = localStorage[fileid+"_c"];
     if(x == undefined)
@@ -689,19 +695,24 @@ function checkLocalStorageLength() {
 }
 function getShare() {
     if(window.saved == undefined) {
-        initiatePopup({title:"Share...",ht:"You must export the document to a cloud service before you can share it."});    
+        initiatePopup({title:"Share...",ht:"You must export the document to a cloud service before you can share it."}); 
+        cloudXML();
         return;
     }
+    //SERVICES LIST - http://www.addthis.com/services/list
+    //<br><span class='fa fa-envelope' onclick='openTab(\"http://api.addthis.com/oexchange/0.8/forward/email/offer?url="+url+"\")'></span>
     //If there is an inkblob, get the url
     if(getFileData("inkblob_url") != undefined) {
         //Get the id only for the url
         //https://www.filepicker.io/api/file/ z1cUucGQaOwmWbkvTQ49
+        
         var id = getFileData("inkblob_url").substr(35);
         var url = "http://felkerdigitalmedia.com/gltn/edit.php?file="+fileid+"&share="+id;
         //Display the URL
         initiatePopup({title:"Share...",ht:"Send this link to other people and they can collaborate on this document in real time!<br><br><a href='"+url+"' style='color:"+theme.coloralt+"'>"+url+"</a><br><div style='text-align:center;'><img src='http://api.qrserver.com/v1/create-qr-code/?size=300x300%27&data="+encodeURIComponent(url)+"'></div>"});
     } else {
         initiatePopup({title:"Share...",ht:"You must export the document to a cloud service before you can share it."});
+        cloudXML();
     }
     
 }

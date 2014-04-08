@@ -50,8 +50,10 @@ function set_up_format(name, property) {
 	}
 }
 function setFormatItemWidth(index) {
-	if($('#format_item_'+index).val().length < 20)
-		$('#format_item_'+index).css('width', '10 em');
+    if($('#format_item_'+index).val() == undefined)
+        $('#format_item_'+index).css('width', '10em');
+	else if($('#format_item_'+index).val().length < 20)
+		$('#format_item_'+index).css('width', '10em');
 	else if($('#format_item_'+index).val().length > 40)
 		$('#format_item_'+index).css('width', '40em');
 	else
@@ -332,14 +334,14 @@ function post_toolbar(tools) {
 				formatHovertag("heading3", "'Heading-3'", 'null');
 			break;
 			case "image":
-				var imid = $('.img').length;
+				var imid = getObjectSize('img');
 				contentAddSpan({node:"div", class:"img inline img"+imid, ce: false});
 				imgDetails(imid);
 				formatHovertag("img", "'Image Details'", "'imgDetails('+$(this).attr('data-id')+');'");
 			break;
 			case "table":
-			var tid = $('.table').length;
-				contentAddSpan({node:"div", class:"table inline table"+tid, ce: false});
+			var tid = getObjectSize('table');
+				contentAddSpan({node:"div", class:"table table"+tid+" inline", ce: false});
 				tableDetails(tid);
 				formatHovertag("table", "$(this).attr('data-title')", "'tableDetails('+$(this).attr('data-id')+');'");
 			break;
@@ -351,13 +353,13 @@ function post_toolbar(tools) {
 				toggleItalics();
 			break;
             case "reftext":
-                var rtid = $('.reftext').length;
+                var rtid = getObjectSize('reftext');
                 contentAddSpan({node:"span", class:"reftext reftext"+rtid, ce: false});
                 refTextDetails(rtid);
                 formatHovertag("reftext", "'Ref: '+$(this).attr('data-ref')", "'refTextDetails('+$(this).attr('data-id')+');'");
             break;
             case "LaTeX":
-                var lid = $('.latex').length;
+                var lid = getObjectSize('latex');
                 contentAddSpan({node:"kbd", class:"latex latex"+lid, ce: false});
                 latexDetails(lid);
                 formatHovertag("latex", "$(this).attr('data-cmd')", "'latexDetails('+$(this).attr('data-id')+');'");
@@ -382,7 +384,9 @@ function post_toolbar(tools) {
 			break;
 		}
 	});
-	
+}
+function getObjectSize(classname) {
+    return $($('.'+classname)[$('.'+classname).length-1]).attr('class').split(' ')[1].match(/\d+/g)[0];   
 }
 function highlight_tool(el) {
 	//console.log(jQuery(el).attr('class'));
@@ -449,7 +453,9 @@ function refreshBodyDesign() {
 	} else if(window.paneltitle != undefined) {
 		console.log("Change with panel");
 		$('.content_wrapper').css('width', 'calc(100% - 1px)');
-		sizePanel(panelwidth, false);
+        if($('.PanelMaximizeEvent').attr('data-status') == 0)
+		  sizePanel(panelwidth, false);
+            
 		$('.content_textarea').css('width', '100%').css('margin-left', '0px');
 	}
 	setTimeout("onInitToolbar();", 100);
