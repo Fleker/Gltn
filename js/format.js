@@ -51,10 +51,10 @@ function set_up_format(name, property) {
 }
 function setFormatItemWidth(index) {
     if($('#format_item_'+index).val() == undefined)
-        $('#format_item_'+index).css('width', '10em');
-	else if($('#format_item_'+index).val().length < 20)
-		$('#format_item_'+index).css('width', '10em');
-	else if($('#format_item_'+index).val().length > 40)
+        $('#format_item_'+index).css('width', '11em');
+	else if($('#format_item_'+index).val().length < 22)
+		$('#format_item_'+index).css('width', '11em');
+	else if($('#format_item_'+index).val().length > 80)
 		$('#format_item_'+index).css('width', '40em');
 	else
 		$('#format_item_'+index).css('width', 0.5*$('#format_item_'+index).val().length+"em");
@@ -94,9 +94,9 @@ function post_format() {
 			$(e).on('input', function() {
 				format_check_count(i);
 			});*/
-			setInterval("format_check_count("+i+")", 800);
-		}
-		
+			setInterval("format_check_count("+i+")", 100);
+		} else
+		  setInterval("setFormatItemWidth("+i+")", 100);
 		/*if($('#format_item_'+i).val() != undefined) {
 			if($('#format_item_'+i).val().length < 20)
 				$('#format_item_'+i).css('width', '10em');
@@ -106,10 +106,10 @@ function post_format() {
 				$('#format_item_'+i).css('width', 0.5*$('#format_item_'+i).val().length+"em");
 		}*/
 
-        setTimeout("setFormatItemWidth("+i+");", 1000);
+       /* setTimeout("setFormatItemWidth("+i+");", 1000);
        		$('#format_item_'+i).on('input', function() {
 			     setFormatItemWidth(i);
-        	});
+        	});*/
 	}
 	onInitToolbar();
 	
@@ -167,6 +167,7 @@ function format_check_count(i) {
 			$(e).html('<span class="gluten_gray">'+words+'&nbsp;'+mtype+'</span>');
 		}
 	}	
+    setFormatItemWidth(i);
 }
 
 
@@ -181,7 +182,7 @@ function post_format_text(m, inv) {
 		if(m.description.length)
 			out = out + "<br><span class='format_description'>"+m.description+"</span><br>";
 	}
-	out = out + "<input id='format_item_"+m.index+"' placeholder='"+m.placeholder+"' style='width:55%' onmouseenter='hideHovertag()'>";
+	out = out + "<input type='text' id='format_item_"+m.index+"' placeholder='"+m.placeholder+"' style='width:55%' onmouseenter='hideHovertag()'>";
 	if(m.min.length != 0 || m.max.length != 0) {
 		out = out + "<br><div class='format_count' id='format_count_"+m.index+"'></div>";	
 	}
@@ -217,10 +218,10 @@ function post_format_mltext(m) {
 }
 function post_format_content(m) {
 	var out = "";
-	out = "<div class='content_wrapper'><div class='content overflow'></div>";
-	out += "<div class='content toolbar'></div>";
-	out = out + "<div contenteditable='true' class='content content_textarea' onmouseleave='/*hideHovertag()*/' onfocus='/*restoreSelection()*/'></div></div>";
-	out = out + "<table class='content_wordcount'><tr id='content_row'><td class='content_word'></td><td class='content_character'></td><td class='content_save '>&emsp;</td></tr></table>";
+	out = "<div class='small-12 column' style='margin-left: -11px;width: calc(100% + 27px);'><div class='content_wrapper row'><div class='content overflow small-12 column'></div>";
+	out += "<div class='content toolbar small-12 column'></div>";
+	out = out + "<div contenteditable='true' class='content content_textarea small-12 column'></div></div>";
+	out = out + "<div class='content_wordcount small-12 column' style='display:inline-flex'><div class='content_word'></div>&emsp;<div class='content_character'></div>&emsp;<div class='content_save'>&emsp;</div></div></div>"
 	return out;	
 }
 function post_toolbar(tools) {
@@ -360,6 +361,7 @@ function post_toolbar(tools) {
             break;
             case "LaTeX":
                 var lid = getObjectSize('latex');
+                console.log("LATEX "+lid);
                 contentAddSpan({node:"kbd", class:"latex latex"+lid, ce: false});
                 latexDetails(lid);
                 formatHovertag("latex", "$(this).attr('data-cmd')", "'latexDetails('+$(this).attr('data-id')+');'");
@@ -386,7 +388,15 @@ function post_toolbar(tools) {
 	});
 }
 function getObjectSize(classname) {
-    return $($('.'+classname)[$('.'+classname).length-1]).attr('class').split(' ')[1].match(/\d+/g)[0];   
+    if($('.'+classname).length == 0)
+        return 0;
+    var i = 0;
+    $('.'+classname).each(function(N, E) {
+        var int = parseInt($(E).attr('class').split(' ')[1].match(/\d+/g)[0])+1;
+        if(int > i)
+            i = int;
+    });
+    return i;   
 }
 function highlight_tool(el) {
 	//console.log(jQuery(el).attr('class'));
@@ -406,38 +416,13 @@ window.fullscreenOn = false;
 toolbar_width = 0;
 sy_save = 0;
 function update_toolbar_style() {
-	//saveFile();
-	/*if(getRange().collapsed == false) {
-		appendHoloSelection();	
-	}*/
-	//$('.toolbar').width(.94*window.innerWidth);
-	
-
-	//Use this for other dynamic styling stuff
-	/*if(toolbar_width != $('.toolbar').width()) {
-		refreshBodyDesign();
-	}*/
-	
-	
-	var sy = scrollY-10/*-110*/;
-	if(sy <= 0)
-		sy = 0;
-
-	//$('#panel_plugin').css('margin-top', sy);
-	if(sy != sy_save) {
-		$('#panel_plugin').animate({
-			marginTop: sy
-		},80);
-		sy_save = sy;
-	}
-	$('.introjs-overlay').css('display', 'none');
-	//Also, we will redo all the CSS rules just to make sure they're applied to all the new content
 	initTheme();
-	
-	//$('#panel_plugin').css('height', window.innerHeight);
-	
 }
 function refreshBodyDesign() {
+    var h = (window.innerHeight-100)*.85;
+    $('.content_textarea').css('height', h+'px');
+}
+function refreshBodyDesign1() {
 	toolbar_width = $('.toolbar').width();
 	if(window.paneltitle == undefined) {
 		console.log("Change without panel");

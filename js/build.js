@@ -3,7 +3,7 @@ buildPrint = '<button onclick="window.print()" class="noprint"><span class="fa f
 function falseBuild(printr) {
 	window.section_name = "";
 	$('.build').fadeIn(500);
-	$('.body').fadeOut(500);
+	$('.main').fadeOut(500);
 	$('.header').fadeOut(500);
 	out = '<span class="buildRow"><button onclick="exitBuild()"><span class="fa fa-angle-left"></span>&nbsp;Editor</button>';
 	if(printr != true) {
@@ -133,7 +133,7 @@ function continueBuild(el) {
 		
 	//To stuff
 		//$('.body').css('display', 'none');
-		$('.body').fadeOut(500);
+		$('.main').fadeOut(500);
 	finishBuild();
 	scrollTo(0,0);
 	console.warn('finish');
@@ -164,7 +164,7 @@ function finishBuild() {
 }
 function exitBuild() {
 	$('.header').show(1000);
-	$('.body').show(500);
+	$('.main').show(500);
 	$('.build').hide(350);
 	setTimeout("ribbonSwitch(ribbon_index, false);window.scrollTo(0,0);",1025);
 }
@@ -1007,7 +1007,7 @@ console.log(d);
         //.children()[0];
 //        console.log("! FRAC");
 //        console.log(frac);
-        $(frac).css('width', den).css('color', 'black').css('border', 'solid 2px').css('background-color', 'black').css('top', '-1.096em').css('height', '13px');
+//        $(frac).css('width', den).css('color', 'black').css('border', 'solid 2px').css('background-color', 'black').css('top', '-1.096em').css('height', '15px');
 //        .css('top', '-1.096em').css('height', '11px');
     
     }

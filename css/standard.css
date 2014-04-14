@@ -13,10 +13,47 @@ body {
 	color: #000;
 	overflow-x:hidden;
 	margin: -2px;
+    cursor:inherit;
 	width: calc(100% + 4px);
 }
-.body {
+.main {
 	padding-top:102px;	
+    max-width:inherit; 
+    width: 100%;
+margin-left: auto;
+margin-right: auto;
+    min-width:100% !important;
+}
+kbd {
+    border-top: none;
+border-left: none;
+border-right: none;
+background-color: transparent;
+padding: 0px;
+margin: 0;
+color: inherit;
+border-radius: 0;   
+}
+.content {
+    display:block;   
+}
+.content_textarea {
+    font-size:12pt;   
+}
+.overflow {
+    padding-top: 6px;
+padding-bottom: 8px;   
+}
+.toolbar {
+    padding-top: 7px;
+padding-bottom: 21px;
+}   
+.ribbonhead, .ribbongroup, .ribbonbody {
+    max-width:100%;
+}
+.ribbonheader {
+    padding-top:3px;
+    padding-bottom:3px;
 }
 .header {
 	position:fixed;
@@ -25,8 +62,31 @@ body {
 	border-bottom:solid 1px #bbb;
 	left:0px;
 	width:100%;
+    max-width:100%;
     z-index:98;
 }	
+input {
+    display:inline;   
+}
+table tr th, table tr td {
+    padding: 0.5625rem 0.625rem;
+    font-size: 0.875rem;
+    color: inherit;
+}
+.reveal-modal {
+    background-color:inherit;   
+}
+abbr {
+    color:inherit;   
+}
+.ribbonbutton {
+    font-size: 14pt;
+max-width: 100%;
+padding-left: 15px;
+padding-right: 15px;
+    padding-top:11px;
+height: 81px;   
+}
 span, div, body {
 	column-span: all;
 	-webkit-column-span:all;
@@ -43,9 +103,9 @@ span, div, body {
 
 /* Initiate */
 #panel_content {
-	width: 100%;
+/*	width: 100%;*/
 	background-color: #fff;
-	padding-left: 10px;
+	padding-left: 12px;
 	padding-top: 1em;
 	
 	-webkit-box-shadow:  0px 0px 0px 1px rgba(0, 0, 0, 1);
@@ -57,9 +117,14 @@ span, div, body {
 	display:none;
 	background-color:#eee;
 	border:solid 1px black;
-	padding-left: .6em;
 	padding-top: 0.7em;
-	padding-right: 0.3em;
+    position:fixed;
+    top:99px;
+}
+table {
+    background-color:inherit;
+    border:none;
+    margin-bottom:0px;
 }
 .panel_plugin_title {
 	font-weight:bold;	
@@ -70,6 +135,9 @@ span, div, body {
 #panel_research {
 	width: 0%;	
 	display:none;
+}
+.content_wrapper {
+    margin-left: -11px;
 }
 
 /* Styles */
@@ -86,11 +154,10 @@ span, div, body {
 	margin-top:-2px;
 }
 .content {
-	border: solid 2px #444;
+	border: solid 1px #999;
 	height: 23px;
-	padding-top: 2px;
-	margin-left: 2px;
-	width: calc(100% - -12px);
+	padding-top: 6px;
+    padding-bottom: 23px;
 }
 .content_textarea {
 	width: calc(100% - 1px);	
@@ -103,7 +170,7 @@ span, div, body {
 	line-height: 1.3em;
 }
 .toolbar {
-	background-color: #aaa;
+	background-color: #bdc3c7;
 	margin-bottom: -4px;
 	
 }	
@@ -113,14 +180,14 @@ span, div, body {
 	height:100%;
 }
 .popup_character {
-	position: fixed;
+	/*position: fixed;
 	left: 5%;
 	right: 5%;
 	top: 5%;
 	bottom: 5%;
 	width: 50%;
 	height: 30%;
-	background-color: #999;
+	background-color: #999;*/
 }
 /* Internal Styles Formatting */
 .citation {
@@ -136,7 +203,7 @@ span, div, body {
 	text-decoration: none;
 	border-bottom: solid 1px #f1c40f;
     display:inline;
-    font-size:112%;
+    font-size:100%;
 }	
 .table {
     text-decoration:none;
@@ -194,7 +261,7 @@ span, div, body {
 	background-color:rgba(0,0,0,.8);	
 }
 .popuptop {
-	position:fixed;
+	/*position:fixed;
 	width:70%;
 	left:15%;
 	height:60%;
@@ -203,7 +270,7 @@ span, div, body {
 	background-color:#EEEEEE;
 	min-width:3in;
 	min-height:2in;
-    z-index:101;
+    z-index:101;*/
 }
 .popuptitle {
 	font-size: 24pt;
@@ -224,8 +291,8 @@ span, div, body {
 	
 }
 .popupcontent {
-	max-height: 75%;
-overflow: auto;
+    /*	max-height: 75%;
+    overflow: auto;*/
 width: 90%;
 /*background-color: rgba(100,100,100,.05);*/	
 }
@@ -302,6 +369,7 @@ box-shadow:         0px -2px 1px rgba(0, 0, 0, 1);*/
 
 button {
 	cursor:pointer;	
+    transition:background-color,color 0ms ease-out;
 }
 .button {
 	cursor: pointer;	
@@ -326,6 +394,7 @@ display: block;
 	color:black;
 	font-family:serif;
 	font-size:12pt;
+    height:10in;
 }
 .mfrac {
        
@@ -346,7 +415,7 @@ kbd {
 }
 @media screen {
 .page {
-	width:6in;
+	width:8in;
 	padding-left:1in;
 	/*padding-top:0.5in;
 	padding-bottom:0.5in;
@@ -354,8 +423,8 @@ kbd {
 	padding-right:1in;
 	
 	background-color:white;
-	-webkit-box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 1);
-	box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 1);	
+	-webkit-box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 1);
+	box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 1);	
 	text-decoration: none;
 
 }
@@ -404,13 +473,14 @@ margin-right: 1in;
 background-color: white;
 text-decoration: none;
 }
-	hr, button, .fa, .noprint {
+	hr, button, .fa, .noprint, .buildrow {
 		display:none;
 		opacity:0;	
 	}
 	.page0header {
 		margin-top:0.35in;	
 	}
+    
 }
 .panel_plugin {
 	overflow-y:auto;	

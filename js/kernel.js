@@ -904,12 +904,13 @@ function normalscreen() {
 	window.fullscreenOn = false;	
 	$('.content_textarea').css('z-index', 0).css('position', 'inherit');
 		$('.content_textarea').animate({
-			width: $('.toolbar').width(),
-			fontSize:"12pt",
-			paddingLeft:"6px",
-			paddingRight:"6px",
-			paddingTop:"0px",
-			lineHeight:"1.3em"
+			width: "inherit",
+            height: "inherit",
+			fontSize:"inherit",
+			paddingLeft:"inherit",
+			paddingRight:"inherit",
+			paddingTop:"inherit",
+			lineHeight:"inherit"
 		},1000);
 		nightscreen(1);
 		$('.fullscreenui').fadeOut(100);
@@ -1076,7 +1077,11 @@ document.onkeydown = function(e) {
 
 //Gets an array of words in the body
 function getWords() {
-    $('.content_textarea').html().toLowerCase().trim().replace(/<kbd class="latex.*<\/kbd>/g, "").replace(/></g, "> <").replace(/<[^>]*>/g, "").replace(/"/g, "").replace(/&nbsp;/g, " ").split(' ');
+    var a = $('.content_textarea').html().toLowerCase().trim().replace(/<kbd class="latex.*<\/kbd>/g, "").replace(/></g, "> <").replace(/<[^>]*>/g, "").replace(/"/g, "").replace(/&nbsp;/g, " ").split(' ');
+    if(a.length == 0) 
+        return [""];
+    else
+        return a
 }
 function postWordCount() {
 	//Right now, this only does the words in the content_textarea; it should get the build count

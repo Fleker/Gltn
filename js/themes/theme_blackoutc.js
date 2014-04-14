@@ -1,7 +1,7 @@
 // Sample theme - Blackout
 // This is meant to be a softer theme, using a dark background to be easier to see
 function initTheme() {
-	window.theme = {};
+//	window.theme = {};
 	//set theme variables
 	//fullscreen variables
 	theme.darkbg = 'rgb(1, 1, 1)';
@@ -50,6 +50,9 @@ function runThemeSettings() {
     $('#ThemeColor').on('change', function() {
        theme.ribbonhighlight = $(this).val(); 
         writeToSettings('ribbonhighlight', $(this).val());
+        
+writeCss("button:hover {	background-color:"+theme.ribbonhighlight+";color:black;}button:active {	position:relative;	top:1px;}");
+writeCss("button.ribbonbutton:hover {	background-color:"+theme.ribbonhighlight+";color:black;}button:active {	position:relative;	top:1px;}");
     });   
 }
 initTheme();
@@ -61,4 +64,8 @@ writeCss("@import url(http://fonts.googleapis.com/css?family=Roboto+Condensed:30
 //Theme parameters for content_textarea not necessary (unless we removed the reload requirement for themes - but for now it'll stay due to a lack of default parameters)
 	$('.content_textarea').css('background-color', theme.normbg).css('color', theme.normcolor);
 setLoaderColor('255,255,255');
-writeCss("button {	background-color:"+theme.normcolor+";	border-radius:3;	text-indent:0;	border:1px solid #888;	display:inline-block;	color:"+theme.normbg+";	font-weight:bold;	font-style:normal;	text-decoration:none;	text-align:center;padding:3px;min-width:30px;}button:hover {	background-color:#ddd;}button:active {	position:relative;	top:1px;}");
+writeCss("button.textbutton {	background-color:"+theme.normcolor+";	border-radius:3;	text-indent:0;	border:1px solid #888;	display:inline-block;	color:"+theme.normbg+";	font-weight:bold;	font-style:normal;	text-decoration:none;	text-align:center;padding:3px;min-width:30px;}");
+writeCss("button.ribbonbutton { padding-top:2px;height:77px; }");
+writeCss("button { background-color:transparent }");
+writeCss("button:hover {	background-color:"+theme.ribbonhighlight+";color:black;}button:active {	position:relative;	top:1px;}");
+writeCss("button.ribbonbutton:hover {	background-color:"+theme.ribbonhighlight+";color:black;}button:active {	position:relative;	top:1px;}");

@@ -37,7 +37,27 @@ hovertagRegistrar = new Array();
 obj = {};
 currentformat = "";
 document.ready = function() {
-	console.log('Gltn has woken up: v 1.1.4.3');
+	console.log('Gltn has woken up: v 1.2.0.1');
+    $(document).foundation({
+      animation: 'fadeAndPop',
+      animation_speed: 250,
+      close_on_background_click: true,
+      dismiss_modal_class: 'close-reveal-modal',
+      bg_class: 'reveal-modal-bg',
+      bg : $('.reveal-modal-bg'),
+      css : {
+        open : {
+          'opacity': 0,
+          'visibility': 'visible',
+          'display' : 'block'
+        },
+        close : {
+          'opacity': 1,
+          'visibility': 'hidden',
+          'display': 'none'
+        }
+      }
+    });
     x = {};
     //Setup Filepicker
     filepicker.setKey("AePnevdApT62LvpkSSsiVz");
@@ -55,7 +75,11 @@ document.ready = function() {
             var d = localStorage[fileid].substring(a,b);
             
             //Okay, grab the InkBlob url and sync    
+            try {
              initiatePopup({title:'Syncing...',ht:'<div class="progress" style="font-size:14pt;text-align:center;width:100%;"></div>',bordercolor:'#7f8c8d', ht:"&emsp;&emsp;&emsp;Downloading the latest copy."});
+            } catch(E) {
+                console.error(E.message);   
+            }
             var a = localStorage[fileid].indexOf('<inkblob_url>')+13;
             var b = localStorage[fileid].indexOf('</inkblob_url>');
             console.log(localStorage[fileid].substring(a,b));
@@ -83,6 +107,7 @@ function startSaveFile() {
         try {
             saveFile();
         } catch(e) {
+            console.error(e.message);
             cloudResave();
         }
     }
@@ -100,6 +125,8 @@ function startSaveFile() {
 }
 function saveFile() {	
 	fileid = $('#file_name_internal').val();
+    if(fileid == undefined)
+        fileid = "scratchpad";
 	$('.content_save').hide();
 	//console.log(o.gluten_doc, x, obj);
 	if(window.jsonsave == undefined) 
@@ -145,6 +172,7 @@ function saveFile() {
 		var att = window.metadata[i].id.replace(/ /g, '_');
 		//console.warn(i);
 		obj['metadata'][att] = grabMetadata(i).value;
+//        console.log(att, i, grabMetadata(i).value);
 		//console.log(obj.metadata);
 		//console.warn(i);
 	}
@@ -358,6 +386,11 @@ function finishRestore2(full) {
 	   initNotifications();
 	   setHeader();
 	   
+    } else {
+        $('.latex').each(function(N, E) {
+            postLatex($(E).attr('data-cmd'));
+            $(E).html(getLatex());
+        });
     }
 	try {
 		initContext();
@@ -631,13 +664,17 @@ function cloudRead(ink, callback, localMod) {
             var b = data.indexOf('</last_modified>');
             var c = parseInt(data.substring(a,b));
             localMod = parseInt(localMod);
-            if(c <= localMod) {
+            console.log(localMod, c, localMod >= c, "a >= b");
+            if(localMod >= c) {
 //                console.log("Not synced: "+c+", "+localMod);
                 if(callback == "RF") {
                     restoreFile();
                     closePopup();
                 }
                    return;
+            } else if(localMod == c) {
+                closePopup();
+                return;
             }
             initService("main_Sync", "Downloading...", "<span style='border-radius:100%'><span class='fa fa-cloud-download'></span>&nbsp;<i class='fa fa-refresh fa-spin'></i><span>");
             
@@ -702,7 +739,7 @@ function getShare() {
     //SERVICES LIST - http://www.addthis.com/services/list
     //<br><span class='fa fa-envelope' onclick='openTab(\"http://api.addthis.com/oexchange/0.8/forward/email/offer?url="+url+"\")'></span>
     //If there is an inkblob, get the url
-    if(getFileData("inkblob_url") != undefined) {
+    if(getFileData("inkblob_url") != "undefined") {
         //Get the id only for the url
         //https://www.filepicker.io/api/file/ z1cUucGQaOwmWbkvTQ49
         

@@ -67,18 +67,31 @@ function runPanel(panel_id_name) {
 	openPanelPlugin(p.width, min, panel_id_name);
 }
 function openPanelPlugin(percent, min, panel_id_name) {
-	$('#panel_plugin').css('opacity', 0).css('width', '1px');
-	sizePanel(percent);
+	$('#panel_plugin').css('opacity', 0);
+    $('.panel_plugin_content').empty();
 	setTimeout(function() {
 		populatePanelPlugin(panel_id_name);
 		/*$('#panel_plugin').animate({
 			minWidth: min+"in"
 		}, 360);*/
-	},80);
+	},250);
+    sizePanel(percent);
+    $('#panel_plugin').animate({
+        opacity:1,
+        width:(100/12*columnCount(percent,true))+"%",
+        marginTop:"-1px",
+        paddingRight:"15px",
+        paddingBottom:"50px",
+    },100, function() {
+        	sizePanel(percent);
+//            $('.panel_plugin_content').animate({
+//                width: (columnCount(percent, true)*10)+(Math.floor(window.innerWidth/100)-2)-24+"rem"
+//            }, 100);
+        });
 }
 function sizePanel(percent, refresh) {
 	//animateContentPanel((97-percent)+"%");
-	$('#panel_plugin').animate({
+	/*$('#panel_plugin').animate({
 		width:(percent-2)+'%',
 		opacity: 1,
 		marginLeft: '-3px'
@@ -89,8 +102,17 @@ function sizePanel(percent, refresh) {
 				refreshBodyDesign();
 		}
 	);
-	$('#panel_content').css('width', (97-percent)+"%");
-	//animateContentPanel((window.innerWidth - $('#panel_plugin').width() - 35)+"px");
+	$('#panel_content').css('width', (97-percent)+"%");*/
+    
+    //Use Foundation to create an appropriate number of panels
+    if(percent == 0)
+        $('#panel_content').attr('class', 'columns large-'+(12-columnCount(percent, true))+" small-"+(12-columnCount(percent, true))+" medium-"+(12-columnCount(percent, true)));
+    else
+        $('#panel_content').attr('class', 'columns large-'+(12-columnCount(percent, true))+" small-"+(9-columnCount(percent, true))+" medium-"+(10-columnCount(percent, true)));
+    setTimeout(function() {
+        $('#panel_plugin').attr('class', 'columns end large-'+columnCount(percent, true)+' small-'+columnCount(percent, true));
+    }, 50);
+    //animateContentPanel((window.innerWidth - $('#panel_plugin').width() - 35)+"px");
 			
 }
 function squeezeContentPanel() {
@@ -134,15 +156,15 @@ function hidePanelPlugin() {
 	$('#PanelCloseEvent').click();
 	//
 	$('#panel_plugin').animate({
-		width: "0%",
-		minWidth: "0in",
 		opacity: 0,
 		}, 100, function() {
-			$('#panel_plugin').css('display', 'none');
-			stretchContentPanel();
-			refreshBodyDesign();
+//			$('#panel_plugin').css('display', 'none');
+//			stretchContentPanel();
+//			refreshBodyDesign();
+            sizePanel(0,false);
 		}
 	);
+    
     $('#panel_content').show(200);
 	window.paneltitle = undefined;
 	paneloverride = [];
@@ -158,7 +180,7 @@ function populatePanelPlugin(panel_id_name) {
 	} catch(e) {
 		
 	}
-	$('.panel_plugin_content').css('height', (window.innerHeight-127)+"px").css('overflow-y', 'auto');
+	$('.panel_plugin_content').css('height', (window.innerHeight-127-50)+"px").css('overflow-y', 'auto');
 }
 function openPanelResearch() {
 	initResearch();	
@@ -184,7 +206,7 @@ function initService(id, title, icon) {
 	if(window.services == undefined)
 		window.services = new Array();
 	if($('.content'+id).length == 0) {
-		$('#content_row').append("<span title='"+title+"' class='content"+id+"' onclick='runPanel(\""+id+"\")'>&emsp;"+icon+"</span>");
+		$('.content_wordcount').append("<span title='"+title+"' class='content"+id+"' onclick='runPanel(\""+id+"\")'>&emsp;"+icon+"</span>");
 		services.push({id: id, title: title, icon: icon});		
 	} else {
 		$('.content'+id).attr('title', title).html("&emsp;"+icon);
@@ -666,7 +688,7 @@ function RunPanelmain_Filesys() {
 			}
 		});
 		$('.Filesys_delete').hover(function() {
-			$(this).css('color', theme.normbg).css('background-color', '#f44').css('border-radius', 100);
+			$(this).css('color', theme.normbg).css('background-color', theme.palette.red).css('border-radius', 100);
 		}, function() {
 			$(this).css('color', theme.normcolor).css('background-color', 'inherit');
 		});
@@ -762,7 +784,7 @@ function RunPanelmain_Filesys() {
 			sterm = "";
 		else
 			sterm = term.toLowerCase();
-		out = "<button id='filesys_new'><span class='fa fa-plus'></span>&nbsp;New</button><input type='file' id='filesys_u' style='display:none' name='file[]'><button id='filesys_up'><span class='fa fa-cloud-upload'>&nbsp;</span>Upload</button><br><span class='fa fa-search'></span>&nbsp;<input type='search' id='filesys_s' style='width:85%' value='"+sterm+"'><table style='width:100%'><input type='hidden' id='filesys_file'>";
+		out = "<button class='textbutton' id='filesys_new'><span class='fa fa-plus'></span>&nbsp;New</button><input type='file' id='filesys_u' style='display:none' name='file[]'><button class='textbutton' id='filesys_up'><span class='fa fa-cloud-upload'>&nbsp;</span>Upload</button><br><span class='fa fa-search'></span>&nbsp;<input type='search' id='filesys_s' style='width:85%;display:inline' value='"+sterm+"'><table style='width:100%'><input type='hidden' id='filesys_file'>";
 		fstotal = 0;
 		for(i in localStorage){
 			c(i);
@@ -780,9 +802,9 @@ function RunPanelmain_Filesys() {
                 
                 
 				if(i == fileid)
-					bgc = '#2980b9';
+					bgc = theme.palette.blue;
 				else
-					bgc = '#2c3e50';
+					bgc = theme.palette.dark;
 				var fsi = localStorage[i].length;
 				var fsci = localStorage[i+"_c"].length;
 				fstotal += fsi;
@@ -812,7 +834,7 @@ function RunPanelmain_Filesys() {
                         //console.error(e.message);
                     } 
                     //#2c3e50
-					out += "<tr><td class='tfile' style='background-color:#ecf0f1;border:solid 2px "+bgc+";padding-bottom:8px;width:98%;cursor:pointer;' data-v='"+i+"'><table style='font-size:7pt;font-family:sans-serif;width:100%;'><tr><td style='text-align:left'><span style='font-size:8pt' class='fa fa-file-text'></span>&nbsp;"+i+".gltn</td><td style='text-align:center;width:23px' class='Filesys_delete' data-f='"+i+"'>X</td></tr></table>";
+					out += "<tr><td class='tfile' style='background-color:#ecf0f1;border:solid 2px "+bgc+";padding-bottom:8px;width:98%;cursor:pointer;' data-v='"+i+"'><table style='font-size:7pt;font-family:sans-serif;width:100%;'><tr><td style='text-align:left'><span style='font-size:8pt' class='fa fa-file-text'></span>&nbsp;"+i+".gltn</td><td style='text-align:center;width:36px' class='Filesys_delete' data-f='"+i+"'>X</td></tr></table>";
 					if(title != undefined)
 						out += "<div style='margin-left:3px'><b>"+title+"</b></div>";	
 					out += "<span style='font-size:8pt'>&emsp;"+xx.file.format+"&nbsp;&nbsp;"+xx.file.language+"&nbsp;&nbsp;"+fsout+"</span><br>";

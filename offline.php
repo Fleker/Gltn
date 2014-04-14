@@ -41,7 +41,7 @@ echo "http://netdna.bootstrapcdn.com/font-awesome/4.0.3/fonts/fontawesome-webfon
 echo "http://netdna.bootstrapcdn.com/font-awesome/4.0.3/fonts/fontawesome-webfont.eot?#iefix&v=4.0.3 \n";
 echo "http://netdna.bootstrapcdn.com/font-awesome/4.0.3/fonts/fontawesome-webfont.woff?v=4.0.3 \n";
 echo "http://netdna.bootstrapcdn.com/font-awesome/4.0.3/fonts/fontawesome-webfont.svg?v=4.0.3#fontawesomeregular \n";  
-echo "https://api.filepicker.io/v1/filepicker.js \n";
+echo "https://api.filepicker.io/v1/filepicker.js\n";
 
 $g = $_GET;
 foreach($g as $i) {
@@ -56,6 +56,6 @@ echo "\nNETWORK:\n";
 echo "* \n";
 
 echo "\nFALLBACK:\n";
-echo "js/panels_translate.js js/offlineload.js"
+echo "js/gltnstore.js js/offlineload.js"
 
 ?>

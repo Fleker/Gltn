@@ -152,139 +152,69 @@ function LatexGreek(char) {
 
 
 function latexDetails(id) {
-
-    ht = "<table style='width:100%'><tr><td style='vertical-align:top;width:50%;'>LaTeX is a form of markup that, among other features, allows for rich math formatting. <br><br>Help:&nbsp;<input type='search' style='width:50%' id='latexSearch' placeholder='Search for something...'><br><span style='font-size:9pt'>Note that mathematical formulas must be placed between \"$\"</span></td><td width:50%;>";
-
+    console.log("LATEX " +id);
+    console.log($('.latex'+id).attr('data-cmd'));
+    ht = "<table style='width:100%'><tr><td style='vertical-align:top;width:50%;'>LaTeX is a form of markup that, among other features, allows for rich math formatting. <br><br>Help:&nbsp;<input type='search' style='width:50%' id='latexSearch' placeholder='Search for something...'><br><span style='font-size:9pt'>**Mathematical formulas must be placed between \"$\"</span></td><td width:50%;>";
     ht += "<div id='latexRef' style='display:none;background-color: rgba(255,255,255,.1);padding:5px;'></div></td></tr></table>";
-
    // ht += "<button id='latexPrev'>Preview</button>";
-
     ht += "<table style='width:99%'><tr><td style='width:50%'><div id='latexCmd' style='height:4em;width:95%;border: solid 1px rgba(0,129,255,1);background-color:"+theme.normfsui+";margin-top:5px;margin-left:5px;margin-bottom:10px;' contenteditable='true'></div></td>";
-
-    
-
     ht += "<td style='width:50%'><div id='latexView' style='height:4em;width:95%;border: solid 1px;background-color:"+theme.normfsui+";margin-top:5px;margin-left:5px;margin-bottom:10px;'></div></td></tr></table>";
-
     ht += "<div id='latexBuffer' style='visibility:hidden'></div>";
-
     ht += "<button id='latexSave'>Save</button>";
-
     $('.latex'+id).attr('data-id', id);
-
     ht += "<input type='hidden' id='PopupId' value='"+id+"'>";
-
     fnc = function x(){
-
         id = $('#PopupId').val();
-
         Preview.Init();
-
         function populate(cmd) {
-
             var preview = false;
-
             if(cmd != -1) {
-
                 $('#latexCmd').html(cmd);
-
                 Preview.Update();
-
             }
-
             $('#latexPrev').on('click', function() {
-
                 if(preview) { 
-
                     $('#latexCmd').fadeIn(300);
-
                     $('#latexView').fadeOut(300);
-
                     $('#latexPrev').html('Preview');
-
                     preview = false;
-
                 } else {
-
                     $('#latexCmd').fadeOut(300);
-
                     $('#latexView').fadeIn(300);
-
                     $('#latexPrev').html('View Commands');
-
                     preview = true;
-
                 }
-
             });
-
             $('#latexCmd').on('input', function() {
-
                 $('.latex'+id).html($('#latexView').html());
-
                 $('.latex'+id).attr('data-cmd', $('#latexCmd').text());
-
                 console.log('latexing');
-
                 Preview.Update();
-
             });
-
             $('#latexSave').on('click', function() {
-
                 Preview.Update();
-
                 setTimeout(function() {
-
                     console.log($('#latexView').html());
-
                     if($('#latexView').html().length < 1)
-
                         $('#latexView').html("LaTeX")
-
                     $('.latex'+id).html($('#latexView').html());
-
                     markAsDirty();
-
                     closePopup();
-
                 }, 250);
-
             });
-
             $('#latexSearch').on('input', function() {
-
                 showLatexReference($(this).val());
-
             });
-
         }
-
         
-
-
-
-        
-
-       
-
-        
-
-        
-
         if($('.latex'+id).attr('data-cmd') != undefined) {
-
             populate($('.latex'+id).attr('data-cmd'));
-
         } else {
-
             populate(-1);
-
         }  
-
     };
 
     initiatePopup({title: "Insert LaTeX", bordercolor: "#f1c40f", ht: ht, fnc: fnc, size: "large"});
-
 }
 
 function showLatexReference(str) {
@@ -408,18 +338,17 @@ function setHeader() {
 	window.holoribbon_std =  {
 
 		Home: new Array(
-
 //            {text: "Start the Tour", img: "<span class='fa fa-home' style='font-size:18pt'></span>", action: "alert('TBD')", key:"Alt+T"}, 
             {text: "Create a File", img: "<span class='fa fa-file' style='font-size:18pt'></span>", action: "createNewFile()", key:"Alt+N"},
-            {group: "", value:"<span style='font-size:16pt'>Welcome to Gltn!</span>"},
+            {group: "", value:"<div style='font-size:22pt;padding-top:0px;text-align:center;'>Welcome to Gltn!</div>"},
             {text: "Explore Files", img: "<span class='fa fa-folder-open' style='font-size:18pt'></span>", action: "runPanel('main_Filesys')", key: "Alt+O"} 
 
 		//	{group: '', value: '<font size="4" id="temp_header" >Welcome to Gluten!</font><br><table style=\'width:40%;margin-left:30%\'><tr><td><button onclick="window.introdisabled = true;introJsStart();"><span class=\'fa fa-home\'></span>&nbsp;Start the Tour!</button></td><td><button id="iFILESYS" onclick="runPanel(\'main_Filesys\')"><span class=\'fa fa-folder-open\'></span>&nbsp;Explore Files</button></td></tr></table>'}
 
 		),
-
+        /* <input type='text' id='file_name' style='width:7em'><span class='postfix'>.gltn</span><button id='file_name_con' disabled='true'>Save As</button><input type='hidden' id='file_name_internal'>"*/
 		File: new Array(
-			{group: "File Name", value:"<input type='text' id='file_name' style='width:7em'><button id='file_name_con' disabled='true'>Save As</button><input type='hidden' id='file_name_internal'>"},
+			{group: "", value:'<div class="row collapse" style="margin-top:-6px"><div class="small-5 columns"><input type="text" value="'+fileid+'" /></div><div class="small-1 columns"><span class="postfix">.gltn</span></div><div class="small-2 columns end"><input type="hidden" id="file_name_internal"><button id="file_name_con" disabled="true">Rename</button></div></div>'},
 			{text: 'Compile & Export', img: '<span style="font-size:18pt" class="fa fa-file"></span>', action: "startBuild();setTimeout('exitintro();', 1000);", key: "Alt+B"},
 			{text: 'Share', img: '<span style="font-size:18pt" class="fa fa-code-fork"></span>', action: "getShare();"}
 		),
@@ -446,17 +375,13 @@ function setHeader() {
 		),
 
 		Me: new Array(
-			{group: 'Name', value:'<input id="me_name" type="text">'}
+			{group: 'Name', value:'<div style="margin-top:-6px"><input id="me_name" type="text"></div>'}
 		)
 
 	};
-
 	newRibbon('.header', holoribbon_std);
-
 	ribbonSwitch(0,false);
-
 	ribbonLoad();
-
 }
 
 function ribbonLoad() {
@@ -761,13 +686,13 @@ function closeButton(i) {
 /*** Custom Theming ***/
 
 function initTheme() {
-    window.theme = {};	
+//    window.theme = {};	
 	//set theme colors/css
 	//set theme variables
 	//fullscreen variables
 	theme.darkbg = "rgb(0, 0, 0)";
 	theme.normcolor = "rgb(0, 0, 0)";
-	theme.normbg = "rgb(255, 255, 255)";
+	theme.normbg = "white";
 	theme.darkcolor = "rgb(200, 200, 200)";
 	theme.coloralt = '#222';
 	theme.normfsui = "rgb(204, 204, 204)";
@@ -776,10 +701,13 @@ function initTheme() {
 	theme.normfsuicolor = 'black';
 	theme.ribbonhighlight = 'rgba(44, 62, 80,1.0)';
 	theme.ribbonplain = 'rgba(0,0,0,0)';
+    theme.palette = {};
+    theme.palette.red = "rgb(255,68,68)";
+    theme.palette.dark = "rgba(44,62,80,1)";
+    theme.palette.blue = '#2980b9';
     $('.popupcontent').css('padding-left','15px');
+//    $('.main').css('background-color', "#ecf0f1"    );
 }
-
-initTheme();
 
 function themeCss(rule, val) {
 	$('body').css(rule, val);	
@@ -793,6 +721,8 @@ function startThemer() {
 	//isn't called until settings are grabbed because otherwise window.settings.theme wouldn't exist
 	//grab current theme
 	//if not set reset themes
+    window.theme = {};
+    initTheme();
 	var url = undefined;
 	if(window.settings.theme == undefined) {
 		window.settings.theme = "default, blackout";
@@ -822,9 +752,14 @@ function startThemer() {
 		initTheme();
       		 setLoaderColor('32,32,32');
         writeCss('@import url(http://fonts.googleapis.com/css?family=Lato:100,300,400);');
-		themeCss('font-family', '"Lato", sans-serif');
+//		writeCss('@import url(http://fonts.googleapis.com/css?family=Merriweather+Sans:400,300,700&subset=latin,latin-ext);');
+        themeCss('font-family', '"Lato", sans-serif');
 		themeCss('font-size', '10pt');
-		writeCss("button { font-family:Lato,sans-serif;background-color:rgba(255,255,255,0.00);border-radius:3;text-indent:0;border:0px solid #888;display:inline-block;color:#333333;font-weight:bold;font-style:normal;text-decoration:none;text-align:center;padding:5px;min-width:30px;} button:hover { background-color: #34495e; color: #ecf0f1; } button:active {position:relative;top:1px;}");
+        themeCss('background-color', '#ecf0f1');
+		writeCss("button { font-family:Lato,sans-serif;background-color:rgba(255,255,255,0.00);border-radius:3;text-indent:0;border:0px solid #888;display:inline-block;color:#333333;font-weight:bold;font-style:normal;text-decoration:none;text-align:center;padding:5px;min-width:30px;}");
+        writeCss("button.ribbonbutton, button.toolbar_button { font-weight:400; }");
+        writeCss("button.textbutton { border: solid 1px #999;padding: 8px;background-color: #f9f9f9;font-weight: 400; }");
+        writeCss("button:hover { background-color: #34495e; color: #ecf0f1; } button:active {position:relative;top:1px;}");
     	}
 }
 
@@ -1904,9 +1839,9 @@ function getLoader(query, m) {
 
         };
 
-    var target = document.getElementById(query);
+//    var target = document.getElementById(query);
 
-    var spinner = new Spinner(opts).spin(target); 
+//    var spinner = new Spinner(opts).spin(target); 
 	console.log($('#'+query).width()/2-26, $('#'+query).height()/2-26);
 	$('.spinner').css('position', 'relative').css('left', '50%').css('top', '95px');
 	return "";
@@ -1922,6 +1857,15 @@ function truncateFloat(floater) {
 }
 function openTab(url) {
     window.open($(this).attr('data-url'), '_blank');   
+}
+/* Takes a percent and converts it to the nearest column value in a 12-column system */
+function columnCount(p, trunc) {
+    var a = 100/12;
+    var b = p/a;
+    if(trunc == true)
+        return Math.floor(b);
+    else
+        return Math.round(b);
 }
     /*
 
