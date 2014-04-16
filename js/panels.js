@@ -51,7 +51,7 @@ function runPanel(panel_id_name) {
         max = "<span class='PanelMaximizeEvent' data-status='0'></span><button onclick='maximizePanel()'><span class='fa fa-arrows-alt'></span></button>";
     }
     console.log(max);
-	$('.panel_plugin_title').html(lcr_split(p.title+'&emsp;<span class="PanelPopupEvent"></span><span class="PanelKeyEvent" data-keycode="" data-alt="" data-ctrl="" data-shift=""></span><span id="PanelCloseEvent"></span><span id="PanelBuildEvent"></span>', '', max+'<button onclick="hidePanelPlugin()" data-step="22" data-intro="Click me to hide the panel.">'+closeButton()+'</button>'));
+	$('.panel_plugin_title').html('<table class="panel_plugin_head"><tr><td>'+p.title+'&emsp;<span class="PanelPopupEvent"></span><span class="PanelKeyEvent" data-keycode="" data-alt="" data-ctrl="" data-shift=""></span><span id="PanelCloseEvent"></span><span id="PanelBuildEvent"></span></td><td style="text-align:right">'+ max+'<button onclick="hidePanelPlugin()" data-step="22" data-intro="Click me to hide the panel.">'+closeButton()+'</button></td></tr></table>'));
 	$('#panel_plugin').css("border-color", p.bordercolor).css('display', 'inline-table');
 	window.paneloverride = p.override;
     window.panelwidth = p.width;
@@ -78,11 +78,14 @@ function openPanelPlugin(percent, min, panel_id_name) {
     sizePanel(percent);
     $('#panel_plugin').animate({
         opacity:1,
-        width:(100/12*columnCount(percent,true))+"%",
+        width:"100%",
         marginTop:"-1px",
         paddingRight:"15px",
         paddingBottom:"50px",
     },100, function() {
+            $('#panel_plugin_content, .panel_plugin_head').animate({
+                width:(100/12*columnCount(percent,true))+"%"
+            },100);
         	sizePanel(percent);
 //            $('.panel_plugin_content').animate({
 //                width: (columnCount(percent, true)*10)+(Math.floor(window.innerWidth/100)-2)-24+"rem"
@@ -374,7 +377,7 @@ function RunPanelmain_Citation() {
 	//var out = "<div class='citationPanel_refresh' style='font-size:10pt;cursor:pointer;'>REFRESH</div>";
 
 	function populateCitations() {
-		var out = "<button class='citationPanel_new'>New Source</button><br>";
+		var out = "<button class='citationPanel_new textbutton'>New Source</button><br>";
 		for(i=0;i<citation.length;i++) {
 			if(citation[i] != undefined && citation[i] != "undefined") {
 				c = citation[i];
@@ -398,7 +401,7 @@ function RunPanelmain_Citation() {
 			}
 		}
 		if(citation.length == 0)
-			out += "<span style='font-size:20pt'>:(</span><br>You haven't added any citations.";
+			out += "&emsp;&emsp;<span style='font-size:28pt;font-weight:100;'>:(</span><br><br>You haven't added any citations.";
 		postPanelOutput(out);
 		$('.citationPanel_citation, .PanelUrl').on('click', function() {
             if($(this).attr('data-url') != undefined)
@@ -618,7 +621,7 @@ function StylePanelmain_Outline() {
 	$('.Outline').css('border', 'solid 1px black').css('width', '85%');
 } 
 function GetPanelmain_Filesys() {
-	return {title: '<span class="fa fa-folder-open" style="font-size:13pt"></span>&nbsp;My Documents', bordercolor: '#7f8c8d', width:25};
+	return {title: '<span class="fa fa-folder-open" style="font-size:15pt"></span>&nbsp;My Documents', bordercolor: '#7f8c8d', width:25};
 }
 function InitPanelmain_Filesys() {
 	$(document).on('keydown', function(e) {
@@ -628,8 +631,8 @@ function InitPanelmain_Filesys() {
 	});
 }
 function createNewFile() {
-    ht = "<input id='FileName' value='untitled'>&nbsp;.gltn&emsp;";
-    ht += "<input type='search' id='FormatFinder' placeholder='Choose a Format'><button id='FormatOk'>Create</button><br><span style='font-size:14pt;'>&emsp;Search for a Format</span><br><div id='FormatSearch' style='text-align:center'><div>";
+    ht = '<div class="row collapse"><div class="small-3 columns"><input type="text" value="untitled" /></div><div class="small-1 columns"><span class="postfix">.gltn</span></div>';
+    ht += "<div class='small-6 columns end'>&emsp;<input type='search' id='FormatFinder' style='width:40%;display:inline-block' placeholder='Choose a Format'>&ensp;<button id='FormatOk' class='textbutton' style='margin-left:30px;font-size:16pt;font-weight:400;'>Create</button></div></div><br><span style='font-size:14pt;'>&emsp;Search for a Format<br></span><br><div id='FormatSearch' style='text-align:center'><div>";
     fnc = function x() {
         function search(v) {
             arr = [];
@@ -784,7 +787,7 @@ function RunPanelmain_Filesys() {
 			sterm = "";
 		else
 			sterm = term.toLowerCase();
-		out = "<button class='textbutton' id='filesys_new'><span class='fa fa-plus'></span>&nbsp;New</button><input type='file' id='filesys_u' style='display:none' name='file[]'><button class='textbutton' id='filesys_up'><span class='fa fa-cloud-upload'>&nbsp;</span>Upload</button><br><span class='fa fa-search'></span>&nbsp;<input type='search' id='filesys_s' style='width:85%;display:inline' value='"+sterm+"'><table style='width:100%'><input type='hidden' id='filesys_file'>";
+		out = "<button class='textbutton' id='filesys_new'><span class='fa fa-plus'></span>&nbsp;New</button><input type='file' id='filesys_u' style='display:none' name='file[]'><button class='textbutton' id='filesys_up'><span class='fa fa-cloud-upload'>&nbsp;</span>Upload</button><br><span class='fa fa-search' style='font-size:16pt'></span>&nbsp;&nbsp;&nbsp;<input type='search' id='filesys_s' style='width:85%;display:inline' value='"+sterm+"'><table style='width:100%'><input type='hidden' id='filesys_file'>";
 		fstotal = 0;
 		for(i in localStorage){
 			c(i);
@@ -834,7 +837,7 @@ function RunPanelmain_Filesys() {
                         //console.error(e.message);
                     } 
                     //#2c3e50
-					out += "<tr><td class='tfile' style='background-color:#ecf0f1;border:solid 2px "+bgc+";padding-bottom:8px;width:98%;cursor:pointer;' data-v='"+i+"'><table style='font-size:7pt;font-family:sans-serif;width:100%;'><tr><td style='text-align:left'><span style='font-size:8pt' class='fa fa-file-text'></span>&nbsp;"+i+".gltn</td><td style='text-align:center;width:36px' class='Filesys_delete' data-f='"+i+"'>X</td></tr></table>";
+					out += "<tr><td class='tfile' style='background-color:"+bgc+"border:solid 2px "+bgc+";padding-bottom:8px;width:98%;cursor:pointer;' data-v='"+i+"'><table style='font-size:7pt;font-family:sans-serif;width:100%;'><tr><td style='text-align:left'><span style='font-size:8pt' class='fa fa-file-text'></span>&nbsp;"+i+".gltn</td><td style='text-align:center;width:36px' class='Filesys_delete' data-f='"+i+"'>X</td></tr></table>";
 					if(title != undefined)
 						out += "<div style='margin-left:3px'><b>"+title+"</b></div>";	
 					out += "<span style='font-size:8pt'>&emsp;"+xx.file.format+"&nbsp;&nbsp;"+xx.file.language+"&nbsp;&nbsp;"+fsout+"</span><br>";
@@ -853,7 +856,7 @@ function RunPanelmain_Filesys() {
 		}
 		out += "</table>";
 		fstotal += localStorage['settings'].length;
-		fstotalout = "<span style='font-size:10pt'>&emsp;"+getLocalStorageLength()+"KB stored</span>"
+		fstotalout = "<br><span style='font-size:10pt'>&emsp;"+getLocalStorageLength()+"KB stored</span>"
 		out += fstotalout;
 		post(out,term);
         jQuery("abbr.timeago").timeago();
@@ -880,8 +883,8 @@ function RunPanelmain_Find() {
 	out += "<input type='search' id='FindIn' placeholder='Find' style='width:95%'><br>";
 	out += "<input type='search' id='FindOut' placeholder='Replace With' style='width:95%'><br>";
 	out += "<span id='FindNum' style='font-size:10pt'></span><br>";
-	out += "<button id='FindApply'>Replace All</button>";
-	out += "<button id='FindCancel'>Cancel Changes</button>";
+	out += "<button id='FindApply' class='textbutton'>Replace All</button><br><br>";
+	out += "<button id='FindCancel' class='textbutton'>Cancel Changes</button>";
 	postPanelOutput(out);
 	window.cta = $('.content_textarea').html();
 	window.cta2 = $('.content_textarea').html();	
@@ -1075,7 +1078,7 @@ function RunPanelmain_Dictionary() {
 	if(window.settings.dictionarysort == undefined || window.settings.dictionarysort == "undefined")
 		window.settings.dictionarysort = window.settings.dictionary;
 	function openApp() {
-		out = "<input type='search' id='DictionaryIn' style='width:90%'><button id='DictionarySettings'><span class='fa fa-cog'></span></button>";
+		out = "<input type='search' id='DictionaryIn' style='width:65%;display:inline;'><button id='DictionarySettings'><span class='fa fa-cog'></span></button>";
 		out += "<div id='DictionaryOut'><span style='font-size:16pt'>Welcome</span><br>Search for something<br><br><br><div style='text-align:center;padding-left:80%;font-size:30pt;margin-top:25%;' class='fa-stack fa-lg'><span class='fa fa-circle-o fa-stack-2x'></span><span class='fa fa-quote-left fa-stack-1x'></span></div>";
 		out += "</div>";
 		postPanelOutput(out);	
@@ -1167,7 +1170,7 @@ function RunPanelmain_Dictionary() {
 		out += "Sort the dictionaries that you want to access, separated by a comma then a space.<br>";
 		out += "<input id='DictionarySort' value='"+window.settings.dictionarysort+"' style='width:95%'>";
 		//out += "<button id='DictionarySortSave'>Save Order</button>";
-		out += "<br><br><u>Accessible Dictionaries</u><ul style='margin-left:-20px;margin-top:0px;'>";
+		out += "<br><br><u>Accessible Dictionaries</u><ul style='margin-left:20px;margin-top:0px;'>";
 		var a = window.settings.dictionary.split(', ');
 		for(i in a) {
 			console.log('dictionary_'+a[i]);
@@ -1177,7 +1180,7 @@ function RunPanelmain_Dictionary() {
 			out += b[4]+" "+a[i]+"<br>";
 			console.log(b);
 		}	
-		out += "</ul><button id='DictionaryStore' onclick='launchStore()'>Download More Dictionaries</button>";
+		out += "</ul><button id='DictionaryStore' class='textbutton' onclick='launchStore()'>Download More Dictionaries</button>";
 		postPanelOutput(out);
 		$('#DictionaryBack').on('click', function() {
 			openApp();
@@ -1263,7 +1266,7 @@ function RunPanelmain_Themes() {
 			out += b[3]+"&nbsp;<span style='font-size:16pt'>"+b[1]+"</span>";
 			out += "</div>";
 		}
-		out += "<br><br><button onclick='launchStore()'>Download More Themes</button>";
+		out += "<br><br><button class='textbutton' onclick='launchStore()'>Download More Themes</button>";
 		postPanelOutput(out);
 		$('.ThemesCard').on('click', function() {
 			var c = $(this).attr('data-c');

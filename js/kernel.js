@@ -258,7 +258,7 @@ function initiateCitationEditor(q, hovertag, h2) {
     
 			ht = ht + "<div class='citationEditorBookpub citationInput'><input type='text' placeholder='Page #' style='width:4em' id='citationEditorIPage'>&nbsp;<input placeholder='Volume' style='width:5em' id='citationEditorIVolume'>&nbsp;<input type='text' placeholder='Edition' style='width:6em' id='citationEditorIEdition'>&nbsp;<input type='text' placeholder='Series' id='citationEditorISeries'>Referenced author?<input type='checkbox' id='citationEditorIMain' value='off'></div>";
     
-			ht = ht + "<div class='citationEditorAuthor citationInput'>Author: <input placeholder='First' class='citationEditorIAuthorFirst' id='citationEditorIAuthorFirst'>&nbsp;<input placeholder='M' style='width:2em' class='citationEditorIAuthorMiddle'' id='citationEditorIAuthorMiddle'>&nbsp;<input placeholder='Last' class='citationEditorIAuthorLast' id='citationEditorIAuthorLast'><span class='fa fa-plus-circle button' id='citationAddContributor'></span></div>";
+			ht = ht + "<div class='citationEditorAuthor citationInput'>Author: <input placeholder='First' class='citationEditorIAuthorFirst' id='citationEditorIAuthorFirst'>&nbsp;<input placeholder='M' style='width:2em' class='citationEditorIAuthorMiddle'' id='citationEditorIAuthorMiddle'>&nbsp;<input placeholder='Last' class='citationEditorIAuthorLast' id='citationEditorIAuthorLast'><button id='citationAddContributor'><span class='fa fa-plus-circle'> </span></button></div>";
     
 			ht = ht + "<div class='citationEditorPublication citationInput'>Publication: <input placeholder='Publisher' id='citationEditorIPublisher'>&nbsp;<input placeholder='City' id='citationEditorICity'>&nbsp;<input placeholder='Year' style='width:4em' id='citationEditorIYear'></div>";
     
@@ -271,7 +271,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 			ht = ht + "<div class='citationEditorMedium citationInput'> <input placeholder='Medium' id='citationEditorIMedium'></div>";
 			ht = ht + "<div class='citationEditorAbstract citationInput'>Type a summary of this work and how you used it in writing your document.<br><div contenteditable id='citationEditorIAbstract' style='height:3em;border:solid 1px #999;'></div></div>";
 			ht = ht + "<datalist id='citationContributorTypes'><option>Author</option><option>Editor</option><option>Translator</option></datalist><datalist id='citationAutoTitle'></datalist>"			
-			ht = ht + "<button style='' id='citationEditorSave'>Save</button>";
+			ht = ht + "<button style='' class='textbutton' id='citationEditorSave'>Save</button>";
 		
 		var fnc = function x() {
             $('#citationEditorIType').focus();
@@ -521,6 +521,10 @@ function initiateCitationEditor(q, hovertag, h2) {
 }
 
 function citationHovertag(recall) {
+    formatHovertag('citation', 'citation[$(this).attr("data-id")].Title', 'initiateCitationEditor(undefined,$(this).attr("data-i")) ');
+//    formatHovertag('citation', "'citation[$(this).attr(\"data-id\")].Title'", "'initiateCitationEditor(undefined,$(this).attr(\"data-i\"))'");
+}
+function citationHovertag2(recall) {
 	/*$('.citation').off('hover');
 	$('.citation').on('hover', function() {
 		alert(5);
@@ -544,7 +548,42 @@ function citationHovertag(recall) {
 	}
 }
 //'
+//Using the new Tooltips 
 function formatHovertag(classname, textcode, action, recall) {
+    $('.'+classname).off();
+    $('.'+classname).removeClass("has-tip");
+    $('.'+classname).attr('data-tooltip', 'true');
+    $('.'+classname).addClass('has-tip');
+   
+    $('.'+classname).attr('data-title', textcode);
+    $('.'+classname).attr('data-action', action);
+    $('.'+classname).attr('data-options', "disable_for_touch:true");
+    $('.'+classname).on('click', function() {
+        eval($(this).attr('data-action')); 
+    });
+    //TODO Remove such a tip beforehand to prevent overflow
+    $('.tooltip[data-selector="'+classname+'"]').remove();
+    $('body').append(Foundation.libs.tooltip.settings.tip_template(classname, textcode));
+//    console.log($('.'+classname));
+    $('.'+classname).hover(function() {
+//        console.log("H");
+        classname = $(this).attr('class').split(' ')[0];
+        Foundation.libs.tooltip.showTip($('.tooltip[data-selector="'+classname+'"]'));
+//        console.log($('.tooltip[data-selector="'+classname+'"]'));
+        console.log($(this).attr('data-title'));
+        txt = $(this).attr('data-title'); 
+     try {
+            txt = eval($(this).attr('data-title'));   
+     } catch(e) {
+            console.error(e.message);  
+     }
+        $('.tooltip[data-selector="'+classname+'"]').css('top', $(this).offset().top+30).css('left', $(this).offset().left+8).html( $(Foundation.libs.tooltip.settings.tip_template(classname, txt)).html());
+    }, function() {
+        classname = $(this).attr('class').split(' ')[0];
+        Foundation.libs.tooltip.hide($('.tooltip[data-selector="'+classname+'"]'));
+    });
+}
+function formatHovertag2(classname, textcode, action, recall) {
 	/*for(i in hovertagRegistrar) {
 		if(hovertagRegistrar[i].classname == classname && recall != true)
 			return;	

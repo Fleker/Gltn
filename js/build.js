@@ -1007,7 +1007,7 @@ console.log(d);
         //.children()[0];
 //        console.log("! FRAC");
 //        console.log(frac);
-//        $(frac).css('width', den).css('color', 'black').css('border', 'solid 2px').css('background-color', 'black').css('top', '-1.096em').css('height', '15px');
+        $(frac).css('width', den).css('color', 'black').css('border', 'solid 2px').css('background-color', 'black').css('top', '-1.096em').css('height', '15px');
 //        .css('top', '-1.096em').css('height', '11px');
     
     }

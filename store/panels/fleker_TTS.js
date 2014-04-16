@@ -8,7 +8,7 @@ function GetPanelfleker_TTS() {
 }
 function RunPanelfleker_TTS() {
 //    window.tts = new GoogleTTS('');
-    postPanelOutput("It helps a writer when one's writing is spoken. This allows a better understanding of flow and perspective to one's audience. If you want, your computer can speak your essay. Just sit back and listen.<br><br><button id='startTTS'>Start Speaking</button>");
+    postPanelOutput("It helps a writer when one's writing is spoken. This allows a better understanding of flow and perspective to one's audience. If you want, your computer can speak your essay. Just sit back and listen.<br><br><button id='startTTS' class='textbutton'>Start Speaking</button>");
     $('#startTTS').on('click', function() {
         speechSynthesis.cancel();
         var output = $('.content_textarea').html().toLowerCase().trim().replace(/<kbd class="latex.*<\/kbd>/g, "").replace(/></g, "> <").replace(/<[^>]*>/g, "").replace(/"/g, "").replace(/&nbsp;/g, " ");

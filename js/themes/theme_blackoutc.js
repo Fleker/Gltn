@@ -51,8 +51,9 @@ function runThemeSettings() {
        theme.ribbonhighlight = $(this).val(); 
         writeToSettings('ribbonhighlight', $(this).val());
         
-writeCss("button:hover {	background-color:"+theme.ribbonhighlight+";color:black;}button:active {	position:relative;	top:1px;}");
-writeCss("button.ribbonbutton:hover {	background-color:"+theme.ribbonhighlight+";color:black;}button:active {	position:relative;	top:1px;}");
+        writeCss("button:hover {	background-color:"+theme.ribbonhighlight+";color:black;}button:active {	position:relative;	top:1px;}");
+        writeCss("button.ribbonbutton:hover {	background-color:"+theme.ribbonhighlight+";color:black;}button:active {	position:relative;	top:1px;}");
+        writeCss("::selection {color:white;background:"+theme.ribbonhighlight+";}::-moz-selection {color:white;background:"+theme.ribbonhighlight+";}");
     });   
 }
 initTheme();
@@ -66,6 +67,9 @@ writeCss("@import url(http://fonts.googleapis.com/css?family=Roboto+Condensed:30
 setLoaderColor('255,255,255');
 writeCss("button.textbutton {	background-color:"+theme.normcolor+";	border-radius:3;	text-indent:0;	border:1px solid #888;	display:inline-block;	color:"+theme.normbg+";	font-weight:bold;	font-style:normal;	text-decoration:none;	text-align:center;padding:3px;min-width:30px;}");
 writeCss("button.ribbonbutton { padding-top:2px;height:77px; }");
+writeCss(".ribbonbutton { padding-top:2px;height:77px; }");
 writeCss("button { background-color:transparent }");
 writeCss("button:hover {	background-color:"+theme.ribbonhighlight+";color:black;}button:active {	position:relative;	top:1px;}");
 writeCss("button.ribbonbutton:hover {	background-color:"+theme.ribbonhighlight+";color:black;}button:active {	position:relative;	top:1px;}");
+
+writeCss("::selection {color:white;background:"+theme.ribbonhighlight+";}::-moz-selection {color:white;background:"+theme.ribbonhighlight+";}");

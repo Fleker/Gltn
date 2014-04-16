@@ -348,7 +348,7 @@ function setHeader() {
 		),
         /* <input type='text' id='file_name' style='width:7em'><span class='postfix'>.gltn</span><button id='file_name_con' disabled='true'>Save As</button><input type='hidden' id='file_name_internal'>"*/
 		File: new Array(
-			{group: "", value:'<div class="row collapse" style="margin-top:-6px"><div class="small-5 columns"><input type="text" value="'+fileid+'" /></div><div class="small-1 columns"><span class="postfix">.gltn</span></div><div class="small-2 columns end"><input type="hidden" id="file_name_internal"><button id="file_name_con" disabled="true">Rename</button></div></div>'},
+			{group: "", value:'<div class="row collapse" style="margin-top:6px"><div class="small-5 columns"><input type="text" value="'+fileid+'" /></div><div class="small-1 columns"><span class="postfix">.gltn</span></div><div class="small-2 columns end"><input type="hidden" id="file_name_internal"><button id="file_name_con" class="textbutton" disabled="true">Rename</button></div></div>'},
 			{text: 'Compile & Export', img: '<span style="font-size:18pt" class="fa fa-file"></span>', action: "startBuild();setTimeout('exitintro();', 1000);", key: "Alt+B"},
 			{text: 'Share', img: '<span style="font-size:18pt" class="fa fa-code-fork"></span>', action: "getShare();"}
 		),

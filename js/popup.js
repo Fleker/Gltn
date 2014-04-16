@@ -9,7 +9,7 @@ function initiatePopup(data) {
 	//Opens popup, designs framework
 //    $('.popup').css('left', '30%').css('width', '0%').css('top', '40%').css('height', '0%');
 //    $('#myModal').html('<div class="popupcontent"></div>');
-	$('#myModal').html('<div style="width:100%;text-align:right"><a class="close-reveal-modal">&#215;</a></div><table style="width:100%;vertical-align:top;" class="popupstatic"><tr><td style="vertical-align:top;width:100%;"><span class="popuptitle"></span><span class="popupsubtitle"></span><div class="popupbody"></div></td><td style="text-align:right"><img id="popupimg" src=""></img></td></tr></table><div class="popupcontent"></div>');
+	$('#myModal').html('<div style="width:100%;text-align:right"><button class="close-reveal-modal" style="color:inherit;font-size:1.5em">&#215;</button></div><table style="width:100%;vertical-align:top;" class="popupstatic"><tr><td style="vertical-align:top;width:100%;"><span class="popuptitle"></span><span class="popupsubtitle"></span><div class="popupbody"></div></td><td style="text-align:right"><img id="popupimg" src=""></img></td></tr></table><div class="popupcontent"></div>');
 //	$('.popuptop').html('<div style="width:100%;text-align:right"><button onclick="closePopup()">'+closeButton()+'</button></div><table style="width:100%;vertical-align:top;" class="popupstatic"><tr><td style="vertical-align:top;width:100%;"><span class="popuptitle"></span><span class="popupsubtitle"></span><div class="popupbody"></div></td><td style="text-align:right"><img id="popupimg" src=""></img></td></tr></table><div class="popupcontent2" style="margin-left:4px;height:100px"><div class="popupcontent"></div></div>');
 	if(data.title != undefined)
 		$('.popuptitle').html(data.title+"<br>");

@@ -59,6 +59,7 @@ ga('send', 'pageview');
 <!-- Mark as Offline -->
     <script src="js/foundation/foundation.js"></script>
     <script src="js/foundation/foundation.reveal.js"></script>
+    <script src="js/foundation/foundation.tooltip.js"></script>
     <script src="js/foundation/vendor/fastclick.js"></script>
     <script src="js/foundation/vendor/modernizr.js"></script>
     <link rel="stylesheet" href="css/normalize.css">
@@ -98,7 +99,7 @@ ga('send', 'pageview');
       </div>
       
       <div id="panel_plugin" class="small-0 columns">  
-        <div class="panel_plugin_title"></div>
+        <div class="panel_plugin_title" style="margin-top:-15px"></div>
         <div class="panel_plugin_content"></div>
       </div>
 </div>
@@ -124,7 +125,7 @@ ga('send', 'pageview');
   <h2>Awesome. I have it.</h2>
   <p class="lead">Your couch.  It is mine.</p>
   <p>Im a cool paragraph that lives inside of an even cooler modal. Wins</p>
-  <a class="close-reveal-modal">&#215;</a>
+  <button class="close-reveal-modal">&#215;</button>
 </div>
 
 <div class="hovertag">

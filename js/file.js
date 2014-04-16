@@ -56,7 +56,21 @@ document.ready = function() {
           'visibility': 'hidden',
           'display': 'none'
         }
-      }
+      },
+    });
+    $(document).foundation({
+        tooltips: {
+            selector : '.has-tip',
+            additional_inheritable_classes : [],
+            tooltip_class : '.tooltip',
+            touch_close_text: 'tap to close',
+            disable_for_touch: false,
+            tip_template : function (selector, content) {
+              return '<span data-selector="' + selector + '" class="'
+                + Foundation.libs.tooltip.settings.tooltip_class.substring(1)
+                + '">' + content + '<span class="nub"></span></span>';
+            }
+          } 
     });
     x = {};
     //Setup Filepicker
@@ -414,7 +428,7 @@ function finishRestore2(full) {
     hovertagRegistrar = hovertagRegistrarTemp;
     console.log("The temp registrar contains "+hovertagRegistrarTemp.length+" items");
 	recallHovertags(hovertagRegistrar);
-	setInterval("recallHovertags(hovertagRegistrar);",1000);
+//	window.hovertagregistrarinterval = setInterval("recallHovertags(hovertagRegistrar);",1000);
 	postWordCount();
 	initNiftyUI4Saving();
 	if(window.offline != true && !full)
