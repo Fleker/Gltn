@@ -116,7 +116,6 @@ span, div, body {
 	vertical-align:top;
 }
 #panel_plugin {
-	width: 0%;	
 	display:none;
 	background-color:#eee;
 	border:solid 1px black;
@@ -133,7 +132,7 @@ table {
 	font-weight: bold;
     margin-top: -25px;
     padding-bottom: 20px;
-    width:110%;
+/*    width:110%;*/
 }
 button[disabled] {
     background-color: inherit;

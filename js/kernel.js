@@ -181,7 +181,20 @@ function initiateCitationEditor(q, hovertag, h2) {
 				q = '';
             //var range = rangy.getSelection();
 			var range = getRange();
-			citei = citationi;
+    
+            function getCitationi() {
+                if($('.citation').length == 0)
+                    return 0;
+                var i = 0;
+                $('.citation').each(function(N, E) {
+                    var int = parseInt($(E).attr('id').split(' ')[0].match(/\d+/g)[0])+1;
+                    if(int > i)
+                        i = int;
+                });
+                return i;   
+            } 
+            
+			citei = getCitationi();
 			citeid = citation.length+1;
 			window.citationrestore = false;
 			if(range.toHtml().length == 0 && hovertag == undefined && q != "panelonly") {
@@ -306,7 +319,9 @@ function initiateCitationEditor(q, hovertag, h2) {
 							$('#citationEditorIAuthorLast').first().attr('placeholder', citation[i].AuthorLast).css('border-color','#d35400');
 							$('#citationEditorIEdition').attr('placeholder', citation[i].Edition).css('border-color', '#d35400');
 						}
+//                        console.log("!undefined");
 					}
+//                    console.log(i);
 				}
 			});	
 			function getCitationI(index) {
@@ -582,6 +597,20 @@ function formatHovertag(classname, textcode, action, recall) {
         classname = $(this).attr('class').split(' ')[0];
         Foundation.libs.tooltip.hide($('.tooltip[data-selector="'+classname+'"]'));
     });
+    
+    if(recall != true && recall != "true") { 
+        include = true;
+        for(i in hovertagRegistrar) {
+            console.log("!-!", hovertagRegistrar[i].classname, classname, hovertagRegistrar[i].classname == classname);
+            if(hovertagRegistrar[i].classname == classname) {
+                include = false;
+            }
+        }
+        if(include) {
+		  hovertagRegistry(classname, textcode, action);
+        }
+        console.log(classname, recall);
+    }
 }
 function formatHovertag2(classname, textcode, action, recall) {
 	/*for(i in hovertagRegistrar) {

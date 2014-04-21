@@ -1189,6 +1189,7 @@ function initContext() {
 
 function parseCT() {
 	var r = new RegExp('<span class="context" [^>]*>([\\s\\S]+?)</span>', 'gi');
+    $('.content_textarea span').each(function() {/* if($(this).attr('class') == undefined)*/ $(this).css('line-height','inherit').css('background-color','inherit').css('font-size','inherit').css('font-family', 'inherit') })
 	try {
 		saveSelection();
 		var a = $('.content_textarea').html();
@@ -1196,14 +1197,14 @@ function parseCT() {
    		a = a.replace(r, '$1');
         //Infamous White background bug and similar DIES
 //        a = a.replace(/<span [^c][^l][^a][^s][^s][^>]*>(.*)<\/span>/g, "$1");
-        $('.content_textarea span').each(function() { if($(this).attr('class') == undefined) $(this).css('line-height','inherit').css('background-color','inherit').css('font-size','inherit') })
+        
        		a = a.replace(/<\/span><\/div>/g, "</span>&nbsp;</div>");
        		a = a.replace(/<\/span><\/kbd>/g, "</span>&nbsp;</kbd>");
        		a = a.replace(/<\/kbd><\/kbd>/g, "</kbd>&nbsp;</kbd>");
         	a = a.replace(/<\/span>([\w])/g, "</span>&nbsp;$1");
         	a = a.replace(/<\/kbd>([\w])/g, "</span>&nbsp;$1");
         	a = a.replace(/<\/div>([\w])/g, "</span>&nbsp;$1");
-		a = a.replace(/(<span [^<]+? class="rangySelectionBoundary" [^<]+?>........)&nbsp;/g, "$1"); 
+		    a = a.replace(/(<span [^<]+? class="rangySelectionBoundary" [^<]+?>........)&nbsp;/g, "$1"); 
         	a = a.replace(/<\/kbd><\/div>/g, "</kbd>&nbsp;</div>");
         	a = a.replace(/<\/div><\/div>/g, "</div>&nbsp;</div>");
 

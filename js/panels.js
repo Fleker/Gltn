@@ -51,7 +51,7 @@ function runPanel(panel_id_name) {
         max = "<span class='PanelMaximizeEvent' data-status='0'></span><button onclick='maximizePanel()'><span class='fa fa-arrows-alt'></span></button>";
     }
     console.log(max);
-	$('.panel_plugin_title').html('<table class="panel_plugin_head"><tr><td>'+p.title+'&emsp;<span class="PanelPopupEvent"></span><span class="PanelKeyEvent" data-keycode="" data-alt="" data-ctrl="" data-shift=""></span><span id="PanelCloseEvent"></span><span id="PanelBuildEvent"></span></td><td style="text-align:right">'+ max+'<button onclick="hidePanelPlugin()" data-step="22" data-intro="Click me to hide the panel.">'+closeButton()+'</button></td></tr></table>'));
+	$('.panel_plugin_title').html('<table class="panel_plugin_head"><tr><td>'+p.title+'&emsp;<span class="PanelPopupEvent"></span><span class="PanelKeyEvent" data-keycode="" data-alt="" data-ctrl="" data-shift=""></span><span id="PanelCloseEvent"></span><span id="PanelBuildEvent"></span></td><td style="text-align:right">'+ max+'<button onclick="hidePanelPlugin()" data-step="22" data-intro="Click me to hide the panel.">'+closeButton()+'</button></td></tr></table>');
 	$('#panel_plugin').css("border-color", p.bordercolor).css('display', 'inline-table');
 	window.paneloverride = p.override;
     window.panelwidth = p.width;
@@ -78,14 +78,13 @@ function openPanelPlugin(percent, min, panel_id_name) {
     sizePanel(percent);
     $('#panel_plugin').animate({
         opacity:1,
-        width:"100%",
         marginTop:"-1px",
         paddingRight:"15px",
         paddingBottom:"50px",
     },100, function() {
-            $('#panel_plugin_content, .panel_plugin_head').animate({
+           /* $('#panel_plugin, .panel_plugin_head').animate({
                 width:(100/12*columnCount(percent,true))+"%"
-            },100);
+            },100);*/
         	sizePanel(percent);
 //            $('.panel_plugin_content').animate({
 //                width: (columnCount(percent, true)*10)+(Math.floor(window.innerWidth/100)-2)-24+"rem"
@@ -111,9 +110,9 @@ function sizePanel(percent, refresh) {
     if(percent == 0)
         $('#panel_content').attr('class', 'columns large-'+(12-columnCount(percent, true))+" small-"+(12-columnCount(percent, true))+" medium-"+(12-columnCount(percent, true)));
     else
-        $('#panel_content').attr('class', 'columns large-'+(12-columnCount(percent, true))+" small-"+(9-columnCount(percent, true))+" medium-"+(10-columnCount(percent, true)));
+        $('#panel_content').attr('class', 'columns large-'+(12-columnCount(percent, true))+" small-"+(7-columnCount(percent, true))+" medium-"+(10-columnCount(percent, true)));
     setTimeout(function() {
-        $('#panel_plugin').attr('class', 'columns end large-'+columnCount(percent, true)+' small-'+columnCount(percent, true));
+        $('#panel_plugin').attr('class', 'columns end large-'+columnCount(percent, true)+' small-'+columnCount(percent+40, true)+' medium-'+columnCount(percent+16, true));
     }, 50);
     //animateContentPanel((window.innerWidth - $('#panel_plugin').width() - 35)+"px");
 			
@@ -183,7 +182,7 @@ function populatePanelPlugin(panel_id_name) {
 	} catch(e) {
 		
 	}
-	$('.panel_plugin_content').css('height', (window.innerHeight-127-50)+"px").css('overflow-y', 'auto');
+	$('.panel_plugin_content').css('height', (window.innerHeight-127-60)+"px").css('overflow-y', 'auto');
 }
 function openPanelResearch() {
 	initResearch();	
@@ -429,34 +428,54 @@ function GetPanelmain_Idea() {
 function RunPanelmain_Idea() {
 	function populateIdeas() {
 		
-		out = "<div style='background-color: "+theme.normbg+";border: solid 1px;padding-left: 12px;padding-right: 0px;border-color: #aaa;color: "+theme.coloralt+";padding-top: 6px;width: 94%;' id='PANELIDEA'><u>General Notes</u><br><textarea class='PanelIdea' style='font-family:serif; background-color:"+theme.normbg+";color:"+theme.coloralt+";min-height:2em;' data-id='-1'></textarea></div>";
+		out = "<div style='background-color: "+theme.normbg+";border: solid 1px;padding-left: 12px;padding-right: 0px;border-color: #aaa;color: "+theme.coloralt+";padding-top: 6px;width: 94%;' id='PANELIDEA'><u>General Notes</u><br><textarea class='PanelIdea' style='background-color:"+theme.normbg+";color:"+theme.coloralt+";min-height:2em;' data-id='-1'></textarea></div>";
+        j = 0;
 		for(i in citation) {
-			if(citation[i] != "undefined")
-				out = out+"<hr><div style='background-color: "+theme.normbg+";border: solid 1px;padding-left: 12px;padding-right: 0px;border-color: #aaa;color:"+theme.coloralt+";padding-top: 6px;width: 94%;'><u>"+citation[i].Title+"</u><br><textarea class='PanelIdea' data-id='"+i+"' style='font-family:serif; background-color:"+theme.normbg+";color:"+theme.coloralt+"'></textarea></div>";
+			if(citation[i] != "undefined" && citation[i] != undefined) {
+//                console.log(j,i,citation[i]);
+				out = out+"<hr><div style='background-color: "+theme.normbg+";border: solid 1px;padding-left: 12px;padding-right: 0px;border-color: #aaa;color:"+theme.coloralt+";padding-top: 6px;width: 94%;'><u>"+citation[i].Title+"</u><br><textarea class='PanelIdea' data-id='"+j+"' style='background-color:"+theme.normbg+";color:"+theme.coloralt+"'></textarea></div>";
+                j++;
+            }
 		}
 		postPanelOutput(out);
 		//Now we have to fill in our contentfilesy
-		$('.PanelIdea[data-id=-1]').val(decodeURIComponent(ideadefault));
-		$('.PanelIdea[data-id=-1]').css('height', decodeURIComponent(ideadefault).split(' ').length/15+"em");
-		for(i in citation) {
-			var v = decodeURIComponent(idea[i]);
-			if(v == undefined || v == "undefined")
-				v = "";
-			var h = v.split(' ').length/15;
-			if(h < 2)
-				h = 2;
-			$('.PanelIdea[data-id='+i+']').val(v);
-			$('.PanelIdea[data-id='+i+']').css('height', h+"em");
-		}
-	
+//		$('.PanelIdea[data-id=-1]').val(decodeURIComponent(ideadefault));
+//		$('.PanelIdea[data-id=-1]').css('height', decodeURIComponent(ideadefault).split(' ').length/10+"em");
+		reHeight();
+        
 		$('.PanelIdea').on('input', function() {
 			var id = $(this).attr('data-id');
 			if(id >= 0) 
 				idea[id] = encodeURIComponent($(this).val());
 			else if(id == -1)
 				ideadefault = encodeURIComponent($(this).val());
+            markAsDirty();
 		});
+        $('.PanelIdea').focusin(function() {
+           reHeight(); 
+        });
 	}
+    function reHeight() {
+        $('.idea_div').show();
+        for(i=-1;i<idea.length;i++) {
+            //To grab the logical pixel height of a textarea, the text must first be placed in a DIV, then the height of that is grabbed
+            //From http://www.impressivewebs.com/textarea-auto-resize/
+            if($('.idea_div').length == 0)
+                $('.panel_plugin_content').append('<div class="idea_div" style="border:solid 1px; padding-left:12px; padding-right:0px; padding-top:6px; width: 84%; font-size:0.875rem; word-wrap: break-word;"></div>');
+            if(i == -1)
+                var v = decodeURIComponent(ideadefault);
+            else
+                var v = decodeURIComponent(idea[i]);
+			if(v == undefined || v == "undefined")
+				v = "";
+			$('.idea_div').html(v.replace(/\n/g, '<br>'));
+			$('.PanelIdea[data-id='+i+']').val(v);
+            console.log($('.idea_div'),$('.idea_div').height());
+			$('.PanelIdea[data-id='+i+']').css('height', $('.idea_div').height()+24+"px");
+		}
+	    $('.idea_div').hide();
+           
+    }
 	$('.PanelPopupEvent').on('click', function() {
 		populateIdeas();
 	});
@@ -486,7 +505,7 @@ function RunPanelmain_Outline() {
 		range = obtainRange();
 	function generatePanel() {
 		ht = "<div id='outlineButtons'><button id='outlineBuild'><span class='fa fa-file'></span></button>&nbsp;Use '-' to denote levels.</div>";
-		ht += "<div style='overflow-y:auto;/*height:"+(window.innerHeight-215)+"px*/'><div contenteditable='true' style='background-color:"+theme.normbg+";color:"+theme.normcolor+"' class='Outline'>"+outline;+"</div></div>";
+		ht += "<div style='overflow-y:auto;/*height:"+(window.innerHeight-215)+"px*/'><div contenteditable='true' style='line-height:1.5em;background-color:"+theme.normbg+";color:"+theme.normcolor+"' class='Outline'>"+outline;+"</div></div>";
 		postPanelOutput(ht);
 		$('.Outline').on('input', function() {
 			writeToSaved('main_outline', $('.Outline').html());

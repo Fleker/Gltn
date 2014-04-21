@@ -1,5 +1,5 @@
 ﻿builddate = 0;
-buildPrint = '<button onclick="window.print()" class="noprint"><span class="fa fa-print"></span></button><button onclick="printHelp()" class="noprint"><span class="fa fa-question"></span>&nbsp;Print Help</button><button onclick="convertDoc()" class="noprint">Convert</button>';
+buildPrint = '<button onclick="window.print()" class="noprint textbutton"><span class="fa fa-print"></span></button><button onclick="printHelp()" class="noprint textbutton"><span class="fa fa-question"></span>&nbsp;Print Help</button><button onclick="convertDoc()" class="noprint textbutton">Convert</button>';
 function falseBuild(printr) {
 	window.section_name = "";
 	$('.build').fadeIn(500);
@@ -21,7 +21,7 @@ function startBuild(el) {
 	//$('.page').css('width','8.5in');
 	window.section_name = "";
 	$('#searching').val('');
-	$('.build').html('<span class="buildRow"><button onclick="exitBuild()"><span class="fa fa-angle-left"></span>&nbsp;Editor</button>'+buildPrint+'</span><span class="buildtime noprint" style="font-size:9pt"></span>');
+	$('.build').html('<span class="buildRow"><button onclick="exitBuild()" class="textbutton"><span class="fa fa-angle-left"></span>&nbsp;Editor</button>'+buildPrint+'</span><span class="buildtime noprint" style="font-size:9pt"></span>');
         
 		//$('.build_progress').css('display', 'block').css('position', 'fixed').css('width', '50%').css('height', '50%').css('top','25%').css('left','25%').css('background-color', 'rgba(0,0,0,0.3)').css('font-size','16pt').css('margin-top','10%');
 	initiatePopup({title:"Compilation Progress",bordercolor:"rgb(44, 145, 16)",ht:"<div id='build_progress' class='build_progress' style=''></div>"});
@@ -34,7 +34,7 @@ function startBuild(el) {
             updateBuildProgress("<span style='color:#c00'>Error Building: "+e.message+"</span>");
             console.error(e.message);
         }
-    },500);
+    },100    );
     
     //Search for all services and see if any of them support the ExportFile{panel} function which will let them add an export option
     var a = window.settings.panels.split(', ');
@@ -152,11 +152,12 @@ function continueBuild(el) {
 function updateBuildProgress(text) {
     setTimeout(function() {
 	   $('.build_progress').empty();
-        $('.build_progress').append(text);}, 10);
+        $('.build_progress').append(text);
+    }, 10);
 }
 function finishBuild() {
 	//$('.build_progress').css('display', 'none');
-	closePopup();
+	setTimeout("closePopup(false);",1000);
 	$('.header').hide(1000);
 	window.scrollTo(0,0);
 		//stopgf;

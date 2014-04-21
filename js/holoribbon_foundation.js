@@ -23,7 +23,7 @@ function newRibbon(element, ribbon) {
     
 	out = '';
     for(i in keys) {
-        out = out + '<div class="ribbongroup row" style="text-align:center;"><div class="small-12 small-centered column"><div class="row">';
+        out = out + '<div class="ribbongroup row" style="text-align:center;"><div class="small-12 '+ribbon[keys[i]].length+' small-centered column"><div class="row">';
         for(j in ribbon[keys[i]]) {
             var k = ribbon[keys[i]][j];
 			var classname = "ribbonbutton column small-"+columnCount(100/ribbon[keys[i]].length, true)+" "+((j == ribbon[keys[i]].length - 1)?"end":"");

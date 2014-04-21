@@ -157,7 +157,8 @@ function saveFile() {
 	obj.idea = idea;
 	obj.ideadefault = ideadefault;
 	obj.hovertagRegistrar = hovertagRegistrar;
-	obj.file = {};
+    if(obj.file == undefined)
+	   obj.file = {};
 	obj['file']['format'] = $('#file_format').val();
 	obj['file']['language'] = $('#file_language').val();
 	obj['file']['tags'] = $('#file_tags').val();
@@ -526,7 +527,12 @@ function initNiftyUI4Saving() {
 }
 function markAsDirty() {
     $('.content_save').html("<span class='fa fa-file-text' style='color:"+window.theme.coloralt+"'></span>&nbsp;<span class='fa fa-pencil' style='color:"+window.theme.coloralt+"'></span>");
-         window.dirty = true;
+    try {
+        jsonsave.gluten_doc.file.last_modified = new Date().getTime();
+    } catch(e) {
+        
+    }
+    window.dirty = true;
         if(isCloudSaved())
             initService("main_Sync", "Syncing Online...", "<span style='border-radius:100%'><span class='fa fa-cloud-upload'></span>&nbsp;<i class='fa fa-refresh fa-spin'></i><span>");   
 }
