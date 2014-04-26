@@ -29,12 +29,14 @@ function startBuild(el) {
 	updateBuildProgress('Beginning to Compile...');
 	setTimeout(function() {
         try {
+              
             continueBuild(el);  
         } catch(e) {
             updateBuildProgress("<span style='color:#c00'>Error Building: "+e.message+"</span>");
             console.error(e.message);
         }
-    },100    );
+    },500    );
+    setTimeout('updateBuildProgress("Compiling...");',400);
     
     //Search for all services and see if any of them support the ExportFile{panel} function which will let them add an export option
     var a = window.settings.panels.split(', ');
@@ -89,6 +91,9 @@ function convertDoc() {
 }
 
 function continueBuild(el) {
+    window.build_ln = new Array();
+    window.build_fn = new Array();
+    window.build_volume = new Array();
 	//Duplicate paper  
     updateBuildProgress("Starting to Build...");
 	var cta = false;
@@ -157,7 +162,7 @@ function updateBuildProgress(text) {
 }
 function finishBuild() {
 	//$('.build_progress').css('display', 'none');
-	setTimeout("closePopup(false);",1000);
+	setTimeout("closePopup();",1000);
 	$('.header').hide(1000);
 	window.scrollTo(0,0);
 		//stopgf;
@@ -308,7 +313,7 @@ function citationFormatted(string, i, id, page, cob) {
 	//Insert a citation content_formatted object and return it with properties filled in
 	//console.log(string, id);
 	//console.warn(citation[id]);
-	console.error(string, id, page, cob);
+//	console.error(string, id, page, cob);
 //	if(page != undefined) {
 	//	main = page.split("|")[1];
 		//page = page.split("|")[0];
@@ -317,7 +322,9 @@ function citationFormatted(string, i, id, page, cob) {
         if(typeof(citation[id].Contributors) == "string")
             citation[id]["Contributors"] = [citation[id]['Contributors']];
 	if(cob != undefined) {
-		var ln = new Array();
+        
+        
+		/*var ln = new Array();
 		var fn = new Array();
 		var volumes = new Array();
 		for(i=0;i<citation.length;i++) {
@@ -335,7 +342,9 @@ function citationFormatted(string, i, id, page, cob) {
 					}
 				}
 			}
-		}
+		}*/
+        
+        
 		//Get the number of authors for this source
 			var sourceauthors = 0;
 			var sourceauthorsarray = new Array();
@@ -366,11 +375,11 @@ function citationFormatted(string, i, id, page, cob) {
 		
 		
 		if(citation[id].AuthorFirst.length || citation[id].AuthorLast.length) {
-			console.log("sourceauthorsarray");
-			console.log(sourceauthorsarray);
+//			console.log("sourceauthorsarray");
+//			console.log(sourceauthorsarray);
 			if(!citation[id].AuthorLast.length && citation[id].AuthorFirst.length) {
 				string = string.replace(/cAUTHOR/, cob.firstonlyauthor.replace(/AUTHOR_FIRST/, citation[id].AuthorFirst).replace(/AUTHOR_FIRST_I/, citation[id].AuthorFirst.substr(0,1)).replace(/AUTHOR_LAST/g, citation[id].AuthorLast));
-			} else if(ln.indexOf(citation[id].AuthorLast) > -1 && ln.indexOf(citation[id].AuthorLast) == fn.indexOf(citation[id].AuthorFirst)) {
+			} else if(build_ln.indexOf(citation[id].AuthorLast) > -1 && build_ln.indexOf(citation[id].AuthorLast) == build_fn.indexOf(citation[id].AuthorFirst)) {
 				string = string.replace(/cAUTHOR/, cob.sameauthor.replace(/AUTHOR_FIRST/, citation[id].AuthorFirst).replace(/AUTHOR_FIRST_I/, citation[id].AuthorFirst.substr(0,1)).replace(/AUTHOR_LAST/g, citation[id].AuthorLast));
 			} else if(sourceauthors == 2) {
 				console.log(string);
@@ -487,6 +496,11 @@ function citationFormatted(string, i, id, page, cob) {
 			string = string.replace(/cPAGE/g, cob.page.replace(/PAGE/g, page));
 		else
 			string = string.replace(/cPAGE/g, "");
+        
+        build_fn.push(citation[id].AuthorFirst);
+        build_ln.push(citation[id].AuthorLast);
+        build_volume.push(citation[id].Title);
+        
 	}
 	if(typeof(citation[id]['ContributorsFirst']) == "string")
 					citation[id]['ContributorsFirst'] = [citation[id]['ContributorsFirst']];
@@ -521,7 +535,7 @@ function citationFormatted(string, i, id, page, cob) {
 		string = string.replace(/PAGE/g, page);	
 	else
 		string = string.replace(/ PAGE/g, "");
-	console.log(string);
+//	console.log(string);
 	return string;	
 	} catch(e) {
 		console.log(e.stack);
@@ -736,7 +750,7 @@ function post_content_formatting(object) {
 			$(this).html($(this).html().replace(/ /g,'</'+erray[ele]+'>&nbsp;<'+erray[ele]+' style="'+s+'">'));
 		});
 	}*/
-	console.warn($('.draft').html());
+//	console.warn($('.draft').html());
 	/*$('.draft > span > div').each(function() {
 		$(this).html($(this).html().replace(/ /g,'===').replace(/ /g,"~~~"));
 	});
@@ -746,10 +760,15 @@ function post_content_formatting(object) {
 	});*/
     /*** PARAGRAPH DETECTION ***/
     console.log($('.draft').html());
+    $('.draft span').css('color', 'inherit');
 	if(object.paragraph_indent == undefined)
 		object.paragraph_indent = "";
-	window.cont = $('.draft').html().replace(/&nbsp;/g, " ");
+//	window.cont = $('.draft').html().replace(/&nbsp;/g, " ");
     window.cont = $('.draft').html().replace(/<div><\/div>/g, " ");
+    window.cont = cont.replace(/<div>(.*)<\/div>/g, "$1");
+    window.cont = cont.replace(/<div>(.*)<\/div>/g, "$1");
+    window.cont = cont.replace(/<span style="line-height: inherit; font-size: inherit; font-family: inherit; border: none; color: inherit; background-color: inherit;">(.*)<\/span>/g, "$1");
+//    window.cont = cont.replace(/<div><span .*>(.*)<\/span>/g, "$1");
     window.cont = cont.replace(/<div><br>/g, "<div>");
 	window.cont = cont.replace(/<\/div><div><br><\/div><div>/g, "<br>"+object.paragraph_indent);
 	window.cont = cont.replace(/<div><br><\/div><div>/g, "<br>"+object.paragraph_indent);
@@ -758,10 +777,16 @@ function post_content_formatting(object) {
     window.cont = cont.replace(/<\/div> <div>/g, "<br>"+object.paragraph_indent);
     window.cont = cont.replace(/<\/div><\/span><div>/g, "</div>"+object.paragraph_indent);
     window.cont = cont.replace(/<\/div><div><br><div>/g, "<br>"+object.paragraph_indent);
-     window.cont = cont.replace(/<div><br><div>/g, "</div>"+object.paragraph_indent);
+    window.cont = cont.replace(/<div><br><div>/g, "</div>"+object.paragraph_indent);
     window.cont = cont.replace(/<br><div>/g, ""+object.paragraph_indent);
     window.cont = cont.replace(/<br>&emsp;<kbd/g, "</div><br>"+object.paragraph_indent+"<kbd");
-    
+    window.cont = cont.replace(/<br> &nbsp;<br>/g, "<br>"+object.paragraph_indent);
+    window.cont = cont.replace(/<br>&emsp;<br>&emsp;/g, "<br>"+object.paragraph_indent);
+    window.cont = cont.replace(/<br>&emsp;  <br>&emsp;/g, "<br>"+object.paragraph_indent);
+    window.cont = cont.replace(/<div>/g, "<br>"+object.paragraph_indent);
+    window.cont = cont.replace(/<br>&emsp;<br>/g, "<br>");
+    window.cont = cont.replace(/<br>&emsp;<br>/g, "<br>");
+//    console.log( cont.match(/<br> &nbsp;<br>/g));
     
    
 	console.log(cont);
@@ -773,7 +798,7 @@ function post_content_formatting(object) {
 	
 	/*** Replace output function so that it places every item into an array instead of just outputting ***/
 function c(s) {
-//	console.log(s);	
+//	console.log(s);	 
 	//s = s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 //	$('body').append(s+"<br>");
 }
@@ -846,6 +871,7 @@ for(i in b) {
             tag = "";
 			parsingdiv = false;
 			c("End of tag");
+            
         } else if(b[i] == "<") {
              /***/
             //$('body').append(tag+",<br>"+e+"; "+w+"<br>");
@@ -925,7 +951,7 @@ for(i in b) {
 		w = '';
 	//div splitter
 	out = out.replace(/---/g, ' ');*/
-console.log(d);
+//console.log(d);
 	/*** *** Now implement the project **/
 	updateBuildProgress("Generating pages...");
 	maxh = $('.scale').height()*8.56; //Add 9+2 for body margins just because it works. Don't question it. (It probably has to do with the 1 in padding on the top and bottom, making total height 13 and body 11.
@@ -957,13 +983,15 @@ console.log(d);
             continue;
         }
         dspan = dspan.replace('</span>  ', '</span>');
+//        console.log(dspan);
 		add_to_page("<span class='hideme'>"+dspan +" "+"</span>", undefined, undefined, col_count);
 		//console.warn($('.page'+p+'body').height(), maxh);
 		//console.warn(('.page'+p+'col'+(col_count-1)), $('.page'+p+'col'+(col_count-1)).height(), maxh, $('.page'+p+'col'+(col_count-1)).html().length);
 		//console.warn(('.page'+p+'col'+(col_count-1)), $('.page'+p+'col'+(col_count-1)).html().length, $('.page'+p+'col'+(col_count-1)).height());
 		if(column <= 0) {
 			c("|"+$('.page'+p+'body').height()+" "+maxh+";");
-			if($('.page'+p+'body').height() > maxh) {
+			if($('.page'+p+'body').height() >= maxh) {
+//                console.log(dspan+" PAGE TOO LONG",$('.page'+p+'body').height(),maxh,p);    
 				c('page too long');
 				add_new_page();
 				/*hm = $('.hideme').length;
@@ -972,7 +1000,7 @@ console.log(d);
 			} 
 		} else {
 			//console.log($('.page'+p+'col'+(col_count-1)));
-			if($('.page'+p+'col'+(col_count-1)).height() > maxh) {
+			if($('.page'+p+'col'+(col_count-1)).height() >= maxh) {
 				col_count++;
 				//console.error(column, col_count, (col_count-1), (column <= (col_count-1)));
 				if(column <= (col_count-1)) {
@@ -1075,7 +1103,7 @@ function post_bibliography(object, cob) {
 	
 	//Add part by part by running through citation. If too much, new page in same method as above.	
 	ca = $('.draft').html().split('<div');
-	var maxh = $('.scale').height()*6.5;
+	var maxh = $('.scale').height()*8.56;
 	for(j in ca) {
 		//TODO - Find a way to grab the current page, not necessarily the last one. This will be handy for things that are added after content
 		p = $('.page').length-1;
@@ -1105,24 +1133,24 @@ function findCitation(cite) {
 }
 function compare(a,b) {
   if(a.AuthorLast.length && b.AuthorLast.length) {
-	  if (a.AuthorLast < b.AuthorLast)
+	  if (a.AuthorLast.toUpperCase() < b.AuthorLast.toUpperCase())
 		 return -1;
-	  if (a.AuthorLast > b.AuthorLast)
+	  if (a.AuthorLast.toUpperCase() > b.AuthorLast.toUpperCase())
 		return 1;
   } else if(!a.AuthorLast.length && b.AuthorLast.length) {
-	  if (a.Title < b.AuthorLast)
+	  if (a.Title.toUpperCase() < b.AuthorLast.toUpperCase())
 		 return -1;
-	  if (a.Title > b.AuthorLast)
+	  if (a.Title.toUpperCase() > b.AuthorLast.toUpperCase())
 		return 1;
   } else if(a.AuthorLast.length && !b.AuthorLast.length) {
-	  if (a.AuthorLast < b.Title)
+	  if (a.AuthorLast.toUpperCase() < b.Title.toUpperCase())
 		 return -1;
-	  if (a.AuthorLast > b.Title)
+	  if (a.AuthorLast.toUpperCase() > b.Title.toUpperCase())
 		return 1;
   } else {
-	  if (a.Title < b.Title)
+	  if (a.Title.toUpperCase() < b.Title.toUpperCase())
 		 return -1;
-	  if (a.Title > b.Title)
+	  if (a.Title.toUpperCase() > b.Title.toUpperCase())
 		return 1;
   }
   return 0;

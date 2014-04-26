@@ -1,0 +1,262 @@
+### Load Code on Startup
+`InitPanel[Panel_Name]`
+If your panel is on the list of available panels, this function will be executed when the page loads. (If it isn't on the list, then this function won't run) 
+
+This function allows a panel to set up a function that will persist for the entire session, such as keyboard shortcuts.
+
+#### Keyboard Shortcut
+
+```Javascript
+    function InitPanelmain_Character() {
+        $(document).on('keydown', function(e) {
+		if(e.keyCode == 67 && e.altKey) {
+			runPanel('main_Character');	
+		}
+	});
+    }
+```
+
+This code runs when the page first loads, and will open the panel when Alt+C is pressed. This can be done all through available APIs.
+
+##### Keyboard Shortcut Function
+If you don't care for as much customization as the function above, you can set up a simpler function that will open your panel on a specific key combination.
+
+`keyboardShortcut(id, keys)`
+
+* id - The id of the panel that you wish to run
+* keys - An object containing the values of the key combination
+* * alt - Boolean representing if you want alt pressed
+* * shift - Boolean representing if you want shift pressed
+* * ctrl - Boolean representing if you want ctrl pressed
+* * key - The key you want pressed
+
+If one of the meta keys are not defined in the object, it defaults to false. If the `key` property is not defined, the function will not run.
+
+Additionally, this function will not add the keyboard shortcut to the ribbon. This will be done manually when the panel is installed in the `install_panel` function. If this panel is installed through the store, the attribute will be included automatically, so you don't need to worry about it.
+
+*Note*: Please don't use this to override stock panels. The result of running two panels at once will be inconsistent and have a poor UX.
+
+#### Services
+This can also be used to create a persistent service, such as an extension that syncs your files with Dropbox. Gltn provides a way to show this service to the end user. When this function is called, it adds an icon next to the word count and save indicator. The icon, when hovered over, displays the name of the service. Clicking on the icon opens the panel where you can display status information about this service.
+
+`initService(id, title, icon)`
+
+* id - The id of the panel
+* title - The title for the service
+* icon - What will appear next to the word count; if you want to have an icon that changes, give it a unique id and manipulate the icon using the id
+
+### Get a Panel
+`GetPanel[Panel_Name]`
+
+```Javascript
+    function GetPanelmain_Character() {
+            return {title: "Character Palette", bordercolor: "#000099", width: 25, override:[13]};
+    }
+```
+
+**Hint:**
+Core panels are denoted by 'Main_[Panel_Name]
+
+`return {title: "", bordercolor: "", width: #};`
+* title - Name of the Panel, displayed at the top
+* bordercolor - Color of the border surrounding the panel
+* width - Percent of the screen the panel takes up
+* override - When this panel is active, which javascript key codes do you want to override the default action? For the character palette, a new line shouldn't be added because you pressed enter, so you can prevent that from happening by passing the keycode for Enter (13)
+* maximize - If true, the panel gets a maximize button that allows it to take over the whole screen, hiding your content temporarily. Also, the panel can get notified of this and adjust the layout accordingly
+
+### Run Code for the Panel
+`RunPanel[Panel_Name]`
+
+Here you are able to execute code.
+
+#### PostPanelOutput
+This sets up the HTML for your panel. You can specify id names or classes. You must return complete HTML.
+    
+    postPanelOutput(out);
+
+This function *must* be called in the RunPanel function. Otherwise no HTML will be displayed.
+The function overwrites previous HTML in the panel, so this should be kept in mind as you generate outputs. 
+If you wish to have a more dynamic feel, create divs and use JQuery to manipulate individual tags. You can use postPanelOutput as a way of generating the framework.
+
+Any code can be put in the RunPanel function, including JQuery events and functions.
+*Note*: You must use JQuery for events. Onclick and other DOM events will not work for calling internal functions.
+
+#### Popup Close Event
+If your panel uses popups, you might want to know when your popup closes so you can refresh your HTML or run a certain block of code.
+
+Place this event in your RunPanel function.
+
+```Javascript
+    $('.PanelPopupEvent').click(function() {
+        {code}
+        alert($(this).attr('data-title'));
+    });
+```
+
+Getting the 'data-title' attribute from the event object gives you the title for the popup so your code can respond only if a certain type of popup is closing. 
+
+#### Key Press Event
+Your panel is able to respond to global user key events with a simple integration much like responding to a popup close.
+
+```Javascript
+    $('.PanelKeyEvent').on('click', function() {
+        if($(this).attr('data-keycode') == 13) {
+	        contentAddText(character);
+	        $(this).attr('data-keycode', '');	
+	    }
+    });
+```
+
+Possible attributes from the element:
+
+`data-keycode` - The Javascript keycode of the key being pressed
+
+`data-alt` - The alt key is being pressed
+
+`data-ctrl` - The ctrl key is being pressed
+
+`data-shift` - The shift key is being pressed
+
+*Notes*:
+You cannot prevent default actions at this time, nor for the foreseeable future, so do not try to override default actions.
+
+Also, as in the example above, you may wish to reset the `data-keycode` attribute if you do not wish to receive more than one click event for a single key press.
+
+#### Send Data to Panels
+Sometimes you want a panel to display data specific to your situation. There are a few simple functions to send data to a panel and retrieve it.
+
+`create_panel_data(obj)`
+* obj - A JSON object of attribute names and values to send
+
+`grab_panel_data()`
+Returns a JSON object of those attributes and values. If a panel is open, you can retrieve its name through the `sender` attribute
+
+If the panel isn't open, you should choose `runPanel(panelid)` in order to open it. 
+
+`clear_panel_data()`
+Once the data stops being relevant, you should remove it to prevent it from being used again in the future. This function removes all shared panel data.
+
+#### Find and Replace Text-Only
+When using HTML and text, using a standard string.replace tool can be difficult. If you want to replace text in the content area, using this function:
+`FindTextReplaceText(RegIn, RegOut)`
+* RegIn - A regular expression to find
+* RegOut - A regular expression for replacing
+
+#### Panel Close Event
+A panel can add an event that occurs when the panel is closing.
+
+```Javascript
+    $('#PanelCloseEvent').on('click', function() {
+            {code}
+    });
+```
+
+#### Document Build Event
+Some panels may want to have access to the built document instead of the default. If so, a build event may be called and once completed notify the panel to do something else.
+
+```Javascript
+    startBuild();
+    $('#PanelBuildEvent').click(function() {
+        {do something}
+    });
+```
+
+#### Maximizing and Minimizing
+If the attribute is properly set in the Get function, the panel can hide the content and take control of the whole screen. While this alone may be effective, your layout and function may need to shift to take advantage of the increased real estate. To do so, create an event listener for a specific panel event.
+
+```Javascript
+     $('.PanelMaximizeEvent').on('click', function() {
+        if($(this).attr('data-status') == 1) {
+            /** Code to execute when the panel is becoming maximized **/
+        } else {
+            /** Code to execute when the panel is becoming minimized **/
+        }
+    });
+```
+
+#### LaTeX
+Panels can integrate with LaTeX by translating a command into the formatted output.
+
+##### Text to LaTeX
+These two functions will translate a command into formatted output.
+
+```Javascript
+    postLatex("$x^2$");
+    var x = getLatex();
+```
+* postLatex(cmd, callback) - Receives a command as a string and translates it into formatted output. Due to the Mathjax library, the output can't be retrieved directly. Rather, you must call a separate function to access the output.
+* getLatex() - Retrieves the formatted output as HTML
+
+##### LatexAPI
+You can access pieces of the LaTeX reference much like the Spreadsheet reference. They're also formatted the same
+`window.LatexAPI`
+
+### Style Panel
+StylePanel[Panel_Name]
+This function can be used to set up CSS rules. It is not necessary, but is available as a second function that can run, right after RunPanel is called.
+
+Alternatively, this can be called using StylePanelClass
+StylePanelClass(className, {css-rule, css-value, css-rule, css-value, etc.})
+The css rules and values should be in an array in an even-odd order (every other item is a rule).
+
+### Saving
+For simple applications like a dictionary you may use a generic set of code. However, for advanced operations, or even for simple settings, you'll need to save data. 
+#### Saving to File
+`writeToFile(att, val)`
+* att - The name of the attribute
+* val - The value for it (will end up being a string, so keep that in mind)
+
+This function sets the value for the given attribute to the given value. This is saved in the document, so this is good only for applications where you want data set for a specific document such as an outline tool.
+
+To access the data, simply call `getFileData({att})`
+
+#### Saving to Settings
+`writeToSettings(att, val)`
+* att - The name of the attribute
+* val - The value for it (will end up being a string, so keep that in mind)
+
+In many cases you want user data to persist not just between sessions, but between files. By writing to the shared settings, the same data can be accessed by a panel for any file.
+
+To access the data, simply call `getSettings({att})`
+
+### Export
+In some cases you may wish to use a panel for prototyping, such as for an outline. A few functions are available for developers to create a solid experience.
+#### Mimicking the Build System
+If you just want to replicate the UX while maintaining full control of your output, call the faux setup function:
+`falseBuild(remove_print);`
+This sets up the build process like the standard setup, but the developer can control the output directly using the standard functions like `add_new_page()` and `add_to_page(s)`
+
+*Note*: If the parameter remove_print is `true`, the print button will not show up, indicating to the user that the result is not meant to be printed.
+
+#### Sending to Build System
+For lengthier outputs or for adding pagination, developers can send their output to the build system and let it generate a properly formatted paper based on the output (this will ignore format style functions)
+`startBuild(el)`
+Where el is a jQuery selector
+
+### Removing Panel
+With the Gltn Store, users will be able to install panels. Also, they'll be able to uninstall them. There is an additional function you may include which is called only when the panel is being uninstalled. It is recommended that you remove any relevant settings and file properties inside of this function. 
+
+`RemovePanel{PanelID}()`
+
+### File Conversion
+This section of the documentation explains how to set up a plugin that will enable a user to export the HTML-formed document from gltn to a secondary file format.
+
+#### Setting It Up
+There are a few conditions you need in order to enable your plugin to appear as a conversion option.
+
+* `service = true` - Your plugin must be registered as a service when installing
+* `ExportFile{plugin_id}` - Your plugin must contain a function called `ExportFile{plugin_id}`
+
+#### ExportFile
+This function is called when the build is originally run. At this point you can add your conversion option, but you cannot convert the file yet. The file will likely not be built at this point, so you should not attempt to poll the system.
+
+#### Export Button
+In that function, you should add the option. You can do so by calling `add_export_button(title, icon, fnc)`
+* title - The title of the conversion. Be brief, like ".docx"
+* icon - The text for the icon that will accompany the title on the button
+* fnc - The function to actually do the conversions. This function must be called `x()` in order for it to run.
+
+#### Grabbing Content
+The entire file is in the `$('.build')` including a few buttons. You can parse each page by calling `$('.page')`, or choose a specific page `$('.page[data-p=##]')`
+
+Your converted file can be generated and use the InkFilePicker API to decide on where the file should be placed.

@@ -1,0 +1,22 @@
+{
+	"title": "Gltn API",
+	"tagline": "The Easiest Way To Format Your Paper",
+	"docs_path": "docs",
+	"image": "img/flat_design_stage1.png",
+	"theme": "navy",
+	"template":"default",
+	"toggle_code": true,
+	"date_modified": true,
+	"repo": "fleker/gltn",
+	"twitter": ["handnf"],
+	"google_analytics": "UA-12653604-10",
+    "clean_urls": false,
+    "float":false,
+    "toggle_code":false,
+	"links": {
+		"Editor": "https://felkerdigitalmedia.com/gltn/edit.php",
+        "Announcements Blog":"http://gltndev.wordpress.com",
+		"GitHub Repo": "https://github.com/fleker/gltn",
+		"Help/Support/Bugs": "https://github.com/fleker/gltn/issues"
+	}
+}

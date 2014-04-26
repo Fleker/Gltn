@@ -39,7 +39,7 @@ function onBuildFormat() {
 function onSetHeader() {
 	var auth_array = valMetadata("Author").split(" ");
 	var last_name = auth_array[auth_array.length - 1];
-	push_header(lcr_split("", "", last_name+" PAGE"));
+	push_header(lcr_split("", "", "<span style='font-size:12pt'>"+last_name+" PAGE</span>"));
 }
 function onGetFormats() {
 	var obj = {};
