@@ -3,7 +3,7 @@ Gltn
 
 What is it?
 
-**Try it out!** http://felkerdigitalmedia.com/gltn/edit.php?file=Demo
+**Try it out!** http://felkerdigitalmedia.com/gltn/edit.php
 
 The goal is to build a better document editor. Word, OpenOffice, Google Docs are all "word processors". You can type things and style things.
 But everything you style has to be done yourself.
@@ -35,4 +35,4 @@ past the boring stuff of writing - formatting and citations and everything else 
 #### Third-Party Developers
 You can edit the source files or develop plugins using the various frameworks available in Gltn. Go to the Wiki page to learn more about developing plugins.
 
-http://github.com/Fleker/Gltn/wiki
+http://felkerdigitalmedia.com/gltn/docs/
