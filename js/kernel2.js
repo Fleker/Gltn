@@ -160,7 +160,7 @@ function latexDetails(id) {
     ht += "<table style='width:99%'><tr><td style='width:50%'><div id='latexCmd' style='height:4em;width:95%;border: solid 1px rgba(0,129,255,1);background-color:"+theme.normfsui+";margin-top:5px;margin-left:5px;margin-bottom:10px;' contenteditable='true'></div></td>";
     ht += "<td style='width:50%'><div id='latexView' style='height:4em;width:95%;border: solid 1px;background-color:"+theme.normfsui+";margin-top:5px;margin-left:5px;margin-bottom:10px;'></div></td></tr></table>";
     ht += "<div id='latexBuffer' style='visibility:hidden'></div>";
-    ht += "<button id='latexSave'>Save</button>";
+    ht += "<button id='latexSave' class='textbutton'>Save</button>";
     $('.latex'+id).attr('data-id', id);
     ht += "<input type='hidden' id='PopupId' value='"+id+"'>";
     fnc = function x(){
@@ -340,15 +340,11 @@ function setHeader() {
 		Home: new Array(
 //            {text: "Start the Tour", img: "<span class='fa fa-home' style='font-size:18pt'></span>", action: "alert('TBD')", key:"Alt+T"}, 
             {text: "Create a File", img: "<span class='fa fa-file' style='font-size:18pt'></span>", action: "createNewFile()", key:"Alt+N"},
-            {group: "", value:"<div style='font-size:22pt;padding-top:0px;text-align:center;'>Welcome to Gltn!</div>"},
+            {group: "", value:"<div style='font-size:22pt;padding-top:6px;text-align:center;'>Welcome to Gltn!</div>"},
             {text: "Explore Files", img: "<span class='fa fa-folder-open' style='font-size:18pt'></span>", action: "runPanel('main_Filesys')", key: "Alt+O"} 
-
-		//	{group: '', value: '<font size="4" id="temp_header" >Welcome to Gluten!</font><br><table style=\'width:40%;margin-left:30%\'><tr><td><button onclick="window.introdisabled = true;introJsStart();"><span class=\'fa fa-home\'></span>&nbsp;Start the Tour!</button></td><td><button id="iFILESYS" onclick="runPanel(\'main_Filesys\')"><span class=\'fa fa-folder-open\'></span>&nbsp;Explore Files</button></td></tr></table>'}
-
 		),
-        /* <input type='text' id='file_name' style='width:7em'><span class='postfix'>.gltn</span><button id='file_name_con' disabled='true'>Save As</button><input type='hidden' id='file_name_internal'>"*/
 		File: new Array(
-			{group: "", value:'<div class="row collapse" style="margin-top:6px"><div class="small-5 columns"><input type="text" value="'+fileid+'" /></div><div class="small-1 columns"><span class="postfix">.gltn</span></div><div class="small-2 columns end"><input type="hidden" id="file_name_internal"><button id="file_name_con" class="textbutton" disabled="true">Rename</button></div></div>'},
+			{group: "", value:'<div class="row collapse" style="margin-top:9px"><div class="small-2 medium-5 columns"><input id="file_name" type="text" value="'+fileid+'" /></div><div class="small-4 medium-1 columns"><span class="postfix">.gltn</span></div><div class="small-6 medium-3 columns end"><input type="hidden" id="file_name_internal"><button id="file_name_con" class="textbutton" disabled="true">Rename</button></div></div>'},
 			{text: 'Compile & Export', img: '<span style="font-size:18pt" class="fa fa-file"></span>', action: "startBuild();setTimeout('exitintro();', 1000);", key: "Alt+B"},
 			{text: 'Share', img: '<span style="font-size:18pt" class="fa fa-code-fork"></span>', action: "getShare();"}
 		),
@@ -369,13 +365,14 @@ function setHeader() {
 
 		About: new Array(
 			{text: 'Open Source', img: '<span style="font-size:18pt" class="fa fa-github-alt"></span>', action: "window.location='http://www.github.com/fleker/gltn'"},
+			{text: 'Documentation', img: '<span style="font-size:18pt" class="fa fa-book"></span>', action: "window.location='http://felkerdigitalmedia.com/gltn/docs'"},
 			{text: 'Send Feedback', img: '<span style="font-size:18pt" class="fa fa-envelope"></span>', action: "window.location='mailto:handnf+gltn@gmail.com'"},
 			{text: 'Gltn Blog', img: '<span style="font-size:18pt" class="fa fa-bullhorn"></span>', action:"window.location='http://gltndev.wordpress.com/'"},
 			{text: 'Credits', img: '<span style="font-size:18pt" class="fa fa-legal"></span>', action: 'postLegal()'}
 		),
 
 		Me: new Array(
-			{group: 'Name', value:'<div style="margin-top:-6px"><input id="me_name" type="text"></div>'}
+			{group: 'Name', value:'<div style="margin-top:2px"><input id="me_name" type="text" placeholder="Name"></div>'}
 		)
 
 	};
@@ -385,41 +382,22 @@ function setHeader() {
 }
 
 function ribbonLoad() {
-
-	//$('#file_name').val(fileid);
-
-	$('#file_name').attr('value', fileid);
-
+    $('#file_name').attr('value', fileid);
 	$('#file_name').attr('defaultValue', fileid);
-
 	$('#file_name_internal').val(fileid);
-
 	$('#file_name').on('input', function() {
-
 		console.log('file_name oninput');
-
 		$('#file_name_con').attr('disabled', false);
-
 	});
-
 	$('#file_name_con').on('click', function() {
-
 		var v = $('#file_name').val();
-
 		v = v.replace(/ /g, "");
-
-		//console.log(v, localStorage[v]);
-
-        ovr = true;
-
+		ovr = true;
 		if(localStorage[v] != undefined) {
-
 			ovr = confirm('This file already exists: '+v+'; Overwrite the contents of this file?');	
-
 		}
-
 		if(ovr) {
-			if(v.substr(-2) == "_c")
+            if(v.substr(-2) == "_c")
 				v = v.substr(0,v.length-2)+"c";
 			$('#file_name_con').attr('disabled', true);
 			$('#file_name_internal').val(v);
@@ -427,32 +405,18 @@ function ribbonLoad() {
             localStorage[v+"_c"] = localStorage[fileid+"_c"];
 			setTimeout('window.location = "?file='+v+'";', 250);
 		}
-
 	});
-
-	//$('#me_name').val(window.settings.me_name);
-
 	$('#me_name').attr('value', settings.me_name);
-
 	$('#me_name').attr('defaultValue', settings.me_name);
-
 	$('#me_name').on('input', function() {
-
 		writeToSettings('me_name', $('#me_name').val());		
-
 	});
-
 }
 
 function postLegal() {
-
-	out = "�2014 Made by Nick Felker<br>(@HandNF)<br>";
-
+	out = "2014 Made by Nick Felker<br>(@HandNF)<br>";
     out += "Made using libraries from Mathjax, Font Awesome, jQuery, Rangy, InkFilepicker, and others<br>";
-
-    out += "Shoutout to everyone who posted online about stuff like replacing text nodes and the ample amount of help from Stacked Overflow.<br>";
-
-    out += "Loader was created by TaniaLD";
+    out += "Shoutout to everyone who posted online about stuff like replacing text nodes and the ample amount of help from StackOverflow.<br>";
 
 	f = function x() { };
 
@@ -1224,110 +1188,51 @@ function parseCT() {
 
 	}
 
-	//findTextReplaceText(r, '$1');
-
-	//Now we ping other functions, one internal and one by {fofrmat}.js to set up stuff
-
+//Now we ping other functions, one internal and one by {fofrmat}.js to set up stuff
 	contextMarkup();
-
-	//console.log($('.content_textarea').html());	
+	try {
+        onStyleMarkup();
+	} catch(e) {}
 
 	try {
-
-		onStyleMarkup();
-
-	} catch(e) {
-
-		
-
-	}
-
-	try {
-
 		restoreSelection();	
-
-	} catch(e) {
-
-		
-
-	}
-
-	//Now we do a jQuery event
-
+    } catch(e) {}
+    recallHovertags();
 }
 
 function contextPanel(e) {
 
 	//occurs when item is clicked
-
-	
-
-	//Create intent
-
+    //Create intent
 	var f = $('.context[data-i='+e+']');
-
 	create_panel_data({html:f.html(), index:f.attr('data-i')});
-
 	//Launch panel
-
 	runPanel('main_Context');
-
 	//In panel, populate data and organize it
-
 	console.log(f.html());
-
-
-
 }
 
 function apply_context(text, d) {
-
 	//Finds text (or HTML unfortunately FTM) and replaces it
-
 	var a = $('.content_textarea').html();
-
 	var r = new RegExp('('+text+')', 'gi');
-
 	var b = a.match(r);
-
 	if(b != null) {
-
-		//a = a.replace(r, "<span class='context' data-i='"+window.context.length+"'>$1</span>");
-
-		//$('.content_textarea').html(a);
-
 		if(d.type == "Don't Overuse") {
-
 			var wc = $('.content_textarea').text().split(' ').length;
-
 			var ac = a.match(r);
-
 			if(ac != null) {
-
 				if((ac.length / wc) > d.limit) {
-
 					findTextReplaceText(r, "<span class='context' data-i='"+window.context.length+"'>$1</span>");
-
 					window.context.push(d);
-
 				}
-
-//				console.log(ac.length, wc, (ac.length/wc),d.limit);
-
 			}
-
 		} else {
-
 			findTextReplaceText(r, "<span class='context' data-i='"+window.context.length+"'>$1</span>");
-
 			window.context.push(d);
-
 		}
-
 	}
-
 	//Hovertag - use d.type
-
 }
 
 function contextMarkup() {

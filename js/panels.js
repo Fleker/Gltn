@@ -112,7 +112,7 @@ function sizePanel(percent, refresh) {
     else
         $('#panel_content').attr('class', 'columns large-'+(12-columnCount(percent, true))+" small-"+(7-columnCount(percent, true))+" medium-"+(10-columnCount(percent, true)));
     setTimeout(function() {
-        $('#panel_plugin').attr('class', 'columns end large-'+columnCount(percent, true)+' small-'+columnCount(percent+40, true)+' medium-'+columnCount(percent+16, true));
+        $('#panel_plugin').attr('class', 'columns end large-'+columnCount(percent, true)+' small-'+columnCount(percent+42, true)+' medium-'+columnCount(percent+18, true));
     }, 50);
     //animateContentPanel((window.innerWidth - $('#panel_plugin').width() - 35)+"px");
 			
@@ -649,9 +649,10 @@ function InitPanelmain_Filesys() {
 		}
 	});
 }
+//Modal for new file creation and implementation
 function createNewFile() {
-    ht = '<div class="row collapse"><div class="small-3 columns"><input type="text" value="untitled" /></div><div class="small-1 columns"><span class="postfix">.gltn</span></div>';
-    ht += "<div class='small-6 columns end'>&emsp;<input type='search' id='FormatFinder' style='width:40%;display:inline-block' placeholder='Choose a Format'>&ensp;<button id='FormatOk' class='textbutton' style='margin-left:30px;font-size:16pt;font-weight:400;'>Create</button></div></div><br><span style='font-size:14pt;'>&emsp;Search for a Format<br></span><br><div id='FormatSearch' style='text-align:center'><div>";
+    ht = '<div class="row collapse"><div class="small-3 medium-3 columns"><input id="FileName" type="text" value="untitled" /></div><div class="small-3 medium-1 columns"><span class="postfix">.gltn</span></div>';
+    ht += "<div class='small-6 medium-8 columns end'>&emsp;<input type='search' id='FormatFinder' style='width:40%;display:inline-block' placeholder='Choose a Format'>&ensp;<button id='FormatOk' class='textbutton' style='margin-left:30px;font-size:16pt;font-weight:400;'>Create</button></div></div><br><span style='font-size:14pt;'>&emsp;Search for a Format<br></span><br><div id='FormatSearch' style='text-align:center'><div>";
     fnc = function x() {
         function search(v) {
             arr = [];
@@ -822,11 +823,10 @@ function RunPanelmain_Filesys() {
 				if(title == undefined)
 					title = "";
                 
-                
+                bgc = theme.palette.dark;
 				if(i == fileid)
 					bgc = theme.palette.blue;
-				else
-					bgc = theme.palette.dark;
+					
 				var fsi = localStorage[i].length;
 				var fsci = localStorage[i+"_c"].length;
 				fstotal += fsi;
@@ -856,7 +856,7 @@ function RunPanelmain_Filesys() {
                         //console.error(e.message);
                     } 
                     //#2c3e50
-					out += "<tr><td class='tfile' style='background-color:"+bgc+"border:solid 2px "+bgc+";padding-bottom:8px;width:98%;cursor:pointer;' data-v='"+i+"'><table style='font-size:7pt;font-family:sans-serif;width:100%;'><tr><td style='text-align:left'><span style='font-size:8pt' class='fa fa-file-text'></span>&nbsp;"+i+".gltn</td><td style='text-align:center;width:36px' class='Filesys_delete' data-f='"+i+"'>X</td></tr></table>";
+					out += "<tr><td class='tfile "+((i==fileid)?"selected":"")+"' style='background-color:"+bgc+";border:solid 0px "+bgc+";padding-bottom:8px;width:98%;cursor:pointer;' data-v='"+i+"'><table style='font-size:7pt;font-family:sans-serif;width:100%;'><tr><td style='text-align:left'><span style='font-size:8pt' class='fa fa-file-text'></span>&nbsp;"+i+".gltn</td><td style='text-align:center;width:36px' class='Filesys_delete' data-f='"+i+"'>X</td></tr></table>";
 					if(title != undefined)
 						out += "<div style='margin-left:3px'><b>"+title+"</b></div>";	
 					out += "<span style='font-size:8pt'>&emsp;"+xx.file.format+"&nbsp;&nbsp;"+xx.file.language+"&nbsp;&nbsp;"+fsout+"</span><br>";

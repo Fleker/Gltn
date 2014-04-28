@@ -1,10 +1,10 @@
 // File.js handles the saves and restores, changing the formatting, and other file-related functions (convert to PDF? LaTeX, .doc)
 
 //Since the file initiates when it loads, you can do some initization 
-citation = new Array();
+citation = [];
 citationi = 0;
 
-idea = new Array();
+idea = [];
 ideadefault = "";
 fileid = "scratchpad";
 shareid = "";
@@ -12,7 +12,7 @@ formatid = "";
 //Handle GET parameters
 GET = window.location.search.substring(1);
 GETarr = GET.split("&");
-for(i in GETarr) {
+for(var i in GETarr) {
     GETparam = GETarr[i].split("=")[0]; 
     GETval = GETarr[i].split("=")[1];
     
@@ -20,8 +20,10 @@ for(i in GETarr) {
         fileid = GETval;
     if(GETparam == "share")
         shareid = GETval;
-    if(GETparam == "format")
+    if(GETparam == "format") {
         formatid = GETval;
+        $('#file_format').val(GETval);
+    }
 }
 /*
 fileid = window.location.search.substr(6);
@@ -33,7 +35,7 @@ max_char = 0;
 min_word = 0;
 max_word = 0;
 
-hovertagRegistrar = new Array();
+hovertagRegistrar = [];
 obj = {};
 currentformat = "";
 document.ready = function() {

@@ -32,17 +32,18 @@ function initTheme() {
 	
 	//Misc panel support
 	$('.tfile').css('background-color', '#444');	
+	$('.tfile.selected').css('background-color', theme.palette.blue);	
 }	
 function loadThemeSettings() {
     out = 'Highlight Color: <select id="ThemeColor">';
     if(theme.ribbonhighlight == "#09f")
-        out += '<option value="#09f" selected="true">Blue</option>'
+        out += '<option value="#09f" selected="true">Blue</option>';
     else    
-        out += '<option value="#09f">Blue</option>'
+        out += '<option value="#09f">Blue</option>';
     if(theme.ribbonhighlight == "#f90")
-        out += '<option value="#f90" selected="true">Orange</option>'
+        out += '<option value="#f90" selected="true">Orange</option>';
     else    
-        out += '<option value="#f90">Orange</option>'
+        out += '<option value="#f90">Orange</option>';
         
      return out; 
 }
@@ -73,3 +74,4 @@ writeCss("button:hover {	background-color:"+theme.ribbonhighlight+";color:black;
 writeCss("button.ribbonbutton:hover {	background-color:"+theme.ribbonhighlight+";color:black;}button:active {	position:relative;	top:1px;}");
 
 writeCss("::selection {color:white;background:"+theme.ribbonhighlight+";}::-moz-selection {color:white;background:"+theme.ribbonhighlight+";}");
+writeCss(".has-tip:hover { border-bottom: solid 1px #ccc; color:inherit; }");

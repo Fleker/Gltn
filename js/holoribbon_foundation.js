@@ -22,20 +22,21 @@ function newRibbon(element, ribbon) {
     $('.ribbonhead').html(out);
     
 	out = '';
-    for(i in keys) {
-        out = out + '<div class="ribbongroup row" style="text-align:center;"><div class="small-12 '+ribbon[keys[i]].length+' small-centered column"><div class="row">';
-        for(j in ribbon[keys[i]]) {
+    var columnSize = [];
+    for(var i in keys) {
+        columnSize.push(0);
+        out = out + '<div class="ribbongroup row" style="text-align:center;"><div class="ribbongroupchild '+ribbon[keys[i]].length+' small-centered column"><div class="row ribbongroupgrandchild">';
+        for(var j in ribbon[keys[i]]) {
             var k = ribbon[keys[i]][j];
 			var classname = "ribbonbutton column small-"+columnCount(100/ribbon[keys[i]].length, true)+" "+((j == ribbon[keys[i]].length - 1)?"end":"");
-//			var classname = "ribbonbutton column "+((j == ribbon[keys[i]].length - 1)?"end":"");
-			
-            if(k.img != undefined) {
+			columnSize[columnSize.length-1] += columnCount(100/ribbon[keys[i]].length, true);
+            if(k.img !== undefined) {
                 //standard button
-				if(k.key == undefined)
+				if(k.key === undefined)
 					k.key = "";
-                out += '<button class="'+classname+'" style="" onclick="'+k.action+'"><div style="cursor:pointer;">' + k.img + '</div><div style="text-align:center;">' + k.text + '</div><span style="font-size:9pt">'+ k.key +'</span></button>';
+                out += '<button class="'+classname+'" style="" onclick="'+k.action+'"><div class="holoribbon_icon" style="cursor:pointer;">' + k.img + '</div><div class="holoribbon_title" style="text-align:center;">' + k.text + '</div><span class="holoribbon_key" style="font-size:9pt">'+ k.key +'</span></button>';
             } 
-            else if(k.group != undefined) {
+            else if(k.group !== undefined) {
                 //group button
                 out += '<div class="'+classname+'" style=""><div style="">' + k.value + '</div><div style="text-align:center">' + k.group + '</div></div>';
             }
@@ -47,6 +48,10 @@ function newRibbon(element, ribbon) {
     }
 //    console.log(out);   
     $('.ribbonbody').html(out);
+    for(i in columnSize) {
+        $($('.ribbongroupchild')[i]).addClass('small-'+columnSize[i]);   
+        $($('.ribbongroupgrandchild')[i]).css('width', (1200/columnSize[i])+"%");
+    }
 	ribbonGesture();
 	$('.ribbongroup').css('margin-left','102%').css('display', 'inline-table').css('opacity', 0);
 	ribbonobj.index = -1;

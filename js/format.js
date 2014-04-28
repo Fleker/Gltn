@@ -1,6 +1,6 @@
   // Formatting Engine
 
-window.metadata = new Array();
+window.metadata = [];
 format_js_index = 0;
 
 function new_format() {
@@ -14,13 +14,13 @@ function new_format() {
 }
 function new_format_item(type, ops) {
 	format_js_index++;
-	if(ops == undefined)
+	if(ops === undefined)
 		ops = {};
 	window.metadata[format_js_index] = {type: type, index: format_js_index, min: 0, max: 0};
 	var option_choices = ["label", "max", "min", "mtype", "placeholder", "description", "id"];
 	//FUTURE - Default Text
 	for(i=0;i<option_choices.length;i++) {
-		if(ops[option_choices[i]] != undefined) {
+		if(ops[option_choices[i]] !== undefined) {
 			window.metadata[format_js_index][option_choices[i]] = ops[option_choices[i]];
 		} else {
 			window.metadata[format_js_index][option_choices[i]] = "";
@@ -50,7 +50,7 @@ function set_up_format(name, property) {
 	}
 }
 function setFormatItemWidth(index) {
-    if($('#format_item_'+index).val() == undefined)
+    if($('#format_item_'+index).val() === undefined)
         $('#format_item_'+index).css('width', '11em');
 	else if($('#format_item_'+index).val().length < 22)
 		$('#format_item_'+index).css('width', '11em');
@@ -60,7 +60,7 @@ function setFormatItemWidth(index) {
 		$('#format_item_'+index).css('width', 0.5*$('#format_item_'+index).val().length+"em");
 }
 function post_format() {
-	var out = ""
+	var out = "";
 	for(i=0;i<=format_js_index;i++) {
 		type = window.metadata[i].type;
 		
@@ -89,7 +89,7 @@ function post_format() {
 	});
 	
 	for(i=0;i<=format_js_index;i++) {
-		if(window.metadata[i].min.length != 0 || window.metadata[i].max.length != 0) {
+		if(window.metadata[i].min.length !== 0 || window.metadata[i].max.length !== 0) {
 			/*var e = '#format_item_'+i;
 			$(e).on('input', function() {
 				format_check_count(i);
@@ -139,9 +139,9 @@ function post_format() {
 
 function format_check_count(i) {
 	content = $('#format_item_'+i).val();
-	if(content.length == 0)
+	if(content.length === 0)
 		content = $('#format_item_'+i).html();
-	if(window.metadata[i] == undefined)
+	if(window.metadata[i] === undefined)
 		console.log("md"+i);
 	mtype = window.metadata[i].mtype;
 	min = window.metadata[i].min;
@@ -175,7 +175,7 @@ function post_format_text(m, inv) {
 	var out = "";
 	
 	var ind = m.index;
-	if(inv != undefined && inv != 0)
+	if(inv !== undefined && inv !== 0)
 		ind = (m.index-inv)+"_2";
 	else {
 		out = out + m.label+":&nbsp;";
@@ -183,7 +183,7 @@ function post_format_text(m, inv) {
 			out = out + "<br><span class='format_description'>"+m.description+"</span><br>";
 	}
 	out = out + "<input type='text' id='format_item_"+m.index+"' placeholder='"+m.placeholder+"' style='width:55%' onmouseenter='hideHovertag()'>";
-	if(m.min.length != 0 || m.max.length != 0) {
+	if(m.min.length !== 0 || m.max.length !== 0) {
 		out = out + "<br><div class='format_count' id='format_count_"+m.index+"'></div>";	
 	}
 	return out;
@@ -192,7 +192,7 @@ function post_format_date(m, inv) {
 	var out = "";
 	
 	var ind = m.index;
-	if(inv != undefined && inv != 0)
+	if(inv !== undefined && inv !==0)
 		ind = (m.index-inv)+"_2";
 	else {
 		out = out + m.label+":&nbsp;";
@@ -200,7 +200,7 @@ function post_format_date(m, inv) {
 			out = out + "<br><span class='format_description'>"+m.description+"</span><br>";
 	}
 	out = out + "<input type='date' id='format_item_"+m.index+"' placeholder='"+m.placeholder+"' onmouseenter='hideHovertag()'>";
-	if(m.min.length != 0 || m.max.length != 0) {
+	if(m.min.length !== 0 || m.max.length !== 0) {
 		out = out + "<br><div class='format_count' id='format_count_"+m.index+"'></div>";	
 	}
 	return out;
@@ -211,7 +211,7 @@ function post_format_mltext(m) {
 	if(m.description.length)
 		out = out + "<span class='format_description'>"+m.description+"</span><br>";	
 	out = out + "<div class='post_format_mltext' contenteditable id='format_item_"+m.index+"' onmouseenter='hideHovertag()'></div>";
-	if(m.min.length != 0 || m.max.length != 0) {
+	if(m.min.length !==0 || m.max.length !== 0) {
 		out = out + "<div class='format_count' id='format_count_"+m.index+"'></div>";	
 	}
 	return out;
@@ -221,7 +221,7 @@ function post_format_content(m) {
 	out = "<div class='small-12 column' style='margin-left: -11px;width: calc(100% + 27px);'><div class='content_wrapper row'><div class='content overflow small-12 column'></div>";
 	out += "<div class='content toolbar small-12 column'></div>";
 	out = out + "<div contenteditable='true' class='content content_textarea small-12 column'></div></div>";
-	out = out + "<div class='content_wordcount small-12 column' style='display:inline-flex'><div class='content_word'></div>&emsp;<div class='content_character'></div>&emsp;<div class='content_save'>&emsp;</div></div></div>"
+	out = out + "<div class='content_wordcount small-12 column' style='display:inline-flex'><div class='content_word'></div>&emsp;<div class='content_character'></div>&emsp;<div class='content_save'>&emsp;</div></div></div>";
 	return out;	
 }
 function post_toolbar(tools) {
@@ -385,6 +385,7 @@ function post_toolbar(tools) {
 				}
 			break;
 		}
+        recallHovertags();
 	});
 }
 function getObjectSize(classname) {
