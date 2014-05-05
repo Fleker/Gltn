@@ -8,7 +8,7 @@ function GetPanelfleker_TTS() {
 }
 function RunPanelfleker_TTS() {
 //    window.tts = new GoogleTTS('');
-    postPanelOutput("It helps a writer when one's writing is spoken. This allows a better understanding of flow and perspective to one's audience. If you want, your computer can speak your essay. Just sit back and listen.<br><br><button id='startTTS' class='textbutton'>Start Speaking</button>");
+    postPanelOutput("It helps a writer when one's writing is spoken. This allows a better understanding of flow and perspective to one's audience. If you want, your computer can speak your essay. Just sit back and listen.<br><br><button id='startTTS' class='textbutton'>Start Speaking</button><br><button id='stopTTS' class='textbutton'>Stop Speaking</button>");
     $('#startTTS').on('click', function() {
         speechSynthesis.cancel();
         var output = $('.content_textarea').html().toLowerCase().trim().replace(/<kbd class="latex.*<\/kbd>/g, "").replace(/></g, "> <").replace(/<[^>]*>/g, "").replace(/"/g, "").replace(/&nbsp;/g, " ");
@@ -19,12 +19,12 @@ function RunPanelfleker_TTS() {
         }
         readMessage(outarr, 0);
     });
-    $('#PanelBuildEvent').on('click', function() {
-//        window.tts.play($('.content_textarea').text()); 
+    $('#stopTTS').on('click', function() {
+       speechSynthesis.cancel(); 
     });
 }
 function readMessage(outarr, i) {
-    if(outarr[i] == undefined)
+    if(outarr[i] === undefined)
         return;
     var msg = new SpeechSynthesisUtterance(outarr[i]);
     window.speechSynthesis.speak(msg);     

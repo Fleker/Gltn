@@ -19,4 +19,4 @@ Core panels are denoted by 'Main_[Panel_Name]
 * override - When this panel is active, which javascript key codes do you want to override the default action? For the character palette, a new line shouldn't be added because you pressed enter, so you can prevent that from happening by passing the keycode for Enter (13)
 * maximize - If true, the panel gets a maximize button that allows it to take over the whole screen, hiding your content temporarily. Also, the panel can get notified of this and adjust the layout accordingly
 
-
+**Note:** For layout reasons, the smallest possible width a panel can have is 17. Any panel with a smaller given width will be set to 17. Keep this in mind when developing so that you develop the layout accordingly.

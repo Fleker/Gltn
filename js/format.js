@@ -420,15 +420,17 @@ function update_toolbar_style() {
 	initTheme();
 }
 function refreshBodyDesign() {
-    var h = (window.innerHeight-100)*.85;
-    $('.content_textarea').css('height', h+'px');
+    if(fullscreenOn === false) {
+        var h = (window.innerHeight-100)*0.85;
+        $('.content_textarea').css('height', h+'px');
+    }
 }
 function refreshBodyDesign1() {
 	toolbar_width = $('.toolbar').width();
-	if(window.paneltitle == undefined) {
+	if(window.paneltitle === undefined) {
 		console.log("Change without panel");
-		if(window.fullscreenOn == false) {
-			var h = (window.innerHeight-100)*.85;
+		if(window.fullscreenOn === false) {
+			var h = (window.innerHeight-100)*0.85;
 			var w = window.innerWidth-25;
 			$('.content_wrapper').css('width', w+'px').css('margin-bottom', '-3px').css('margin-left', '-13px')/*.css('overflow-x', 'hidden')*/;
 			$('.content_textarea').css('height', h+'px').css('width', w+'px');	
@@ -436,15 +438,15 @@ function refreshBodyDesign1() {
 		
 		//Update Header
 		ribbonSwitch(ribbon_index, true);
-	} else if(window.paneltitle != undefined) {
+	} else if(window.paneltitle !== undefined) {
 		console.log("Change with panel");
 		$('.content_wrapper').css('width', 'calc(100% - 1px)');
-        if($('.PanelMaximizeEvent').attr('data-status') == 0)
-		  sizePanel(panelwidth, false);
+        if($('.PanelMaximizeEvent').attr('data-status') === 0)
+            sizePanel(panelwidth, false);
             
 		$('.content_textarea').css('width', '100%').css('margin-left', '0px');
 	}
-	setTimeout("onInitToolbar();", 100);
+    setTimeout(function() { onInitToolbar(); }, 100);
 }
 $( window ).resize(function() {
   refreshBodyDesign();

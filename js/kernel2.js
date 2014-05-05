@@ -1,25 +1,13 @@
 function refTextDetails(id) {
-
     ht = "<span style='font-size:14pt'>Pick an Object. The text will use the figure number of this object. (Just the number)</span><br><div id='Popup'></div>";
-
     $('.reftext'+id).attr('data-id', id);
-
     ht += "<input type='hidden' id='PopupId' value='"+id+"'>";
-
     fnc = function x() {
-
         id = $('#PopupId').val();
-
         function populate(ind) {
-
-//            console.log("populate {"+ind+"}");
-
             var a = $('.img');
-
             out = "<table style='width:90%'>";
-
             var i = 0;
-
             $('.content_textarea .img').each(function() {
                 if(ind == i && $('.reftext'+id).attr('data-ref').indexOf('img') > -1)
                     bg = "rgba(0,255,0,.5)";
@@ -364,10 +352,10 @@ function setHeader() {
 		),
 
 		About: new Array(
-			{text: 'Open Source', img: '<span style="font-size:18pt" class="fa fa-github-alt"></span>', action: "window.location='http://www.github.com/fleker/gltn'"},
-			{text: 'Documentation', img: '<span style="font-size:18pt" class="fa fa-book"></span>', action: "window.location='http://felkerdigitalmedia.com/gltn/docs'"},
-			{text: 'Send Feedback', img: '<span style="font-size:18pt" class="fa fa-envelope"></span>', action: "window.location='mailto:handnf+gltn@gmail.com'"},
-			{text: 'Gltn Blog', img: '<span style="font-size:18pt" class="fa fa-bullhorn"></span>', action:"window.location='http://gltndev.wordpress.com/'"},
+			{text: 'GitHub', img: '<span style="font-size:18pt" class="fa fa-github-alt"></span>', action: "openTab('http://www.github.com/fleker/gltn')"},
+			{text: 'Documentation', img: '<span style="font-size:18pt" class="fa fa-book"></span>', action: "openTab('http://felkerdigitalmedia.com/gltn/docs')"},
+			{text: 'Send Feedback', img: '<span style="font-size:18pt" class="fa fa-envelope"></span>', action: "openTab('mailto:handnf+gltn@gmail.com')"},
+			{text: 'Gltn Blog', img: '<span style="font-size:18pt" class="fa fa-bullhorn"></span>', action:"openTab('http://gltndev.wordpress.com/')"},
 			{text: 'Credits', img: '<span style="font-size:18pt" class="fa fa-legal"></span>', action: 'postLegal()'}
 		),
 
@@ -406,14 +394,15 @@ function ribbonLoad() {
 			setTimeout('window.location = "?file='+v+'";', 250);
 		}
 	});
-	$('#me_name').attr('value', settings.me_name);
-	$('#me_name').attr('defaultValue', settings.me_name);
+	$('#me_name').attr('value', getSettings("me_name"));
+	$('#me_name').attr('defaultValue', getSettings("me_name"));
 	$('#me_name').on('input', function() {
 		writeToSettings('me_name', $('#me_name').val());		
 	});
 }
 
 function postLegal() {
+    out = "Gltn version "+GLTN_VERSION+"<br>";
 	out = "2014 Made by Nick Felker<br>(@HandNF)<br>";
     out += "Made using libraries from Mathjax, Font Awesome, jQuery, Rangy, InkFilepicker, and others<br>";
     out += "Shoutout to everyone who posted online about stuff like replacing text nodes and the ample amount of help from StackOverflow.<br>";
@@ -427,6 +416,7 @@ function postLegal() {
 currentpanel = "";
 
 function install_panel(id, name, img, url, service, key, num) {
+    console.log(id, name, img, url, service, key, num);
 	if(service == undefined)
 		service = false;
 	if(key == undefined)
@@ -444,111 +434,61 @@ function install_panel(id, name, img, url, service, key, num) {
 	}
     if(typeof(service) == "string")
         service = service.replace(/,/, "");
-	if(window.settings.panels.indexOf(id) == -1) {
-		window.settings.panels += ", "+id;
+	if(getSettings('panels').indexOf(id) == -1) {
+		writeToSettings('panels', getSettings('panels') + ", "+id);
 	}
-	window.settings['panels_'+id] = id+", "+name+", "+img+", "+url+", "+service+", "+key;
+	writeToSettings('panels_'+id, id+","+name+","+img+","+url+","+service+","+key);
 
-	if(window.offline != true) {
-
-	//Now store script offline - this really sucks though
-
+	if(window.offline !== true) {
+        //Now store script offline - this really sucks though
 		loadjscssfile(url, "js");
-
-		//$('body').append('');
-
 		$('#themeframe').attr('src', url);
-
+        currentpanel = "null";
         window.setTimeout(function() {download_panel(id,num)}, 200);
-
-        
-
-//        console.log(localStorage['zpanels_'+id]);
-
-//		setTimeout("localStorage['zpanels_"+id+"'] = $('#themeframe').contents().text();", 1000);
-
-	//} else {
-
 	}
 }
 
 function download_panel(id,num) {
-    if(currentpanel != id) {
+    if(currentpanel !== id) {
         console.log(id, currentpanel);
         if(!currentpanel.length)
             return;
-        window.setTimeout(function() {download_panel(id,num)}, 100);
+        window.setTimeout(function() {download_panel(id,num);}, 100);
     } else {
         console.log("Installed");
         localStorage['zpanels_'+id] = $('#themeframe').contents().text();  
         console.log("eval('InitPanel"+id+"();');  "+num);
-	    setTimeout("eval('InitPanel"+id+"();');", 100);	
-        initPanels(num+1)
+        setTimeout("eval('InitPanel"+id+"();');", 100);	
+        initPanels(num+1);
     }
 }
 
 function uninstall_panel(id) {
-
-	//alert('Fix ribbon');
-
 	//For removing the ribbon, need to compare the name of the ribbon with the name of the panel
-
-	var a = window.settings['panels_'+id].split(', ');
-
-	var b = new Array();
-
-	for(i in holoribbon_std['Panels']) {
-
-		var j = holoribbon_std['Panels'][i];
-
-		//console.log(a[1],i, j);
-
+	var a = getSettings('panels_'+id).split(', ');
+	var b = [];
+	for(var i in holoribbon_std.Panels) {
+		var j = holoribbon_std.Panels[i];
 		if(j.text != a[1]) {
-
 			b.push(j);
-
-			//console.log('Found '+j.text+' as '+id);	
-
-			
-
 		}
-
 	}
-
-	holoribbon_std['Panels'] = b;
-
+	holoribbon_std.Panels = b;
 	newRibbon('.header', holoribbon_std);
-
-
-
-	//Now we can set up a way for panels to turn off stuff
-
+    //Now we can set up a way for panels to turn off stuff
 	//We set a short timer so that if it doesn't exist, it doesn't ruin the flow of the function
-
 	setTimeout("eval('RemovePanel"+id+"();');", 1);
-
-	var a = window.settings.panels.split(', ');
-
-	var b = new Array();
-
+	var a = getSettings('panels').split(', ');
+	var b = [];
 	for(i in a) {
-
 		if(a[i] != id) {
-
 			b.push(a[i])
-
 		}	
-
 	}	
-
-	window.settings.panels = b.join(', ');
-
-	window.settings['panels_'+id] = undefined;	
-
-	if(localStorage['zpanels_'+id] != undefined) 
-
+	writeToSettings('panels', b.join(', '));
+	writeToSettings('panels_'+i, undefined);	
+	if(localStorage['zpanels_'+id] !== undefined) 
 		localStorage.removeItem('zpanels_'+id);
-
 }
 
 function appendHoloSelection() {
@@ -665,7 +605,6 @@ function initTheme() {
 	theme.normfsuicolor = 'black';
 	theme.ribbonhighlight = 'rgba(44, 62, 80,1.0)';
 	theme.ribbonplain = 'rgba(0,0,0,0)';
-    theme.palette = {};
     theme.palette.red = "rgb(255,68,68)";
     theme.palette.dark = "rgba(44,62,80,1)";
     theme.palette.blue = '#2980b9';
@@ -685,26 +624,33 @@ function startThemer() {
 	//isn't called until settings are grabbed because otherwise window.settings.theme wouldn't exist
 	//grab current theme
 	//if not set reset themes
-    window.theme = {};
+    window.theme = {palette:{}};
     initTheme();
-	var url = undefined;
-	if(window.settings.theme == undefined) {
-		window.settings.theme = "default, blackout";
-		window.settings.currenttheme = "default";
-		window.settings.theme_default = "default, Default, js/themes/kernel.js, <span class='fa fa-heart-o'></span>";
-		window.settings.theme_blackout = "blackout, Blackout, js/themes/theme_blackout.js, <span class='fa fa-heart'></span>";
+	var url;
+	if(getSettings('theme') === undefined) {
+		writeToSettings('theme', "default, blackout");
+		writeToSettings('currenttheme', "default");
+		writeToSettings('theme_default', "default, Default, js/themes/kernel.js, <span class='fa fa-heart-o'></span>");
+		writeToSettings('theme_blackout', "blackout, Blackout, js/themes/theme_blackout.js, <span class='fa fa-heart'></span>");
 	} //else {
 
-	var a = window.settings.theme.split(', ');
-	var b = window.settings['theme_'+window.settings.currenttheme].split(', ');
-		url = b[2];
-	//}
-
+	var a = getSettings('theme').split(', ');
+	var b = getSettings('theme_'+getSettings("currenttheme")).split(', ');
+		
+    //Data validation
+    //console.log(b,b.length);
+    if(b.length == 3) {
+        b[2] = b[2].substring(0,b[2].length - 1);  
+        b[3] = "?";
+    }
+    console.log(b,b.length);
+    url = b[2];
+    writeToSettings('theme_'+getSettings("currenttheme"), b[0]+", "+b[1]+", "+b[2]+", "+b[3]);
 	//if not default insert JS
-	if(url != undefined && b[0] != "default") {
+	if(url !== undefined && b[0] != "default") {
 		console.log("Loading theme "+b[1]+" @ "+url);
-		console.log(window.offline != true)
-		if(window.offline != true) {
+		console.log(window.offline !== true);
+		if(window.offline !== true) {
 			loadjscssfile(url, 'js');
 			//Load script and save it
 			//Now store script offline - this really sucks though
@@ -714,7 +660,7 @@ function startThemer() {
 		//JS will have same function and call that script
 	} else if(b[0] == "default") {
 		initTheme();
-      		 setLoaderColor('32,32,32');
+        setLoaderColor('32,32,32');
         writeCss('@import url(http://fonts.googleapis.com/css?family=Lato:100,300,400);');
 //		writeCss('@import url(http://fonts.googleapis.com/css?family=Merriweather+Sans:400,300,700&subset=latin,latin-ext);');
         themeCss('font-family', '"Lato", sans-serif');
@@ -724,7 +670,7 @@ function startThemer() {
         writeCss("button.ribbonbutton, button.toolbar_button { font-weight:400; }");
         writeCss("button.textbutton { border: solid 1px #999;padding: 8px;background-color: #f9f9f9;font-weight: 400; }");
         writeCss("button:hover { background-color: #34495e; color: #ecf0f1; } button:active {position:relative;top:1px;}");
-    	}
+    }
 }
 
 function setLoaderColor(col) {
@@ -794,25 +740,15 @@ function setLoaderColor(col) {
 }
 
 function install_theme(id, name, url, icon) {
-
-	if(window.settings.theme.indexOf(id) == -1) {
-
-		window.settings.theme += ", "+id;
-
-		window.settings['theme_'+id] = id+', '+name+', '+url+', '+icon;	
-
+	if(getSettings('theme').indexOf(id) == -1) {
+		writeToSettings(getSettings() + ", "+id);
+		writeToSettings('theme_'+id, id+', '+name+', '+url+', '+icon);	
 	}
-
-	if(offline != true) {
-
+	if(offline !== true) {
 		//Now store script offline - this really sucks though
-
 		$('#themeframe').attr('src', url);
-
 		setTimeout("localStorage['ztheme_"+id+"'] = $('#themeframe').contents().text();", 1000);
-
 	}
-
 }
 
 function uninstall_theme(id) {
@@ -844,25 +780,15 @@ function uninstall_theme(id) {
 }
 
 function selectTheme(id) {
-
 	var a = window.settings.theme.split(', ');
-
-	var b = new Array();
-
 	for(i in a) {
-
 		if(a[i] == id)
-
-			window.settings.currenttheme = id;	
-
+			writeToSettings('currenttheme', id);	
 	}
-
 	//startThemer();
-
-	saveFile();
-
-	setTimeout("window.location.reload();", 150);
-
+    markAsDirty();
+    startSaveFile();
+    startThemer();
 }
 
 function onUpdateReady() {
@@ -936,191 +862,94 @@ function RunPanelmain_Offline() {
 	postPanelOutput(out);
 
 }
-
 window.applicationCache.oncached = appcache();
-
 window.applicationCache.onupdateready = onUpdateReady();
-
-//window.applicationCache.onerror = console.log('ACE');
-
-//
-
 window.applicationCache.onprogress = function(e) {
-
     // The event object should be a progress event (like those used by XHR2)
-
     // that allows us to compute a completion percentage, but if not,
-
     // we keep count of how many times we've been called.
-
     var progress = "";
-
     if (e && e.lengthComputable) // Progress event: compute percentage
-
         progress = " " + Math.round(100*e.loaded/e.total) + "%"
-
     else                         // Otherwise report # of times called
-
         progress = " (" + ++progresscount + ")"
-
-
-
-   // console.log("Downloading new version" + progress);
-
 	initService("main_Offline", "App caching", "<span class='fa fa-plane'></span>"+progress);
-
 	window.appcachestatus = "Found new version - Refresh to update";
-
     postNotification("appcache", "A new version of the app was downloaded. Click to update.", "window.location.reload()");
-
     return false;
-
 };
 
 function initNotifications() {
-
 	//Notifications live, send out requests?	
-
 	if(window.notifications == undefined) {
-
 		window.notifications = new Array();		
-
 	}
-
     postNotificationsIcon();
-
-	
-
 	//since appcache is too fast:
-
 	console.log(appcachestatus);
-
 	if(appcachestatus == "Found new version - Refresh to update")
-
 		postNotification("appcache", "A new version of the app was downloaded. Click to update.", "window.location.reload()");
-
 }
 
 function postNotificationsIcon() {
-
     if(notifications.length == 0)
-
         initService("main_Notifications", "Notifications (0)", "<span class='fa fa-bell-o'></span>");
-
     else
-
         initService("main_Notifications", "Notifications ("+notifications.length+")", "<span class='fa fa-bell'></span>&nbsp;"+notifications.length);
-
 }
 
-function InitPanelmain_Notifications() {
-
-	
-
-}
+function InitPanelmain_Notifications() {}
 
 function GetPanelmain_Notifications() {
-
 	return {title: "Notifications", bordercolor: "#666", width:25};	
-
 }
 
 function RunPanelmain_Notifications() {
-
 	//get window.notifications
-
 	var nonotes = "You have no new notifications";
-
 	var out = "";
-
 	if(notifications.length) {
-
 		for(i in notifications) {
-
 			out += "<div class='notification' style='background-color: rgba(0,255,0,.3);cursor:pointer;padding-left: 5px;padding-top: 5px;border: solid 1px "+theme.coloralt+";' data-id='"+notifications[i].id+"' data-i='"+i+"'><div class='notification_delete fa fa-times' style='width:21px;text-align:center;' data-id='"+notifications[i].id+"'></div>&nbsp;&nbsp;<div style='display:inline-table' onclick='"+notifications[i].action+"' >"+notifications[i].text+"</div></div><br>";
-
 		}
-
 		postPanelOutput(out);
-
         
-
         $('.notification_delete').off().hover(function() {
-
 			$(this).css('color', theme.normbg).css('background-color', '#f44').css('border-radius', 100);
-
 		}, function() {
-
 			$(this).css('color', theme.normcolor).css('background-color', 'inherit');
-
 		}).on('click', function() {
-
-            
-
             for(i in notifications) {
-
                 if(notifications[i].id == $(this).attr('data-id')) {
-
                     notifications.splice(i);
-
                     $('.notification[data-i='+i+']').animate({
-
                         width:'0%',
-
                         opacity:0
-
                     }, 300);
-
                     postNotificationsIcon();
-
                 }   
-
             }
-
         });
-
-        
-
-        
-
-	} else {
-
+    } else {
 		postPanelOutput(nonotes);	
-
 	}
-
 }
 
 function postNotification(id, text, action) {
-
     if(notifications == undefined)
-
             initNotifications();
-
 	var npush = -1;
-
 	for(i in notifications) {
-
 		if(notifications[i].id == id)
-
 			npush = i;
-
 	}
-
-	if(npush == -1) {
-
+    if(npush == -1) {
 		notifications.push({id:id, text:text, action:action});
-
 		postNotificationsIcon();
-
 	} else {
-
 		notifications[npush] = {id:id, text:text, action:action};
-
 		postNotificationsIcon();
-
 	}
-
 }
 
 
@@ -1132,10 +961,11 @@ function initContext() {
 	parseCT();
 		//formatHovertag("img", "'Image Details'", "'imgDetails('+$(this).attr('data-id')+');'");
 	$('.content_textarea').on('keydown', function( event ) {
-        console.log("Keyin "+event.which);
+//        console.log("Keyin "+event.which);
 	  if (event.which == 32 || event.which == 8 || event.which == 46 || event.which == 13) {
-          console.log("parse context");
-	  	setTimeout("parseCT();",20);
+//          console.log("parse context");
+//	  	    setTimeout("parseCT();",1);
+          parseCT();
 		//contentAddText(' ');
 	  	//event.preventDefault();
 	  }
@@ -1762,7 +1592,7 @@ function truncateFloat(floater) {
     return parseFloat(floater.toPrecision(15));
 }
 function openTab(url) {
-    window.open($(this).attr('data-url'), '_blank');   
+    window.open(url, '_blank');   
 }
 /* Takes a percent and converts it to the nearest column value in a 12-column system */
 function columnCount(p, trunc) {
@@ -1793,3 +1623,9 @@ function columnCount(p, trunc) {
 	}
 
          */
+function getloader() {
+    return "<div style='text-align:Center;' class='spin'></div>";  
+}
+function spinloader() {
+     $('.spin').spin({ color: theme.coloralt, shadow: false, lines: 7, length:40, width:8, radius:31, corners:1, trail:68, speed:1.6});   
+}

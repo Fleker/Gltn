@@ -1,19 +1,21 @@
 ﻿	// JavaScript Document
 mainpanels = "main_Character, main_Idea, main_Citation, main_Find, main_Filesys, main_Notifications";
 //Other panels are here by default, but don't need to be called on init
+//console.log(a);
 function initPanels(num) {
-    if(num == undefined)
+    if(num === undefined)
         num = 0;
-   if(window.settings.panels == undefined) {
-		window.settings.panels = mainpanels;	
+   if(getSettings('panels') === undefined) {
+		writeToSettings('panels', mainpanels);	
 	}
-	var a = window.settings.panels.split(', ');
-    console.log("Initializing Panel #"+num+": "+a[num]);
-    if(num == NaN)
+	var a = getSettings('panels').split(',');
+    if(num === NaN)
         return null;
     if(a.length - 1 < num)
         return null;
-//	for(i in a) {
+    console.log("Initializing Panel #"+num+": "+a[num]);
+    a[num] = a[num].trim();
+    
 		if(a[num].indexOf('main') > -1) {
 			try {
 				//
@@ -25,15 +27,23 @@ function initPanels(num) {
             initPanels(num+1);
 		} else {
 			//Need to add script
-			var b = window.settings['panels_'+a[num]].split(', ');
+            console.log(a[num], getSettings('panels_'+a[num]));
+			var b = getSettings('panels_'+a[num]).split(',');
+            console.log("Panel Manifest "+b.length, b);
 			if(b.length == 4)
 				install_panel(b[0], b[1], b[2], b[3], false, " ", num);
 			else if(b.length == 5)
 				install_panel(b[0], b[1], b[2], b[3], b[4], " ", num);
 			else if(b.length == 6)
 				install_panel(b[0], b[1], b[2], b[3], b[4], b[5], num);
+            else if(b.length == 8) /* Data Validation */ {
+                install_panel(b[0], b[1].trim(), "?", b[3], b[4].trim(), b[5].trim(), num);     
+            }
 		}
-    InitPanelmain_Table();
+    if(num == 0) {
+        InitPanelmain_Table();
+        InitPanelmain_PageCount();
+    }
 //	}
     //Now we do a bit of additional installs
 //    install_panel("main_PDF", "Export to PDF", ".", "", true, "");
@@ -51,9 +61,11 @@ function runPanel(panel_id_name) {
         max = "<span class='PanelMaximizeEvent' data-status='0'></span><button onclick='maximizePanel()'><span class='fa fa-arrows-alt'></span></button>";
     }
     console.log(max);
-	$('.panel_plugin_title').html('<table class="panel_plugin_head"><tr><td>'+p.title+'&emsp;<span class="PanelPopupEvent"></span><span class="PanelKeyEvent" data-keycode="" data-alt="" data-ctrl="" data-shift=""></span><span id="PanelCloseEvent"></span><span id="PanelBuildEvent"></span></td><td style="text-align:right">'+ max+'<button onclick="hidePanelPlugin()" data-step="22" data-intro="Click me to hide the panel.">'+closeButton()+'</button></td></tr></table>');
+	$('.panel_plugin_title').html('<table class="panel_plugin_head" style="width:100%"><tr><td>'+p.title+'&emsp;<span class="PanelPopupEvent"></span><span class="PanelKeyEvent" data-keycode="" data-alt="" data-ctrl="" data-shift=""></span><span id="PanelCloseEvent"></span><span id="PanelBuildEvent"></span></td><td style="text-align:right;padding:0px;">'+ max+'<button onclick="hidePanelPlugin()" data-step="22" data-intro="Click me to hide the panel." style="margin-top:15px;">'+closeButton()+'</button></td></tr></table>');
 	$('#panel_plugin').css("border-color", p.bordercolor).css('display', 'inline-table');
 	window.paneloverride = p.override;
+    if(p.width < 17)
+        p.width = 17;
     window.panelwidth = p.width;
 	//$('#panel_plugin').css('margin-top');
 	
@@ -450,6 +462,7 @@ function RunPanelmain_Idea() {
 			else if(id == -1)
 				ideadefault = encodeURIComponent($(this).val());
             markAsDirty();
+            reHeight();
 		});
         $('.PanelIdea').focusin(function() {
            reHeight(); 
@@ -470,8 +483,8 @@ function RunPanelmain_Idea() {
 				v = "";
 			$('.idea_div').html(v.replace(/\n/g, '<br>'));
 			$('.PanelIdea[data-id='+i+']').val(v);
-            console.log($('.idea_div'),$('.idea_div').height());
-			$('.PanelIdea[data-id='+i+']').css('height', $('.idea_div').height()+24+"px");
+//            console.log($('.idea_div'),$('.idea_div').height());
+			$('.PanelIdea[data-id='+i+']').css('height', $('.idea_div').height()+36+"px");
 		}
 	    $('.idea_div').hide();
            
@@ -487,7 +500,7 @@ function StylePanelmain_Idea() {
 }
 
 function GetPanelmain_Outline() {
-	return {title: "Outline", bordercolor: "#2c3e50", width: 40, override:[9]};	
+	return {title: "Outline", bordercolor: "#2c3e50", width: 40};	
 }
 function RunPanelmain_Outline() {
 	range = null;
@@ -764,6 +777,7 @@ function RunPanelmain_Filesys() {
 				try {
 					var i = $.xml2json(xml);                
 				} catch(e) {
+                    console.error(e.message);
 					$('.progress').html('<span style="color:red">Error: Not a proper Gltn file</span>');
 					setTimeout('closePopup();', 4000);
 					return null;
@@ -819,11 +833,11 @@ function RunPanelmain_Filesys() {
 					c(e.message);
 					continue;
 				}
-				title = xx.metadata.Title;
+				title = decodeURIComponent(xx.metadata.Title);
 				if(title == undefined)
 					title = "";
                 
-                bgc = theme.palette.dark;
+                bgc = theme.coloralt;
 				if(i == fileid)
 					bgc = theme.palette.blue;
 					
@@ -835,7 +849,7 @@ function RunPanelmain_Filesys() {
 				//console.log(xx.file.tags.split(','),sterm)
 				if(sterm == undefined || (sterm != undefined  && (title.toLowerCase().indexOf(sterm) > -1) || i.toLowerCase().indexOf(sterm) > -1 || xx.file.tags.indexOf(sterm) > -1)) {
 					try {
-						var y = xx.file.format;
+						var y = decodeURIComponent(xx.file.format);
 					} catch(e) {
 						console.error(e.message);
 						continue;
@@ -846,7 +860,7 @@ function RunPanelmain_Filesys() {
                          //console.log(xx.file.last_modified, time);
                        time = jQuery.timeago(new Date().setTime(xx.file.last_modified));
                         timeiso = new Date();
-                        timeiso.setTime(xx.file.last_modified);
+                        timeiso.setTime(decodeURIComponent(xx.file.last_modified));
                         //console.log(xx.file.last_modified,timeiso, timeiso.getTime());
                         timeiso = timeiso.toISOString();
                         //console.log(xx.file.last_modified, time, timeiso);
@@ -1051,32 +1065,32 @@ function findTextReplaceText(finder, replacer) {
 function install_dictionary(format, url, name, id, icon) {
 	//window.settings.dictionary = 'gltn, wiktionary, wikipedia';
 	//window.settings.dictionary_gltn = 'XML, http://felkerdigitalmedia.com/gltn/dictionary.php, Ouvert Dictionary, gltn, G';
-	if(window.settings.dictionary.indexOf(id) == -1) {
-		window.settings.dictionary += ", "+id;
-		window.settings['dictionary_'+id] = format+', '+url+', '+name+', '+id+', '+icon;
-		window.settings.dictionarysort += ", "+id;
+	if(getSettings('dictionary').indexOf(id) == -1) {
+		writeToSettings('dictionary', getSettings('dictionary') + ", "+id);
+		writeToSettings('dictionary_'+id, format+', '+url+', '+name+', '+id+', '+icon);
+		writeToSettings('dictionarysort', getSettings('dictionarysort') + ", "+id);
 	} else
 		console.error("You've already installed "+id); 	
 }	
 function uninstall_dictionary(id) {
-	var a = window.settings.dictionary.split(', ');
+	var a = getSettings('dictionary').split(', ');
 	var b = new Array();
 	for(i in a) {
 		if(a[i] != id) {
 			b.push(a[i])
 		}	
 	}	
-	window.settings.dictionary = b.join(', ');
-	window.settings['dictionary_'+id] = undefined;
+	writeToSettings('dictionary', b.join(', '));
+	writeToSettings('dictionary_'+id, undefined);
 	
-	var a = window.settings.dictionarysort.split(', ');
+	var a = getSettings('dictionarysort').split(', ');
 	var b = new Array();
 	for(i in a) {
 		if(a[i] != id) {
 			b.push(a[i])
 		}	
 	}	
-	window.settings.dictionarysort = b.join(', ');
+	writeToSettings('dictionarysort', b.join(', '));
 	
 }
 function GetPanelmain_Dictionary() {
@@ -1088,14 +1102,14 @@ function RunPanelmain_Dictionary() {
 	var connect_time = 0;
 	var ajaxrequests = new Array();
 	//Check stock dictionaries and 'install' if null
-	if(window.settings.dictionary == undefined) {
-		window.settings.dictionary = 'gltn, wiktionary, wikipedia';
-		window.settings.dictionary_gltn = 'XML, http://felkerdigitalmedia.com/gltn/dictionaries/dictionary.php, Ouvert Dictionary, gltn, <span class="fa fa-leaf"></span>';
-		window.settings.dictionary_wiktionary = 'HTML, http://felkerdigitalmedia.com/gltn/dictionaries/dictionary_wik.php, Wiktionary, wiktionary, <span class="fa fa-terminal"></span>';
-		window.settings.dictionary_wikipedia = 'HTML, http://felkerdigitalmedia.com/gltn/dictionaries/dictionary_wiki.php, Wikipedia, wikipedia, <span class="fa fa-globe"></span>';
+	if(getSettings('dictionary') == undefined) {
+		writeToSettings('dictionary', 'gltn, wiktionary, wikipedia');
+		writeToSettings('dictionary_gltn', 'XML, http://felkerdigitalmedia.com/gltn/dictionaries/dictionary.php, Ouvert Dictionary, gltn, <span class="fa fa-leaf"></span>');
+		writeToSettings('dictionary_wiktionary', 'HTML, http://felkerdigitalmedia.com/gltn/dictionaries/dictionary_wik.php, Wiktionary, wiktionary, <span class="fa fa-terminal"></span>');
+		writeToSettings('dictionary_wikipedia', 'HTML, http://felkerdigitalmedia.com/gltn/dictionaries/dictionary_wiki.php, Wikipedia, wikipedia, <span class="fa fa-globe"></span>');
 	}	
-	if(window.settings.dictionarysort == undefined || window.settings.dictionarysort == "undefined")
-		window.settings.dictionarysort = window.settings.dictionary;
+	if(getSettings('dictionarysort') == undefined || getSettings('dictionarysort') == "undefined")
+		writeToSettings('dictionarysort', getSettings('dictionary'));
 	function openApp() {
 		out = "<input type='search' id='DictionaryIn' style='width:65%;display:inline;'><button id='DictionarySettings'><span class='fa fa-cog'></span></button>";
 		out += "<div id='DictionaryOut'><span style='font-size:16pt'>Welcome</span><br>Search for something<br><br><br><div style='text-align:center;padding-left:80%;font-size:30pt;margin-top:25%;' class='fa-stack fa-lg'><span class='fa fa-circle-o fa-stack-2x'></span><span class='fa fa-quote-left fa-stack-1x'></span></div>";
@@ -1139,7 +1153,7 @@ function RunPanelmain_Dictionary() {
 			index = 0;
 			function tryDictionary(i) {
 				console.log(i, d[i]);
-				j = window.settings['dictionary_'+d[i]].split(', ');
+				j = getSettings('dictionary_'+d[i]).split(', ');
 				console.log(j[2], $('#DictionaryIn').val());
 				$('#DictionaryOut').css('background-color', 'inherit').css('padding-left', '0').css('padding-top', '0').css('padding-bottom', '0').css('border', 'none').css('margin-top', '0').css('width', '100%').css('color', 'inherit');
 				var req = $.get(j[1], {word: $('#DictionaryIn').val()}, function (data) {
@@ -1187,13 +1201,13 @@ function RunPanelmain_Dictionary() {
 	function openSettings() {
 		out = "<button id='DictionaryBack'><span class='fa fa-angle-left'></span></button><br>";
 		out += "Sort the dictionaries that you want to access, separated by a comma then a space.<br>";
-		out += "<input id='DictionarySort' value='"+window.settings.dictionarysort+"' style='width:95%'>";
+		out += "<input id='DictionarySort' value='"+getSettings("dictionarysort")+"' style='width:95%'>";
 		//out += "<button id='DictionarySortSave'>Save Order</button>";
 		out += "<br><br><u>Accessible Dictionaries</u><ul style='margin-left:20px;margin-top:0px;'>";
-		var a = window.settings.dictionary.split(', ');
+		var a = getSettings('dictionary').split(', ');
 		for(i in a) {
 			console.log('dictionary_'+a[i]);
-			var b = window.settings['dictionary_'+a[i]].split(', ');
+			var b = getSettings('dictionary_'+a[i]).split(', ');
 			//"<span class='fa fa-circle-o' style='font-size:9pt'></span>"+	
 			b[4] = b[4].replace(/&gt;/g, ">").replace(/&lt;/g, "<");
 			out += b[4]+" "+a[i]+"<br>";
@@ -1206,12 +1220,8 @@ function RunPanelmain_Dictionary() {
 		});
 		$('#DictionarySort').on('input', function() {
 			//$('#DictionarySortSave').attr('disabled', false);
-			window.settings['dictionarysort'] = $('#DictionarySort').val();
+			writeToSettings('dictionarysort', $('#DictionarySort').val());
 		});
-		/*$('#DictionarySortSave').on('click', function() {
-			
-			$('#DictionarySortSave').attr('disabled', true);
-		});*/
 	}
 	function xmlDictionaryParse(d) {
 		out = "<span style='font-size:17pt'>"+d.name+"</span>";
@@ -1267,21 +1277,21 @@ function GetPanelmain_Themes() {
 }
 function RunPanelmain_Themes() {
 	function loadThemes() {
-		var a = window.settings.theme.split(', ');
+		var a = getSettings('theme').split(', ');
         try {
             loadThemeSettings();
-		    out = "<button id='ThemeSettings'><span class='fa fa-cog'></span></button><br>";
+		    out = "<button id='ThemeSettings' class='textbutton'><span class='fa fa-cog'></span>&nbsp;Theme Settings</button><br>";
         } catch(e) {
             out = "";
         }
 		for(i in a) {
-			var b = window.settings['theme_'+a[i]].split(', ');
-			var bg = "rgba(255,0,0,.3)";
-			console.log(a[i], settings.currenttheme)
-			if(a[i] == settings.currenttheme)
-				bg = "rgba(0,128,255,.4)";
+			var b = getSettings('theme_'+a[i]).split(', ');
+			var bg = theme.palette.red;
+			console.log(a[i], getSettings('currenttheme'))
+			if(a[i] == getSettings('currenttheme'))
+				bg = theme.palette.blue;
 			out += "<div style='background-color:"+bg+";min-height:50px;margin-bottom:15px;cursor:pointer;padding-left: 4px;padding-top: 3px;' class='ThemesCard' data-c='"+a[i]+"'>";
-			b[3] = b[3].replace(/&gt;/g, ">").replace(/&lt;/g, "<");
+//			b[3] = b[3].replace(/&gt;/g, ">").replace(/&lt;/g, "<");
 			out += b[3]+"&nbsp;<span style='font-size:16pt'>"+b[1]+"</span>";
 			out += "</div>";
 		}
@@ -1293,7 +1303,7 @@ function RunPanelmain_Themes() {
 			window.location.reload();
 		});
         $('#ThemeSettings').on('click', function() {
-           var out = "<button id='ThemeCards'>X</button><br>"+loadThemeSettings();
+           var out = "<button id='ThemeCards'><span class='fa fa-times'></span></button><br>"+loadThemeSettings();
            postPanelOutput(out);
             runThemeSettings();
             $('#ThemeCards').on('click', function() {
@@ -1303,3 +1313,41 @@ function RunPanelmain_Themes() {
 	}
 	loadThemes();
 }	
+
+/** Page Count **/
+function InitPanelmain_PageCount() {
+    postPageCount();
+    $(document).on('keydown', function(e) {
+        if(e.keyCode == 32) {
+            postPageCount();
+            if(window.paneltitle == "main_PageCount")
+                RunPanelmain_PageCount();
+        }
+     });
+}
+function GetPanelmain_PageCount() {
+    return {title:"Page Count", bordercolor: theme.coloralt, width:20};   
+}
+function RunPanelmain_PageCount() {
+    out = "<div style='text-align:center'>This document is</div><br><br>";
+    out += "<div style='font-size:24pt;text-align:center;font-weight:100;'>~"+postPageCount()+" Page"+(postPageCount()==1?"":"s")+"</div>";
+    out += "<br><div style='text-align:center;font-size:8pt;font-style:italic;'>Based on the number of words that can fit on a page. This does not factor additional formatting like bibliographies or cover pages.</div><br><br><br><br><br>"; 
+    
+    out += "<div style='text-align:center'>Spoken, it is</div><br><br>";
+    out += "<div style='font-size:24pt;text-align:center;font-weight:100;'>~"+Math.round(10*getWords().length/130)/10+" Minute"+(postPageCount()==1?"":"s")+"</div>";
+    out += "<br><div style='text-align:center;font-size:8pt;font-style:italic;'>Based on an average of 130 words per minute.</div><br><br><br><br><br>";
+    
+    out += "<div style='text-align:center;'></div><br><br>";
+    out += "<div style='text-align:center;font-size:18pt;font-weight:100;'>"+getWords().length+" Words<br><br>"+getWords().join('').length+" Chars</div>";
+    postPanelOutput(out);
+}
+function postPageCount() {
+    var i = Math.round(onGetPageCount()*10)/10;  
+    initService("main_PageCount", "Page Count", Math.ceil(i)+" Page"+(Math.ceil(i)==1?"":"s")); 
+    return i;
+}
+function onGetPageCount() {
+    //Based on MLA procedures
+    var a = getWords();
+    return a.length*2/700;
+}   

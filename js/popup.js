@@ -2,7 +2,6 @@
 
 popupFocus = false;
 function initiatePopup(data) {
-    closePopup();
 	hideHovertag();
 	if(data === undefined)
 		data = {};

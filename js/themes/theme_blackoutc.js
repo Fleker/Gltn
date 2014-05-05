@@ -15,8 +15,8 @@ function initTheme() {
 	theme.normfsuicolor = 'white';
 //	theme.ribbonhighlight = '#05a';
     theme.ribbonhighlight = '#09f';
-    if(window.settings.ribbonhighlight != undefined && window.settings.ribbonhighlight.length > 0)
-        theme.ribbonhighlight = window.settings.ribbonhighlight; 
+    if(getSettings("ribbonhighlight") !== undefined && getSettings("ribbonhighlight").length > 0)
+        theme.ribbonhighlight = getSettings("ribbonhighlight"); 
 	theme.ribbonplain = 'rgba(0,0,0,0)';
 	
 	$('.header').css('background-color', '#333').css('border-bottom', 'solid 1px rgba(255,255,255,0.4)');
@@ -52,10 +52,14 @@ function runThemeSettings() {
        theme.ribbonhighlight = $(this).val(); 
         writeToSettings('ribbonhighlight', $(this).val());
         
-        writeCss("button:hover {	background-color:"+theme.ribbonhighlight+";color:black;}button:active {	position:relative;	top:1px;}");
-        writeCss("button.ribbonbutton:hover {	background-color:"+theme.ribbonhighlight+";color:black;}button:active {	position:relative;	top:1px;}");
-        writeCss("::selection {color:white;background:"+theme.ribbonhighlight+";}::-moz-selection {color:white;background:"+theme.ribbonhighlight+";}");
+        executeSettings();
     });   
+}
+function executeSettings() {
+    writeCss("button:hover {	background-color:"+theme.ribbonhighlight+";color:black;}button:active {	position:relative;	top:1px;}");
+    writeCss("button.ribbonbutton:hover {	background-color:"+theme.ribbonhighlight+";color:black;}button:active {	position:relative;	top:1px;}");
+    writeCss("::selection {color:white;background:"+theme.ribbonhighlight+";}::-moz-selection {color:white;background:"+theme.ribbonhighlight+";}");  
+    writeCss("input:focus, div:focus, button:focus{ outline: solid 1px "+theme.ribbonhighlight+";} input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px "+theme.ribbonhighlight+" inset}");
 }
 initTheme();
 writeCss("@import url(http://fonts.googleapis.com/css?family=Roboto+Condensed:300italic,400italic,700italic,400,300,700);");
@@ -66,12 +70,13 @@ writeCss("@import url(http://fonts.googleapis.com/css?family=Roboto+Condensed:30
 //Theme parameters for content_textarea not necessary (unless we removed the reload requirement for themes - but for now it'll stay due to a lack of default parameters)
 	$('.content_textarea').css('background-color', theme.normbg).css('color', theme.normcolor);
 setLoaderColor('255,255,255');
-writeCss("button.textbutton {	background-color:"+theme.normcolor+";	border-radius:3;	text-indent:0;	border:1px solid #888;	display:inline-block;	color:"+theme.normbg+";	font-weight:bold;	font-style:normal;	text-decoration:none;	text-align:center;padding:3px;min-width:30px;}");
+writeCss("button.textbutton {text-indent:0;	border:1px solid white;	display:inline-block;	color:"+theme.normbg+";	font-style:normal;	text-decoration:none;	text-align:center;padding:3px; text-transform:uppercase; min-width:80px; color:white; background-color: transparent; border-radius: 30px; font-weight:100; font-size:10pt; letter-spacing: 1px; margin-left: 3px; padding-left: 8px; padding-right: 7px;}");
 writeCss("button.ribbonbutton { padding-top:2px;height:77px; }");
 writeCss(".ribbonbutton { padding-top:2px;height:77px; }");
 writeCss("button { background-color:transparent }");
 writeCss("button:hover {	background-color:"+theme.ribbonhighlight+";color:black;}button:active {	position:relative;	top:1px;}");
 writeCss("button.ribbonbutton:hover {	background-color:"+theme.ribbonhighlight+";color:black;}button:active {	position:relative;	top:1px;}");
+writeCss("select { background-color:#999;color:black;}");
 
-writeCss("::selection {color:white;background:"+theme.ribbonhighlight+";}::-moz-selection {color:white;background:"+theme.ribbonhighlight+";}");
+executeSettings();
 writeCss(".has-tip:hover { border-bottom: solid 1px #ccc; color:inherit; }");

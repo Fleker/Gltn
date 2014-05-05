@@ -48,9 +48,9 @@ function new_gluten_formats() {
 function install_gluten_format(name, type, uri) {
 	formats.push({name: name, type: type, uri: uri});
 	if(settings['formats_name'].indexOf(name) == -1) {
-		window.settings['formats_name'] = window.settings['formats_name'] + ", " + name;
-		window.settings['formats_type'] = window.settings['formats_type'] + ", " + type;
-		window.settings['formats_uri'] = window.settings['formats_uri'] + ", " + uri;
+		writeToSettings('formats_name', getSettings('format_name') + ", " + name);
+		writeToSettings('formats_type', getSettings('formats_type') + ", " + type);
+		writeToSettings('formats_uri', getSettings('formats_uri') + ", " + uri);
 	}
 
 	new_gluten_formats();
@@ -197,13 +197,18 @@ function initiateCitationEditor(q, hovertag, h2) {
 			citei = getCitationi();
 			citeid = citation.length+1;
 			window.citationrestore = false;
-			if(range.toHtml().length == 0 && hovertag == undefined && q != "panelonly") {
+            try {
+                var rangeToHTM = range.toHtml();   
+            } catch(e) {
+                var rangeToHTM = ""
+            }
+			if(rangeToHTM.length == 0 && hovertag == undefined && q != "panelonly") {
                 if(citation[citationi] != "undefined" && citation[citationi] != undefined)
 				    citationi++;
 				//Add quote and citation stuff
 				//contentAddText('  ');
 				contentAddSpan({class: 'citation', id:'citation'+citei, node:'span', leading_quote:(q.length>0)});
-				contentAddText(' ');
+//				contentAddText(' ');
 				//contentAddSpan({node:'span'});
 			}
 			else if(hovertag >= 0 /*citation is selected OR hovertag click - hovertag is the citei*/) {
@@ -248,7 +253,7 @@ function initiateCitationEditor(q, hovertag, h2) {
                 window.quoteout = $('#citation'+citei).html().replace(/"/g,'&quot;');
             } catch(e) {
 		          console.error(e.message);
-                window.quoteout = '" "';   
+                window.quoteout = '""';   
             }
 		console.log("Q"+window.quoteout,citei,$('#citation'+citei).html());
 			out = 'Quote: <input id="citationQuote" style="width:74%;margin-left:13%;" value="'+window.quoteout+'"><br>What do you want to cite?<br><input class="citelist" type="text" list="citelist" id="citationEditorIType">';
@@ -464,11 +469,13 @@ function initiateCitationEditor(q, hovertag, h2) {
 					}
 				$('#citation'+citei).attr('data-id', citeid);
 				$('#citation'+citei).attr('data-i', citei);
-				citationHovertag();
+				
 				closePopup();
                 $('#citation'+citei).html($('#citationQuote').val());
                 window.quoteout = undefined;
-				introJsStart(16);
+                recallHovertags();
+                citationHovertag();
+//				introJsStart(16);
 			}
 			function citationRestore() {
 				type = citation[citeid]['MediumFormat'];
@@ -596,6 +603,8 @@ function formatHovertag(classname, textcode, action, recall) {
     }, function() {
         classname = $(this).attr('class').split(' ')[0];
         Foundation.libs.tooltip.hide($('.tooltip[data-selector="'+classname+'"]'));
+        recallHovertags();
+        citationHovertag();
     });
     
     if(recall != true && recall != "true") { 
@@ -757,6 +766,7 @@ function contentAddSpan(t) {
 		//Move forward one to keep typing.
 		//moveCarat("character", -2-3);
 		contentValidate();
+        parseCT();
 		
 	}
 }
@@ -951,12 +961,9 @@ function fullscreen() {
 		$('.content_textarea').stop().animate({
 			top: "-.1%",
 			left:"-.1%",
-			width:"95%",
-			width:window.innerWidth-55+"px",
-			/*width:"calc(100%-80px)",*/
-			height:window.innerHeight-35+"px",
-			/*height:"calc(100%-35px)",*/
-			fontSize:"16pt",
+			width:"101%",
+			height:"101%",
+            fontSize:"16pt",
 			paddingLeft:"60px",
 			paddingRight:"30px",
 			paddingTop:"35px",
@@ -1016,7 +1023,7 @@ function checkIntro() {
 	if(localStorage['autointro'] == undefined && false) {
 		introdisabled = true;
 		localStorage['autointro'] = true;
-		introJsStart();
+//		introJsStart();
 	}	
 }
 //setTimeout("checkIntro()", 1000);
@@ -1032,7 +1039,7 @@ if(window.introdisabled != false && false)
 }
 function exitintro() {
 	window.introdisabled = false;
-	introJs().exit();	
+//	introJs().exit();	
 	//alert("There you go, one perfectly formatted paper. Wasn't that easy? In fact, it was very simple to do, and it didn't require memorizing a computer language or formatting rules. There's a lot of things the human mind is good at; automation isn't one of them. Save you time for, you know, actually *writing* your paper.\n\nThis project is open source, so check it out on GitHub and contribute if you want. It is easy to develop a panel or add a small feature.\n\nI hope that this project is exciting, and that you'll use it once it is available.\n-Nick Felker");
 }
 
@@ -1113,7 +1120,7 @@ document.onkeydown = function(e) {
         case 84:
             if(e.altKey) {
                 window.introdisabled = true;
-                introJsStart();      
+//                introJsStart();      
             }
         break;
 		case 122: /*F11*/
@@ -1145,7 +1152,11 @@ document.onkeydown = function(e) {
 
 //Gets an array of words in the body
 function getWords() {
-    var a = $('.content_textarea').html().toLowerCase().trim().replace(/<kbd class="latex.*<\/kbd>/g, "").replace(/></g, "> <").replace(/<[^>]*>/g, "").replace(/"/g, "").replace(/&nbsp;/g, " ").split(' ');
+    try {
+        var a = $('.content_textarea').html().toLowerCase().trim().replace(/<kbd class="latex.*<\/kbd>/g, "").replace(/></g, "> <").replace(/<[^>]*>/g, "").replace(/"/g, "").replace(/&nbsp;/g, " ").split(' ');
+    } catch(e) {
+        var a = "";
+    }
     if(a.length == 0) 
         return [""];
     else

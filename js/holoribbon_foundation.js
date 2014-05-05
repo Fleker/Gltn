@@ -38,7 +38,7 @@ function newRibbon(element, ribbon) {
             } 
             else if(k.group !== undefined) {
                 //group button
-                out += '<div class="'+classname+'" style=""><div style="">' + k.value + '</div><div style="text-align:center">' + k.group + '</div></div>';
+                out += '<div class="'+classname+'" style=""><div style="">' + k.value + '</div><div style="text-align:center;margin-top:-5px;">' + k.group + '</div></div>';
             }
 			
 			

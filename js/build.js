@@ -5,7 +5,7 @@ function falseBuild(printr) {
 	$('.build').fadeIn(500);
 	$('.main').fadeOut(500);
 	$('.header').fadeOut(500);
-	out = '<span class="buildRow"><button onclick="exitBuild()"><span class="fa fa-angle-left"></span>&nbsp;Editor</button>';
+	out = '<span class="buildRow"><button class="textbutton" onclick="exitBuild()"><span class="fa fa-angle-left"></span>&nbsp;Editor</button>';
 	if(printr != true) {
 		out += buildPrint;
     }
@@ -25,7 +25,6 @@ function startBuild(el) {
         
 		//$('.build_progress').css('display', 'block').css('position', 'fixed').css('width', '50%').css('height', '50%').css('top','25%').css('left','25%').css('background-color', 'rgba(0,0,0,0.3)').css('font-size','16pt').css('margin-top','10%');
 	initiatePopup({title:"Compilation Progress",bordercolor:"rgb(44, 145, 16)",ht:"<div id='build_progress' class='build_progress' style=''></div>"});
-        setTimeout('getLoader("buildProgress")');
 	updateBuildProgress('Beginning to Compile...');
 	setTimeout(function() {
         try {
@@ -156,8 +155,10 @@ function continueBuild(el) {
 }
 function updateBuildProgress(text) {
     setTimeout(function() {
-	   $('.build_progress').empty();
-        $('.build_progress').append(text);
+//	   $('.build_progress').empty();
+        $('.build_progress').html(text+"<br>"+getloader());
+        spinloader();
+//        $('#progress_buddy').html();
     }, 10);
 }
 function finishBuild() {

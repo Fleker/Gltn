@@ -70,8 +70,13 @@
           e.preventDefault();
 
           if (!self.locked) {
-            var settings = S('[' + self.attr_name() + '].open').data(self.attr_name(true) + '-init'),
-                bg_clicked = S(e.target)[0] === S('.' + settings.bg_class)[0];
+              try {
+                  var settings = S('[' + self.attr_name() + '].open').data(self.attr_name(true) + '-init'),
+                    bg_clicked = S(e.target)[0] === S('.' + settings.bg_class)[0];
+              } catch(e) {
+                  console.error(e.message);
+                  bg_clicked = true;   
+              }
 
             if (bg_clicked) {
               if (settings.close_on_background_click) {

@@ -34,12 +34,13 @@ min_char = 0;
 max_char = 0;
 min_word = 0;
 max_word = 0;
+GLTN_VERSION = "1.3.0.1";
 
 hovertagRegistrar = [];
 obj = {};
 currentformat = "";
 document.ready = function() {
-	console.log('Gltn has woken up: v 1.2.0.1');
+	console.log('Gltn has woken up: v '+GLTN_VERSION);
     $(document).foundation({
       animation: 'fadeAndPop',
       animation_speed: 250,
@@ -79,7 +80,7 @@ document.ready = function() {
     filepicker.setKey("AePnevdApT62LvpkSSsiVz");
     
     //Let's check the file to determine whether we should grab it locally or online
-    if(localStorage[fileid] != undefined) {
+    if(localStorage[fileid] !== undefined) {
         if(window.location.href.indexOf("&share=") > -1) {
             var c = window.location.href.substr(window.location.href.indexOf("&share=")+7);
             cloudRead("https://www.filepicker.io/api/file/"+c, "RF", fileid);
@@ -128,7 +129,7 @@ function startSaveFile() {
         }
     }
     else if(isCloudSaved()) {
-        cloudRead(getFileData("inkblob_url"), "RF2", x.file.last_modified);
+        cloudRead(getFileData("inkblob_url"), "RF2", jsonsave.gluten_doc.file.last_modified);
     } else {
         saveFile();   
     }
@@ -188,7 +189,8 @@ function saveFile() {
 //		console.log(obj.metadata,i,window.metadata[i].id,obj['metadata'][window.metadata[i].id]);
 		var att = window.metadata[i].id.replace(/ /g, '_');
 		//console.warn(i);
-		obj['metadata'][att] = grabMetadata(i).value;
+        if(att.length > 0)
+		  obj['metadata'][att] = encodeURIComponent(grabMetadata(i).value);
 //        console.log(att, i, grabMetadata(i).value);
 		//console.log(obj.metadata);
 		//console.warn(i);
@@ -205,11 +207,11 @@ function saveFile() {
 	//Save global settings - Integrated saves
 	op = {};
 	opbj = {};
-	if(window.settings != undefined) {	
+	if(window.settings !== undefined) {	
 		for(i in window.settings) {
 //			console.warn("WS "+i);
 			writeToSettings(i, window.settings[i]);
-			opbj[i] = window.settings[i];
+			opbj[i] = getSettings(i);
 		}
 	}
 	op.gluten_prefs = opbj;
@@ -246,7 +248,7 @@ function restoreFile(full) {
 	if(xpref != undefined) {
 		window.settings = {};
 		for(i in xpref) {
-			window.settings[i] = xpref[i].replace(/&gt;/g, ">").replace(/&lt;/g, "<");	
+			writeToSettings(i, xpref[i]);	
 		}
 	}
 	} catch(e) {
@@ -269,8 +271,8 @@ function restoreFile(full) {
 	//var x = xml2json(jQuery.parseHTML(localStorage[fileid]),"  ");
     if(localStorage[fileid]) {
 	try {
-        console.log('"'+localStorage[fileid]+'"');
-	x = $.xml2json(localStorage[fileid].trim());
+//        console.log('"'+localStorage[fileid]+'"');
+	       x = $.xml2json(localStorage[fileid].trim());
 	} catch(e) {
 		console.error(e.message);
 		var z = confirm("This document has improper XML. Click okay to send a bug report.");
@@ -319,8 +321,12 @@ function restoreFile(full) {
 		}
 		citationi = x.citationi;
 		idea  = [];
-		if(x.idea != undefined)	
-			idea = x.idea;
+		if(x.idea != undefined) {
+            if(typeof(x.idea)) 
+                idea = [x.idea];
+            else
+                idea = x.idea;
+        }
 		ideadefault = x.ideadefault;
 		if(x.saved != undefined) {
 			window.saved = {};
@@ -475,7 +481,7 @@ function newFile2() {
 		if(window.metadata[i].id == "Author") {
 			console.log(i, window.settings.me_name);
 			//console.log($('#f'+i));
-			$('#format_item_'+i).val(window.settings.me_name);
+			$('#format_item_'+i).val(getSettings('me_name'));
 		}
 	}
 	//Call {format}
@@ -511,11 +517,12 @@ function writeToFile(att, val) {
 	writeToSaved(att, val);	
 }
 function getSettings(att) {
-    return window.settings[att];   
+    return decodeURIComponent(window.settings[att]);   
 }
 function writeToSettings(att, val) {
 	if(val != undefined && att != undefined) {
-		val = val.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/&nbsp;/g, " ").replace(/&emsp;/g, ' ');		
+        val = encodeURIComponent(decodeURIComponent(val));
+//		val = val.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/&nbsp;/g, " ").replace(/&emsp;/g, ' ');		
 	}
 	if(window.settings == undefined)
 		window.settings = {};	
@@ -954,15 +961,15 @@ function checkloadjscssfile(filename, filetype){
 }
 //format = 'mla';
 function initFormats() {
-	if(settings['formats_name'] == undefined) {
-		settings['formats_name'] = "";
-		settings['formats_type'] = "";
-		settings['formats_uri'] = "";
+	if(getSettings("formats_name") == undefined) {
+        writeToSettings("formats_name", "");
+		writeToSettings("formats_type", "");
+        writeToSettings("formats_uri", "");
 	}
 	//load all custom formats
-	for(i in window.settings.formats_name.split(', ')) {
-		if(settings.formats_name.split(', ')[i].length)
-			install_gluten_format(settings.formats_name.split(', ')[i], settings.formats_type.split(', ')[i], settings.formats_uri.split(', ')[i]);	
+	for(i in getSettings('formats_name').split(', ')) {
+		if(getSettings("formats_name").split(', ')[i].length)
+			install_gluten_format(getSettings('formats_name').split(', ')[i], getSettings('formats_type').split(', ')[i], getSettings('formats_uri').split(', ')[i]);	
 	}
 }
 function formatShift() {
@@ -1079,8 +1086,8 @@ function formatShift2(d) {
 				if(i == window.metadata[j].id.replace(/ /g, '_') && $('#format_item_'+j).val().length == 0) {
 //					console.log("Insert "+d[i]+" for "+window.metadata[j].id);
 					//console.log($('#format_item_'+j).val(), i);
-					$('#format_item_'+j).val(d[i]);
-					$('#format_item_'+j).html(d[i]);
+					$('#format_item_'+j).val(decodeURIComponent(d[i]));
+					$('#format_item_'+j).html(decodeURIComponent(d[i]));
 				} else {
 					//console.log('-');	
 				}
