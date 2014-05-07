@@ -43,6 +43,7 @@ function initPanels(num) {
     if(num == 0) {
         InitPanelmain_Table();
         InitPanelmain_PageCount();
+        InitPanelmain_Sync();
     }
 //	}
     //Now we do a bit of additional installs
@@ -58,9 +59,9 @@ function runPanel(panel_id_name) {
         p.bordercolor = theme.coloralt;
     if(p.maximize == true) {
         
-        max = "<span class='PanelMaximizeEvent' data-status='0'></span><button onclick='maximizePanel()'><span class='fa fa-arrows-alt'></span></button>";
+//        max = "<span class='PanelMaximizeEvent' data-status='0'></span><button onclick='maximizePanel()'><span class='fa fa-arrows-alt'></span></button>";
     }
-    console.log(max);
+//    console.log(max);
 	$('.panel_plugin_title').html('<table class="panel_plugin_head" style="width:100%"><tr><td>'+p.title+'&emsp;<span class="PanelPopupEvent"></span><span class="PanelKeyEvent" data-keycode="" data-alt="" data-ctrl="" data-shift=""></span><span id="PanelCloseEvent"></span><span id="PanelBuildEvent"></span></td><td style="text-align:right;padding:0px;">'+ max+'<button onclick="hidePanelPlugin()" data-step="22" data-intro="Click me to hide the panel." style="margin-top:15px;">'+closeButton()+'</button></td></tr></table>');
 	$('#panel_plugin').css("border-color", p.bordercolor).css('display', 'inline-table');
 	window.paneloverride = p.override;
@@ -665,11 +666,11 @@ function InitPanelmain_Filesys() {
 //Modal for new file creation and implementation
 function createNewFile() {
     ht = '<div class="row collapse"><div class="small-3 medium-3 columns"><input id="FileName" type="text" value="untitled" /></div><div class="small-3 medium-1 columns"><span class="postfix">.gltn</span></div>';
-    ht += "<div class='small-6 medium-8 columns end'>&emsp;<input type='search' id='FormatFinder' style='width:40%;display:inline-block' placeholder='Choose a Format'>&ensp;<button id='FormatOk' class='textbutton' style='margin-left:30px;font-size:16pt;font-weight:400;'>Create</button></div></div><br><span style='font-size:14pt;'>&emsp;Search for a Format<br></span><br><div id='FormatSearch' style='text-align:center'><div>";
+    ht += "<div class='small-6 medium-8 columns end'>&emsp;<input type='search' id='FormatFinder' style='width:40%;display:inline-block' placeholder='Choose a Format'>&ensp;<button id='FormatOk' class='textbutton' style='margin-left:30px;font-size:16pt;'>Create</button></div></div><br><span style='font-size:14pt;'>&emsp;Search for a Format<br></span><br><div id='FormatSearch' style='text-align:center'><div>";
     fnc = function x() {
         function search(v) {
             arr = [];
-            out = "";
+            out = "<div class='row'>";
             if(v == undefined)
                 v = "";
             for(i in window.formats) {
@@ -677,12 +678,12 @@ function createNewFile() {
                     if(formats[i].type.toLowerCase().indexOf(v.toLowerCase()) > -1 || formats[i].name.toLowerCase().indexOf(v.toLowerCase()) > -1) {
                         //Add to the grid
                         arr.push(formats[i]);
-                        out += "<div class='fileformat' data-name='"+formats[i].name+"' style='width:8em;height:4em;display:inline-table;text-align:center;'><div style='width:8em;height:4em;display:inline-table;border:solid 2px "+theme.coloralt+";background-color:"+theme.ribbonhighlight+";color:"+theme.darkcolor+";font-size:18pt;text-align:center;'>"+formats[i].name+"</div><div style='text-align:center;font-size:14pt;'>"+formats[i].name+"&nbsp;"+formats[i].type+"</div></div>";
-                        if(arr.length % 4 == 0)
-                            out += "<br>";
+                        out += "<div class='fileformat' data-name='"+formats[i].name+"' style='width:8em;height:4em;display:inline-table;text-align:center;' class='large-4 medium-6 small-12'><div style='width:8em;height:4em;display:inline-table;border:solid 2px "+theme.coloralt+";background-color:"+theme.ribbonhighlight+";color:"+theme.darkcolor+";font-size:18pt;text-align:center;'>"+formats[i].name+"</div><div style='text-align:center;font-size:14pt;'>"+formats[i].name+"&nbsp;"+formats[i].type+"</div></div>";
+                        
                     }
                 }
             }
+            out += "</div>";
             $('#FormatSearch').html(out);
             $('.fileformat').on('click', function() {
                 $('#FormatFinder').val($(this).attr('data-name')); 
@@ -889,10 +890,13 @@ function RunPanelmain_Filesys() {
 		}
 		out += "</table>";
 		fstotal += localStorage['settings'].length;
-		fstotalout = "<br><span style='font-size:10pt'>&emsp;"+getLocalStorageLength()+"KB stored</span>"
+		fstotalout = "<br><span style='font-size:10pt'>&emsp;"+getLocalStorageLength()+"KB stored</span><br><button class='textbutton exportall'>Export All Data</button>"
 		out += fstotalout;
 		post(out,term);
         jQuery("abbr.timeago").timeago();
+        $('.exportall').on('click', function() {
+            startExportHTML(getGltp(), "My Gltn Data");   
+        });
 		//setTimeout("post(out);", 50);
 	}	
 	resetFolder();

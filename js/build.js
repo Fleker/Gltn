@@ -1,5 +1,5 @@
 ﻿builddate = 0;
-buildPrint = '<button onclick="window.print()" class="noprint textbutton"><span class="fa fa-print"></span></button><button onclick="printHelp()" class="noprint textbutton"><span class="fa fa-question"></span>&nbsp;Print Help</button><button onclick="convertDoc()" class="noprint textbutton">Convert</button>';
+buildPrint = '<button onclick="window.print()" class="noprint textbutton"><span class="fa fa-print"></span>&nbsp;Print</button><button onclick="printHelp()" class="noprint textbutton"><span class="fa fa-question"></span>&nbsp;Print Help</button><button onclick="convertDoc()" class="noprint textbutton">Export</button>';
 function falseBuild(printr) {
 	window.section_name = "";
 	$('.build').fadeIn(500);
@@ -69,20 +69,24 @@ function printHelp() {
 }
 function convertDoc() {
     function createConvertButton(format) {
-        return "<button class='convertButton' data-format='"+format+"' style='width:60px;text-align:center;'>" +format.substring(0,1).toUpperCase()+format.substring(1)+"</button><br>";
+        return "<button class='convertButton textbutton' data-format='"+format+"' style='min-width:60px;text-align:center;'>" +format.substring(0,1).toUpperCase()+format.substring(1)+"</button>";
     }
-    ht = "<div id='convertDocBox'><b>Choose a Format to Convert To:</b><br>(Note that this is currently in beta)<br>";
-    ht += createConvertButton('docx');
+    ht = "<div id='convertDocBox'><span style='font-weight:200;font-size:16pt;'>Export to Which Format?</span><br><span style='font-style:italic;font-size:10pt;'>This feature is currently in beta</span><br><br><br>";
+    ht += createConvertButton('html');
+    /*ht += createConvertButton('docx');
     ht += createConvertButton('odt');
     ht += createConvertButton('pdf');
     ht += createConvertButton('epub'); 
-    ht += createConvertButton('mobi'); 
+    ht += createConvertButton('mobi');*/ 
     ht += createConvertButton('txt');
-//    ht += createConvertButton('html');
     ht += "</div>";
     fnc = function x() {
         $('.convertButton').on('click', function() {
-            startConversion($(this).attr('data-format'));
+            var export_format = $(this).attr('data-format')
+            if(export_format == "html")
+                startExportHTML();
+            else
+                startConversion(export_format);
            $('#convertDocBox').html("<font size='12pt'>Please Wait</font><br>Your file will be converted and downloaded soon<br>"+getLoader()); 
         });
     };

@@ -402,7 +402,7 @@ function ribbonLoad() {
 }
 
 function postLegal() {
-    out = "Gltn version "+GLTN_VERSION+"<br>";
+    out = "Gltn version "+GLTN_VERSION+"<br><br>";
 	out = "2014 Made by Nick Felker<br>(@HandNF)<br>";
     out += "Made using libraries from Mathjax, Font Awesome, jQuery, Rangy, InkFilepicker, and others<br>";
     out += "Shoutout to everyone who posted online about stuff like replacing text nodes and the ample amount of help from StackOverflow.<br>";
@@ -829,8 +829,7 @@ function appcache() {
 
 	console.log("App is now available for offline use.");
 
-	//if($('.contentmain_Offline').length == 0)
-
+	
 		setTimeout('initService("main_Offline", "App available offline", "<span class=\'fa fa-plane\'></span>");', 2000);
 
 	//hot swap	
@@ -970,15 +969,8 @@ function initContext() {
 	  	//event.preventDefault();
 	  }
 	});
-    
-    var exists = false;
-    for(i in hovertagRegistrar) {
-//        console.log(hovertagRegistrar[i].classname);
-        if(hovertagRegistrar[i].classname == "context")
-            exists = true;
-    }
-    if(!exists)
-        formatHovertag('context', "window.context[parseInt($(this).attr('data-i'))].type", "'contextPanel('+$(this).attr('data-i')+')'");
+    formatHovertag('context', "window.context[parseInt($(this).attr('data-i'))].type", "'contextPanel('+$(this).attr('data-i')+')'");
+//    recallHovertags();
 }
 
 function parseCT() {
@@ -1245,19 +1237,44 @@ function restoreSelection() {
 
 
 /*** Sync Service - Not directly related to files ***/
-
+function InitPanelmain_Sync() {
+    window.SYNC_HISTORY = ["File Downloading..."];
+    window.SYNC_STATUS = "";
+}
 function GetPanelmain_Sync() {
-
     return {title: "Sync", bordercolor: "#34495e", width:20};   
-
 }
 
 function RunPanelmain_Sync() {
-
-    out = "<span style='font-size:15'>Sync is On</span><br>This file is currently saved somewhere online. You can access it from a different computer.";
-
+    out = "<div id='main_sync_panel' style='font-weight:100;font-size:20pt;text-align:center'></div><br><br><span style='font-style:italic;font-size:10pt'>This file is stored on a cloud service, enabling access from a separate computer</span><br><br><div id='history_sync_panel' style='font-weight:200;font-size:10pt;border:solid 1px "+theme.palette.dark+";padding-left:6px;text-align:center;opacity:0.5'></div>";
     postPanelOutput(out);
-
+     $('#PanelCloseEvent').on('click', function() {
+            clearInterval(checkr);
+    });
+    var checkr = setInterval(function() {
+        $('#main_sync_panel').html("<span class='fa fa-check'></span><br>"+SYNC_STATUS);
+        $('#history_sync_panel').empty();
+        var max = (SYNC_HISTORY.length > 30)?30:SYNC_HISTORY.length;
+        for(var i=1;i<max;i++) {
+               $('#history_sync_panel').append(SYNC_HISTORY[i]+"<br>");
+        }
+        if(SYNC_HISTORY.length > 31)
+            SYNC_HISTORY.length = 31;
+    },1000)
+}
+function setSyncStatus(txt) {
+    if(SYNC_HISTORY == undefined) {
+        InitPanelmain_Sync();   
+    }
+    SYNC_STATUS = txt;   
+    SYNC_HISTORY.unshift(txt);
+}
+function getSyncStatusGood() {
+    var TIME = new Date();
+    var s = (TIME.getSeconds()<10)?"0"+TIME.getSeconds():TIME.getSeconds();
+    var h = (TIME.getHours()<10)?"0"+TIME.getHours():TIME.getHours();   
+    var m = (TIME.getMinutes()<10)?"0"+TIME.getMinutes():TIME.getMinutes();
+    return "Synced as of "+h+":"+m+":"+s;    
 }
 
 function initMathjax() {
@@ -1624,8 +1641,11 @@ function columnCount(p, trunc) {
 
          */
 function getloader() {
-    return "<div style='text-align:Center;' class='spin'></div>";  
+    return "<div style='text-align:center; width:100%;' class='spin'></div>";  
 }
-function spinloader() {
-     $('.spin').spin({ color: theme.coloralt, shadow: false, lines: 7, length:40, width:8, radius:31, corners:1, trail:68, speed:1.6});   
+function spinloader(inline) {
+    if(inline)
+        $('.spin').spin({ color: theme.coloralt, shadow: false, lines: 7, length:4, width:2, radius:2, corners:1, trail:68, speed:1.6}).css('width','').css('height','').css('display','inline').css('margin-left','-20px');   
+    else
+        $('.spin').spin({ color: theme.coloralt, shadow: false, lines: 7, length:30, width:6, radius:21, corners:1, trail:68, speed:1.6});     
 }

@@ -184,7 +184,7 @@ function post_format_text(m, inv) {
 	}
 	out = out + "<input type='text' id='format_item_"+m.index+"' placeholder='"+m.placeholder+"' style='width:55%' onmouseenter='hideHovertag()'>";
 	if(m.min.length !== 0 || m.max.length !== 0) {
-		out = out + "<br><div class='format_count' id='format_count_"+m.index+"'></div>";	
+		out = out + "<div class='format_count' id='format_count_"+m.index+"'></div>";	
 	}
 	return out;
 }

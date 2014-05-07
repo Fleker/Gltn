@@ -25,16 +25,13 @@ for(var i in GETarr) {
         $('#file_format').val(GETval);
     }
 }
-/*
-fileid = window.location.search.substr(6);
-if(window.location.search.indexOf("&share") > -1)
-    fileid = window.location.search.substring(6,window.location.search.indexOf("&share"));*/
 
 min_char = 0;
 max_char = 0;
 min_word = 0;
 max_word = 0;
 GLTN_VERSION = "1.3.0.1";
+SYNC_STATUS = "";
 
 hovertagRegistrar = [];
 obj = {};
@@ -93,7 +90,8 @@ document.ready = function() {
             
             //Okay, grab the InkBlob url and sync    
             try {
-             initiatePopup({title:'Syncing...',ht:'<div class="progress" style="font-size:14pt;text-align:center;width:100%;"></div>',bordercolor:'#7f8c8d', ht:"&emsp;&emsp;&emsp;Downloading the latest copy."});
+                initiatePopup({title:'Syncing...',ht:'<div class="progress" style="font-size:14pt;text-align:center;width:100%;"></div>',bordercolor:'#7f8c8d', ht:"&emsp;&emsp;&emsp;Downloading the latest copy."});
+                setSyncStatus("Downloading from Server");
             } catch(E) {
                 console.error(E.message);   
             }
@@ -573,8 +571,9 @@ function cloudXML() {
 //    filename: 'hello.txt', mimetype: 'text/plain', isWriteable: true, size: 100};
     initiatePopup({title:'Saving File Online',ht:'<div class="progress" style="font-size:14pt;text-align:center;width:100%;"></div>',bordercolor:'#7f8c8d', ht:"&emsp;&emsp;&emsp;Please wait as the export menu loads."});
     content = $('.content_textarea').html();
-    input = json2xml(o, "")+content;
-    console.log(input);
+    saveFile();
+    input = json2xml(jsonsave, "")+content;
+//    console.log(input);
     filepicker.store(input, function(InkBlob){
             filepicker.exportFile(
               InkBlob,
@@ -653,13 +652,15 @@ function cloudResave() {
         }
     }
     content = $('.content_textarea').html();
-    initService("main_Sync", "Synced", "<span class='fa fa-cloud'></span>");
      filepicker.write(window.ink,
          json2xml(o, "")+content,
         function(InkBlob){
-            console.log("Complete resync for now");
+//            console.log("Complete resync for now");
+            setSyncStatus("Changes Saved Online");   
+            initService("main_Sync", "Synced", "<span class='fa fa-cloud'></span>");
         }, function(FPError) {
             console.log("Error: "+FPError.toString());
+            setSyncStatus("<span style='font-color:"+theme.palette.red+"'>Error at "+Date().getHours()+":"+Date().getMinutes()+":"+Date.getSeconds()+"  "+FPError.toString()+"</span>");
         }
     );   
 }
@@ -693,18 +694,21 @@ function cloudRead(ink, callback, localMod) {
             var b = data.indexOf('</last_modified>');
             var c = parseInt(data.substring(a,b));
             localMod = parseInt(localMod);
-            console.log(localMod, c, localMod >= c, "a >= b");
+//            console.log(localMod, c, localMod >= c, "a >= b");
             if(localMod >= c) {
 //                console.log("Not synced: "+c+", "+localMod);
                 if(callback == "RF") {
                     restoreFile();
                     closePopup();
                 }
-                   return;
+                setSyncStatus(getSyncStatusGood());
+                return;
             } else if(localMod == c) {
+                setSyncStatus(getSyncStatusGood());
                 closePopup();
                 return;
             }
+            setSyncStatus("Downloading New Copy");  
             initService("main_Sync", "Downloading...", "<span style='border-radius:100%'><span class='fa fa-cloud-download'></span>&nbsp;<i class='fa fa-refresh fa-spin'></i><span>");
             
             //If so, let's keep going
@@ -775,7 +779,7 @@ function getShare() {
         var id = getFileData("inkblob_url").substr(35);
         var url = "http://felkerdigitalmedia.com/gltn/edit.php?file="+fileid+"&share="+id;
         //Display the URL
-        initiatePopup({title:"Share...",ht:"Send this link to other people and they can collaborate on this document in real time!<br><br><a href='"+url+"' style='color:"+theme.coloralt+"'>"+url+"</a><br><div style='text-align:center;'><img src='http://api.qrserver.com/v1/create-qr-code/?size=300x300%27&data="+encodeURIComponent(url)+"'></div>"});
+        initiatePopup({title:"Share...",ht:"Send this link to other people and they can collaborate on this document in real time!<br><br><a href='"+url+"' style='color:"+theme.palette.blue+"'>"+url+"</a><br><div style='text-align:center;'><img src='http://api.qrserver.com/v1/create-qr-code/?size=300x300%27&data="+encodeURIComponent(url)+"'><br><br> <button class='resave textbutton' onclick='cloudXML()'>Save Elsewhere</button> </div>"});
     } else {
         initiatePopup({title:"Share...",ht:"You must export the document to a cloud service before you can share it."});
         cloudXML();
@@ -783,6 +787,42 @@ function getShare() {
     
 }
 //Using the Cloudconvert.org API
+function startExportHTML(src, suggestedFile) {
+    if($('#build_print').length == 0) {
+                $('body').append("<div id='build_print'></div>");   
+            }
+            $('#build_print').html($('#build').html());
+            $('#build_print .page').css('box-shadow', 'none').css('-webkit-box-shadow', 'none').css('font-family', 'Times').css('12pt');
+            $('#build_print .page').css('width', '6in').css('margin-left', '1in').css('margin-right', '1in').css('background-color', 'white').css('text-decoration', 'none');
+            $('#build_print hr, #build_print button, #build_print .noprint').css('display', 'none').css('opacity', 0);
+            $('#build_print .noprint').remove();
+    
+    
+    input = $('#build_print').html();
+    if(src != undefined) 
+        input = src;
+    filepicker.store(input, function(InkBlob){
+            filepicker.exportFile(
+              InkBlob,
+              {extension:(suggestedFile==undefined)?".html":".xml",
+                 /*mimetype: 'text/gltn',*/
+                suggestedFilename: (suggestedFile==undefined)?fileid:suggestedFile,
+               base64decode: false
+              },
+              function(InkBlob){
+                  
+            });
+            console.log("Store successful:", JSON.stringify(InkBlob));
+            closePopup();
+        }, function(FPError) {
+            closePopup();
+            console.log(FPError.toString());
+        }, function(progress) {
+            console.log("Loading: "+progress+"%");
+        }
+   );   
+}
+
 function startConversion(output) {
     if(output == undefined)
         output = "pdf";

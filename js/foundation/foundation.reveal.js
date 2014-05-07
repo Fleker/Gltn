@@ -79,7 +79,7 @@
               }
 
             if (bg_clicked) {
-              if (settings.close_on_background_click) {
+              if (true) {
                 e.stopPropagation();
               } else {
                 return;

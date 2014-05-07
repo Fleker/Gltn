@@ -174,7 +174,40 @@ function surroundRange() {
                 }
             }
 }
-
+Date.prototype.toDateInputValue = (function() {
+    var local = new Date(this);
+    local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+    return local.toJSON().slice(0,10);
+});
+function scrapeURL(url) {
+    window.SCRAPE_DONE = false;
+    $.get('php/geturl.php', {url:url}, function(data) {
+        window.scrapedata = data;
+        var webpage = {};
+        var atts = [{o:"<title>", e:"</title>", n:"website_title"}];
+            atts.push({o:'rel="author">', e:'</a>', n:"author"});
+            atts.push({o:'class="author fn">', e:'</a>', n:"author"});
+            atts.push({o:'<author>', e:'<', n:"author"});
+            atts.push({o:'<h1 class="alpha tweet-title">', e:'</h1>', n:"title"});
+            atts.push({o:'og:title" content="', e:'"', n:"title"});
+            atts.push({o:'og:site_name" content="', e:'"', n:"publisher_title"});
+            atts.push({o:'Posted <time datetime="', e:'"', n:"pub_date"});
+        for(j in atts) {
+            i = atts[j];
+            var a = data.indexOf(i.o);
+            var i_sub = data.substring(a+i.o.length);
+            var b = i_sub.indexOf(i.e);
+            if(a > -1) {
+                webpage[i.n] = i_sub.substring(0,b);   
+            }
+        }
+        console.log("SCRAPE_DONE");
+        if(webpage.title != undefined)
+            webpage.title = webpage.title.substring(window.title.indexOf("|"));
+        window.SCRAPE_WEBPAGE = webpage;
+        window.SCRAPE_DONE = true;
+    });
+}
 function initiateCitationEditor(q, hovertag, h2) {
 			//q = '"';
 			if(q == undefined)
@@ -264,7 +297,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 			var ht = out+"</datalist>";
     
     
-            ht += "<div class='citationEditorWebsite citationInput'> Website:<input placeholder='Website Title' id='citationEditorIWebsite'>&nbsp;<input placeholder='Website Publisher' id='citationEditorIWebPublisher'><br>&emsp;&emsp;<input type='url' placeholder='URL' id='citationEditorIUrl' style='width:80%'></div>";
+            ht += "<div class='citationEditorWebsite citationInput'>&emsp;&emsp;<input type='url' placeholder='URL' id='citationEditorIUrl' style='width:80%;display:inline;'>"+getloader()+"<input placeholder='Website Title' id='citationEditorIWebsite' type='text' style='display:inline;width:45%;'>&emsp;<input type='text' placeholder='Website Publisher' id='citationEditorIWebPublisher' style='display:inline;width:45%;'><br></div>";
     
 			ht = ht + "<div class='citationEditorDatabase citationInput'> Database:<input placeholder='Database Name' id='citationEditorIDatabse'>&nbsp;<input type='URL' placeholder='url' style='width:30em' id='citationEdtiorIDbUrl'></div>";
     
@@ -274,11 +307,11 @@ function initiateCitationEditor(q, hovertag, h2) {
     
 			ht = ht + "<div class='citationEditorPlay citationInput'>Act: <input id='citationEditorIAct' style='width:4em'>&nbsp;Scene:<input id='citationEditorIScene' style='width:4em'>&nbsp;Line(s): <input id='citationEditorILines' style='width:10em'></div>";
     
-			ht = ht + "<div class='citationEditorBookpub citationInput'><input type='text' placeholder='Page #' style='width:4em' id='citationEditorIPage'>&nbsp;<input placeholder='Volume' style='width:5em' id='citationEditorIVolume'>&nbsp;<input type='text' placeholder='Edition' style='width:6em' id='citationEditorIEdition'>&nbsp;<input type='text' placeholder='Series' id='citationEditorISeries'>Referenced author?<input type='checkbox' id='citationEditorIMain' value='off'></div>";
+			ht = ht + "<div class='citationEditorBookpub citationInput'><input type='text' placeholder='Page #' style='width:4em;display:inline;' id='citationEditorIPage'>&emsp;<input placeholder='Volume' style='width:5em;display:inline' id='citationEditorIVolume' type='text'>&emsp;<input type='text' placeholder='Edition' style='width:6em;display:inline;' id='citationEditorIEdition'>&emsp;<input type='text' placeholder='Series' id='citationEditorISeries' style='display:inline;width:10em'>&emsp;Referenced author?<input type='checkbox' id='citationEditorIMain' value='off'></div>";
     
-			ht = ht + "<div class='citationEditorAuthor citationInput'>Author: <input placeholder='First' class='citationEditorIAuthorFirst' id='citationEditorIAuthorFirst'>&nbsp;<input placeholder='M' style='width:2em' class='citationEditorIAuthorMiddle'' id='citationEditorIAuthorMiddle'>&nbsp;<input placeholder='Last' class='citationEditorIAuthorLast' id='citationEditorIAuthorLast'><button id='citationAddContributor'><span class='fa fa-plus-circle'> </span></button></div>";
+			ht = ht + "<div class='citationEditorAuthor citationInput'>Author: <input type='text' placeholder='First' class='citationEditorIAuthorFirst' id='citationEditorIAuthorFirst' style='display:inline;width:33%;'>&nbsp;<input placeholder='M' style='width:2em;display:inline'' type='text' class='citationEditorIAuthorMiddle'' id='citationEditorIAuthorMiddle' style='display:inline'>&nbsp;<input placeholder='Last' class='citationEditorIAuthorLast' id='citationEditorIAuthorLast' type='text' style='display:inline;width:33%'><button id='citationAddContributor'><span class='fa fa-plus-circle'> </span></button></div>";
     
-			ht = ht + "<div class='citationEditorPublication citationInput'>Publication: <input placeholder='Publisher' id='citationEditorIPublisher'>&nbsp;<input placeholder='City' id='citationEditorICity'>&nbsp;<input placeholder='Year' style='width:4em' id='citationEditorIYear'></div>";
+			ht = ht + "<div class='citationEditorPublication citationInput'>Publication: <input type='text' style='display:inline;width:12em;' placeholder='Publisher' id='citationEditorIPublisher'>&emsp;<input type='text' style='display:inline; width:12em;' placeholder='City' id='citationEditorICity'>&emsp;<input type='number' placeholder='Year' style='width:4em;display:inline' id='citationEditorIYear'></div>";
     
     
 			ht = ht + "<div class='citationEditorGovernment citationInput'><input placeholder='Nation' id='citationEditorIGovnation'><input placeholder='Branch of Government' id='citationEditorIGovbranch' list='branches'><input placeholder='Committee' id='citationEditorIGovcomm'><input placeholder='Session, eg. 110th Cong., 1st sess' id='citationEditorIGovsess'></div><datalist id='branches'><option>Cong. Senate</option><option>Cong. Reps</option><option>Supreme Court</option><option>Pres</option></datalist>";
@@ -287,7 +320,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 			ht = ht + "<div class='citationEditorAccdate citationInput'> Accessed On: &nbsp;<input type='date' id='citationEditorIAccdate'></div>";	
 			ht = ht + "<div class='citationEditorBible citationInput'> <input placeholder='Book' id='citationEditorIBiblebook'><input placeholder='Chapter' id='citationEditorIBiblechapter'><input placeholder='Verse' id='citationEditorIBibleverse'></div>";
 			ht = ht + "<div class='citationEditorMedium citationInput'> <input placeholder='Medium' id='citationEditorIMedium'></div>";
-			ht = ht + "<div class='citationEditorAbstract citationInput'>Type a summary of this work and how you used it in writing your document.<br><div contenteditable id='citationEditorIAbstract' style='height:3em;border:solid 1px #999;'></div></div>";
+			ht = ht + "<div class='citationEditorAbstract citationInput'>Type a summary of this work and how you used it in writing your document.<br><div contenteditable id='citationEditorIAbstract' style='height:3em;border:solid 1px #999;'></div></div><br><br>";
 			ht = ht + "<datalist id='citationContributorTypes'><option>Author</option><option>Editor</option><option>Translator</option></datalist><datalist id='citationAutoTitle'></datalist>"			
 			ht = ht + "<button style='' class='textbutton' id='citationEditorSave'>Save</button>";
 		
@@ -305,6 +338,10 @@ function initiateCitationEditor(q, hovertag, h2) {
 				var out = "<br><input placeholder='Job' class='citationEditorIAuthorType' list='citationContributorTypes' style='width:3.5em'><input placeholder='First' class='citationEditorIAuthorFirst'>&nbsp;<input placeholder='M' style='width:2em' class='citationEditorIAuthorMiddle'>&nbsp;<input placeholder='Last' class='citationEditorIAuthorLast'>";
 				$('.citationEditorAuthor').append(out);
 			});
+            $('#citationEditorIUrl').on('input', function() {
+//                var url_data = scrapeURL($(this).val()); 
+                spinloader(true);
+            });
 			$('#citationEditorITitle, #citationEditorIEdition, #citationEditorIAuthorLast').on('input', function() {
 				var t = $('#citationEditorITitle').val();
 				var e = $('#citationEditorIEdition').val();
@@ -364,6 +401,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 							break;
 							case 'eimage':
 								citationShow('Title Description Author Website Pubdate Accdate');
+                            break;
 							case 'raw data':
 								//IDK
 								citationShow('Description');
@@ -402,6 +440,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 						return;
 					}
 				}
+                $('.citationEditorAccdate').val(new Date().toDateInputValue());
 			}
 			function citationShow(str) {
 				stra = str.split(' ');

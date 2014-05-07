@@ -22,7 +22,7 @@ function RunPanelfleker_Wordcloud() {
     }
     sortable.sort(function(a, b) {return b[1] - a[1]})
     
-    out = "";
+    out = "<div style='line-height:1.5em;text-align:center;'>";
     for(i in sortable) {
 //        console.log(sortable, i, sortable[i]);
         //Get percent to determine size
@@ -51,5 +51,6 @@ function RunPanelfleker_Wordcloud() {
         
         out += "pt' title='"+sortable[i][1]+" "+((sortable[i][1] > 1) ? "instances" : "instance") +"'>"+sortable[i][0]+"</span>       ";
     }
+    out += "</div>";
     postPanelOutput(out);
 }

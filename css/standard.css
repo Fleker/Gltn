@@ -343,6 +343,8 @@ button[disabled] {
 	font-size: 24pt;
 	margin-left: 15px;
 	color: #333;
+    font-weight: 100;
+    opacity: .5;
 }
 .popupsubtitle {
 	font-size: 13pt;
