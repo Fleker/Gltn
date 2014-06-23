@@ -82,61 +82,30 @@ function refTextDetails(id) {
 
 
 function LatexGreek(char) {
-
     return {id:char, keywords: char+" "+char.toLocaleLowerCase(), cmd:"\\"+char.toLowerCase(), param:[], des:"Displays the letter "+char};
-
 }
 
-
-
  window.LatexAPI = {
-
         /*** LATEX TEXT MARKUP ***/
-
         Bar: {id:"Bar", keywords:"bar", cmd:"\\bar{x}", param:[{id:"x", des:"Value to get bar placed over it"}], des:"Places a bar over the input value"},
-
         Subscript: {id:"Subscript", keywords:"element sub subscript", cmd:"_{exp}", param:[{id:"exp", des:"The expression you want subscripted"}], des:"Subscripts a specific input"},
-
         Superscript: {id:"Superscript", keywords:"exponent sup superscript", cmd:"^{exp}", param:[{id:"exp", des:"The expression you want superscripted"}], des:"Superscripts a specific input"},
-
         
-
         /*** LATEX MATH MARKUP ***/
-
         Fraction: {id:"Fraction", keywords:"frac, fraction, divide, division", cmd:"\\frac{n}{d}", param:[{id:"n", des:"Numerator"},{id:"d", des:"Denominator"}], des:"Displays a fraction"},
-
         Sum: {id:"Sum", keywords:"sum, summation, sigma", cmd:"\\sum\\limits_{i}^{k}", param:[{id:"i", des:"The initial value"},{id:"k", des:"The final value"}],des:"Shows a summation using a sigma"},
-
         Root: {id:"Root", keywords:"square root radical", cmd:"\\sqrt[root]{exp}", param:[{id:"root", des:"Opt. The root of the radical"},{id:"exp", des:"The expression you want under the radical"}], des:"Shows an expression under a radical"},
 
-            
-
         /*** LATEX CONSTANTS: GREEK ***/
-
-            
-
         Alpha: LatexGreek("Alpha"),
-
         Pi: LatexGreek("Pi"),
-
         Omega: LatexGreek("Omega"),
 
         /*** LATEX SYMBOLS & CONSTANTS ***/
-
         Times: {id:"Times", keywords:"multiplication multiply times", cmd:"\\times", param:[], des:"Displays the times symbol, often used for multiplication"},
-
         Space: {id:"Space", keywords:"space tab whitespace", cmd:"\\, or \\: or \\;", param:[], des:"Displays a space that is thin, medium, or wide respectively."},
-
         Bullet: {id:"Bullet", keywordS:"bullet dot times product", cmd:"\\bullet", param:[], des:"Displays a bullet"}
-
 };
-
-
-
-
-
-
-
 
 
 function latexDetails(id) {
@@ -206,200 +175,39 @@ function latexDetails(id) {
 }
 
 function showLatexReference(str) {
-
     function showReference(item) {
-
         console.log(item);
-
         out = "<b>"+item.id+"</b><br>";
-
         out += "<span style='font-family:monospace'>"+item.cmd+"</span>";
-
         out += "<div style='margin-left:35px;font-size:10pt'><ul>";
-
         for(i in item.param) {
-
             out += "<li>"+item.param[i].id+": "+item.param[i].des+"</li>";
-
         }
-
         out += "</ul>"+item.des+"</div>";
-
         $('#latexRef').html(out);
-
         return out;
-
     }
-
     var v = str;
-
     if(v.length) {
-
         $('#latexRef').fadeIn(300);
-
         for(i in LatexAPI) {
-
             if(v == LatexAPI[i].id) {
-
 //                            console.log(v, console[i].id);
-
                 showReference(LatexAPI[i]); 
-
                 return;
-
             }
-
             
-
             if(LatexAPI[i].keywords.indexOf(v) > -1) {
-
                 showReference(LatexAPI[i]); 
-
                 return;
-
             }
-
         }
-
         $('#latexRef').html("<span style='font-size:11pt'>&emsp;Sorry, that could not be found.</span>");
-
     } else {
-
         $('#latexRef').fadeOut(300);   
-
     }
-
 }
 
-/*** HOLORIBBON ***/
-
-/*newRibbon('.header', {
-
-       'File': new Array(
-
-			   {'text': 'Back', 'img': '', 'action': 'returnHome();'},
-
-               {'text': 'Download', 'img': '', 'action': "convertToPreview();pdf.save(o.title+'.pdf');"}
-
-           
-
-       ),
-
-	   'View': new Array(
-
-			   {'text': 'Edit', 'img': '', 'action': 'convertToInput()'},
-
-               {'text': 'View XML', 'img': '', 'action': 'convertToXML()'},
-
-			   {'text': 'Preview', 'img': '', 'action': 'convertToPreview()'},
-
-			   {'text': 'Print', 'img': '', 'action': 'print();'}
-
-
-
-		),
-
-       'Options': new Array(
-
-                {'group': 'Words', 'value': 'Min: <input type="number" id="count_words_min" value="0" oninput="wordCount()" min="0" class="countinput"><br>Max: <input type="number" id="count_words_max" value="0" oninput="wordCount()" min="0" class="countinput">'},
-
-                {'group': 'Timer', 'value': 'Minutes: <input type="number" id="timer_minutes" value="0" min="0">'}
-
-           
-
-       ),
-
-	   'Panels': new Array (
-
-			   {'text': 'Citations', 'img': '', 'action': 'panelCitation()'},
-
-			   {'text': 'Ideas', 'img': '', 'action': 'panelIdea()'}
-
-	   )
-
-    });*/
-
-function setHeader() {
-
-	console.log('Header set');
-
-	window.holoribbon_std =  {
-
-		Home: new Array(
-//            {text: "Start the Tour", img: "<span class='fa fa-home' style='font-size:18pt'></span>", action: "alert('TBD')", key:"Alt+T"}, 
-            {text: "Create a File", img: "<span class='fa fa-file' style='font-size:18pt'></span>", action: "createNewFile()", key:"Alt+N"},
-            {group: "", value:"<div style='font-size:22pt;padding-top:6px;text-align:center;'>Welcome to Gltn!</div>"},
-            {text: "Explore Files", img: "<span class='fa fa-folder-open' style='font-size:18pt'></span>", action: "runPanel('main_Filesys')", key: "Alt+O"} 
-		),
-		File: new Array(
-			{group: "", value:'<div class="row collapse" style="margin-top:9px"><div class="small-2 medium-5 columns"><input id="file_name" type="text" value="'+fileid+'" /></div><div class="small-4 medium-1 columns"><span class="postfix">.gltn</span></div><div class="small-6 medium-3 columns end"><input type="hidden" id="file_name_internal"><button id="file_name_con" class="textbutton" disabled="true">Rename</button></div></div>'},
-			{text: 'Compile & Export', img: '<span style="font-size:18pt" class="fa fa-file"></span>', action: "startBuild();setTimeout('exitintro();', 1000);", key: "Alt+B"},
-			{text: 'Share', img: '<span style="font-size:18pt" class="fa fa-code-fork"></span>', action: "getShare();"}
-		),
-
-		Panels: new Array(
-			{text: 'Gltn Store', img: '<span style="font-size:18pt" class="fa fa-shopping-cart"/>', action: "launchStore()", key: "Alt+S"},
-			{text: 'Outline', img: '<span style="font-size:18pt" class="fa fa-list"></span>', action: "runPanel('main_Outline');"},
-			{text: 'Citations', img: '<span style="font-size:18pt" class="fa fa-book"></span>', action: "runPanel('main_Citation');"},
-			{text: 'Ideas', img: '<span style="font-size:18pt" class="fa fa-lightbulb-o"></span>', action: "runPanel('main_Idea');"},
-			{text: 'Style Guide', img: '<span style="font-size:18pt" class="fa fa-info-circle"/>', action: "runPanel('main_Guide');"}
-		),
-
-		Tools: new Array(
-			{text: 'Find', img: '<span style="font-size:18pt" class="fa fa-search"></span>', action: "runPanel('main_Find');", key: "Alt+F"},
-			{text: 'Dictionary', key:"Alt+D", img: '<span style="font-size:18pt" class="fa fa-quote-left"></span>', action: "runPanel('main_Dictionary');"},
-			{text: 'Themes', img: '<span style="font-size:18pt" class="fa fa-picture-o"></span>', action: "runPanel('main_Themes')"}
-		),
-
-		About: new Array(
-			{text: 'GitHub', img: '<span style="font-size:18pt" class="fa fa-github-alt"></span>', action: "openTab('http://www.github.com/fleker/gltn')"},
-			{text: 'Documentation', img: '<span style="font-size:18pt" class="fa fa-book"></span>', action: "openTab('http://felkerdigitalmedia.com/gltn/docs')"},
-			{text: 'Send Feedback', img: '<span style="font-size:18pt" class="fa fa-envelope"></span>', action: "openTab('mailto:handnf+gltn@gmail.com')"},
-			{text: 'Gltn Blog', img: '<span style="font-size:18pt" class="fa fa-bullhorn"></span>', action:"openTab('http://gltndev.wordpress.com/')"},
-			{text: 'Credits', img: '<span style="font-size:18pt" class="fa fa-legal"></span>', action: 'postLegal()'}
-		),
-
-		Me: new Array(
-			{group: 'Name', value:'<div style="margin-top:2px"><input id="me_name" type="text" placeholder="Name"></div>'}
-		)
-
-	};
-	newRibbon('.header', holoribbon_std);
-	ribbonSwitch(0,false);
-	ribbonLoad();
-}
-
-function ribbonLoad() {
-    $('#file_name').attr('value', fileid);
-	$('#file_name').attr('defaultValue', fileid);
-	$('#file_name_internal').val(fileid);
-	$('#file_name').on('input', function() {
-		console.log('file_name oninput');
-		$('#file_name_con').attr('disabled', false);
-	});
-	$('#file_name_con').on('click', function() {
-		var v = $('#file_name').val();
-		v = v.replace(/ /g, "");
-		ovr = true;
-		if(localStorage[v] != undefined) {
-			ovr = confirm('This file already exists: '+v+'; Overwrite the contents of this file?');	
-		}
-		if(ovr) {
-            if(v.substr(-2) == "_c")
-				v = v.substr(0,v.length-2)+"c";
-			$('#file_name_con').attr('disabled', true);
-			$('#file_name_internal').val(v);
-            localStorage[v] = localStorage[fileid]
-            localStorage[v+"_c"] = localStorage[fileid+"_c"];
-			setTimeout('window.location = "?file='+v+'";', 250);
-		}
-	});
-	$('#me_name').attr('value', getSettings("me_name"));
-	$('#me_name').attr('defaultValue', getSettings("me_name"));
-	$('#me_name').on('input', function() {
-		writeToSettings('me_name', $('#me_name').val());		
-	});
-}
 
 function postLegal() {
     out = "Gltn version "+GLTN_VERSION+"<br><br>";
@@ -413,182 +221,9 @@ function postLegal() {
 
 }
 
-currentpanel = "";
 
-function install_panel(id, name, img, url, service, key, num) {
-    console.log(id, name, img, url, service, key, num);
-	if(service == undefined)
-		service = false;
-	if(key == undefined)
-		key = " ";
-	img = img.replace(/&gt;/g, ">").replace(/&lt;/g, "<");
-	if(service != true) {
-		if(key != undefined && key.length > 0 && key != "[object Object]")
-            holoribbon_std['Panels'].push({text: name, img: img, action: "runPanel('"+id+"')", key:key});
-		else
-			holoribbon_std['Panels'].push({text: name, img: img, action: "runPanel('"+id+"')"});
-		newRibbon('.header', holoribbon_std);
-		console.log("Installing "+name+"...  "+num);
-		ribbonSwitch(ribbon_index,false);
-		ribbonLoad();
-	}
-    if(typeof(service) == "string")
-        service = service.replace(/,/, "");
-	if(getSettings('panels').indexOf(id) == -1) {
-		writeToSettings('panels', getSettings('panels') + ", "+id);
-	}
-	writeToSettings('panels_'+id, id+","+name+","+img+","+url+","+service+","+key);
-
-	if(window.offline !== true) {
-        //Now store script offline - this really sucks though
-		loadjscssfile(url, "js");
-		$('#themeframe').attr('src', url);
-        currentpanel = "null";
-        window.setTimeout(function() {download_panel(id,num)}, 200);
-	}
-}
-
-function download_panel(id,num) {
-    if(currentpanel !== id) {
-        console.log(id, currentpanel);
-        if(!currentpanel.length)
-            return;
-        window.setTimeout(function() {download_panel(id,num);}, 100);
-    } else {
-        console.log("Installed");
-        localStorage['zpanels_'+id] = $('#themeframe').contents().text();  
-        console.log("eval('InitPanel"+id+"();');  "+num);
-        setTimeout("eval('InitPanel"+id+"();');", 100);	
-        initPanels(num+1);
-    }
-}
-
-function uninstall_panel(id) {
-	//For removing the ribbon, need to compare the name of the ribbon with the name of the panel
-	var a = getSettings('panels_'+id).split(', ');
-	var b = [];
-	for(var i in holoribbon_std.Panels) {
-		var j = holoribbon_std.Panels[i];
-		if(j.text != a[1]) {
-			b.push(j);
-		}
-	}
-	holoribbon_std.Panels = b;
-	newRibbon('.header', holoribbon_std);
-    //Now we can set up a way for panels to turn off stuff
-	//We set a short timer so that if it doesn't exist, it doesn't ruin the flow of the function
-	setTimeout("eval('RemovePanel"+id+"();');", 1);
-	var a = getSettings('panels').split(', ');
-	var b = [];
-	for(i in a) {
-		if(a[i] != id) {
-			b.push(a[i])
-		}	
-	}	
-	writeToSettings('panels', b.join(', '));
-	writeToSettings('panels_'+i, undefined);	
-	if(localStorage['zpanels_'+id] !== undefined) 
-		localStorage.removeItem('zpanels_'+id);
-}
-
-function appendHoloSelection() {
-
-	var selection = {
-
-		Selection: new Array(
-
-			{text: '', img: '<span style="font-size:18pt" class="fa fa-bold"></span>', action: "toggleBold()"},
-
-			{text: '', img: '<span style="font-size:18pt" class="fa fa-italic"></span>', action: "toggleItalics()"},
-
-			{text: '', img: '<span style="font-size:18pt" class="fa fa-underline"></span>', action: "toggleUnder()"},
-
-			{text: '', img: '<span style="font-size:18pt" class="fa fa-strikethrough"></span>', action: "toggleStrike()"}
-
-		)
-
-	};
-
-	newRibbon('.header', $.extend({}, holoribbon_std, selection));
-
-	ribbonSwitch(ribbon_index, false);
-
-}
-
-function doesThisWork() {
-
-	var flag = new Array();
-
-	if (window.File && window.FileReader && window.FileList && window.Blob) {
-
-	  // Great success! All the File APIs are supported.
-
-	} else {
-
-	  alert('The File APIs are not fully supported in this browser.');
-
-	  flag.push('The File APIs are not fully supported in this browser.')
-
-	}
-
-	
-
-	if(window.localStorage) {
-
-		
-
-	} else {
-
-		alert('Local Storage is not supported in this browser.');
-
-		flag.push('Local Storage is not supported in this browser.')
-
-	}	
-
-	try {
-
-		$('#header').attr('id');
-
-	} catch(e) {
-
-		alert('jQuery does not work');
-
-		flag.push('jQuery does not work');		
-
-	}
-
-	try { var isFileSaverSupported = !!new Blob(); } catch(e){
-
-		alert('Blobs are not supported');
-
-		flag.push('Blobs are not supported');	
-
-	}
-
-	if(window.applicationCache == undefined) {
-
-		alert('You do not have Application Cache in your browser. You may still use Gltn, but it will not work offline.');	
-
-	}
-
-	return !flag.length;
-
-}
-
-function closeButton(i) {
-
-	if(i == 1)
-
-		return "<span class='fa fa-times'/>"
-
-	else
-
-		return '<span class="fa fa-times"/>'	
-
-}
 
 /*** Custom Theming ***/
-
 function initTheme() {
 //    window.theme = {};	
 	//set theme colors/css
@@ -752,31 +387,18 @@ function install_theme(id, name, url, icon) {
 }
 
 function uninstall_theme(id) {
-
 	var a = window.settings.theme.split(', ');
-
 	var b = new Array();
-
 	for(i in a) {
-
 		if(a[i] != id)
-
 			b.push(a[i]);	
-
 		if(a[i] == settings.currenttheme)
-
 			settings.currenttheme = a[i-1];
-
 	}
-
 	window.settings.theme = b.join(', ');
-
 	localStorage.removeItem('theme_'+id);
-
 	if(localStorage['ztheme_'+id] != undefined)
-
 		localStorage.removeItem('ztheme_'+id);
-
 }
 
 function selectTheme(id) {
@@ -791,92 +413,7 @@ function selectTheme(id) {
     startThemer();
 }
 
-function onUpdateReady() {
 
-	appcache();
-
-  //window.appcachestatus = "Found new version - Refresh to update";
-
-  console.log('Found new version!');
-
-
-
-}
-
-window.applicationCache.addEventListener('error', function() {
-
-	console.error("Error caching files for offline use.");
-
-	if(window.offline != true) {
-
-		window.appcachestatus = "Error caching files for offline use";
-
-		initService("main_Offline", "App caching", "&nbsp;");
-
-	} else {
-
-		window.appcachestatus = "You are currently working offline";
-
-		setTimeout('initService("main_Offline", "App available offline", "<span class=\'fa fa-plane\'></span>");', 2000);
-
-	}
-
-});
-
-window.appcachestatus = "App available offline";
-
-function appcache() {
-
-	console.log("App is now available for offline use.");
-
-	
-		setTimeout('initService("main_Offline", "App available offline", "<span class=\'fa fa-plane\'></span>");', 2000);
-
-	//hot swap	
-
-	try {
-
-		window.applicationCache.swapCache();
-
-	} catch(e) {
-
-		
-
-	}
-
-	return false;
-
-}
-
-function GetPanelmain_Offline() {
-
-	return {title: "<span class='fa fa-plane'></span>&nbsp;Offline", bordercolor:"#ff9900", width: 15};	
-
-}
-
-function RunPanelmain_Offline() {
-
-	out = "<span style='font-size:16pt'>This App is Available Offline</span><br>What Does this Mean?<br><br>If your device is not connected to the Internet, you can still open Gltn in your browser. Of course, not every feature will be available such as the Dictionary and the Gltn Store, but you will be able to edit and build documents like always.<br><br><span style='font-weight:bold;font-size:10pt;color:#ff9900'>"+window.appcachestatus+"</span>";
-
-	postPanelOutput(out);
-
-}
-window.applicationCache.oncached = appcache();
-window.applicationCache.onupdateready = onUpdateReady();
-window.applicationCache.onprogress = function(e) {
-    // The event object should be a progress event (like those used by XHR2)
-    // that allows us to compute a completion percentage, but if not,
-    // we keep count of how many times we've been called.
-    var progress = "";
-    if (e && e.lengthComputable) // Progress event: compute percentage
-        progress = " " + Math.round(100*e.loaded/e.total) + "%"
-    else                         // Otherwise report # of times called
-        progress = " (" + ++progresscount + ")"
-	initService("main_Offline", "App caching", "<span class='fa fa-plane'></span>"+progress);
-	window.appcachestatus = "Found new version - Refresh to update";
-    postNotification("appcache", "A new version of the app was downloaded. Click to update.", "window.location.reload()");
-    return false;
-};
 
 function initNotifications() {
 	//Notifications live, send out requests?	
@@ -1172,70 +709,6 @@ function RunPanelmain_Context() {
 	});
 }
 
-/*** Still Important Div Cursor Restore
-
--Thanks to Rangy ***/
-
-var savedSel = null;
-
-var savedSelActiveElement = null;
-
-
-
-function saveSelection() {
-
-	// Remove markers for previously saved selection
-
-	if (savedSel) {
-
-		rangy.removeMarkers(savedSel);
-
-	}
-
-	savedSel = rangy.saveSelection();
-
-	savedSelActiveElement = document.activeElement;
-
-	//gEBI("restoreButton").disabled = false;
-
-//	console.log($('.content_textarea').html());
-
-}
-
-
-
-function restoreSelection() {
-
-	if (savedSel != null) {
-
-		rangy.restoreSelection(savedSel, true);
-
-		savedSel = null;
-
-		//gEBI("restoreButton").disabled = true;
-
-		window.setTimeout(function() {
-
-			if (savedSelActiveElement && typeof savedSelActiveElement.focus != "undefined") {
-
-				savedSelActiveElement.focus();
-
-			}
-
-			//saveSelection();
-
-//			console.log($('.content_textarea').html());
-
-		}, 1);
-
-	}
-
-}
-
-
-
-
-
 /*** Sync Service - Not directly related to files ***/
 function InitPanelmain_Sync() {
     window.SYNC_HISTORY = ["File Downloading..."];
@@ -1278,322 +751,133 @@ function getSyncStatusGood() {
 }
 
 function initMathjax() {
-
     window.Preview = {
-
   delay: 150,        // delay after keystroke before updating
-
-
-
   preview: null,     // filled in by Init below
-
   buffer: null,      // filled in by Init below
-
-
-
   timeout: null,     // store setTimout id
-
   mjRunning: false,  // true when MathJax is processing
-
   oldText: null,     // used to check if an update is needed
-
-
-
-  //
-
   //  Get the preview and buffer DIV's
-
-  //
-
   Init: function () {
-
     this.preview = document.getElementById("latexView");
-
     this.buffer = document.getElementById("latexView");
-
   },
-
-
-
-  //
-
   //  Switch the buffer and preview, and display the right one.
-
   //  (We use visibility:hidden rather than display:none since
-
   //  the results of running MathJax are more accurate that way.)
-
-  //
-
   SwapBuffers: function () {
-
-    var buffer = this.preview, preview = this.buffer;
-
+      var buffer = this.preview, preview = this.buffer;
     this.buffer = buffer; this.preview = preview;
-
     buffer.style.visibility = "hidden"; buffer.style.position = "absolute";
-
     preview.style.position = ""; preview.style.visibility = "";
-
   },
-
-
-
-  //
-
   //  This gets called when a key is pressed in the textarea.
-
   //  We check if there is already a pending update and clear it if so.
-
   //  Then set up an update to occur after a small delay (so if more keys
-
   //    are pressed, the update won't occur until after there has been 
-
   //    a pause in the typing).
-
   //  The callback function is set up below, after the Preview object is set up.
-
-  //
-
   Update: function () {
-
     if (this.timeout) {clearTimeout(this.timeout)}
-
     this.timeout = setTimeout(this.callback,this.delay);
-
   },
-
-
-
-  //
-
   //  Creates the preview and runs MathJax on it.
-
   //  If MathJax is already trying to render the code, return
-
   //  If the text hasn't changed, return
-
   //  Otherwise, indicate that MathJax is running, and start the
-
   //    typesetting.  After it is done, call PreviewDone.
-
-  //  
-
   CreatePreview: function () {
-
       //console.log(this);
-
     Preview.timeout = null;
-
     if (this.mjRunning) return;
-
     var text = document.getElementById("latexCmd").innerHTML;
-
       console.log(this.oldtext, text);
-
     if (text === this.oldtext) return;
-
     this.buffer.innerHTML = this.oldtext = text;
-
     this.mjRunning = true;
-
       console.log(text);
-
-    
-
     MathJax.Hub.Queue(
-
       ["Typeset",MathJax.Hub,this.buffer],
-
       ["PreviewDone",this]
-
     );
-
   },
-
-
-
-  //
-
   //  Indicate that MathJax is no longer running,
-
   //  and swap the buffers to show the results.
-
-  //
-
   PreviewDone: function () {
-
     this.mjRunning = false;
-
     this.SwapBuffers();
-
   },
-
-        
-
   doNothing: function() {
-
-        
-
     }
-
 };
-
-
-
-//
-
 //  Cache a callback to the CreatePreview action
-
-//
-
 Preview.callback = MathJax.Callback(["CreatePreview",Preview]);
-
 Preview.callback.autoReset = true;  // make sure it can run more than once
-
-   
-
 //Initialize all the LaTeX attributes because they look ugly at first (this is seriously going to hurt sync though)
-
     $('.latex').each(function() {
-
         $(this).html($(this).attr('data-cmd'));
-
         console.log($(this).html());
-
         //console.log(MathJax.Hub);
-
         MathJax.Hub.Queue(
-
           ["Typeset",MathJax.Hub,this],
-
           ["doNothing",Preview]
-
         );
-
     });
-
 }
 
 function postLatex(cmd, callbackFnc) {
-
     if($('#latexdummy').length == 0) {
-
         $('body').append("<span id='latexdummy' style='display:none'></span>");   
-
     }
-
     $('#latexdummy').html(cmd);
-
     MathJax.Hub.Queue(["Typeset",MathJax.Hub,"latexdummy"], 'getLatex');
-
-    
-
-    
-
-    
-
-//    setTimeout(function() { return $('.latexdummy').html() }, 200);
-
 }
-
-
-
 function getLatex() {
-
     return $('#latexdummy').html();
-
 }
-
-
-
-//function doNothing() {
-
-//    
-
-//}
-
 function getLoaderOpts() {
-
     return {
-
           lines: 7, // The number of lines to draw
-
           length: 7, // The length of each line
-
           width: 8, // The line thickness
-
           radius: 26, // The radius of the inner circle
-
           corners: 1, // Corner roundness (0..1)
-
           rotate: 12, // The rotation offset
-
           direction: 1, // 1: clockwise, -1: counterclockwise
-
           color: theme.coloralt, // #rgb or #rrggbb or array of colors
-
           speed: 1.3, // Rounds per second
-
           trail: 65, // Afterglow percentage
-
           shadow: false, // Whether to render a shadow
-
           hwaccel: false, // Whether to use hardware acceleration
-
           className: 'spinner', // The CSS class to assign to the spinner
-
           zIndex: 5, // The z-index (defaults to 2000000000)
-
           top: 'auto', // Top position relative to parent in px
-
           left: 'auto'   // Left position relative to parent in px
-
         };
-
 }   
 
 function getLoader(query, m) {
 	$('.spinner').remove();
-
     var opts = {
-
           lines: 7, // The number of lines to draw
-
           length: 7, // The length of each line
-
           width: 8, // The line thickness
-
           radius: 26, // The radius of the inner circle
-
           corners: 1, // Corner roundness (0..1)
-
           rotate: 12, // The rotation offset
-
           direction: 1, // 1: clockwise, -1: counterclockwise
-
           color: theme.coloralt, // #rgb or #rrggbb or array of colors
-
           speed: 1.3, // Rounds per second
-
           trail: 65, // Afterglow percentage
-
           shadow: false, // Whether to render a shadow
-
           hwaccel: false, // Whether to use hardware acceleration
-
           className: 'spinner', // The CSS class to assign to the spinner
-
           zIndex: 5, // The z-index (defaults to 2000000000)
-
           top: $('#'+query).height()/2-26, // Top position relative to parent in px
-
           left: $('#'+query).width()/2-26 // Left position relative to parent in px
-
         };
-
 //    var target = document.getElementById(query);
-
 //    var spinner = new Spinner(opts).spin(target); 
 	console.log($('#'+query).width()/2-26, $('#'+query).height()/2-26);
 	$('.spinner').css('position', 'relative').css('left', '50%').css('top', '95px');
@@ -1610,42 +894,4 @@ function truncateFloat(floater) {
 }
 function openTab(url) {
     window.open(url, '_blank');   
-}
-/* Takes a percent and converts it to the nearest column value in a 12-column system */
-function columnCount(p, trunc) {
-    var a = 100/12;
-    var b = p/a;
-    if(trunc == true)
-        return Math.floor(b);
-    else
-        return Math.round(b);
-}
-    /*
-
-    return null;
-
-    return new Spinner().spin().el.outerHTML; 
-
-    if(mL == undefined)
-
-        return "<div class='loader10'></div>"; 
-
-    else if(mT == undefined)
-
-        return "<div class='loader10' style='margin-left:"+mL+"px'></div>"; 
-
-    else
-
-         return "<div class='loader10' style='margin-left:"+mL+"px;margin-top:"+mT+"'></div>";
-	}
-
-         */
-function getloader() {
-    return "<div style='text-align:center; width:100%;' class='spin'></div>";  
-}
-function spinloader(inline) {
-    if(inline)
-        $('.spin').spin({ color: theme.coloralt, shadow: false, lines: 7, length:4, width:2, radius:2, corners:1, trail:68, speed:1.6}).css('width','').css('height','').css('display','inline').css('margin-left','-20px');   
-    else
-        $('.spin').spin({ color: theme.coloralt, shadow: false, lines: 7, length:30, width:6, radius:21, corners:1, trail:68, speed:1.6});     
 }

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gltn_store>
+<app>
+	<parent>app</parent>
+	<name>Blackout Condensed</name>
+	<icon_fa>heart</icon_fa>
+	<id>blackoutc</id>
+	<url>js/themes/theme_blackoutc.js</url>
+	<type>Theme</type>
+	<credit>Nick Felker</credit>
+	<description>A modification of the standard Blackout to use a condensed version of Roboto. A writing application should also include beautiful typography.</description>
+	<updated_last>1389163700</updated_last>
+	<updated_meta>1389163700</updated_meta>
+	<version>1.0</version>	
+	<install>0</install>
+	<uninstall>0</uninstall>
+</app>
+<app>
+	<parent>app</parent>
+	<name>Translate</name>
+	<icon_fa>yen</icon_fa>
+	<id>fleker_Translate</id>
+	<url>store/panels/fleker_translate.js</url>
+	<type>Panel</type>
+	<credit>Nick Felker</credit>
+	<key></key>
+	<description>A Google Translate client for Gltn</description>
+	<updated_last>1389163700</updated_last>
+	<updated_meta>1389163700</updated_meta>
+	<version>1.0</version>
+	<install>0</install>
+	<uninstall>0</uninstall>
+</app>
+<app>
+	<parent>app</parent>
+	<name>Spotify Player</name>
+	<icon_fa>headphones</icon_fa>
+	<id>fleker_Spotify</id>
+	<url>store/panels/fleker_Spotify.js</url>
+	<type>Panel</type>
+	<credit>Nick Felker</credit>
+	<key></key>
+	<description>This panel gives users a variety of curated playlists to listen to while writing. This is done using Spotify's embed API, so you will need a Spotify account.</description>
+	<updated_last>1389163700</updated_last>
+	<updated_meta>1389163700</updated_meta>
+	<version>0.1</version>
+	<install>0</install>
+	<uninstall>0</uninstall>
+</app>
+</gltn_store>

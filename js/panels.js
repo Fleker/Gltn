@@ -1,7 +1,144 @@
-﻿	// JavaScript Document
 mainpanels = "main_Character, main_Idea, main_Citation, main_Find, main_Filesys, main_Notifications";
+//PANEL CLASS
+function Panel() {
+    this.id = "";
+    this.name = "";
+    this.icon = "";
+    this.url = "";
+    this.service = false;
+    this.key = [];
+    Panel.prototype.getManifest = function() {
+        return {id: this.id, name: this.name, icon: this.icon, url: this.url, service: this.service, key:this.key};   
+    };
+    Panel.prototype.setId = function(id) {
+      
+        
+    };
+    
+    //Panel events
+    Panel.prototype.onInit = undefined;
+    Panel.prototype.onRun = undefined;
+    Panel.prototype.onContext = undefined;
+    Panel.prototype.onExport = undefined;
+}
+//PANELS ENUM
+/*availablePanels = {
+    Main_Character = new Panel().set     
+};*/
+//PERMISSION CLASS
+function Permission(permission_key) {
+    if(permission_key !== undefined) {
+        var c = Permissions[permission_key].clone(Permission); 
+        this.id = c.id;
+        this.description = c.description;
+        this.allowed = c.allowed;
+    } else {
+        this.id = "";
+        this.description = "";
+        this.allowed = false;
+    }
+    Permission.prototype.enable = function(id, allowed) {
+
+    };
+    Permission.prototype.isAllowed = function() {
+        return allowed;   
+    };
+    Permission.prototype.setId = function(id) {
+        this.id = id;
+        return this;
+    };
+    Permission.prototype.setDescription = function(description) {
+        this.description = description;
+        return this;
+    };
+}
+//PERMISSION ENUM
+Permissions = {
+    UNRESTRICTED: new Permission().setId("UNRESTRICTED").setDescription("Have unrestricted access to the webpage")
+  };
+
+
 //Other panels are here by default, but don't need to be called on init
-//console.log(a);
+currentpanel = "";
+
+//PANEL INSTALL
+function install_panel(id, name, img, url, service, key, num) {
+    console.log(id, name, img, url, service, key, num);
+	if(service == undefined)
+		service = false;
+	if(key == undefined)
+		key = " ";
+	img = img.replace(/&gt;/g, ">").replace(/&lt;/g, "<");
+	if(service != true) {
+		if(key != undefined && key.length > 0 && key != "[object Object]")
+            holoribbon_std['Panels'].push({text: name, img: img, action: "runPanel('"+id+"')", key:key});
+		else
+			holoribbon_std['Panels'].push({text: name, img: img, action: "runPanel('"+id+"')"});
+		newRibbon('.header', holoribbon_std);
+		console.log("Installing "+name+"...  "+num);
+		ribbonSwitch(ribbon_index,false);
+		ribbonLoad();
+	}
+    if(typeof(service) == "string")
+        service = service.replace(/,/, "");
+	if(getSettings('panels').indexOf(id) == -1) {
+		writeToSettings('panels', getSettings('panels') + ", "+id);
+	}
+	writeToSettings('panels_'+id, id+","+name+","+img+","+url+","+service+","+key);
+
+	if(window.offline !== true) {
+        //Now store script offline - this really sucks though
+		loadjscssfile(url, "js");
+		$('#themeframe').attr('src', url);
+        currentpanel = "null";
+        window.setTimeout(function() {download_panel(id,num)}, 200);
+	}
+}
+
+function download_panel(id,num) {
+    if(currentpanel !== id) {
+        console.log(id, currentpanel);
+        if(!currentpanel.length)
+            return;
+        window.setTimeout(function() {download_panel(id,num);}, 100);
+    } else {
+        console.log("Installed");
+        localStorage['zpanels_'+id] = $('#themeframe').contents().text();  
+        console.log("eval('InitPanel"+id+"();');  "+num);
+        setTimeout("eval('InitPanel"+id+"();');", 100);	
+        initPanels(num+1);
+    }
+}
+
+function uninstall_panel(id) {
+	//For removing the ribbon, need to compare the name of the ribbon with the name of the panel
+	var a = getSettings('panels_'+id).split(', ');
+	var b = [];
+	for(var i in holoribbon_std.Panels) {
+		var j = holoribbon_std.Panels[i];
+		if(j.text != a[1]) {
+			b.push(j);
+		}
+	}
+	holoribbon_std.Panels = b;
+	newRibbon('.header', holoribbon_std);
+    //Now we can set up a way for panels to turn off stuff
+	//We set a short timer so that if it doesn't exist, it doesn't ruin the flow of the function
+	setTimeout("eval('RemovePanel"+id+"();');", 1);
+	var a = getSettings('panels').split(', ');
+	var b = [];
+	for(i in a) {
+		if(a[i] != id) {
+			b.push(a[i])
+		}	
+	}	
+	writeToSettings('panels', b.join(', '));
+	writeToSettings('panels_'+i, undefined);	
+	if(localStorage['zpanels_'+id] !== undefined) 
+		localStorage.removeItem('zpanels_'+id);
+}
+
+
 function initPanels(num) {
     if(num === undefined)
         num = 0;
