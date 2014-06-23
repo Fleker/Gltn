@@ -8,10 +8,14 @@ function Panel(id, displayName, icon, url, service, key) {
     this.override = key || [];
     this.bordercolor = theme.darkcolor;
     this.width = 25;
-    this.maximize = false;
+    this.canMaximize = false;
+    this.isMaximized = false;
     Panel.prototype.getManifest = function() {
-        return {id: this.id, name: this.name, icon: this.icon, url: this.url, service: this.service, key:this.key, bordercolor:this.bordercolor, width:this.width, maximize:this.maximize };   
+        return {id: this.id, name: this.name, icon: this.icon, url: this.url, service: this.service, key:this.key, bordercolor:this.bordercolor, width:this.width, maximize:this.canMaximize };   
     };
+    Panel.prototype.hasBordercolor = function() {
+        return this.bordercolor !== undefined && this.bordercolor.length > 0;   
+    }
     Panel.prototype.setBordercolor = function(border) {
         this.bordercolor = border;
         return this;
@@ -32,6 +36,12 @@ function Panel(id, displayName, icon, url, service, key) {
         this.width = width;
         return this;
     };
+    Panel.prototype.canMaximize = function() {
+        return this.canMaximize;   
+    }
+    Panel.prototype.isMaximized = function() {
+        return this.isMaximized;   
+    }
     
     //Panel events
     Panel.prototype.onInit = undefined;
@@ -56,6 +66,17 @@ availablePanels = {
     Main_Table: new Panel("Main_Table", "Spreadsheets"),
     Main_Themes: new Panel("Main_Themes", "Theme Selector");
 };
+function addNewPanel(panel) {
+    availablePanels[panel.id] = panel;   
+}
+//SERVICES CLASS
+//SERVICES ENUM
+activeServices = {
+    
+};
+function addNewService(service) {
+    activeServices[service.id] = service;   
+}
 //PERMISSION CLASS
 function Permission(permission_key) {
     if(permission_key !== undefined) {
@@ -90,7 +111,8 @@ Permissions = {
 
 
 //Other panels are here by default, but don't need to be called on init
-currentpanel = "";
+currentpanel = undefined;
+downloadingpanel = "";
 
 //PANEL INSTALL
 function install_panel(id, name, img, url, service, key, num) {
@@ -121,22 +143,24 @@ function install_panel(id, name, img, url, service, key, num) {
         //Now store script offline - this really sucks though
 		loadjscssfile(url, "js");
 		$('#themeframe').attr('src', url);
-        currentpanel = "null";
+        downloadingpanel = "null";
         window.setTimeout(function() {download_panel(id,num)}, 200);
 	}
 }
 
 function download_panel(id,num) {
-    if(currentpanel !== id) {
-        console.log(id, currentpanel);
-        if(!currentpanel.length)
+    if(downloadingpanel !== id) {
+        console.log(id, downloadingpanel);
+        if(!downloadingpanel.length)
             return;
         window.setTimeout(function() {download_panel(id,num);}, 100);
     } else {
         console.log("Installed");
         localStorage['zpanels_'+id] = $('#themeframe').contents().text();  
         console.log("eval('InitPanel"+id+"();');  "+num);
-        setTimeout("eval('InitPanel"+id+"();');", 100);	
+        eval("availablePanels['"+id+"'] = "+id+");
+        if(availablePanels[id].onInit !== undefined)
+            availablePanels[id].onInit();
         initPanels(num+1);
     }
 }
@@ -155,7 +179,8 @@ function uninstall_panel(id) {
 	newRibbon('.header', holoribbon_std);
     //Now we can set up a way for panels to turn off stuff
 	//We set a short timer so that if it doesn't exist, it doesn't ruin the flow of the function
-	setTimeout("eval('RemovePanel"+id+"();');", 1);
+    if(availablePanels[id].onUninstall !== undefined)
+        availablePanels[id].onUninstall();
 	var a = getSettings('panels').split(', ');
 	var b = [];
 	for(i in a) {
@@ -215,18 +240,18 @@ function initPanels(num) {
 }
 function runPanel(panel_id_name) {
 	//Get Properties of the Panel First
-	var p = eval("GetPanel"+panel_id_name+"();");
-	//$('.panel_plugin_title').html();
-    var max = "";
-//    console.warn(p.maximize);
-    if(p.bordercolor == undefined)
-        p.bordercolor = theme.coloralt;
-    if(p.maximize == true) {
-        
-//        max = "<span class='PanelMaximizeEvent' data-status='0'></span><button onclick='maximizePanel()'><span class='fa fa-arrows-alt'></span></button>";
+	var p = availablePanels[panel_id_name];
+    if(p === undefined) {
+        alert("Panel "+panel_id_name+" does not exist");
+        return;
     }
-//    console.log(max);
-	$('.panel_plugin_title').html('<table class="panel_plugin_head" style="width:100%"><tr><td>'+p.title+'&emsp;<span class="PanelPopupEvent"></span><span class="PanelKeyEvent" data-keycode="" data-alt="" data-ctrl="" data-shift=""></span><span id="PanelCloseEvent"></span><span id="PanelBuildEvent"></span></td><td style="text-align:right;padding:0px;">'+ max+'<button onclick="hidePanelPlugin()" data-step="22" data-intro="Click me to hide the panel." style="margin-top:15px;">'+closeButton()+'</button></td></tr></table>');
+    var max = "";
+    if(!p.hasBordercolor())
+        p.setBordercolor(theme.coloralt);
+    if(p.canMaximize()) {
+        max = "<span class='PanelMaximizeEvent' data-status='0'></span><button onclick='maximizePanel()'><span class='fa fa-arrows-alt'></span></button>";
+    }
+	$('.panel_plugin_title').html('<table class="panel_plugin_head" style="width:100%"><tr><td>'+p.title+'&emsp;<span class="PanelPopupEvent"></span><span class="PanelKeyEvent" data-keycode="" data-alt="" data-ctrl="" data-shift=""></span><span id="PanelCloseEvent"></span><span id="PanelBuildEvent"></span></td><td style="text-align:right;padding:0px;">'+max+ '<button onclick="hidePanelPlugin()" style="margin-top:15px;">'+closeButton()+'</button></td></tr></table>');
 	$('#panel_plugin').css("border-color", p.bordercolor).css('display', 'inline-table');
 	window.paneloverride = p.override;
     if(p.width < 17)
@@ -315,69 +340,60 @@ function animateContentPanel(p) {
 	);
 }
 function maximizePanel() {
-    if($('.PanelMaximizeEvent').attr('data-status') == 0) {
-        //Maximize
-        $('#panel_content').hide(200);
-        $('#panel_plugin').animate({
-            width:"100%",
-            marginLeft:"0px"
-        }, 200);
-        $('.PanelMaximizeEvent').attr('data-status', 1);
-    } else {
-        //Minimize
-        $('#panel_content').show(200);
-        sizePanel(panelwidth);
-        $('.PanelMaximizeEvent').attr('data-status', 0)
-    }
-    $('.PanelMaximizeEvent').click();
+    PanelManager.onPanelMaximize();
 }
 function hidePanelPlugin() {
-	$('#PanelCloseEvent').click();
-	//
-	$('#panel_plugin').animate({
-		opacity: 0,
-		}, 100, function() {
-//			$('#panel_plugin').css('display', 'none');
-//			stretchContentPanel();
-//			refreshBodyDesign();
-            sizePanel(0,false);
-		}
-	);
-    
-    $('#panel_content').show(200);
-	window.paneltitle = undefined;
-	paneloverride = [];
+	PanelManager.onClose();
 }
 function postPanelOutput(text) {
-	$('.panel_plugin_content').html(text+"<br><br>");
+	panelWrite(text);
+}
+function panelWrite(text) {
+    $('.panel_plugin_content').html(text+"<br><br>");
 	//Any other panel stuff can be here too (if I want to add a footer)
 }
 function populatePanelPlugin(panel_id_name) {
-	eval("RunPanel"+panel_id_name+"();");	
-	try {
-		eval("StylePanel"+panel_id_name+"();");	
-	} catch(e) {
-		
-	}
-	$('.panel_plugin_content').css('height', (window.innerHeight-127-60)+"px").css('overflow-y', 'auto');
+	availablePanels[panel_id_name].onRun();
+	$('.panel_plugin_content').css('height', (window.innerHeight-187)+"px").css('overflow-y', 'auto');
 }
-function openPanelResearch() {
-	initResearch();	
-}
-function closePanelResearch() {
-	pauseResearch();
-}
-function StylePanelClass(classname, arr) {
-	//Allow CSS Classes to receive custom CSS values to refine the experience
-	//In the future, we will be able to include Gluten-based CSS templates to create a unified experience
-	for(i=0;i<arr.length;i+=2) {
-		$('.'+classname).css(arr[i], arr[i+1]);
-	}
-	
-}
+PanelManager = {
+    onClose: function() {
+        $('#PanelCloseEvent').click();
+        $('#panel_plugin').animate({
+            opacity: 0,
+            }, 100, function() {
+                sizePanel(0,false);
+            }
+        );
+
+        $('#panel_content').show(200);
+        window.paneltitle = undefined;
+        paneloverride = [];
+    },
+    onMaximize: function() {
+        if($('.PanelMaximizeEvent').attr('data-status') == 0) {
+            //Maximize
+            $('#panel_content').hide(200);
+            $('#panel_plugin').animate({
+                width:"100%",
+                marginLeft:"0px"
+            }, 200);
+            $('.PanelMaximizeEvent').attr('data-status', 1);
+        } else {
+            //Minimize
+            $('#panel_content').show(200);
+            sizePanel(panelwidth);
+            $('.PanelMaximizeEvent').attr('data-status', 0)
+        }
+        $('.PanelMaximizeEvent').click();
+    },
+    onPopupClose: function(title) {
+        $('.PanelPopupEvent').attr('data-title', title);
+        $('.PanelPopupEvent').click();	
+    }
+};
 function PanelOnPopupClose(title) {
-	$('.PanelPopupEvent').attr('data-title', title);
-	$('.PanelPopupEvent').click();		
+    PanelManager.onPopupClose(title);
 }
 function initService(id, title, icon) {
 	//onclick='runPanel(\'"+id+"\')'
@@ -458,9 +474,6 @@ function clear_panel_data() {
 //TODO, use JSON to enable search
 availablePanels.Main_Character.setBordercolor("#009").setWidth(25).setOverride([13]);
 
-function GetPanelmain_Character() {
-	return {title: "Character Palette", bordercolor: "#000099", width: 25, override:[13]};	
-}
 function RunPanelmain_Character() {
 	//var main = new Array('', '', '', '', '', '', '', '', '', '—');
 			var main = new Array({val: '✔', title: 'Checkmark', tag: 'checkmark check'});
@@ -1193,58 +1206,7 @@ availablePanels.Main_Find.setBordercolor("#e74c3c").setWidth(20).onRun = RunPane
 availablePanels.Main_Find.title = '<span class="fa fa-exchange" style="font-size:13pt"></span>&nbsp;Find & Replace';
 
 
-function findTextReplaceText(finder, replacer) {
-	re = finder;
-	//console.log(re);
-	ro = replacer;
-  
-	$('.content_textarea').each(function() {
-		traverseChildNodes(this);
-	});
-			 
-	function traverseChildNodes(node) {
-		var next;		 
-		if (node.nodeType === 1) {
-			// (Element node)
-			if (node = node.firstChild) {
-				do {
-					// Recursively call traverseChildNodes
-					// on each child node
-					next = node.nextSibling;
-					traverseChildNodes(node);
-				} while(node = next);
-			}
-		} else if (node.nodeType === 3) {
-			// (Text node
-			if (re.test(node.data)) {
-				wrapMatchesInNode(node);
-			}
-		}
-	}	
-	function wrapMatchesInNode(textNode) {
-		var temp = document.createElement('span');
-		temp.innerHTML = textNode.data.replace(re, ro);
-		// temp.innerHTML is now:
-		// "\n    This order's reference number is <a href="/order/RF83297">RF83297</a>.\n"
-		// |_______________________________________|__________________________________|___|
-		//                     |                                      |                 |
-		//                 TEXT NODE                             ELEMENT NODE       TEXT NODE
-	 
-		// Extract produced nodes and insert them
-		// before original textNode:
-		while (temp.firstChild) {
-			/*console.log(temp.firstChild);
-			console.log(textNode);
-			console.log(textNode.parentNode);
-			console.log(textNode.parentNode.parentNode);
-			console.log(temp.firstChild.nodeType);*/
-			textNode.parentNode.insertBefore(temp.firstChild, textNode);
-		}
-		// Logged: 3,1,3
-		// Remove original text-node:
-		textNode.parentNode.removeChild(textNode);
-	}
-}
+
 function install_dictionary(format, url, name, id, icon) {
 	//window.settings.dictionary = 'gltn, wiktionary, wikipedia';
 	//window.settings.dictionary_gltn = 'XML, http://felkerdigitalmedia.com/gltn/dictionary.php, Ouvert Dictionary, gltn, G';

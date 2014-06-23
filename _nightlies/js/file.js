@@ -30,7 +30,7 @@ min_char = 0;
 max_char = 0;
 min_word = 0;
 max_word = 0;
-GLTN_VERSION = "1.3.0.2";
+GLTN_VERSION = "1.3.0.3";
 SYNC_STATUS = "";
 function File() {
     this.metadata = [];
