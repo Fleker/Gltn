@@ -20,6 +20,10 @@ function Panel(id, displayName, icon, url, service, key) {
         this.bordercolor = border;
         return this;
     }
+    Panel.prototype.enableMaximize = function() {
+        this.maximize = true;
+        return this;
+    }
     Panel.prototype.setMaximize = function(max) {
         this.maximize = max;
         return this;
@@ -42,6 +46,9 @@ function Panel(id, displayName, icon, url, service, key) {
     Panel.prototype.isMaximized = function() {
         return this.isMaximized;   
     }
+    Panel.prototype.activate = function() {
+        downloadingpanel = this.id;  
+    };
     
     //Panel events
     Panel.prototype.onInit = undefined;
@@ -50,24 +57,63 @@ function Panel(id, displayName, icon, url, service, key) {
     Panel.prototype.onExport = undefined;
     Panel.prototype.onUninstall = undefined;
 }
+//PanaelManager Class 
+function PanelManager() {
+    this.availablePanels = {
+        Main_Character: new Panel("Main_Character", "Character Panel", "", undefined, false, [13]),
+        Main_Citation: new Panel("Main_Citation", "Citation Editor"),
+        Main_Dictionary: new Panel("Main_Dictionary", "Dictionary"),
+        Main_Filesys: new Panel("Main_Filesys", "My Documents"),
+        Main_Find: new Panel("Main_Find", "Find & Replace"),
+        Main_Guide: new Panel("Main_Guide", "Style Guide"),
+        Main_Idea: new Panel("Main_Idea", "My Ideas"),
+        Main_Notifications: new Panel("Main_Notifications", "Notifications"),
+        Main_Outline: new Panel("Main_Outline", "Outline Editor"),
+        Main_Pagecount: new Panel("Main_Pagecount", "Page Count"),
+        Main_Sync: new Panel("Main_Sync", "Synchronization Status"),
+        Main_Table: new Panel("Main_Table", "Spreadsheets"),
+        Main_Themes: new Panel("Main_Themes", "Theme Selector")
+    };
+    PanelManager.prototype.onClose = function() {
+        $('#PanelCloseEvent').click();
+        $('#panel_plugin').animate({
+            opacity: 0,
+            }, 100, function() {
+                sizePanel(0,false);
+            }
+        );
+
+        $('#panel_content').show(200);
+        window.paneltitle = undefined;
+        paneloverride = [];       
+    };
+    PanelManager.prototype.onMaximize =  function() {
+        if($('.PanelMaximizeEvent').attr('data-status') == 0) {
+            //Maximize
+            $('#panel_content').hide(200);
+            $('#panel_plugin').animate({
+                width:"100%",
+                marginLeft:"0px"
+            }, 200);
+            $('.PanelMaximizeEvent').attr('data-status', 1);
+        } else {
+            //Minimize
+            $('#panel_content').show(200);
+            sizePanel(panelwidth);
+            $('.PanelMaximizeEvent').attr('data-status', 0)
+        }
+        $('.PanelMaximizeEvent').click();
+    };
+    PanelManager.prototype.onPopupClose = function(title) {
+        $('.PanelPopupEvent').attr('data-title', title);
+        $('.PanelPopupEvent').click();	
+    };
+}
+panelManager = new PanelManager();
 //PANELS ENUM
-availablePanels = {
-    Main_Character: new Panel("Main_Character", "Character Panel", "", undefined, false, [13]),
-    Main_Citation: new Panel("Main_Citation", "Citation Editor"),
-    Main_Dictionary: new Panel("Main_Dictionary", "Dictionary"),
-    Main_Filesys: new Panel("Main_Filesys", "My Documents"),
-    Main_Find: new Panel("Main_Find", "Find & Replace"),
-    Main_Guide: new Panel("Main_Guide", "Style Guide"),
-    Main_Idea: new Panel("Main_Idea", "My Ideas"),
-    Main_Notifications: new Panel("Main_Notifications", "Notifications"),
-    Main_Outline: new Panel("Main_Outline", "Outline Editor"),
-    Main_Pagecount: new Panel("Main_Pagecount", "Page Count"),
-    Main_Sync: new Panel("Main_Sync", "Synchronization Status"),
-    Main_Table: new Panel("Main_Table", "Spreadsheets"),
-    Main_Themes: new Panel("Main_Themes", "Theme Selector");
-};
+
 function addNewPanel(panel) {
-    availablePanels[panel.id] = panel;   
+    panelManager.availablePanels[panel.id] = panel;   
 }
 //SERVICES CLASS
 //SERVICES ENUM
@@ -340,10 +386,10 @@ function animateContentPanel(p) {
 	);
 }
 function maximizePanel() {
-    PanelManager.onPanelMaximize();
+    panelManager.onPanelMaximize();
 }
 function hidePanelPlugin() {
-	PanelManager.onClose();
+	panelManager.onClose();
 }
 function postPanelOutput(text) {
 	panelWrite(text);
@@ -356,44 +402,9 @@ function populatePanelPlugin(panel_id_name) {
 	availablePanels[panel_id_name].onRun();
 	$('.panel_plugin_content').css('height', (window.innerHeight-187)+"px").css('overflow-y', 'auto');
 }
-PanelManager = {
-    onClose: function() {
-        $('#PanelCloseEvent').click();
-        $('#panel_plugin').animate({
-            opacity: 0,
-            }, 100, function() {
-                sizePanel(0,false);
-            }
-        );
 
-        $('#panel_content').show(200);
-        window.paneltitle = undefined;
-        paneloverride = [];
-    },
-    onMaximize: function() {
-        if($('.PanelMaximizeEvent').attr('data-status') == 0) {
-            //Maximize
-            $('#panel_content').hide(200);
-            $('#panel_plugin').animate({
-                width:"100%",
-                marginLeft:"0px"
-            }, 200);
-            $('.PanelMaximizeEvent').attr('data-status', 1);
-        } else {
-            //Minimize
-            $('#panel_content').show(200);
-            sizePanel(panelwidth);
-            $('.PanelMaximizeEvent').attr('data-status', 0)
-        }
-        $('.PanelMaximizeEvent').click();
-    },
-    onPopupClose: function(title) {
-        $('.PanelPopupEvent').attr('data-title', title);
-        $('.PanelPopupEvent').click();	
-    }
-};
 function PanelOnPopupClose(title) {
-    PanelManager.onPopupClose(title);
+    panelManager.onPopupClose(title);
 }
 function initService(id, title, icon) {
 	//onclick='runPanel(\'"+id+"\')'
@@ -1206,10 +1217,29 @@ availablePanels.Main_Find.setBordercolor("#e74c3c").setWidth(20).onRun = RunPane
 availablePanels.Main_Find.title = '<span class="fa fa-exchange" style="font-size:13pt"></span>&nbsp;Find & Replace';
 
 
+//Dictionary Class
+function Dictionary(format, url, name, id, icon) {
+    this.format = format||"XML";
+    this.url = url||"";
+    this.name = name||"";
+    this.id = id||"";
+    this.icon = icon||"";
+}
+
+//DictionaryManager Class
+function DictionaryManager() {
+    this.installedDictionaries = {
+        ouvert: new Dictionary("XML", "http://felkerdigitalmedia.com/gltn/dictionaries/dictionary.php", "Ouvert Dictionary", "ouvert", "G"),
+        wiktionary: new Dictionary("HTML", "http://felkerdigitalmedia.com/gltn/dictionaries/dictionary_wik.php", "Wikitionary", "wikitionary", '<span class="fa fa-terminal"></span>'),
+        wikipedia: new Dictionary("HTML", "http://felkerdigitalmedia.com/gltn/dictionaries/dictionary_wiki.php", "Wikipedia", "wikipedia", '<span class="fa fa-globe"></span>');
+    };
+    this.previousSearches = {
+        //TODO Get previous searches into a chrono array  
+    };
+}
+dictionaryManager = new DictionaryManager();
 
 function install_dictionary(format, url, name, id, icon) {
-	//window.settings.dictionary = 'gltn, wiktionary, wikipedia';
-	//window.settings.dictionary_gltn = 'XML, http://felkerdigitalmedia.com/gltn/dictionary.php, Ouvert Dictionary, gltn, G';
 	if(getSettings('dictionary').indexOf(id) == -1) {
 		writeToSettings('dictionary', getSettings('dictionary') + ", "+id);
 		writeToSettings('dictionary_'+id, format+', '+url+', '+name+', '+id+', '+icon);
@@ -1236,7 +1266,6 @@ function uninstall_dictionary(id) {
 		}	
 	}	
 	writeToSettings('dictionarysort', b.join(', '));
-	
 }
 function GetPanelmain_Dictionary() {
 	return {title:"Dictionary", bordercolor: "#2980b9", width: 40};	

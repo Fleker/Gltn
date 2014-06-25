@@ -16,7 +16,7 @@ If you wish to use Gluten's built in card interface, you may do so through the a
 * ht - Pure HTML that will be displayed underneath the "value" and "image" (if those attributes exist). Otherwise it will be displayed fully inside of the popup.
 * fnc - Javascript that can be run in conjunction with the popup. Like with panels, functions and variables cannot be accessed by outside functions. Keep this in mind as you develop your framework.
 * size - Specifies the amount of screen space the popup should consume
-    * Available sizes are "medium" (default), "tiny", "small", "large", "xlarge"
+    * The default size is "medium". You can retrieve values from the PopupManager Enum
 
 Once the object is created, it can be displayed by calling the method `.show()`.
 
@@ -96,8 +96,8 @@ The class Popup is responsible for creating and managing popups.
 | `.run()`   | void    | Function that executes when the popup opens. It can be overriden. |
 | `.show()`  | void    | Displays the popup                                                |
 
-*Enum POPUP*
-The enum `POPUP` gives the values for each popup size.
+*Enum PopupManager*
+The enum `PopupManager` gives the values for each popup size.
 | Properties | Value          | Description                             | 
 | ---------- | -------------: | --------------------------------------- |
 | `TINY `    | String "tiny"  | Represents a very small popup           |

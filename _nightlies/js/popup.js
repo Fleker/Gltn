@@ -2,14 +2,16 @@
 
 currentpopup = undefined;
 
-//POPUP CLASS
-POPUP = {
+//PopupManager Enum
+PopupManager = {
     TINY: "tiny",
     SMALL: "small",
     MEDIUM: "medium",
     LARGE: "large",
     XLARGE: "xlarge"
 }
+
+//Popup class
 function Popup(data) {
     this.title = data.title;
     this.subtitle = data.subtitle;
@@ -61,7 +63,7 @@ function Popup(data) {
     
     Popup.prototype.close = function(callback) {
         if(currentpopup !== undefined)	
-            PanelOnPopupClose(currentpopup.title);
+            panelManager.onPopupClose(title);
 
         currentpopup = undefined;
         if(callback !== false)
