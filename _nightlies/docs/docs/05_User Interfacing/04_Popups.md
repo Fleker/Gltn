@@ -8,6 +8,7 @@ First, a new object of class Popup must be created.
 This function will set up a popup for you to use. Everything must be supplied in a JSON object.
 
 If you wish to use Gluten's built in card interface, you may do so through the attributes specified in the object. You do not have to. Instead, you can supply all of the hypertext yourself and ignore a few fields. Gluten will only show the attributes you've input.
+
 * title - The title of the popup
 * subtitle - A smaller but important item relating to the popup
 * img - An image justified right of the popup
@@ -67,9 +68,13 @@ In generating the hypertext that you wish to display on your popup, add an input
 ```
 
 ##Close Panel
-The panel can be programmed to close by the following function:
+The most current panel can be programmed to close by the following function:
 
 `closePopup();`
+
+Or you can do so using the object:
+
+`popup.close()`
 
 ##Saving
 If you are adding or replacing data that is meant to exist in the document, it is recommended that you save that data to storage right after closing a popup. By marking the file as dirty, the appropriate save action will occur (whether it needs to be saved locally or synced).
@@ -77,18 +82,18 @@ If you are adding or replacing data that is meant to exist in the document, it i
 `markAsDirty();`
 
 ##Reference
-*Class Popup*
+###*Class Popup*
 The class Popup is responsible for creating and managing popups.
 
-| Properties | Return  | Description                           |
-| ---------- | :-----: | ------------------------------------: |
-| bordercolor| Color   | Color of border surrounding popup     |
-| img        | URL     | Visual display accompanying the popup |
-| output     | HTML    | HTML displaying underneath popup title|
-| size       | String  | Size of the popup                     |
-| subtitle   | String  | Subtitle                              |
-| title      | String  | Title for the popup                   |
-| value      | String  | Descriptive info accompanying popup   |
+| Properties   | Return  | Description                           |
+| ----------   | :-----: | ------------------------------------: |
+| `bordercolor`| Color   | Color of border surrounding popup     |
+| `img`        | URL     | Visual display accompanying the popup |
+| `output`     | HTML    | HTML displaying underneath popup title|
+| `size`       | String  | Size of the popup                     |
+| `subtitle`   | String  | Subtitle                              |
+| `title`      | String  | Title for the popup                   |
+| `value`      | String  | Descriptive info accompanying popup   |
 
 | Methods    | Return  | Description                                                       |
 | ---------- | :-----: | ----------------------------------------------------------------: |
@@ -96,8 +101,9 @@ The class Popup is responsible for creating and managing popups.
 | `.run()`   | void    | Function that executes when the popup opens. It can be overriden. |
 | `.show()`  | void    | Displays the popup                                                |
 
-*Enum PopupManager*
+###*Enum PopupManager*
 The enum `PopupManager` gives the values for each popup size.
+
 | Properties | Value          | Description                             | 
 | ---------- | -------------: | --------------------------------------- |
 | `TINY `    | String "tiny"  | Represents a very small popup           |

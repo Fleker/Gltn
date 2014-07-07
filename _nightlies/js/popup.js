@@ -1,15 +1,18 @@
 // JavaScript Document - Handles Popup Creation and Behavior
 
-currentpopup = undefined;
+var currentpopup;
 
 //PopupManager Enum
-PopupManager = {
+var PopupManager = {
     TINY: "tiny",
     SMALL: "small",
     MEDIUM: "medium",
     LARGE: "large",
-    XLARGE: "xlarge"
-}
+    XLARGE: "xlarge",
+    currentpopup: function() {
+        return currentpopup;   
+    }
+};
 
 //Popup class
 function Popup(data) {

@@ -1,21 +1,48 @@
-There are a few functions that are used to get and run panels.
+##Panels
+Panels are a very front-facing type of plugin. A panel will appear to the side of the editor and allow users to augment their writing experience with different types of functions. Panels may be as in-depth or simple as the developer chooses. It is not difficult to scale a panel. Just treat it like a standard web application. Just note interactions may be different in a smaller screen size.
 
-### Register a Panel
-Panels must be registered so that there are no function name conflicts. This will also be required to check for any security issues related to running javascript.
+When a panel is installed by the user, it is accessible in the holoribbon under the "Panels" section.
 
-However, you can install any panel on your own (on a session-by-session basis currently - though saved data will persist between sessions) using a console function.
+In the code, a panel is an object of class `Panel`
 
-`install_panel(id, name, img, uri,[service, key shortcut])`
+##Services
+Services are a special type of panel. They run in the background. Services will usually be indicated by an icon at the bottom of the content editor, in the services bar. Services may run continuously, or run only when triggered. An example of a built-in service is the file saver. It only runs when triggered by a `markAsDirty()` call. You can see the save status in the bar and how the icon changes when it is actively saving. All of these capabilities are accessible to developers to build your own services.
 
-* id - The internal panel name ie. "main_Character"
+Services will usually have a panel part in order to describe to the user what the service is doing and show any type of pertient information in a visual, easy to understand mannner. The panel will appear when the user clicks on the icon. Alternatively, a different action can be taken. 
+
+As a service traditionally exists in the services bar, it won't appear in the holoribbon. However, a panel may create a service or appear to create a service utilizing some lower-level APIs.
+
+In the code, a service is an object of class `Service`, which inherits `Panel`.
+
+##Panel Manager
+When working with plugins, it is a good idea to integrate your app with APIs from the `PanelManager` class, which is accessible from the variable `panelManager`. The `PanelManager` has functions to manage the life cycle of a panel as well as manage the collection of plugins the user has installed.
+
+##Plugin Life Cycle
+A plugin is first initiated when the webpage initiates, `onInit` is called. This way the plugin may set up a service or set up anything else.
+When the user decides to open up a panel, `onRun` is called. This is the standard code that is run.
+When the panel is closed, `onClose` is called. This lets the plugin do any last minute saves or UI changes before closing.
+If the user does not like the plugin anymore, `onUninstall` is called when the plugin in being removed. Any file attributes or settings that were added can be cleaned up and deleted properly.
+
+##Building Plugins
+Designing both types of plugins are very similar. Before they can be run, they must be installed. This may occur manually or via the Gltn Store. The code to install a panel or service is:
+
+```Javascript
+    var panel = new Panel("MyPanel", "My Panel", "my_panel.png", [], false); 
+    //This could be a service too. They are initiated using the same constructor parameters
+    panelManager.install(panel);
+```
+
+This can be run from the console for debugging.
+
+The panel can also be easily run from the console as well.
+`runPanel("MyPanel") //Using  the panel's id`
+
+### Plugin Constructor
+`new Panel/Service(id, name, img, url, keys, service)`
+
+* id - The internal panel name ie. "MyPanel"
 * name - The user-facing name
-* img - An icon or symbol that will be seen
-* uri - The place where this file currently exists so that it can be loaded
-* service - (Not required) If true, the panel is marked as a service and not included in the ribbon. (Default: false)
-* key shortcut - (Not required) A string that appears as the keyboard shortcut in the ribbon. (Default: undefined)
-
-This function adds a user-facing button to the Panels ribbonsection using the img and name parameters to make it easier to call.
-
-Panels may also be installed by any user who accesses the Gltn Store.
-
-TODO Explain the difference between panels and services
+* img - An icon or symbol that will be seen in the holoribbon for panels
+* url - The place where this file currently exists so that it can be loaded
+* keys overriden - An array of keys that will not complete their specified function in a browser or Gltn. They will be overriden for control in the panel as long as the panel's life. By default this is an empty array.
+* service - This is a boolean that specifies whether this is a service. This is true by default in services, false by default in panels.

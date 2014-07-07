@@ -1,6 +1,23 @@
 // File.js handles the saves and restores, changing the formatting, and other file-related functions (convert to PDF? LaTeX, .doc)
+GLTN_VERSION = "1.3.0.6";
 
 //Since the file initiates when it loads, you can do some initization 
+//TODO Push everything to File
+min_char = 0;
+max_char = 0;
+min_word = 0;
+max_word = 0;
+SYNC_STATUS = "";
+/** FILE CLASS **/
+function File() {
+    this.metadata = [];
+    
+    File.prototype.clearMetadata = function() {
+        this.metadata = [];
+    };  
+}
+file = new File();
+
 citation = [];
 citationi = 0;
 
@@ -9,12 +26,16 @@ ideadefault = "";
 fileid = "scratchpad";
 shareid = "";
 formatid = "";
+
 //Handle GET parameters
 GET = window.location.search.substring(1);
 GETarr = GET.split("&");
 for(var i in GETarr) {
-    GETparam = GETarr[i].split("=")[0]; 
-    GETval = GETarr[i].split("=")[1];
+    if(isNaN(parseInt(i)))
+        continue;
+//    console.log(GETarr, i, parseInt(i));
+    var GETparam = GETarr[i].split("=")[0]; 
+    var GETval = GETarr[i].split("=")[1];
     
     if(GETparam == "file")
         fileid = GETval;
@@ -26,45 +47,53 @@ for(var i in GETarr) {
     }
 }
 
-min_char = 0;
-max_char = 0;
-min_word = 0;
-max_word = 0;
-GLTN_VERSION = "1.3.0.3";
-SYNC_STATUS = "";
-function File() {
-    this.metadata = [];
-    
-    File.prototype.clearMetadata = function() {
-        this.metadata = [];
-    };  
-}
-file = new File();
+
 
 hovertagRegistrar = [];
 obj = {};
 currentformat = "";
 document.ready = function() {
+console.log('...');
+    
+}
+document.onload = function() {
 	console.log('Gltn has woken up: v '+GLTN_VERSION);
+
+}
+$(document).ready(function() {
+    console.log('Gltn has awakened: v '+GLTN_VERSION);
+    setUpFoundation();
+    setUpFilepicker();
+});
+/**
+    Initalizes Foundation Interface
+*/
+function setUpFoundation() {
+    console.log(window.Foundation);
+    $(function() {
+//      $(document).foundation();
+    
     $(document).foundation({
-        animation: 'fadeAndPop',
-        animation_speed: 250,
-        close_on_background_click: true,
-        dismiss_modal_class: 'close-reveal-modal',
-        bg_class: 'reveal-modal-bg',
-        bg : $('.reveal-modal-bg'),
-        css : {
-        open : {
-          'opacity': 0,
-          'visibility': 'visible',
-          'display' : 'block'
-        },
-        close : {
-          'opacity': 1,
-          'visibility': 'hidden',
-          'display': 'none'
+        reveal: {
+            animation: 'fadeAndPop',
+            animation_speed: 200,
+            close_on_background_click: true,
+            dismiss_modal_class: 'close-reveal-modal',
+            bg_class: 'reveal-modal-bg',
+            bg : $('.reveal-modal-bg'),
+            css : {
+                open : {
+                  'opacity': 0,
+                  'visibility': 'visible',
+                  'display' : 'block'
+                },
+                close : {
+                  'opacity': 1,
+                  'visibility': 'hidden',
+                  'display': 'none'
+                }
+            },
         }
-        },
     });
     $(document).foundation({
         tooltips: {
@@ -80,7 +109,13 @@ document.ready = function() {
             }
           } 
     });
-    x = {};
+    });
+}
+/**
+    Initalizes the file from Filepicker
+*/
+function setUpFilepicker() {
+     x = {};
     //Setup Filepicker
     filepicker.setKey("AePnevdApT62LvpkSSsiVz");
     
@@ -122,7 +157,7 @@ document.ready = function() {
         else
             restoreFile();
     }
-};
+}   
 function startSaveFile() {
     //Will only sync if dirty -- else it syncs down instead
     //If not a cloud doc, saves as usual
@@ -377,7 +412,8 @@ function finishRestore(x, xc, full) {
 		//}
 	} catch(e) {
 		console.error(e.message);
-		setTimeout("finishRestore('"+x+"','"+xc+"', '"+full+"');",100);
+        //TODO Change back time
+		setTimeout("finishRestore('"+x+"','"+xc+"', '"+full+"');",2000);
 		return;
 	}
 	//console.log(5);

@@ -1613,7 +1613,7 @@ function postLegal() {
 
 
 
-/*** Custom Theming ***/
+/*** Custom Theming -- THEMES -- Theme Class -- Theme Enum***/
 function initTheme() {
 //    window.theme = {};	
 	//set theme colors/css
