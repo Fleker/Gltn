@@ -1,15 +1,16 @@
 //PANEL CLASS
-function Panel(id, displayName, icon, url, service, key) {
+function Panel(id, displayName, icon, url, key, service) {
     this.id = id || "";
     this.name = displayName || "";
     this.icon = icon || "";
     this.url = url; 
     this.service = service || false;
     this.override = key || [];
-    this.bordercolor = theme.darkcolor;
+    console.log(displayName);
+    this.bordercolor = /*theme.darkcolor||*/"#000";
     this.width = 25;
-    this.canMaximize = false;
-    this.isMaximized = false;
+    this._canMaximize = false;
+    this._isMaximized = false;
     Panel.prototype.getManifest = function() {
         return {id: this.id, name: this.name, icon: this.icon, url: this.url, service: this.service, key:this.key, bordercolor:this.bordercolor, width:this.width, maximize:this.canMaximize };   
     };
@@ -41,10 +42,10 @@ function Panel(id, displayName, icon, url, service, key) {
         return this;
     };
     Panel.prototype.canMaximize = function() {
-        return this.canMaximize;   
+        return this._canMaximize;   
     }
     Panel.prototype.isMaximized = function() {
-        return this.isMaximized;   
+        return this._isMaximized;   
     }
     Panel.prototype.activate = function() {
         downloadingpanel = this.id;  
@@ -59,6 +60,10 @@ function Panel(id, displayName, icon, url, service, key) {
 }
 //PanaelManager Class 
 function PanelManager() {
+    //TODO If I can delay these initalizations until I load the page, then I can use theme attributes for constuctor. 
+    //TODO Though for panels it should be done on Run because it will be based on a soft-picked theme. So, a beforeRun function should be called if applicable to set those parameters
+    //  on both the developer side and the engine side
+    //TODO Move panel parameters to manifest, use id & url only
     this.availablePanels = {
         Main_Character: new Panel("Main_Character", "Character Panel", "", undefined, false, [13]),
         Main_Citation: new Panel("Main_Citation", "Citation Editor"),
@@ -74,6 +79,73 @@ function PanelManager() {
         Main_Table: new Panel("Main_Table", "Spreadsheets"),
         Main_Themes: new Panel("Main_Themes", "Theme Selector")
     };
+    PanelManager.prototype.getAvailablePanels = function() {
+        //TODO Grab all panels     
+        return this.availablePanels;
+    };
+    PanelManager.prototype.getAvailableServices = function() {
+        //TODO Grab panels, filter only services   
+    };  
+    PanelManager.prototype.getPlugin = function(id) {
+        return this.availablePanels[id];   
+    }
+    PanelManager.prototype.install = function(panel, num) {
+        if(panel.service === undefined)
+            panel.service = false;
+        if(panel.key === undefined)
+            panel.key = [];
+        panel.img = panel.img.replace(/&gt;/g, ">").replace(/&lt;/g, "<");
+        //Return keyboard shortcuts
+        if(panel.service != true) {
+            holoribbon_std['Panels'].push({text: panel.name, img: panel.img, action: "runPanel('"+panel.id+"')"});
+            newRibbon('.header', holoribbon_std);
+            console.log("Installing "+name+"...  "+num);
+            ribbonSwitch(ribbon_index,false);
+            ribbonLoad();
+        }
+        writeToSettings('panels_'+id, id+","+url);
+        this.availablePanels[panel.id] = panel;
+
+        if(window.offline !== true) {
+            //Now store script offline - this really sucks though
+            loadjscssfile(url, "js");
+            $('#themeframe').attr('src', url);
+            downloadingpanel = "null";
+            window.setTimeout(function() {download_panel(id,num)}, 200);
+        }
+    };
+    PanelManager.prototype.uninstall = function(id) {
+        //For removing the ribbon, need to compare the name of the ribbon with the name of the panel
+        var a = getSettings('panels_'+id).split(', ');
+        var b = [];
+        for(var i in holoribbon_std.Panels) {
+            var j = holoribbon_std.Panels[i];
+            if(j.text != a[1]) {
+                b.push(j);
+            }
+        }
+        holoribbon_std.Panels = b;
+        newRibbon('.header', holoribbon_std);
+        //Now we can set up a way for panels to turn off stuff
+        //We set a short timer so that if it doesn't exist, it doesn't ruin the flow of the function
+        if(this.availablePanels[id].onUninstall !== undefined)
+            this.availablePanels[id].onUninstall();
+        var a = getSettings('panels').split(', ');
+        var b = [];
+        for(i in a) {
+            if(a[i] != id) {
+                b.push(a[i])
+            }	
+        }	
+        writeToSettings('panels', b.join(', '));
+        writeToSettings('panels_'+i, undefined);	
+        if(localStorage['zpanels_'+id] !== undefined) 
+            localStorage.removeItem('zpanels_'+id);  
+    };
+    PanelManager.prototype.run = function(id) {
+        runPanel(id);   
+    }
+    
     PanelManager.prototype.onClose = function() {
         $('#PanelCloseEvent').click();
         $('#panel_plugin').animate({
@@ -116,10 +188,24 @@ function addNewPanel(panel) {
     panelManager.availablePanels[panel.id] = panel;   
 }
 //SERVICES CLASS
-//SERVICES ENUM
-activeServices = {
+//TODO Constructor
+function Service(id, displayName, icon, url, key, service) {
+    this.id = id || "";
+    this.name = displayName || "";
+    this.icon = icon || "";
+    this.url = url; 
+    this.service = true;
+    this.override = key || [];
     
-};
+    this.servicesBarIcon = "";    
+    this.servicesBarTitle = "";
+    this.onServiceBarClick = undefined; //What happens when service icon is clicked
+    this.onHeartbeat = undefined; //Function to call every so often
+    this.heartRate = 1000; //MS per beat
+    this.heart = undefined; //Interval variable
+}
+Service.prototype = new Panel();
+
 function addNewService(service) {
     activeServices[service.id] = service;   
 }
@@ -162,36 +248,7 @@ downloadingpanel = "";
 
 //PANEL INSTALL
 function install_panel(id, name, img, url, service, key, num) {
-    console.log(id, name, img, url, service, key, num);
-	if(service == undefined)
-		service = false;
-	if(key == undefined)
-		key = " ";
-	img = img.replace(/&gt;/g, ">").replace(/&lt;/g, "<");
-	if(service != true) {
-		if(key != undefined && key.length > 0 && key != "[object Object]")
-            holoribbon_std['Panels'].push({text: name, img: img, action: "runPanel('"+id+"')", key:key});
-		else
-			holoribbon_std['Panels'].push({text: name, img: img, action: "runPanel('"+id+"')"});
-		newRibbon('.header', holoribbon_std);
-		console.log("Installing "+name+"...  "+num);
-		ribbonSwitch(ribbon_index,false);
-		ribbonLoad();
-	}
-    if(typeof(service) == "string")
-        service = service.replace(/,/, "");
-	if(getSettings('panels').indexOf(id) == -1) {
-		writeToSettings('panels', getSettings('panels') + ", "+id);
-	}
-	writeToSettings('panels_'+id, id+","+name+","+img+","+url+","+service+","+key);
-
-	if(window.offline !== true) {
-        //Now store script offline - this really sucks though
-		loadjscssfile(url, "js");
-		$('#themeframe').attr('src', url);
-        downloadingpanel = "null";
-        window.setTimeout(function() {download_panel(id,num)}, 200);
-	}
+    panelManager.install(new Panel(id, name, img, url, key, service),num);
 }
 
 function download_panel(id,num) {
@@ -204,7 +261,8 @@ function download_panel(id,num) {
         console.log("Installed");
         localStorage['zpanels_'+id] = $('#themeframe').contents().text();  
         console.log("eval('InitPanel"+id+"();');  "+num);
-        eval("availablePanels['"+id+"'] = "+id+");
+        eval("availablePanels['"+id+"'] = "+id);
+        console.log("availablePanels['"+id+"'] = "+id);
         if(availablePanels[id].onInit !== undefined)
             availablePanels[id].onInit();
         initPanels(num+1);
@@ -212,41 +270,42 @@ function download_panel(id,num) {
 }
 
 function uninstall_panel(id) {
-	//For removing the ribbon, need to compare the name of the ribbon with the name of the panel
-	var a = getSettings('panels_'+id).split(', ');
-	var b = [];
-	for(var i in holoribbon_std.Panels) {
-		var j = holoribbon_std.Panels[i];
-		if(j.text != a[1]) {
-			b.push(j);
-		}
-	}
-	holoribbon_std.Panels = b;
-	newRibbon('.header', holoribbon_std);
-    //Now we can set up a way for panels to turn off stuff
-	//We set a short timer so that if it doesn't exist, it doesn't ruin the flow of the function
-    if(availablePanels[id].onUninstall !== undefined)
-        availablePanels[id].onUninstall();
-	var a = getSettings('panels').split(', ');
-	var b = [];
-	for(i in a) {
-		if(a[i] != id) {
-			b.push(a[i])
-		}	
-	}	
-	writeToSettings('panels', b.join(', '));
-	writeToSettings('panels_'+i, undefined);	
-	if(localStorage['zpanels_'+id] !== undefined) 
-		localStorage.removeItem('zpanels_'+id);
+    panelManager.uninstall(id);
 }
 
-
 function initPanels(num) {
-    if(num === undefined)
-        num = 0;
    if(getSettings('panels') === undefined) {
 		writeToSettings('panels', mainpanels);	
 	}
+    
+    var a = getSettings('panels').split(',');
+    var a_nm = a.length;
+    if(num === NaN)
+        return null;
+    if(a.length - 1 < num)
+        return null;
+    
+    var b = getSettings('panels_'+a[num]).split(',');
+    if(b[5] == true) {
+        var plugin = new Panel(b[0], b[1], b[2], b[3], b[4], b[5]);    
+    } else {
+        var plugin = new Service(b[0], b[1], b[2], b[3], b[4], b[5]);
+    }
+    if(a[num].indexOf('main') > -1) 
+        panelManager.install(plugin, num);
+    else {
+        if(plugin.onInit !== undefined)
+            plugin.onInit();
+    }
+}
+
+function initPanel2s(num) {
+    if(num === undefined)
+        num = 0;
+    if(getSettings('panels') === undefined) {
+		writeToSettings('panels', mainpanels);	
+	}
+    
 	var a = getSettings('panels').split(',');
     if(num === NaN)
         return null;
@@ -279,11 +338,9 @@ function initPanels(num) {
                 install_panel(b[0], b[1].trim(), "?", b[3], b[4].trim(), b[5].trim(), num);     
             }
 		}
-
-//	}
-    //Now we do a bit of additional installs
-//    install_panel("main_PDF", "Export to PDF", ".", "", true, "");
 }
+
+//Panel GUI
 function runPanel(panel_id_name) {
 	//Get Properties of the Panel First
 	var p = availablePanels[panel_id_name];
@@ -406,6 +463,8 @@ function populatePanelPlugin(panel_id_name) {
 function PanelOnPopupClose(title) {
     panelManager.onPopupClose(title);
 }
+
+//Panel Initiation
 function initService(id, title, icon) {
 	//onclick='runPanel(\'"+id+"\')'
 	//console.error(id, title, icon)
@@ -480,10 +539,12 @@ function clear_panel_data() {
 }
 
 //Default Plugins Here:
+//Plugin Native
+//TODO Move to Polymer
 
 /*** Character Palette */
 //TODO, use JSON to enable search
-availablePanels.Main_Character.setBordercolor("#009").setWidth(25).setOverride([13]);
+panelManager.getAvailablePanels().Main_Character.setBordercolor("#009").setWidth(25).setOverride([13]);
 
 function RunPanelmain_Character() {
 	//var main = new Array('', '', '', '', '', '', '', '', '', '—');
@@ -556,7 +617,7 @@ function RunPanelmain_Character() {
 	//if I want to hide symbols, I can always put additional main attributes here, maybe call them a different name, like all_ch
 	
 }
-availablePanels.Main_Character.onRun = RunPanelmain_Character;
+panelManager.getAvailablePanels().Main_Character.onRun = RunPanelmain_Character;
 function InitPanelmain_Character() {
 	keyboardShortcut('main_Character', {alt: true, key: 67});
 	$(document).on('keydown', function(e) {
@@ -566,8 +627,8 @@ function InitPanelmain_Character() {
 	});
 	//initService('main_Character', 'Character', 'C');
 }
-availablePanels.Main_Character.onInit = InitPanelmain_Character;
-availablePanels.Main_Citation.setBordercolor("#09f").setWidth(25);
+panelManager.getAvailablePanels().Main_Character.onInit = InitPanelmain_Character;
+panelManager.getAvailablePanels().Main_Citation.setBordercolor("#09f").setWidth(25);
 function GetPanelmain_Citation() {
 	return {title: "Citation Editor", bordercolor: "#09f", width: 25};
 }	
@@ -622,8 +683,8 @@ function RunPanelmain_Citation() {
 	populateCitations();
 	//figure out a way to repopulate citations after editing
 }
-availablePanels.Main_Citation.onRun = RunPanelmain_Citation;
-availablePanels.Main_Idea.setBordercolor("#f1c40f").setWidth(40);
+panelManager.getAvailablePanels().Main_Citation.onRun = RunPanelmain_Citation;
+panelManager.getAvailablePanels().Main_Idea.setBordercolor("#f1c40f").setWidth(40);
 function GetPanelmain_Idea() { 
 	return {title: "Document Notes", bordercolor: "#f1c40f", width: 40};	
 }
@@ -684,13 +745,12 @@ function RunPanelmain_Idea() {
 	});
 	populateIdeas();
 }
-availablePanels.Main_Idea.onRun = RunPanelmain_Idea;
+panelManager.getAvailablePanels().Main_Idea.onRun = RunPanelmain_Idea;
 function StylePanelmain_Idea() {
 	$('.PanelIdea').css('width', '90%');
 	$('.PanelIdea').css('max-height', '50%');
 }
-
-availablePanels.Main_Outline.setBordercolor("#2c3e50").setWidth(40);
+panelManager.getAvailablePanels().Main_Outline.setBordercolor("#2c3e50").setWidth(40);
 function GetPanelmain_Outline() {
 	return {title: "Outline", bordercolor: "#2c3e50", width: 40};	
 }
@@ -841,12 +901,12 @@ function RunPanelmain_Outline() {
 			}*/
 		});
 }
-availablePanels.Main_Outline.onRun = RunPanelmain_Outline;
+panelManager.getAvailablePanels().Main_Outline.onRun = RunPanelmain_Outline;
 function StylePanelmain_Outline() {
 	$('.Outline').css('border', 'solid 1px black').css('width', '85%');
 } 
-availablePanels.Main_Outline.setBordercolor('#7f8c8d').setWidth(25);
-availablePanels.Main_Outline.title = '<span class="fa fa-folder-open" style="font-size:15pt"></span>&nbsp;My Documents';
+panelManager.getAvailablePanels().Main_Outline.setBordercolor('#7f8c8d').setWidth(25);
+panelManager.getAvailablePanels().Main_Outline.title = '<span class="fa fa-folder-open" style="font-size:15pt"></span>&nbsp;My Documents';
 function GetPanelmain_Filesys() {
 	return {title: '<span class="fa fa-folder-open" style="font-size:15pt"></span>&nbsp;My Documents', bordercolor: '#7f8c8d', width:25};
 }
@@ -857,7 +917,7 @@ function InitPanelmain_Filesys() {
 		}
 	});
 }
-availablePanels.Main_Filesys.onInit = InitPanelmain_Filesys;
+panelManager.getAvailablePanels().Main_Filesys.onInit = InitPanelmain_Filesys;
 //Modal for new file creation and implementation
 function createNewFile() {
     ht = '<div class="row collapse"><div class="small-3 medium-3 columns"><input id="FileName" type="text" value="untitled" /></div><div class="small-3 medium-1 columns"><span class="postfix">.gltn</span></div>';
@@ -1107,8 +1167,8 @@ function RunPanelmain_Guide() {
 	}
 	postPanelOutput(out);	
 }
-availablePanels.Main_Guide.setBordercolor('#7f8c8d').setWidth(30).onRun = RunPanelmain_Guide;
-availablePanels.Main_Guide.title = '<span class="fa fa-info-circle" style="font-size:13pt"></span>&nbsp;Style Guide';
+panelManager.getAvailablePanels().Main_Guide.setBordercolor('#7f8c8d').setWidth(30).onRun = RunPanelmain_Guide;
+panelManager.getAvailablePanels().Main_Guide.title = '<span class="fa fa-info-circle" style="font-size:13pt"></span>&nbsp;Style Guide';
     
     
 function GetPanelmain_Find() {
@@ -1213,8 +1273,8 @@ function RunPanelmain_Find() {
 		}
 	}
 }
-availablePanels.Main_Find.setBordercolor("#e74c3c").setWidth(20).onRun = RunPanelmain_Find;
-availablePanels.Main_Find.title = '<span class="fa fa-exchange" style="font-size:13pt"></span>&nbsp;Find & Replace';
+panelManager.getAvailablePanels().Main_Find.setBordercolor("#e74c3c").setWidth(20).onRun = RunPanelmain_Find;
+panelManager.getAvailablePanels().Main_Find.title = '<span class="fa fa-exchange" style="font-size:13pt"></span>&nbsp;Find & Replace';
 
 
 //Dictionary Class
@@ -1231,7 +1291,7 @@ function DictionaryManager() {
     this.installedDictionaries = {
         ouvert: new Dictionary("XML", "http://felkerdigitalmedia.com/gltn/dictionaries/dictionary.php", "Ouvert Dictionary", "ouvert", "G"),
         wiktionary: new Dictionary("HTML", "http://felkerdigitalmedia.com/gltn/dictionaries/dictionary_wik.php", "Wikitionary", "wikitionary", '<span class="fa fa-terminal"></span>'),
-        wikipedia: new Dictionary("HTML", "http://felkerdigitalmedia.com/gltn/dictionaries/dictionary_wiki.php", "Wikipedia", "wikipedia", '<span class="fa fa-globe"></span>');
+        wikipedia: new Dictionary("HTML", "http://felkerdigitalmedia.com/gltn/dictionaries/dictionary_wiki.php", "Wikipedia", "wikipedia", '<span class="fa fa-globe"></span>')
     };
     this.previousSearches = {
         //TODO Get previous searches into a chrono array  
@@ -1445,7 +1505,7 @@ function RunPanelmain_Dictionary() {
 	}
 	openApp();
 }
-availablePanels.Main_Dictionary.setBordercolor("#2980b9").setWidth(40).onRun = RunPanelmain_Dictionary;
+panelManager.getAvailablePanels().Main_Dictionary.setBordercolor("#2980b9").setWidth(40).onRun = RunPanelmain_Dictionary;
 
 
 //*** Theme Panel ***/
@@ -1490,7 +1550,7 @@ function RunPanelmain_Themes() {
 	}
 	loadThemes();
 }	
-availablePanels.Main_Themes.setBordercolor('#2ecc71').setWidth(20).onRun = RunPanelmain_Themes;
+panelManager.getAvailablePanels().Main_Themes.setBordercolor('#2ecc71').setWidth(20).onRun = RunPanelmain_Themes;
 
 /** Page Count **/
 function InitPanelmain_PageCount() {
@@ -1503,8 +1563,9 @@ function InitPanelmain_PageCount() {
         }
      });
 }
-availablePanels.Main_Pagecount.setBordercolor(theme.coloralt).setWidth(20);
-availablePanels.Main_Pagecount.onInit = InitPanelmain_PageCount;
+//TODO Use ColorAlt
+panelManager.getAvailablePanels().Main_Pagecount.setBordercolor('#fff').setWidth(20);
+panelManager.getAvailablePanels().Main_Pagecount.onInit = InitPanelmain_PageCount;
 function GetPanelmain_PageCount() {
     return {title:"Page Count", bordercolor: theme.coloralt, width:20};   
 }
@@ -1521,7 +1582,7 @@ function RunPanelmain_PageCount() {
     out += "<div style='text-align:center;font-size:18pt;font-weight:100;'>"+getWords().length+" Words<br><br>"+getWords().join('').length+" Chars</div>";
     postPanelOutput(out);
 }
-availablePanels.Main_Pagecount.onRun = RunPanelmain_PageCount;
+panelManager.getAvailablePanels().Main_Pagecount.onRun = RunPanelmain_PageCount;
 function postPageCount() {
     var i = Math.round(onGetPageCount()*10)/10;  
     initService("main_PageCount", "Page Count", Math.ceil(i)+" Page"+(Math.ceil(i)==1?"":"s")); 

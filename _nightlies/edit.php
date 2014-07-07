@@ -10,19 +10,18 @@
 
 <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 
-<script src="http://code.jquery.com/jquery-2.1.0.js"></script>
+<script src="http://code.jquery.com/jquery-2.1.1.js"></script>
 <script src="http://code.jquery.com/color/jquery.color-2.1.2.min.js"></script>
 
+<script src="js/kernel.js"></script>
+<script src="js/editor.js"></script>
+<script src="js/file.js"></script>
 <script src="js/format.js"></script>
 <script src="js/panels.js"></script>
 <script src="js/popup.js"></script>
-<script src="js/file.js"></script>
 <script src="js/build.js"></script>
-<script src="js/hammer.js"></script>
 <script src="js/holoribbon_foundation.js"></script>
-<script src="js/kernel.js"></script>
-<script src="js/editor.js"></script>
-<script src="js/gltnstore.js"></script>
+<script src="store/secure/gltnstore.js"></script>
 
 
 <script src="js/rangy-1.3alpha.772\rangy-core.js"></script>
