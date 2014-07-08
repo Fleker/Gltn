@@ -77,3 +77,9 @@ function Popup(data) {
 function closePopup(callback) {
     currentpopup.close();
 }
+
+//FUTURE Migration Compatibility
+function initiatePopup(data) {
+    var p = new Popup(data);
+    p.show();
+}

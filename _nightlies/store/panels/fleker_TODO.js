@@ -1,4 +1,11 @@
 currentpanel = "fleker_TODO";
+//TODO Change to new API
+//TODO: NOTE, FIXME, CHANGES, FUTURE
+//TODO Orange
+//FUTURE Blue
+//NOTE Green
+//FIXME Red
+//CHANGES Dark blue grey
 function GetPanelfleker_TODO() {
     return {title: "TODO LIST", width:30, bordercolor: "#d35400"};
 }

@@ -1,5 +1,7 @@
 // Sample theme - Blackout
 // This is meant to be a softer theme, using a dark background to be easier to see
+//TODO Use new palette system 
+//TODO Include a darker colorset for people working VERY late at night.
 function initTheme() {
 //	window.theme = {};
 	//set theme variables

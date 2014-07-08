@@ -1,60 +1,92 @@
-// Misc. stuff from edit.php that shouldn't be in there - clutters up stuff
-//In the future, arrange a way to programitically grab all values.
-	formats = [{name: "APA", type: "IN BETA"}, {name: "MLA", "type": "Essay"}, {name:"IEEE", type:"Report"},{name:"Lab", type:"Report"}];	
-	
-/*(function(){
-	//saving the original console.log function
-	var preservedConsoleLog = console.log;
- 
-	//overriding console.log function
-	console.log = function() {
- 
-		//we can't just call to `preservedConsoleLog` function,
-		//that will throw an error (TypeError: Illegal invocation)
-		//because we need the function to be inside the
-		//scope of the `console` object so we going to use the
-		//`apply` function
-		preservedConsoleLog.apply(console, arguments);
- 
-		//and lastly, my addition to the `console.log` function
-		//if(application.socket){
-		//    application.socket.emit('console.log', arguments);
-		//}
-		alert(JSON.stringify(arguments));
-	}
-})()*/
-//a.replace(/\*(\w+)\*/, '<b>$1<\/b>')
-function new_gluten_formats() {		
-		//Now, let's put them into an HTML based format.
-		var out = "";
-		for(i=0;i<formats.length;i++) {
-			out = out + "<option label='"+formats[i].type+"'>"+formats[i].name+"</option>";	
-		}
-		
+//GLTNFORMAT CLASS -- FORMAT CLASS
+function GltnFormat(id, name, type, url, hidden) {
+    this.id = id;
+    this.name = name;
+    this.type = type;
+    this.url = url || "js/formats/"+id+".js";
+    this.hidden = (type == "IN BETA")?true:hidden || false;
+    formatManager.addFormat(this);
+}
+//FORMATMANAGER CLASS
+function FormatManager() {
+    this.formats = {
+        APA: new GltnFormat("APA", "APA", "Essay", "js/formats/APA.js", true),
+        MLA: new GltnFormat("MLA", "MLA", "Essay", "js/formatts/MLA.js", false),
+        IEEE: new GltnFormat("IEEE", "IEEE", "Report", "js/formats/IEEE.js", false),
+        Lab: new GltnFormat("Lab", "Lab", "Report", "js/formats/Lab.js", false)
+    };
+    this.getFormats = function() {
+        return this.formats;
+    };
+    this.postFormats = function() {
+        var a = this.getFormats();
+        var out = "";
+        for(i in a) {
+            if(a[i].hidden == false) {
+                out = out + "<option label='"+a[i].type+"'>"+a[i].name+"</option>";	   
+            }
+        }
 		//Now output
 		$('#gluten_formats').html(out);
-	}
-	
-	function new_gluten_languages() {
-		window.langs = [{name: "English (US)", code: "en_us"}, {name: "Spanish", code: "es"}];
-		
-		var out = "";
-		for(i=0;i<langs.length;i++) {
-			out = out + "<option label='"+langs[i].code+"'>"+langs[i].name+"</option>";	
-		}	
-		
-		$('#gluten_languages').html(out);
-	}
-function install_gluten_format(name, type, uri) {
-	formats.push({name: name, type: type, uri: uri});
-	if(settings['formats_name'].indexOf(name) == -1) {
-		writeToSettings('formats_name', getSettings('format_name') + ", " + name);
-		writeToSettings('formats_type', getSettings('formats_type') + ", " + type);
-		writeToSettings('formats_uri', getSettings('formats_uri') + ", " + uri);
-	}
-
-	new_gluten_formats();
+    };
+    this.addFormat = function(format) {
+        this.formats[format.id] = format;
+        if(getSettings('formats_name').indexOf(format.name) == -1) {
+            writeToSettings('formats_name', getSettings('format_name') + ", " + format.name);
+            writeToSettings('formats_type', getSettings('formats_type') + ", " + format.type);
+            writeToSettings('formats_url', getSettings('formats_uri') + ", " + format.url);
+        }
+        this.postFormats();
+    };
+    //MLA is the default format
+    this.currentFormat = this.getFormats().MLA;
+    this.getCurrentFormat = function() {
+        return this.currentFormat;   
+    }
+    //TODO Run code here to install all of the formats stored in settings, don't use the constructor. Then you can remove the formatManager code in the item constructor
 }
+formatManager = new FormatManager();
+function new_gluten_formats() {		
+    formatManager.postFormats();
+}
+//LANGUAGE CLASS
+function Language(code, name) {
+    this.code = code;
+    this.name = name;
+}
+//LANGUAGE MANAGER CLASS
+function LanguageManager() {
+    this.languages = {
+        en_us: new Language("en_us", "English (US)"),
+        es: new Language("es", "Spanish")
+    };
+    this.getLanguages = function() {
+        return this.languages;   
+    };
+    this.postLanguages = function() {
+        var out = "";
+        var a = this.getLanguages();
+		for(i in a) {
+			out = out + "<option label='"+a[i].code+"'>"+a[i].name+"</option>";	
+		}	
+		$('#gluten_languages').html(out);
+    };
+}
+languageManager = new LanguageManager();
+
+//FUTURE Here for compatiblity
+function new_gluten_languages() {
+    languageManager.postLanguages();
+}
+function installGltnFormat(name, type, url) {
+    var f = new GltnFormat(name+"_"+type, name, type, url, (type=="IN BETA")?true:false);
+    formatManager.addFormat(f);
+}
+//FUTURE Here for compatibility
+function install_gluten_format(name, type, uri) {
+    installGltnFormat(name, type, url);
+}
+//TODO Documentation on FormatManager
 	
 	
 
@@ -1606,7 +1638,7 @@ function postLegal() {
     out += "Shoutout to everyone who posted online about stuff like replacing text nodes and the ample amount of help from StackOverflow.<br>";
 
 	f = function x() { };
-
+    //CHANGES Uncaught ReferenceError: initiatePopup is not defined 
 	initiatePopup({title:'Credits', value: out, fnc: f});
 
 }
@@ -1614,27 +1646,118 @@ function postLegal() {
 
 
 /*** Custom Theming -- THEMES -- Theme Class -- Theme Enum***/
+//TODO Finish migrating
+function resetTheme() {
+    //TODO Change Dark for Opposite
+   window.theme = {
+       fontColor: "black",
+       fontColorAlt: "#222",
+       fontColorDark: "rgb(200,200,200)"
+       bodyColor: "white",
+       bodyColorDark: "rgb(0,0,0)",
+       fullscreen: {
+            fontColor: "black",
+            bodyColor: "rgb(204,204,204)"
+       }, 
+       fullscreenDark: {
+            fontColor: "white",
+            bodyColor: "rgb(41,41,41)"
+       },
+       ribbon: {
+            highlight: "rgba(44,62,80,1)",
+            plain: "rgba(0,0,0,0)"
+       },
+       palette {
+            /*
+                Each palette has a minified version of Google's Material Design Palette
+                See everything at google.com/design/spec/style/color.html#color-ui-color-palette
+                Instead of including every color, which would take time to implement from a theme standpoint, as well as each item having limited use,
+                    only a few colors from each are included
+                white - weight 50,   essentially being white with that color as an accent; if this is in red, it would be white with a redish tint
+                light - weight 100,  being a light version of that color; if this is in red, it would be pink
+                normal - weight 500, the regular color; if this is in Red, this would be red.
+                thick - weight 900, a darker version of that color; if this is in red, it would be maroon
+                accent100 - weight 100 accent, a light accent color in the same color idea; if this is in red it would be a high contrast light pink
+                accent400 - weight 400 accent, an accent color in the same color idea; if this is in red it would be a high contrast pink
+                accent700 - weight 700 accent, a dark accent color in the same color idea; if this is in red it would be a high contrast dark pink 
+            */
+            blue: {
+                white: "#e7e9fd",
+                light: "#d0d9ff",
+                normal: "#5677fc",
+                thick: "#2a36b1",
+                accent100: "#a6baff",
+                accent400: "#4d73ff",
+                accent700: "#4d69ff"
+            },
+            brown: {
+                white: "#efebe9",
+                light: "#d7ccc8",
+                normal: "#795548",
+                thick: "#3e2723",
+                accent100: "#ff9e80",
+                accent400: "#ff3d00",
+                accent700: "#dd2c00"
+            },
+            grey: {
+                white: "#fafafa",
+                light: "#f5f5f5",
+                normal: "#9e9e9e",
+                thick: "#212121",
+                accent100: "#cfd8dc",
+                accent400: "#607d8b",
+                accent700: "#263238"
+            },
+            green: {
+                white: "#d0f8ce",
+                light: "#a3e9a4",
+                normal: "#259b24",
+                thick: "#0d5302",
+                accent100: "#a2f78d",
+                accent400: "#14e715",
+                accent700: "#12c700"
+            },
+            orange: {
+                white: "#fff3e0",
+                light: "#ffe0b2",
+                normal: "#ff9800",
+                thick: "#e65100",
+                accent100: "#ffd180",
+                accent400: "#ff9100",
+                accent700: "#ff6d00"
+            },
+            purple: {
+                white: "#f3e5f5",
+                light: "#e1bee7",
+                normal: "#9c27b0",
+                thick: "#4a148c",
+                accent100: "#ea80fc",
+                accent400: "#d500f9",
+                accent700: "#aa00ff"
+            },
+            red: {
+                white: "#fde0dc",
+                light: "#f9bdbb",
+                normal: "#e51c23",
+                thick: "#b0120a",
+                accent100: "#ff7997",
+                accent400: "#ff2d6f",
+                accent700: "#e00032"
+            },
+            yellow: {
+                white: "#fffde7",
+                light: "#fff9c4",
+                normal: "#ffeb3b",
+                thick: "#f57f17",
+                accent100: "#ffff8d",
+                accent400: "#ffea00",
+                accent700: "#ffd600"
+            }
+       }
+   };
+}
 function initTheme() {
-//    window.theme = {};	
-	//set theme colors/css
-	//set theme variables
-	//fullscreen variables
-	theme.darkbg = "rgb(0, 0, 0)";
-	theme.normcolor = "rgb(0, 0, 0)";
-	theme.normbg = "white";
-	theme.darkcolor = "rgb(200, 200, 200)";
-	theme.coloralt = '#222';
-	theme.normfsui = "rgb(204, 204, 204)";
-	theme.darkfsui = "rgb(41, 41, 41)";
-	theme.darkfsuicolor = 'white';
-	theme.normfsuicolor = 'black';
-	theme.ribbonhighlight = 'rgba(44, 62, 80,1.0)';
-	theme.ribbonplain = 'rgba(0,0,0,0)';
-    theme.palette.red = "rgb(255,68,68)";
-    theme.palette.dark = "rgba(44,62,80,1)";
-    theme.palette.blue = '#2980b9';
-    $('.popupcontent').css('padding-left','15px');
-//    $('.main').css('background-color', "#ecf0f1"    );
+    theme.palette.red.normal = "rgb(255,68,68)";
 }
 
 function themeCss(rule, val) {
@@ -1649,7 +1772,7 @@ function startThemer() {
 	//isn't called until settings are grabbed because otherwise window.settings.theme wouldn't exist
 	//grab current theme
 	//if not set reset themes
-    window.theme = {palette:{}};
+    resetTheme();
     initTheme();
 	var url;
 	if(getSettings('theme') === undefined) {
@@ -2292,9 +2415,9 @@ function clone(obj, kind) {
         OneShotConstructor.constructor = kind;
     return new OneShotConstructor();
 }
-Object.prototype.clone = function(kind) {
+/*Object.prototype.clone = function(kind) {
     return clone.call(this, this, kind);
-}
+}*/
 function findTextReplaceText(finder, replacer) {
 	re = finder;
 	//console.log(re);
@@ -2347,3 +2470,24 @@ function findTextReplaceText(finder, replacer) {
 		textNode.parentNode.removeChild(textNode);
 	}
 }
+/*(function(){
+	//saving the original console.log function
+	var preservedConsoleLog = console.log;
+ 
+	//overriding console.log function
+	console.log = function() {
+ 
+		//we can't just call to `preservedConsoleLog` function,
+		//that will throw an error (TypeError: Illegal invocation)
+		//because we need the function to be inside the
+		//scope of the `console` object so we going to use the
+		//`apply` function
+		preservedConsoleLog.apply(console, arguments);
+ 
+		//and lastly, my addition to the `console.log` function
+		//if(application.socket){
+		//    application.socket.emit('console.log', arguments);
+		//}
+		alert(JSON.stringify(arguments));
+	}
+})()*/

@@ -1,4 +1,7 @@
-﻿builddate = 0;
+//TODO Fix build system. A - Use Promises
+//TODO B - Change %sc and its effect to improve speed
+//FIXME C - This NEEDS to display correctly. Make a demo if necessary. It cannot be imperfect
+builddate = 0;
 buildPrint = '<button onclick="window.print()" class="noprint textbutton"><span class="fa fa-print"></span>&nbsp;Print</button><button onclick="printHelp()" class="noprint textbutton"><span class="fa fa-question"></span>&nbsp;Print Help</button><button onclick="convertDoc()" class="noprint textbutton">Export</button>';
 function falseBuild(printr) {
 	window.section_name = "";

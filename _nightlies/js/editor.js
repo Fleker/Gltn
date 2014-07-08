@@ -8,6 +8,7 @@ window.onload = function() {
 	if(!doesThisWork()) {
 		alert("I'm sorry. I'm so, so sorry. You are not able to run this application. Please try an improved browser, like Google Chrome or Mozilla Firefox.");
 	}
+    //TODO Change initialization code
 	new_gluten_formats();
 	new_gluten_languages();
             rangy.init();

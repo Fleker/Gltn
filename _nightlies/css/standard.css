@@ -210,6 +210,9 @@ button[disabled] {
 	height: 30%;
 	background-color: #999;*/
 }
+.popupcontent {
+    padding-left: 15px;
+}
 /* Internal Styles Formatting */
 .citation {
 	text-decoration: none;
