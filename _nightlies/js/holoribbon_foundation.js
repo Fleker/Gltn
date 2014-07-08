@@ -117,7 +117,7 @@ function ribbonGesture() {
 			var element = document.getElementsByClassName('header');
 			//var element = document.getElementsByClassName('ribbongroup')[ribbonobj.index];
 			/**/ 
-			var hammertime = Hammer(element).on("swipeleft swiperight", function(event) {
+			/*var hammertime = Hammer(element).on("swipeleft swiperight", function(event) {
 				//console.log('H'+event.gesture.deltaX);
 				//alert(event.gesture.deltaX);
 				if(event.gesture.deltaX > 5) {
@@ -125,7 +125,7 @@ function ribbonGesture() {
 				} else if(event.gesture.deltaX < -5) {
 					ribbonSwitch(ribbonobj.index +1);
 				}
-			});
+			});*/
 }
 //The following is Gltn specific code, so you'll need to modify the colors
 function highlight(el) {

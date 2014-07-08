@@ -1,5 +1,10 @@
 // File.js handles the saves and restores, changing the formatting, and other file-related functions (convert to PDF? LaTeX, .doc)
-GLTN_VERSION = "1.3.0.6";
+GLTN_VERSION = "1.3.0.7";
+//For backwards compatibility, will return true 
+//TODO Later
+function lessThanVersion(version) {
+    
+}
 
 //Since the file initiates when it loads, you can do some initization 
 //TODO Push everything to File
@@ -413,7 +418,7 @@ function finishRestore(x, xc, full) {
 	} catch(e) {
 		console.error(e.message);
         //TODO Change back time
-		setTimeout("finishRestore('"+x+"','"+xc+"', '"+full+"');",2000);
+		setTimeout("finishRestore('"+x+"','"+xc+"', '"+full+"');",200);
 		return;
 	}
 	//console.log(5);
@@ -810,7 +815,11 @@ function checkLocalStorageLength() {
 }
 function getShare() {
     if(window.saved == undefined) {
-        initiatePopup({title:"Share...",ht:"You must export the document to a cloud service before you can share it."}); 
+        //CHANGES Uncaught ReferenceError: initiatePopup is not defined
+        var p = new Popup({
+            title: "Share...",
+            ht: "You must export the document to a cloud service before you can share it."
+        }).show();
         cloudXML();
         return;
     }
@@ -1045,17 +1054,38 @@ function checkloadjscssfile(filename, filetype){
   alert("file already added!")
 }
 //format = 'mla';
+//TODO Once formatmanager is complete, this should be removed
 function initFormats() {
 	if(getSettings("formats_name") == undefined) {
         writeToSettings("formats_name", "");
 		writeToSettings("formats_type", "");
-        writeToSettings("formats_uri", "");
+        writeToSettings("formats_url", "");
 	}
 	//load all custom formats
 	for(i in getSettings('formats_name').split(', ')) {
 		if(getSettings("formats_name").split(', ')[i].length)
-			install_gluten_format(getSettings('formats_name').split(', ')[i], getSettings('formats_type').split(', ')[i], getSettings('formats_uri').split(', ')[i]);	
+			install_gluten_format(getSettings('formats_name').split(', ')[i], getSettings('formats_type').split(', ')[i], getSettings('formats_url').split(', ')[i]);	
 	}
+}
+/**
+    Handles a seamless transition between two formats
+    -Checks user input and makes sure that format exists
+    -If so, replaces the current format script with the new script
+    -Repopulates metadata fields and content area
+**/
+function formatShiftX() {
+    var f1 = formatManager.getCurrentFormat();
+    var f2txt = $('#file_format').val();
+    var f2;
+    for(i in formatManager.getFormats()) {
+        if(formatManager.getFormats()[i].name == f2txt) {
+            f2 = formatManager.getFormats()[i];   
+        } 
+    }   
+    if(f2 === undefined)
+        return;
+    
+    
 }
 function formatShift() {
 	//unload js file

@@ -274,13 +274,9 @@ function uninstall_panel(id) {
 }
 
 function initPanels(num) {
-   if(getSettings('panels') === undefined) {
-		writeToSettings('panels', mainpanels);	
-	}
-    
     var a = getSettings('panels').split(',');
     var a_nm = a.length;
-    if(num === NaN)
+    if(isNaN(num))
         return null;
     if(a.length - 1 < num)
         return null;
@@ -291,6 +287,7 @@ function initPanels(num) {
     } else {
         var plugin = new Service(b[0], b[1], b[2], b[3], b[4], b[5]);
     }
+    //FIXME Uncaught TypeError: Cannot read property 'indexOf' of undefined 
     if(a[num].indexOf('main') > -1) 
         panelManager.install(plugin, num);
     else {
@@ -343,7 +340,8 @@ function initPanel2s(num) {
 //Panel GUI
 function runPanel(panel_id_name) {
 	//Get Properties of the Panel First
-	var p = availablePanels[panel_id_name];
+    //CHANGES Uncaught ReferenceError: availablePanels is not defined 
+	var p = panelManager.getAvailablePanels()[panel_id_name];
     if(p === undefined) {
         alert("Panel "+panel_id_name+" does not exist");
         return;

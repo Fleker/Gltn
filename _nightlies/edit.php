@@ -56,15 +56,7 @@ m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 ga('create', 'UA-24228980-2', 'felkerdigitalmedia.com');
 ga('send', 'pageview');
 </script>
-    
-<!-- Mark as Offline -->
-    <script src="js/foundation/foundation.js"></script>
-    <script src="js/foundation/foundation.reveal.js"></script>
-    <script src="js/foundation/foundation.tooltip.js"></script>
-    <script src="js/foundation/vendor/fastclick.js"></script>
-    <script src="js/foundation/vendor/modernizr.js"></script>
-    <link rel="stylesheet" href="css/normalize.css">
-    <link rel="stylesheet" href="css/foundation.min.css">
+
     
 <link rel="stylesheet" type="text/css" href="css/standard.css">
 </head>
@@ -145,5 +137,14 @@ ga('send', 'pageview');
 	
 </script>
 <script type="text/javascript" src="https://api.filepicker.io/v1/filepicker.js"></script>
+        
+<!--TODO Mark as Offline -->
+    <script src="js/foundation/foundation.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.0/js/foundation/foundation.reveal.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.0/js/foundation/foundation.tooltip.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.0/js/vendor/fastclick.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.0/js/vendor/modernizr.js"></script>
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/foundation.min.css">
 </body>
 </html>
