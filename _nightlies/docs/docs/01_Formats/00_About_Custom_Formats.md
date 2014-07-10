@@ -1,25 +1,29 @@
-### Framework
-* `onInitFormat()` - Sets up format UI
-* `onInitToolbar()` - Adds items to the toolbar
-* `onStylePaper()` - Adds global rules for a paper build
-* `onStyleGuide()` - Returns an HTML formatted guide to how a paper can be written; for details, [See Documentation](http://felkerdigitalmedia.com/gltn/docs/index.php?Formats/Style_Guide)
-* `onBuildFormat()` - Sets up the paper design before the content
-* `onSetHeader()` - Sets the header rules
-* `onGetFormats()` - Rules for formatting the content
-* `onBuildBibliogaphy()` - Sets up the bibliography (if applicable)
-* `onStyleMarkup()` - Integrate with the Context API
+When you write a paper, you need to make sure it is properly formatted. A bibliography must be organized by author's last name. Quotes must be cited in-line using the author's last name. If there is no author, use the title in quotes. Include the page number. And the year. Or not.
 
-### Installing
-To add a format to your paper, you must enter this command into the console:
+There are a lot of nuances to paper styles, and a lot of complicated rules. It's reasonable that aesthetics are a big deal of an essay. However, all of that seems like manual labor. Inline citations? That seems like busywork. A computer can do this job.
 
-```Javascript
-install_gluten_format(name, type, uri)
-```
+A format is the premier class in Gltn. With it, one can shape the editor to include as much or as little metadata as you want. This provides rules for the editing side and how to compile the paper into a full document. By extending another already existing format, it is easy to customize one as much as you desire. Only one format may be active at a time. A user can switch between formats at any time using the format dropdown.
 
-* name - The name of the format. This is what the user types in to choose this format.
-* type - A one-word description of the format type, eg. Essay, Report, Novel, etc.
-* uri - The url of the format script
+A format exists as an object of class `GltnFormat` which is stored in a `FormatManager`. You can use the variable `formatManager` to access available formats and install new ones.
 
-If uri is not included, the format must exist as a javascript file in /js/themes/ with a pathname identical to the format name. 
+A format script is written using JavaScript and can be added into the Gltn Editor using the FormatManager.
 
-Note that at the moment formats aren't saved, so you will need to manually reinstall the format every time you load the page.
+## Creating a new Format
+To create a new format, use the constructor for a GltnFormat:
+
+    new GltnFormat("MLA", "MLA", "Essay", "js/formatts/MLA.js", false)
+    
+`GltnFormat(id, name, type, url, hidden)`
+
+* id - The unique id for this format
+* name - The display name for this format
+* type - A secondary name for this format
+* url - The url of the format script
+* hidden - To hide this format from the format dropdown
+
+## Installing
+
+    var f = new GltnFormat(...);
+    formatManager.addFormat(f);
+    
+Using the method `addFormat`, the format is installed in the editor and can be used offline.

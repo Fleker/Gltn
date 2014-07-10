@@ -5,7 +5,6 @@ function GltnFormat(id, name, type, url, hidden) {
     this.type = type;
     this.url = url || "js/formats/"+id+".js";
     this.hidden = (type == "IN BETA")?true:hidden || false;
-    formatManager.addFormat(this);
 }
 //FORMATMANAGER CLASS
 function FormatManager() {
@@ -22,6 +21,7 @@ function FormatManager() {
         var a = this.getFormats();
         var out = "";
         for(i in a) {
+            this.addFormat(a[i]);
             if(a[i].hidden == false) {
                 out = out + "<option label='"+a[i].type+"'>"+a[i].name+"</option>";	   
             }
@@ -31,12 +31,15 @@ function FormatManager() {
     };
     this.addFormat = function(format) {
         this.formats[format.id] = format;
+        if(getSettings('formats_name') == "undefined") {
+            writeToSettings('formats_name', "");
+        }
         if(getSettings('formats_name').indexOf(format.name) == -1) {
-            writeToSettings('formats_name', getSettings('format_name') + ", " + format.name);
+            writeToSettings('formats_name', getSettings('formats_name') + ", " + format.name);
             writeToSettings('formats_type', getSettings('formats_type') + ", " + format.type);
             writeToSettings('formats_url', getSettings('formats_uri') + ", " + format.url);
+            this.postFormats();
         }
-        this.postFormats();
     };
     //MLA is the default format
     this.currentFormat = this.getFormats().MLA;
@@ -83,7 +86,7 @@ function installGltnFormat(name, type, url) {
     formatManager.addFormat(f);
 }
 //FUTURE Here for compatibility
-function install_gluten_format(name, type, uri) {
+function install_gluten_format(name, type, url) {
     installGltnFormat(name, type, url);
 }
 //TODO Documentation on FormatManager
@@ -1652,7 +1655,7 @@ function resetTheme() {
    window.theme = {
        fontColor: "black",
        fontColorAlt: "#222",
-       fontColorDark: "rgb(200,200,200)"
+       fontColorDark: "rgb(200,200,200)",
        bodyColor: "white",
        bodyColorDark: "rgb(0,0,0)",
        fullscreen: {
@@ -1667,7 +1670,7 @@ function resetTheme() {
             highlight: "rgba(44,62,80,1)",
             plain: "rgba(0,0,0,0)"
        },
-       palette {
+       palette: {
             /*
                 Each palette has a minified version of Google's Material Design Palette
                 See everything at google.com/design/spec/style/color.html#color-ui-color-palette

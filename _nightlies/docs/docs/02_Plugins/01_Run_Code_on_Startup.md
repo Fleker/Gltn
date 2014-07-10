@@ -1,5 +1,5 @@
 ### Load Code on Startup
-`InitPanel[Panel_Name]`
+`panel.onInit = function() { ... }`
 If your panel is on the list of available panels, this function will be executed when the page loads. (If it isn't on the list, then this function won't run) 
 
 This function allows a panel to set up a function that will persist for the entire session, such as keyboard shortcuts.
@@ -7,7 +7,7 @@ This function allows a panel to set up a function that will persist for the enti
 #### Keyboard Shortcut
 
 ```Javascript
-    function InitPanelmain_Character() {
+    panel.onInit = function() {
         $(document).on('keydown', function(e) {
 		if(e.keyCode == 67 && e.altKey) {
 			runPanel('main_Character');	
@@ -38,6 +38,8 @@ Additionally, this function will not add the keyboard shortcut to the ribbon. Th
 
 #### Services
 This can also be used to create a persistent service, such as an extension that syncs your files with Dropbox. Gltn provides a way to show this service to the end user. When this function is called, it adds an icon next to the word count and save indicator. The icon, when hovered over, displays the name of the service. Clicking on the icon opens the panel where you can display status information about this service.
+
+//TODO Move this section to 7
 
 `initService(id, title, icon)`
 

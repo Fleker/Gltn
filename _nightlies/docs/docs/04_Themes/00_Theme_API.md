@@ -1,4 +1,9 @@
 Themes alter the look and feel of the editor, but they should not alter the actual content on-screen. A theme makes the editor look fresh and new while giving the user a consistent user experience.
+//TODO Explain better colors
+//TODO Enum
+//TODO Reference
+
+What is a theme? It is a collection of attributes that alter the look of the editor without altering the actual content on-screen. This gives the Gltn Editor a fresh look that may be modern while at the same time giving users a consistent user experience. How is a theme written? It is a collection of colors, standardized, that developers can use in their plugins for a consistent color palette across all plugins and devices. A theme developer can make up their own set of colors and the user's editor should accurately refect that theme. In addition to colors, developers may also give general CSS commands and run Javascript. If a developer may also create a settings menu for users to have even more customization.
 
 ### Installing
 Themes may be installed manually from a console. 

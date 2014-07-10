@@ -136,8 +136,19 @@ function post_format() {
 	//Theme parameters for content_textarea
 	$('.content_textarea').css('background-color', theme.normbg).css('color', theme.normcolor);
 	console.log('CT colors set');
+    
+    //Preload data that already exists
+    for(j in window.metadata) {
+		try {
+            if(i == window.metadata[j].id.replace(/ /g, '_') && $('#format_item_'+j).val().length == 0) {
+//			   onsole.log("Insert "+d[i]+" for "+window.metadata[j].id);
+                //console.log($('#format_item_'+j).val(), i);
+			     $('#format_item_'+j).val(decodeURIComponent(d[i]));
+			     $('#format_item_'+j).html(decodeURIComponent(d[i]));
+            }
+        } catch(e) {}
+    }
 }
-
 function format_check_count(i) {
 	content = $('#format_item_'+i).val();
 	if(content.length === 0)
@@ -225,14 +236,16 @@ function post_format_content(m) {
 	out = out + "<div class='content_wordcount small-12 column' style='display:inline-flex'><div class='content_word'></div>&emsp;<div class='content_character'></div>&emsp;<div class='content_save'>&emsp;</div></div></div>";
 	return out;	
 }
+
+//TODO Toolbar Class
 function post_toolbar(tools) {
 	window.tools = tools;
 	var overflow = false;
 	$('.toolbar').empty();
 	$('.overflow').empty();
 	$('.toolbar').append("<div class='toolbar_options' style='display:inline'><span class='toolbar_button' data-t='character' id='CHARACTERPANEL'>&emsp;Character&emsp;</span>|");
-	//TODO - Use labels to make prettier, maybe "new_toolbar/new_toolbar_item"
-	//TODO - Use JSON objects to enable more powerful, third-party tools
+	//TODO Use labels to make prettier, maybe "new_toolbar/new_toolbar_item"
+	//TODO Use JSON objects to enable more powerful, third-party tools
 	for(i=0;i<tools.length;i++) {
 		if(typeof(tools[i] == "string")) {
 			var tool_pretty = tools[i];

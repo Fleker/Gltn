@@ -1,5 +1,7 @@
 This will document how to create a dictionary and implement it in Gltn.
 
+//TODO Explain what a dictionary is, class structure
+//TODO Search API, saved searches
 ### Installation
 `install_dictionary(format, url, name, id, icon)`
 

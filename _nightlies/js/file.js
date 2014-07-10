@@ -1,9 +1,28 @@
 // File.js handles the saves and restores, changing the formatting, and other file-related functions (convert to PDF? LaTeX, .doc)
-GLTN_VERSION = "1.3.0.7";
+GLTN_VERSION = "1.3.0.8";
 //For backwards compatibility, will return true 
-//TODO Later
-function lessThanVersion(version) {
-    
+//TODO Document in Migration
+function greaterThanVersion(version) {
+    var split = version.split(".");
+    var V = GLTN_VERSION.split(".");
+    if(split[0] < V[0])
+        return true;
+    //1.X v 1.X OR 2.X v 1.Y
+    if(split[0] > V[1])
+        return false;
+    //1.1.X v 1.2.X
+    if(split[1] < V[1])
+        return true;
+    if(split[1] > V[1])
+        return false;
+    if(split[2] < V[2])
+        return true;
+    if(split[2] > V[2])
+        return false;
+    if(split[3] < V[3])
+        return true;
+    else
+        return false;
 }
 
 //Since the file initiates when it loads, you can do some initization 
@@ -404,6 +423,8 @@ function restoreFile(full) {
     
 }
 function finishRestore(x, xc, full) {
+    //CHANGES THis
+    return;
 	try {
 		//if(x == undefined) {
 			//newFile();	
@@ -417,11 +438,11 @@ function finishRestore(x, xc, full) {
 		//}
 	} catch(e) {
 		console.error(e.message);
-        //TODO Change back time
-		setTimeout("finishRestore('"+x+"','"+xc+"', '"+full+"');",200);
+        //TODO Readjust time
+        setTimeout("finishRestore('"+x+"','"+xc+"', '"+full+"');",2000);
 		return;
 	}
-	//console.log(5);
+	console.log(5);
 	//if(x.file != undefined) {
 		/*for(i in x['metadata']) {
 			//window.metadata[i] = x['metadata'][i];	
@@ -545,7 +566,13 @@ function exportFile() {
 	//add_to_page('Execute this code in a web console to transfer the files over to a different computer:<br><textarea style="width:95%;height:200px;">localStorage["'+fileid+'5"] = \042'+localStorage[fileid].replace(/"/g, '\\"')+'\042;localStorage["'+fileid+'5_c"] = \042'+localStorage[fileid+"_c"].replace(/"/g, '\\"')+'\042;</textarea>');
 }
 function getFileData(att) {
-    return decodeURIComponent(window.saved[att]);   
+    try {
+        return decodeURIComponent(window.saved[att]);  
+    } catch(E) {
+        console.error(E.message);
+        console.log(att);
+        return false;
+    }
 }
 function writeToSaved(att, val) {
 	if(val != undefined && att != undefined) {
@@ -569,7 +596,12 @@ function getSettings(att) {
 }
 function writeToSettings(att, val) {
 	if(val != undefined && att != undefined) {
-        val = encodeURIComponent(decodeURIComponent(val));
+        try {
+            val = encodeURIComponent(decodeURIComponent(val));
+        } catch(e) {
+            console.warn(att, val);
+            console.error(e.message);
+        }
 //		val = val.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/&nbsp;/g, " ").replace(/&emsp;/g, ' ');		
 	}
 	if(window.settings == undefined)
@@ -1073,7 +1105,7 @@ function initFormats() {
     -If so, replaces the current format script with the new script
     -Repopulates metadata fields and content area
 **/
-function formatShiftX() {
+function formatShift() {
     var f1 = formatManager.getCurrentFormat();
     var f2txt = $('#file_format').val();
     var f2;
@@ -1085,9 +1117,10 @@ function formatShiftX() {
     if(f2 === undefined)
         return;
     
-    
+    replacejscssfile(f1.url, f2.url, "js");
+    //TODO Maybe offline support
 }
-function formatShift() {
+function formatShiftX() {
 	//unload js file
 	//console.log(formats);
 	format2 = $('#file_format').val();

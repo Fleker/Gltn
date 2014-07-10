@@ -1,7 +1,10 @@
-### Run Code for the Panel
-`RunPanel[Panel_Name]`
+## Run Code for the Panel
+`panel.onRun = function() { ... }`
 
 Here you are able to execute code.
+
+## Run Code before Panel Opens
+Before the panel opens, you can execute `panel.onBeforeRun` as a way to set up any last minute functions such as panel width and bordercolor before the panel is created with its set attributes.
 
 #### PostPanelOutput
 This sets up the HTML for your panel. You can specify id names or classes. You must return complete HTML.
@@ -69,14 +72,6 @@ These two functions will translate a command into formatted output.
 ##### LatexAPI
 You can access pieces of the LaTeX reference much like the Spreadsheet reference. They're also formatted the same
 `window.LatexAPI`
-
-### Style Panel
-`StylePanel[Panel_Name]`
-This function can be used to set up CSS rules. It is not necessary, but is available as a second function that can run, right after RunPanel is called.
-
-Alternatively, this can be called using StylePanelClass
-StylePanelClass(className, {css-rule, css-value, css-rule, css-value, etc.})
-The css rules and values should be in an array in an even-odd order (every other item is a rule).
 
 ### Saving
 For simple applications like a dictionary you may use a generic set of code. However, for advanced operations, or even for simple settings, you'll need to save data. 

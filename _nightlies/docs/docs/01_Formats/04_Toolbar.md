@@ -1,3 +1,4 @@
+//TODO Show new API
 ## Toolbar
 The code used to initiate controls for the toolbar is done inside the function
 `onInitToolbar() { [code] }`

@@ -545,6 +545,7 @@ function clear_panel_data() {
 panelManager.getAvailablePanels().Main_Character.setBordercolor("#009").setWidth(25).setOverride([13]);
 
 function RunPanelmain_Character() {
+    //TODO switch to full JSON to be prettier/easier to manage
 	//var main = new Array('', '', '', '', '', '', '', '', '', '—');
 			var main = new Array({val: '✔', title: 'Checkmark', tag: 'checkmark check'});
 	/*Music*/	main.push({val:'♪', title: 'Eighth Note', tag: 'music note eighth'}, {val:'♩', title: 'Quarter Note', tag: 'music note quarter'}, {val:'♫', title:'Two Eigth Notes', tag:'music note eighth'}, {val:'♬', title: 'Two Sixteenth Notes', tag: 'music note sixteenth'});
