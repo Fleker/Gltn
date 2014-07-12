@@ -1770,7 +1770,7 @@ function themeCss(rule, val) {
 function writeCss(rules) {
 	$('body').append('<style>'+rules+'</style>');
 }
-
+//TODO Theme Manager
 function startThemer() {
 	//isn't called until settings are grabbed because otherwise window.settings.theme wouldn't exist
 	//grab current theme
@@ -1822,6 +1822,7 @@ function startThemer() {
         writeCss("button.textbutton { border: solid 1px #999;padding: 8px;background-color: #f9f9f9;font-weight: 400; }");
         writeCss("button:hover { background-color: #34495e; color: #ecf0f1; } button:active {position:relative;top:1px;}");
     }
+    setInterval("initTheme()", 1000);
 }
 
 function setLoaderColor(col) {
@@ -2053,7 +2054,7 @@ function parseCT() {
 
 	} catch(e) {
 
-		console.error(e.message);
+		console.warn(e.message);
 
 		var a = $('.content_textarea').html();
 

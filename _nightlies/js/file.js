@@ -1,7 +1,6 @@
 // File.js handles the saves and restores, changing the formatting, and other file-related functions (convert to PDF? LaTeX, .doc)
-GLTN_VERSION = "1.3.0.8";
+GLTN_VERSION = "1.3.0.9";
 //For backwards compatibility, will return true 
-//TODO Document in Migration
 function greaterThanVersion(version) {
     var split = version.split(".");
     var V = GLTN_VERSION.split(".");
@@ -19,7 +18,7 @@ function greaterThanVersion(version) {
         return true;
     if(split[2] > V[2])
         return false;
-    if(split[3] < V[3])
+    if(split[3] <= V[3])
         return true;
     else
         return false;
@@ -423,8 +422,6 @@ function restoreFile(full) {
     
 }
 function finishRestore(x, xc, full) {
-    //CHANGES THis
-    return;
 	try {
 		//if(x == undefined) {
 			//newFile();	
@@ -437,10 +434,10 @@ function finishRestore(x, xc, full) {
 				//newFile();
 		//}
 	} catch(e) {
-		console.error(e.message);
+		console.warn(e.message);
         //TODO Readjust time
-        setTimeout("finishRestore('"+x+"','"+xc+"', '"+full+"');",2000);
-		return;
+        setTimeout("finishRestore('"+x+"','"+xc+"', '"+full+"');",5000);
+        return;
 	}
 	console.log(5);
 	//if(x.file != undefined) {
@@ -1049,13 +1046,18 @@ function createjscssfile(filename, filetype){
 function replacejscssfile(oldfilename, newfilename, filetype){
  var targetelement=(filetype=="js")? "script" : (filetype=="css")? "link" : "none" //determine element type to create nodelist using
  var targetattr=(filetype=="js")? "src" : (filetype=="css")? "href" : "none" //determine corresponding attribute to test for
- var allsuspects=document.getElementsByTagName(targetelement)
+ var allsuspects=document.getElementsByTagName(targetelement);
+ var replaced = false
  for (var i=allsuspects.length; i>=0; i--){ //search backwards within nodelist for matching elements to remove
   if (allsuspects[i] && allsuspects[i].getAttribute(targetattr)!=null && allsuspects[i].getAttribute(targetattr).indexOf(oldfilename)!=-1){
    var newelement=createjscssfile(newfilename, filetype)
-   allsuspects[i].parentNode.replaceChild(newelement, allsuspects[i])
+   allsuspects[i].parentNode.replaceChild(newelement, allsuspects[i]);
+   replaced = true;
   }
  }
+    if(!replaced) {
+        loadjscssfile(newfilename, filetype);
+    }
 }
 function loadjscssfile(filename, filetype){
  if (filetype=="js"){ //if filename is a external JavaScript file
@@ -1109,6 +1111,7 @@ function formatShift() {
     var f1 = formatManager.getCurrentFormat();
     var f2txt = $('#file_format').val();
     var f2;
+    console.log(f1.name, f2txt);
     for(i in formatManager.getFormats()) {
         if(formatManager.getFormats()[i].name == f2txt) {
             f2 = formatManager.getFormats()[i];   
@@ -1116,8 +1119,10 @@ function formatShift() {
     }   
     if(f2 === undefined)
         return;
+    console.log("Format Shifting...");
     
     replacejscssfile(f1.url, f2.url, "js");
+    console.log("Wait for script to load");
     //TODO Maybe offline support
 }
 function formatShiftX() {

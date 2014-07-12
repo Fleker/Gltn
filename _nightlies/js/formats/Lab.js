@@ -1,4 +1,4 @@
-currentformat = "Lab";
+console.log("Lab.js");
 function onInitFormat() {
 	new_format();
 	new_format_item("text", {label: "Title", description: "", mtype:"w", max:12, id:"Title"});
@@ -9,6 +9,7 @@ function onInitFormat() {
 	set_up_format("word count", {min:150});
 	post_format();
 }
+onInitFormat();
 function onInitToolbar() {
     var tools = ["heading1", "heading2", "heading3", "image", "table", "reftext", "LaTeX", "citation", "break"]; 
     post_toolbar(tools);
@@ -34,7 +35,6 @@ function onBuildFormat() {
 		add_to_page(dueout+"<br>");
     
 		add_to_page(centerText("<b><u>"+valMetadata('Title')+"</u></b>"));
-	//add_new_page();
 }
 function onSetHeader() {
 	push_header(lcr_split("", "", "PAGE"));

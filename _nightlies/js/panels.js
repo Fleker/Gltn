@@ -547,22 +547,118 @@ panelManager.getAvailablePanels().Main_Character.setBordercolor("#009").setWidth
 function RunPanelmain_Character() {
     //TODO switch to full JSON to be prettier/easier to manage
 	//var main = new Array('', '', '', '', '', '', '', '', '', '—');
+    var collection = {
+        Checkmark: {val: '✔', title: 'Checkmark', tag: 'checkmark check'},
+        
+        //  MUSIC
+        EighthNote: {val:'♪', title: 'Eighth Note', tag: 'music note eighth'},
+        QuarterNote: {val:'♩', title: 'Quarter Note', tag: 'music note quarter'},
+        TwoEighthNotes: {val:'♫', title:'Two Eigth Notes', tag:'music note eighth'},
+        TwoSixteenthNotes: {val:'♬', title: 'Two Sixteenth Notes', tag: 'music note sixteenth'},
+        FlatNote: {val:"♭", title:"Flat", tag:"music note flat"},
+        NeutralNote:{val:"♮", title:"Neutral", tag:"music note neutral"},
+        SharpNote:{val:"♯", title:"Sharp", tag:"music note sharp"},
+        
+        // GENDER
+        Female: {val:'♀', title: 'Female', tag: 'gender sex female'},
+        Male: {val:'♂', title:'Male', tag:'gender sex male'},
+        Mercury: {val:"☿", title:"Mercury", tag:"Mercury"},
+        Earth:{val:"♁", title:"Earth", tag:"Earth"},
+        
+        // Currency
+        Yen: {val:'¥', title:'Yen', tag: 'money currency yen japan'},
+        Euro: {val:'€', title:'Euro', tag:'money currency euro europe'},
+        Pound: {val:'£', title:'British Pound', tag:'money currency british england pound'},
+        Cent: {val:'¢',title:'Cent',tag:'money currency american cent'},
+        Austral:{val:"₳", title:"Austral Sign", tag:"money currency austral"},
+        Baht: {val:"฿", title:"Baht", tag:"money currency thai baht"},
+        Rupee: {val:"₹", title:"Rupee", tag:"money currency india rupee"},
+        
+        
+        // LEGAL
+        Copyright: {val:'©', title:'Copyright', tag:'legal copyright'},
+        Reserved: {val:'®',title:'Reserved',tag:'legal reserved'},
+        Trademark: {val:'™',title:'Trademark', tag:'legal trademark trademarked'},
+        
+        // Greek Math
+        Pi_:{val:'π',title:'Lowercase Pi',tag:'math greek pi'},
+        Delta: {val:'∆',title:'Delta',tag:'math greek delta'},
+        Pi: {val:'Π',title:'Uppercase Pi',tag:'math greek pi'},
+        //TODO Get Lambda, Beta, Omega - Separate out non-math symbols
+    
+        // Punctuation
+        Emdash: {val:'—',title:'Emdash',tag:'dash emdash'},
+        Elipsis: {val:'…',title:'Elipsis',tag:'elipsis dot'},
+        Tilde: {val:'~', title:'tilde', tag:'tilde'},
+        Upside_DownQuestion: {val:'¿',title:'Upside-Down Question',tag:'question mark upside down'},
+        Upside_DownExclamation: {val:'¡',title:'Upside-Down Exclamation Point',tag:'exclamation point upside down'},
+        Interrobang: {val:'‽',title:'Interrobang',tag:'question mark exclamation point interrobang interabang'},
+            
+        // Math
+        PlusMinus: {val:'±', title:'Plus-Minus', tag:'math plus minus'},
+        Root: {val:'√',title:'Root',tag:'math square root'},
+        Divide: {val:'÷',title:'Divide',tag:'math divide quotient'},
+        Times: {val:'×',title:'Multiply',tag:'math times multiply multiplication'},
+        Dot: {val:'•',title:'Dot',tag:'math dot product multiply'},
+        Degrees: {val:'°',title:'Degrees',tag:'math degrees'},
+        Minutes: {val:'′',title:'Minutes',tag:'math degrees minutes'},
+        Seconds: {val:'″',title:'Seconds',tag:'math degrees minutes seconds'},
+        Permille: {val:'℅',title:'Permille',tag:'permille percent'},
+        InfinitySymbol: {val:'∞',title:'Infinity',tag:'math infinite infinity'},
+        ApproxEqual: {val:"≈", title:"Approximately Equal", tag:"math approximately equal"},
+        
+        // Cards
+        Clubs: {val:'♣',title:'Clubs',tag:'symbol cards club'},
+        Spades:  {val:'♠',title:'Spades',tag:'symbol cards spade'},
+        Hearts: {val:'♥',title:'Hearts',tag:'symbol cards heart'},
+        Diamond: {val:'♦',title:'Diamond',tag:'symbol cards diamond'},
+        
+        // Symbols
+        Carat: {val:'^',title:'Carat',tag:'carat v'},
+        LeftArrow: {val:'←',title:'Left Arrow',tag:'direction arrow left'},
+        UpArrow: {val:'↑',title:'Up Arrow',tag:'direction arrow forward up'},
+        DownArrow: {val:'↓',title:'Down Arrow',tag:'direction arrow backward down'},
+        RightArrow: {val:'→',title:'Right Arrow',tag:'direction arrow right'},
+        PlaceOfInterest:{val:"⌘", title:"Place of Interest", tag:"place interest"},
+        
+        // Document Symbols
+        Section: {val:'§',title:'Section Symbol',tag:'markup section'},
+        Paragraph: {val:'¶',title:'Paragraph Break',tag:'markup paragraph enter newline'},
+        Keyboard: {val: "⌨", title:"Keyboard", tag:"markup writing keyboard"},
+        
+        // Nature
+        BlackFlorette: {val: '✿', title:"Flower", tag:"nature flower"},
+        BlackSun: {val:"☀", title:"Sun", tag:"nature sun"},
+        Sunshine: {val: "☼", title: "Sun Outline", tag:"nature sun"},
+        Umbrella: {val: "☂", title:"Umbrella", tag:"nature umbrella"},
+        Snowman: {val:"☃", title:"Snowman", tag:"nature snow snowman"},
+        Cloud: {val:"☁", title:"Cloud", tag:"cloud nature"},
+        Snowflake: {val: "❄", title:"Snowflake", tag:"snowflake nature"},
+        SnowflakeTrifoliate: {val:"❅", title:"Snowflake", tag:"snowflake nature"},
+        SnowflakeHeavyChevron: {val: "❆", title:"Snowflake", tag:"snowflake nature"},
+        Comet: {val: "☄", title:"Comet", tag:"nature comet meteor"},
+        
+        // Culture
+        USSR: {val: "☭", title:"Hammer & Sickle", tag: "former soviet russia"},
+        Cross: {val: "✞", title:"Cross", tag: "christian cross"},
+        DavidStar: {val: "✡", title:"Star of David", tag:"jewish star david"},
+        
+        // Transport
+        Airplane: {val:"✈", title:"Airplane", tag:"airplane"},
+        
+        // Hazard
+        Skull: {val:"☠", title:"Skull & Crossbones", tag:"skull crossbones pirate"},
+        Radioactive: {val:"☢", title:"Radioactive", tag:"radioactive imagine dragons"},
+        Biohazard: {val:"☣", title:"Biohazard", tag:"biohazard"},
+        Caduceus: {val:"☤", title:"Caduceus", tag:"caduceus medicine snake pole"},
+        
+    };
 			var main = new Array({val: '✔', title: 'Checkmark', tag: 'checkmark check'});
-	/*Music*/	main.push({val:'♪', title: 'Eighth Note', tag: 'music note eighth'}, {val:'♩', title: 'Quarter Note', tag: 'music note quarter'}, {val:'♫', title:'Two Eigth Notes', tag:'music note eighth'}, {val:'♬', title: 'Two Sixteenth Notes', tag: 'music note sixteenth'});
-	/*Gender*/	main.push({val:'♀', title: 'Female', tag: 'gender sex female'}, {val:'♂', title:'Male', tag:'gender sex male'});
-	/*Currency*/main.push({val:'¥', title:'Yen', tag: 'money currency yen japan'},{val:'€', title:'Euro', tag:'money currency euro europe'},{val:'£', title:'British Pound', tag:'money currency british england pound'},{val:'¢',title:'Cent',tag:'money currency american cent'});
-	/*Legal*/	main.push({val:'©', title:'Copyright', tag:'legal copyright'},{val:'®',title:'Reserved',tag:'legal reserved'},{val:'™',title:'Trademark', tag:'legal trademark trademarked'});
-	/*GrMath*/	main.push({val:'π',title:'Lowercase Pi',tag:'math greek pi'},{val:'∆',title:'Delta',tag:'math greek delta'},{val:'Π',title:'Uppercase Pi',tag:'math greek pi'});
-		//Also get Lambda, Beta, Omega - Separate out non-math symbols
-	/*Punction*/main.push({val:'—',title:'Emdash',tag:'dash emdash'},{val:'…',title:'Elipsis',tag:'elipsis dot'},{val:'~', title:'tilde', tag:'tilde'},{val:'¿',title:'Upside-Down Question',tag:'question mark upside down'},{val:'¡',title:'Upside-Down Exclamation Point',tag:'exclamation point upside down'},{val:'‽',title:'Interrobang',tag:'question mark exclamation point interrobang interabang'});
-/*Math*/main.push({val:'±', title:'Plus-Minus', tag:'math plus minus'},{val:'√',title:'Root',tag:'math square root'},{val:'÷',title:'Divide',tag:'math divide quotient'},{val:'×',title:'Multiply',tag:'math times multiply multiplication'},{val:'•',title:'Dot',tag:'math dot product multiply'},{val:'°',title:'Degrees',tag:'math degrees'},{val:'′',title:'Minutes',tag:'math degrees minutes'},{val:'″',title:'Seconds',tag:'math degrees minutes seconds'},{val:'℅',title:'Permille',tag:'permille percent'},{val:'∞',title:'Infinity',tag:'math infinite infinity'}); 
-/*Symbols*/main.push({val:'♣',title:'Clubs',tag:'symbol cards club'}, {val:'♠',title:'Spades',tag:'symbol cards spade'},{val:'♥',title:'Hearts',tag:'symbol cards heart'},{val:'♦',title:'Diamond',tag:'symbol cards diamond'},{val:'^',title:'Carat',tag:'carat v'},{val:'←',title:'Left Arrow',tag:'direction arrow left'},{val:'↑',title:'Up Arrow',tag:'direction arrow forward up'},{val:'↓',title:'Down Arrow',tag:'direction arrow backward down'},{val:'→',title:'Right Arrow',tag:'direction arrow right'});
-/*Document Symbols*/main.push({val:'§',title:'Section Symbol',tag:'markup section'},{val:'¶',title:'Paragraph Break',tag:'markup paragraph enter newline'});
 	
 	var out = "";
 	var searchbar = '<input type="search" id="popup_character_search" style="width:100%" placeholder="Search for Characters" ><br>';
 	out += searchbar;
-	out += "<div class='character_palette_display' id='CHARACTERPANELCHARACTERS'></div>";
+	out += "<div class='character_palette_display'></div>";
 	postPanelOutput(out);
 	character = "";
     list = [];
