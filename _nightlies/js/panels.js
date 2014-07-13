@@ -340,19 +340,20 @@ function initPanel2s(num) {
 //Panel GUI
 function runPanel(panel_id_name) {
 	//Get Properties of the Panel First
-    //CHANGES Uncaught ReferenceError: availablePanels is not defined 
-	var p = panelManager.getAvailablePanels()[panel_id_name];
+    var p = panelManager.getAvailablePanels()[panel_id_name];
     if(p === undefined) {
         alert("Panel "+panel_id_name+" does not exist");
         return;
     }
+    if(p.onBeforeRun !== undefined)
+        p.onBeforeRun();
     var max = "";
     if(!p.hasBordercolor())
         p.setBordercolor(theme.coloralt);
     if(p.canMaximize()) {
         max = "<span class='PanelMaximizeEvent' data-status='0'></span><button onclick='maximizePanel()'><span class='fa fa-arrows-alt'></span></button>";
     }
-	$('.panel_plugin_title').html('<table class="panel_plugin_head" style="width:100%"><tr><td>'+p.title+'&emsp;<span class="PanelPopupEvent"></span><span class="PanelKeyEvent" data-keycode="" data-alt="" data-ctrl="" data-shift=""></span><span id="PanelCloseEvent"></span><span id="PanelBuildEvent"></span></td><td style="text-align:right;padding:0px;">'+max+ '<button onclick="hidePanelPlugin()" style="margin-top:15px;">'+closeButton()+'</button></td></tr></table>');
+	$('.panel_plugin_title').html('<table class="panel_plugin_head" style="width:100%;background-color:initial;border:none;"><tr><td style="color:'+theme.fontColor+';padding-top:9px;">'+p.title+'&emsp;<span class="PanelPopupEvent"></span><span class="PanelKeyEvent" data-keycode="" data-alt="" data-ctrl="" data-shift=""></span><span id="PanelCloseEvent"></span><span id="PanelBuildEvent"></span></td><td style="text-align:right;padding:0px;line-height:1em;">'+max+ '<button onclick="hidePanelPlugin()" style="margin:0px;padding:9px; ">'+closeButton()+'</button></td></tr></table>');
 	$('#panel_plugin').css("border-color", p.bordercolor).css('display', 'inline-table');
 	window.paneloverride = p.override;
     if(p.width < 17)
@@ -454,7 +455,7 @@ function panelWrite(text) {
 	//Any other panel stuff can be here too (if I want to add a footer)
 }
 function populatePanelPlugin(panel_id_name) {
-	availablePanels[panel_id_name].onRun();
+	panelManager.getAvailablePanels()[panel_id_name].onRun();
 	$('.panel_plugin_content').css('height', (window.innerHeight-187)+"px").css('overflow-y', 'auto');
 }
 
@@ -1002,6 +1003,8 @@ function StylePanelmain_Outline() {
 } 
 panelManager.getAvailablePanels().Main_Outline.setBordercolor('#7f8c8d').setWidth(25);
 panelManager.getAvailablePanels().Main_Outline.title = '<span class="fa fa-folder-open" style="font-size:15pt"></span>&nbsp;My Documents';
+//TODO X Circle Button cut off on top
+//TODO Shorten search width a little, color in tables
 function GetPanelmain_Filesys() {
 	return {title: '<span class="fa fa-folder-open" style="font-size:15pt"></span>&nbsp;My Documents', bordercolor: '#7f8c8d', width:25};
 }
@@ -1028,7 +1031,7 @@ function createNewFile() {
                     if(formats[i].type.toLowerCase().indexOf(v.toLowerCase()) > -1 || formats[i].name.toLowerCase().indexOf(v.toLowerCase()) > -1) {
                         //Add to the grid
                         arr.push(formats[i]);
-                        out += "<div class='fileformat' data-name='"+formats[i].name+"' style='width:8em;height:4em;display:inline-table;text-align:center;' class='large-4 medium-6 small-12'><div style='width:8em;height:4em;display:inline-table;border:solid 2px "+theme.coloralt+";background-color:"+theme.ribbonhighlight+";color:"+theme.darkcolor+";font-size:18pt;text-align:center;'>"+formats[i].name+"</div><div style='text-align:center;font-size:14pt;'>"+formats[i].name+"&nbsp;"+formats[i].type+"</div></div>";
+                        out += "<div class='fileformat' data-name='"+formats[i].name+"' style='width:8em;height:4em;display:inline-table;text-align:center;' class='large-4 medium-6 small-12'><div style='width:8em;height:4em;display:inline-table;border:solid 2px "+theme.fontColorAlt+";background-color:"+theme.ribbon.highlight+";color:"+theme.palette.grey.accent400+";font-size:18pt;text-align:center;'>"+formats[i].name+"</div><div style='text-align:center;font-size:14pt;'>"+formats[i].name+"&nbsp;"+formats[i].type+"</div></div>";
                         
                     }
                 }
@@ -1075,9 +1078,9 @@ function RunPanelmain_Filesys() {
 			}
 		});
 		$('.Filesys_delete').hover(function() {
-			$(this).css('color', theme.normbg).css('background-color', theme.palette.red).css('border-radius', 100);
+			$(this).css('color', theme.bodyColor).css('background-color', theme.palette.red.normal).css('border-radius', 100);
 		}, function() {
-			$(this).css('color', theme.normcolor).css('background-color', 'inherit');
+			$(this).css('color', theme.fontColor).css('background-color', 'inherit');
 		});
 		
 		$('.tfile').on('click', function() {
@@ -1188,9 +1191,9 @@ function RunPanelmain_Filesys() {
 				if(title == undefined)
 					title = "";
                 
-                bgc = theme.coloralt;
+                bgc = theme.fontColorAlt;
 				if(i == fileid)
-					bgc = theme.palette.blue;
+					bgc = theme.palette.blue.normal;
 					
 				var fsi = localStorage[i].length;
 				var fsci = localStorage[i+"_c"].length;
@@ -1251,6 +1254,7 @@ function RunPanelmain_Filesys() {
 	}	
 	resetFolder();
 }
+panelManager.getAvailablePanels().Main_Filesys.onRun = RunPanelmain_Filesys;
 function GetPanelmain_Guide() {
 	return {title: '<span class="fa fa-info-circle" style="font-size:13pt"></span>&nbsp;Style Guide', bordercolor: '#7f8c8d', width:30};
 }
@@ -1536,6 +1540,7 @@ function RunPanelmain_Dictionary() {
 		var a = getSettings('dictionary').split(', ');
 		for(i in a) {
 			console.log('dictionary_'+a[i]);
+            //FIXME Fix Settings
 			var b = getSettings('dictionary_'+a[i]).split(', ');
 			//"<span class='fa fa-circle-o' style='font-size:9pt'></span>"+	
 			b[4] = b[4].replace(/&gt;/g, ">").replace(/&lt;/g, "<");

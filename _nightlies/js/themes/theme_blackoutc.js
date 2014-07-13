@@ -21,7 +21,7 @@ function initTheme() {
 	$('.header').css('background-color', '#333').css('border-bottom', 'solid 1px rgba(255,255,255,0.4)');
 	$('#panel_content').css('background-color', '#333');
 	$('#panel_plugin').css('background-color', '#333');
-	$('input').css('background-color', '#444').css('color', theme.fontColor).css('font-family', '"Roboto Condensed", sans-serif').css('font-size', '11pt');
+    $('input[data-theme!=false]').css('background-color', '#444').css('color', theme.fontColor).css('font-family', '"Roboto Condensed", sans-serif').css('font-size', '11pt');
 	$('button').css('font-family', '"Roboto Condensed", sans-serif');
 	$('.toolbar, .overflow').css('background-color', '#444');
 	$('.popuptop').css('color', 'white').css('background-color', theme.bodyColor);
@@ -32,6 +32,8 @@ function initTheme() {
 	//Misc panel support
 	$('.tfile').css('background-color', '#444');	
 	$('.tfile.selected').css('background-color', theme.palette.blue.normal);	
+    //Theme parameters for content_textarea not necessary (unless we removed the reload requirement for themes - but for now it'll stay due to a lack of default parameters)
+	$('.content_textarea').css('background-color', theme.bodyColor).css('color', theme.fontColor);
 }	
 function loadThemeSettings() {
     out = 'Highlight Color: <select id="ThemeColor">';
@@ -68,8 +70,9 @@ writeCss("@import url(http://fonts.googleapis.com/css?family=Roboto+Condensed:30
 	themeCss('font-family', '"Roboto Condensed", sans-serif');
 	themeCss('background-color', theme.bodyColor);
 	themeCss('color', theme.fontColor);
-//Theme parameters for content_textarea not necessary (unless we removed the reload requirement for themes - but for now it'll stay due to a lack of default parameters)
-	$('.content_textarea').css('background-color', theme.bodyColor).css('color', theme.fontColor);
+//writeCss('input { background-color: #444; color: '+theme.fontColor+';font-family:"Roboto Condensed", sans-serif;font-size:11pt; }');
+//
+	
 setLoaderColor('255,255,255');
 writeCss("button.textbutton {text-indent:0;	border:1px solid white;	display:inline-block;	color:"+theme.bodyColor+";	font-style:normal;	text-decoration:none;	text-align:center;padding:3px; text-transform:uppercase; min-width:80px; color:white; background-color: transparent; border-radius: 30px; font-weight:100; font-size:10pt; letter-spacing: 1px; margin-left: 3px; padding-left: 8px; padding-right: 7px;}");
 writeCss("button.ribbonbutton { padding-top:2px;height:77px; }");

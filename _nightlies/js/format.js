@@ -134,7 +134,7 @@ function post_format() {
 				postRange('onkeyup');
 			}	
 	//Theme parameters for content_textarea
-	$('.content_textarea').css('background-color', theme.normbg).css('color', theme.normcolor);
+	$('.content_textarea').css('background-color', theme.bodyColor).css('color', theme.fontColor);
 	console.log('CT colors set');
     
     //Preload data that already exists
@@ -162,9 +162,9 @@ function format_check_count(i) {
 		characters = content.length;
 		var e = '#format_count_'+i;
 		if(min > characters) {
-			$(e).html('<span style="color:'+theme.coloralt+'">'+min+'</span>&emsp;<span class="gluten_red">'+characters+'&nbsp;'+mtype+'</span>&emsp;<span style="color:'+theme.coloralt+'">'+max+'</span>');
+			$(e).html('<span style="color:'+theme.fontColorAlt+'">'+min+'</span>&emsp;<span class="gluten_red">'+characters+'&nbsp;'+mtype+'</span>&emsp;<span style="color:'+theme.coloralt+'">'+max+'</span>');
 		} else if(max < characters) {
-			$(e).html('<spanstyle="color:'+theme.coloralt+'">'+min+'</span>&emsp;<span class="gluten_red">'+characters+'&nbsp;'+mtype+'</span>&emsp;<span style="color:'+theme.coloralt+'">'+max+'</span>');
+			$(e).html('<spanstyle="color:'+theme.fontColorAlt+'">'+min+'</span>&emsp;<span class="gluten_red">'+characters+'&nbsp;'+mtype+'</span>&emsp;<span style="color:'+theme.coloralt+'">'+max+'</span>');
 		} else {
 			$(e).html('<span class="gluten_gray">'+characters+'&nbsp;'+mtype+'</span>');
 		}	
@@ -172,9 +172,9 @@ function format_check_count(i) {
 		words = content.split(' ').length;
 		var e = '#format_count_'+i;
 		if(min > words) {
-			$(e).html('<span style="color:'+theme.coloralt+'">'+min+'</span>&emsp;<span class="gluten_red">'+words+'&nbsp;'+mtype+'</span>&emsp;<span style="color:'+theme.coloralt+'">'+max+'</span>');
+			$(e).html('<span style="color:'+theme.fontColorAlt+'">'+min+'</span>&emsp;<span class="gluten_red">'+words+'&nbsp;'+mtype+'</span>&emsp;<span style="color:'+theme.fontColorAlt+'">'+max+'</span>');
 		} else if(max < words) {
-			$(e).html('<span style="color:'+theme.coloralt+'">'+min+'</span>&emsp;<span class="gluten_red">'+words+'&nbsp;'+mtype+'</span>&emsp;<span style="color:'+theme.coloralt+'">'+max+'</span>');
+			$(e).html('<span style="color:'+theme.fontColorAlt+'">'+min+'</span>&emsp;<span class="gluten_red">'+words+'&nbsp;'+mtype+'</span>&emsp;<span style="color:'+theme.fontColorAlt+'">'+max+'</span>');
 		} else {
 			$(e).html('<span class="gluten_gray">'+words+'&nbsp;'+mtype+'</span>');
 		}
@@ -229,11 +229,10 @@ function post_format_mltext(m) {
 	return out;
 }
 function post_format_content(m) {
-	var out = "";
-	out = "<div class='small-12 column' style='margin-left: -11px;width: calc(100% + 27px);'><div class='content_wrapper row'><div class='content overflow small-12 column'></div>";
+	var out = "<div class='small-12 column' style='margin-left: -11px;width: calc(100% + 27px);'><div class='content_wrapper row'><div class='content overflow small-12 column'></div>";
 	out += "<div class='content toolbar small-12 column'></div>";
-	out = out + "<div contenteditable='true' class='content content_textarea small-12 column'></div></div>";
-	out = out + "<div class='content_wordcount small-12 column' style='display:inline-flex'><div class='content_word'></div>&emsp;<div class='content_character'></div>&emsp;<div class='content_save'>&emsp;</div></div></div>";
+	out += "<div contenteditable='true' class='content content_textarea small-12 column'></div></div>";
+	out += "<div class='content_wordcount small-12 column' style='display:inline-flex'><div class='content_word'></div>&emsp;<div class='content_character'></div>&emsp;<div class='content_save'>&emsp;</div></div></div>";
 	return out;	
 }
 
@@ -324,15 +323,13 @@ function post_toolbar(tools) {
 	$('.toolbar_button').on("click", function() {
 		switch ($(this).attr('data-t')) {
 			case "character":
-				runPanel('main_Character');
-				setTimeout("introJsStart(10);",550);
+				runPanel('Main_Character');
 			break;
 			case "fullscreen":
 				fullscreen();
 			break;
 			case "citation":
 				initiateCitationEditor();
-				setTimeout("introJsStart(13);",550);
 			break;
 			case "heading1":
 				contentAddSpan({node:"span", class:"heading1 heading"});
@@ -416,14 +413,14 @@ function getObjectSize(classname) {
 function highlight_tool(el) {
 	//console.log(jQuery(el).attr('class'));
 	jQuery(el).animate({
-		backgroundColor: theme.ribbonhighlight,
-        color: theme.normbg
+		backgroundColor: theme.ribbon.highlight,
+        color: theme.bodyColor
 	}, 25);
 }
 function unlight_tool(el) {
 	jQuery(el).animate({
-		backgroundColor: theme.ribbonplain,
-        color: theme.normcolor
+		backgroundColor: theme.ribbon.plain,
+        color: theme.fontColor
 	}, 25);
 }
 window.fullscreenOn = false;

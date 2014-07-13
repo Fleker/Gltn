@@ -92,7 +92,7 @@ ga('send', 'pageview');
       </div>
       
       <div id="panel_plugin" class="small-0 columns">  
-        <div class="panel_plugin_title" style="margin-top:-15px"></div>
+        <div class="panel_plugin_title" style="margin-top:-10px"></div>
         <div class="panel_plugin_content"></div>
       </div>
 </div>

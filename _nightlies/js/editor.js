@@ -487,26 +487,26 @@ function setHeader() {
 //            {text: "Start the Tour", img: "<span class='fa fa-home' style='font-size:18pt'></span>", action: "alert('TBD')", key:"Alt+T"}, 
             {text: "Create a File", img: "<span class='fa fa-file' style='font-size:18pt'></span>", action: "createNewFile()", key:"Alt+N"},
             {group: "", value:"<div style='font-size:22pt;padding-top:6px;text-align:center;'>Welcome to Gltn!</div>"},
-            {text: "Explore Files", img: "<span class='fa fa-folder-open' style='font-size:18pt'></span>", action: "runPanel('main_Filesys')", key: "Alt+O"} 
+            {text: "Explore Files", img: "<span class='fa fa-folder-open' style='font-size:18pt'></span>", action: "runPanel('Main_Filesys')", key: "Alt+O"} 
 		),
 		File: new Array(
 			{group: "", value:'<div class="row collapse" style="margin-top:9px"><div class="small-2 medium-5 columns"><input id="file_name" type="text" value="'+fileid+'" /></div><div class="small-4 medium-1 columns"><span class="postfix">.gltn</span></div><div class="small-6 medium-3 columns end"><input type="hidden" id="file_name_internal"><button id="file_name_con" class="textbutton" disabled="true">Rename</button></div></div>'},
-			{text: 'Compile & Export', img: '<span style="font-size:18pt" class="fa fa-file"></span>', action: "startBuild();setTimeout('exitintro();', 1000);", key: "Alt+B"},
+			{text: 'Compile & Export', img: '<span style="font-size:18pt" class="fa fa-file"></span>', action: "startBuild();', 1000);", key: "Alt+B"},
 			{text: 'Share', img: '<span style="font-size:18pt" class="fa fa-code-fork"></span>', action: "getShare();"}
 		),
 
 		Panels: new Array(
 			{text: 'Gltn Store', img: '<span style="font-size:18pt" class="fa fa-shopping-cart"/>', action: "launchStore()", key: "Alt+S"},
-			{text: 'Outline', img: '<span style="font-size:18pt" class="fa fa-list"></span>', action: "runPanel('main_Outline');"},
-			{text: 'Citations', img: '<span style="font-size:18pt" class="fa fa-book"></span>', action: "runPanel('main_Citation');"},
-			{text: 'Ideas', img: '<span style="font-size:18pt" class="fa fa-lightbulb-o"></span>', action: "runPanel('main_Idea');"},
-			{text: 'Style Guide', img: '<span style="font-size:18pt" class="fa fa-info-circle"/>', action: "runPanel('main_Guide');"}
+			{text: 'Outline', img: '<span style="font-size:18pt" class="fa fa-list"></span>', action: "runPanel('Main_Outline');"},
+			{text: 'Citations', img: '<span style="font-size:18pt" class="fa fa-book"></span>', action: "runPanel('Main_Citation');"},
+			{text: 'Ideas', img: '<span style="font-size:18pt" class="fa fa-lightbulb-o"></span>', action: "runPanel('Main_Idea');"},
+			{text: 'Style Guide', img: '<span style="font-size:18pt" class="fa fa-info-circle"/>', action: "runPanel('Main_Guide');"}
 		),
 
 		Tools: new Array(
-			{text: 'Find', img: '<span style="font-size:18pt" class="fa fa-search"></span>', action: "runPanel('main_Find');", key: "Alt+F"},
-			{text: 'Dictionary', key:"Alt+D", img: '<span style="font-size:18pt" class="fa fa-quote-left"></span>', action: "runPanel('main_Dictionary');"},
-			{text: 'Themes', img: '<span style="font-size:18pt" class="fa fa-picture-o"></span>', action: "runPanel('main_Themes')"}
+			{text: 'Find', img: '<span style="font-size:18pt" class="fa fa-search"></span>', action: "runPanel('Main_Find');", key: "Alt+F"},
+			{text: 'Dictionary', key:"Alt+D", img: '<span style="font-size:18pt" class="fa fa-quote-left"></span>', action: "runPanel('Main_Dictionary');"},
+			{text: 'Themes', img: '<span style="font-size:18pt" class="fa fa-picture-o"></span>', action: "runPanel('Main_Themes')"}
 		),
 
 		About: new Array(
@@ -626,40 +626,23 @@ window.applicationCache.addEventListener('error', function() {
 window.appcachestatus = "App available offline";
 
 function appcache() {
-
 	console.log("App is now available for offline use.");
-
-	
-		setTimeout('initService("main_Offline", "App available offline", "<span class=\'fa fa-plane\'></span>");', 2000);
-
+    setTimeout('initService("main_Offline", "App available offline", "<span class=\'fa fa-plane\'></span>");', 2000);
 	//hot swap	
-
 	try {
-
 		window.applicationCache.swapCache();
-
-	} catch(e) {
-
-		
-
-	}
-
+	} catch(e) {}
 	return false;
-
 }
 
+//TODO New Panel Structre
 function GetPanelmain_Offline() {
-
 	return {title: "<span class='fa fa-plane'></span>&nbsp;Offline", bordercolor:"#ff9900", width: 15};	
-
 }
 
 function RunPanelmain_Offline() {
-
 	out = "<span style='font-size:16pt'>This App is Available Offline</span><br>What Does this Mean?<br><br>If your device is not connected to the Internet, you can still open Gltn in your browser. Of course, not every feature will be available such as the Dictionary and the Gltn Store, but you will be able to edit and build documents like always.<br><br><span style='font-weight:bold;font-size:10pt;color:#ff9900'>"+window.appcachestatus+"</span>";
-
 	postPanelOutput(out);
-
 }
 window.applicationCache.oncached = appcache();
 window.applicationCache.onupdateready = onUpdateReady();

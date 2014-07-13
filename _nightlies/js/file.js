@@ -1,5 +1,5 @@
 // File.js handles the saves and restores, changing the formatting, and other file-related functions (convert to PDF? LaTeX, .doc)
-GLTN_VERSION = "1.3.0.9";
+GLTN_VERSION = "1.3.0.10";
 //For backwards compatibility, will return true 
 function greaterThanVersion(version) {
     var split = version.split(".");
@@ -423,16 +423,8 @@ function restoreFile(full) {
 }
 function finishRestore(x, xc, full) {
 	try {
-		//if(x == undefined) {
-			//newFile();	
-		//} else {
-			//if(x.file != undefined) {
-				console.log("onInitFormat");
-				onInitFormat();
-			//}
-			//else
-				//newFile();
-		//}
+        console.log("onInitFormat");
+        onInitFormat();
 	} catch(e) {
 		console.warn(e.message);
         //TODO Readjust time
@@ -1097,8 +1089,8 @@ function initFormats() {
 	}
 	//load all custom formats
 	for(i in getSettings('formats_name').split(', ')) {
-		if(getSettings("formats_name").split(', ')[i].length)
-			install_gluten_format(getSettings('formats_name').split(', ')[i], getSettings('formats_type').split(', ')[i], getSettings('formats_url').split(', ')[i]);	
+//		if(getSettings("formats_name").split(', ')[i].length)
+//			install_gluten_format(getSettings('formats_name').split(', ')[i], getSettings('formats_type').split(', ')[i], getSettings('formats_url').split(', ')[i]);	
 	}
 }
 /**

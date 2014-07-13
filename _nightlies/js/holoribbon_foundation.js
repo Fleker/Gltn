@@ -111,7 +111,7 @@ function ribbonSwitch(index, bool) {
 				marginLeft:$(wide).offset().left+"px",
 				width:($(wide).width()+30)+"px"
 			}, (2*animation_time));
-            $(element).css('background-color', theme.ribbonhighlight);
+            $(element).css('background-color', theme.ribbon.highlight);
 }
 function ribbonGesture() {			
 			var element = document.getElementsByClassName('header');
@@ -131,13 +131,13 @@ function ribbonGesture() {
 function highlight(el) {
 	//console.log(jQuery(el).attr('class'));
 	jQuery(el).stop().animate({
-		backgroundColor: theme.ribbonhighlight,
-        color: theme.normbg
+		backgroundColor: theme.ribbon.highlight,
+        color: theme.bodyColor
 	}, 25);
 }
 function unlight(el) {
 	jQuery(el).stop().animate({
-		backgroundColor: theme.ribbonplain,
-        color: theme.normcolor
+		backgroundColor: theme.ribbon.plain,
+        color: theme.fontColor
 	}, 25);
 }

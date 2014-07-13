@@ -3,17 +3,17 @@
 var currentpopup;
 
 //PopupManager Enum
-var PopupManager = {
-    TINY: "tiny",
-    SMALL: "small",
-    MEDIUM: "medium",
-    LARGE: "large",
-    XLARGE: "xlarge",
-    currentpopup: function() {
+function PopupManager() {
+    this.TINY = "tiny";
+    this.SMALL = "small";
+    this.MEDIUM = "medium";
+    this.LARGE = "large";
+    this.XLARGE = "xlarge";
+    this.currentpopup = function() {
         return currentpopup;   
-    }
+    };
 };
-
+popupManager = new PopupManager();
 //Popup class
 function Popup(data) {
     this.title = data.title;
@@ -49,8 +49,12 @@ function Popup(data) {
             $('#myModal').css('border', "solid 2px "+this.bordercolor);
         } else
             $('#myModal').css('border-width', '1px');
+        $('#myModal').css('background-color', theme.bodyColor).css('color', theme.fontColor);
+        $('#myModal table').css('background-color', theme.bodyColor).css('color', theme.fontColor).css('border', 'none');
+        $('#myModal div, #myModal .popupcontent').css('background-color', theme.bodyColor).css('color', theme.fontColor).css('border', 'none');
+        
         //Populate Popup
-        $('.popupcontent').html(ht);
+        $('.popupcontent').html(this.ht);
         this.run();
         this.postPopup();
     };
@@ -60,13 +64,13 @@ function Popup(data) {
         $('#myModal').foundation('reveal', 'open');
         $('#myModal').focus();
         $(document).on('close', '[data-reveal]', function () {
-            this.close(false);
+            popupManager.currentpopup().close(false);
         });
     };
     
     Popup.prototype.close = function(callback) {
         if(currentpopup !== undefined)	
-            panelManager.onPopupClose(title);
+            panelManager.onPopupClose(this.title);
 
         currentpopup = undefined;
         if(callback !== false)
