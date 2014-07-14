@@ -18,16 +18,20 @@ theme.ribbon.highlight = "#09f";
         theme.ribbon.hightlight = getSettings("ribbonhighlight"); 
 
 function initTheme() {
+    //TODO Handle some of these automatically in a second built-in theme function
 	$('.header').css('background-color', '#333').css('border-bottom', 'solid 1px rgba(255,255,255,0.4)');
 	$('#panel_content').css('background-color', '#333');
 	$('#panel_plugin').css('background-color', '#333');
     $('input[data-theme!=false]').css('background-color', '#444').css('color', theme.fontColor).css('font-family', '"Roboto Condensed", sans-serif').css('font-size', '11pt');
+    $('td[data-theme!=false]').css('color', theme.fontColor);
+    //NOTE data-theme!=false
 	$('button').css('font-family', '"Roboto Condensed", sans-serif');
 	$('.toolbar, .overflow').css('background-color', '#444');
 	$('.popuptop').css('color', 'white').css('background-color', theme.bodyColor);
 	$('.popuptitle').css('color', theme.fontColorAlt);
     $('.content_textarea').css('line-height','1.4em').css('padding-right', '5px');
 	$('.hovertag').css('font-size', '10pt');
+    $('.timeago').css('color', theme.fontColor);
 	
 	//Misc panel support
 	$('.tfile').css('background-color', '#444');	
@@ -59,6 +63,7 @@ function runThemeSettings() {
 function executeSettings() {
     writeCss("button:hover {	background-color:"+theme.ribbon.highlight+";color:black;}button:active {	position:relative;	top:1px;}");
     writeCss("button.ribbonbutton:hover {	background-color:"+theme.ribbon.highlight+";color:black;}button:active {	position:relative;	top:1px;}");
+    writeCss("button.close:hover { background-color:"+theme.red.thick+"}");
     writeCss("::selection {color:white;background:"+theme.ribbon.highlight+";}::-moz-selection {color:white;background:"+theme.ribbon.highlight+";}");  
     writeCss("input:focus, div:focus, button:focus{ outline: solid 1px "+theme.ribbon.highlight+";} input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px "+theme.ribbon.highlight+" inset}");
 }
@@ -78,9 +83,8 @@ writeCss("button.textbutton {text-indent:0;	border:1px solid white;	display:inli
 writeCss("button.ribbonbutton { padding-top:2px;height:77px; }");
 writeCss(".ribbonbutton { padding-top:2px;height:77px; }");
 writeCss("button { background-color:transparent }");
-writeCss("button:hover {	background-color:"+theme.ribbon.highlight+";color:black;}button:active {	position:relative;	top:1px;}");
-writeCss("button.ribbonbutton:hover {	background-color:"+theme.ribbon.highlight+";color:black;}button:active {	position:relative;	top:1px;}");
 writeCss("select { background-color:#999;color:black;}");
+writeCss('table, tr, td { color: '+theme.fontColor+'}');
 
 executeSettings();
 writeCss(".has-tip:hover { border-bottom: solid 1px #ccc; color:inherit; }");

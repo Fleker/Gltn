@@ -83,7 +83,7 @@ If you are adding or replacing data that is meant to exist in the document, it i
 
 ##Reference
 ###*Class Popup*
-The class Popup is responsible for creating and managing popups.
+The class `Popup` is responsible for creating and managing popups.
 
 | Properties   | Return  | Description                           |
 | ----------   | :-----: | ------------------------------------: |

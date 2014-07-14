@@ -1,5 +1,4 @@
 Themes alter the look and feel of the editor, but they should not alter the actual content on-screen. A theme makes the editor look fresh and new while giving the user a consistent user experience.
-//TODO Explain better colors
 //TODO Enum
 //TODO Reference
 
@@ -31,31 +30,10 @@ The first part of the function should be created the theme object and setting up
 
 ```JavaScript
     window.theme = {};
-    theme.normbg = 'black'
+    theme.bodyColor = 'black'
 ```   
 
-Many variables are added to this object and are used throughout the Gltn Editor.
-
-#### Full List of Variables
-It is recommended that you provide values for each of these attributes. If not, the system will issue an error if that variable is used.
-
-```JavaScript
-	theme.darkbg = "rgb(0, 0, 0)"; //The background color for the content editor when the darken button is pressed in fullscreen
-	theme.darkcolor = "rgb(200, 200, 200)"; //The font color for the content editor when the darken button is pressed in fullscreen
-	theme.normcolor = "rgb(0, 0, 0)"; //The normal font color for the content editor
-	theme.normbg = "rgb(255, 255, 255)"; //The normal background color for the content editor
-	theme.coloralt = '#222'; //A color similar to the normal font color for small accenting [Default: "#222"]
-	theme.normfsui = "rgb(204, 204, 204)"; //The normal background color for the fullscreen toolbar [Default: "rgb(204, 204, 204)"]
-	theme.darkfsui = "rgb(41, 41, 41)"; //The background color for the fullscreen toolbar when the darken button is pressed [Default: "rgb(41, 41, 41)"]
-	theme.darkfsuicolor = 'white'; // The font color for the fullscreen toolbar when the darken button is pressed [Default: "white"]
-	theme.normfsuicolor = 'black'; //The normal font color for the fullscreen toolbar [Default: "black"]
-	theme.ribbonhighlight = 'rgba(44, 62, 80,1.0)'; //The color that items in the ribbon turn when hovered over [Default: "rgba(44, 62, 80,1.0)"]
-	theme.ribbonplain = 'rgba(0,0,0,0)'; //The color that items in the ribbon turn when focus is lost [Default: "rgba(0,0,0,0)" in order to go with the parent's background color]
-        theme.palette = {}; //Palette object contains an assortment of static colors to better blend colors
-        theme.palette.red = "rgb(255,68,68)"; //Default red
-        theme.palette.dark = "rgba(44,62,80,1)"; //Default dark/black
-        theme.palette.blue = '#2980b9'; //Default blue
-```
+Many variables are added to this object and are used throughout the Gltn Editor. You may use any type of HTML-supported color format. Just keep in mind a variety of use cases, and try to follow the names of each theme. For example, `theme.bodyColor` would be the background color of the editor. Don't make it something odd like bright green.
 
 #### CSS Rules for Elements
 Now we use jQuery to apply CSS rules to individual objects. Most elements are applicable, though the code below should cover most of the objects. The following snippet is from the Blackout Theme
@@ -86,6 +64,7 @@ The following code should be separate, not in any function.
 ```
 
 #### Loader Color
+//TODO Make sure this is still true
 The new loading icon is developed entirely in CSS. This means the color can be decided by the theme. Write the RGB color for the loader, comma separated.
 `setLoaderColor('220, 119, 240');`
 

@@ -7,3 +7,4 @@ There are several types of buttons to target. Your code may wish to target each 
 * `button` - Default icon button
 * `button.textbutton` - Button that contains text / text & icon
 * `button.ribbonbutton` - An item in the ribbon
+* `button.close` - A close or exit button, denoted with an X.

@@ -1,8 +1,7 @@
 // JavaScript Document - Handles Popup Creation and Behavior
 
-var currentpopup;
-
 //PopupManager Enum
+//TODO Use an array to manage popups. Pop the stack to close last one, keep ones underneath
 function PopupManager() {
     this.TINY = "tiny";
     this.SMALL = "small";
@@ -10,8 +9,9 @@ function PopupManager() {
     this.LARGE = "large";
     this.XLARGE = "xlarge";
     this.currentpopup = function() {
-        return currentpopup;   
+        return this.popups[this.popups.length-1];   
     };
+    this.popups = [];
 };
 popupManager = new PopupManager();
 //Popup class
@@ -21,7 +21,7 @@ function Popup(data) {
     this.img = data.img;
     this.value = data.value;
     this.bordercolor = data.bordercolor;
-    this.output = data.ht || "";
+    this.output = data.ht || data.output || "";
     this.size = data.size || "medium";
     if(data.fnc === undefined)
         data.fnc = function() { };
@@ -31,7 +31,7 @@ function Popup(data) {
     
     Popup.prototype.show = function() {
         hideHovertag();
-        currentpopup = this;
+        popupManager.popups.push(this);
         $('#myModal').html('<div style="width:100%;text-align:right"><button class="close-reveal-modal" style="color:inherit;font-size:1.5em">&#215;</button></div><table style="width:100%;vertical-align:top;" class="popupstatic"><tr><td style="vertical-align:top;width:100%;"><span class="popuptitle"></span><span class="popupsubtitle"></span><div class="popupbody"></div></td><td style="text-align:right"><img id="popupimg" src=""></img></td></tr></table><div class="popupcontent"></div>');
         if(this.title !== undefined)
             $('.popuptitle').html(this.title+"<br>");
@@ -54,7 +54,7 @@ function Popup(data) {
         $('#myModal div, #myModal .popupcontent').css('background-color', theme.bodyColor).css('color', theme.fontColor).css('border', 'none');
         
         //Populate Popup
-        $('.popupcontent').html(this.ht);
+        $('.popupcontent').html(this.output);
         this.run();
         this.postPopup();
     };
@@ -64,22 +64,26 @@ function Popup(data) {
         $('#myModal').foundation('reveal', 'open');
         $('#myModal').focus();
         $(document).on('close', '[data-reveal]', function () {
-            popupManager.currentpopup().close(false);
+            try {
+                popupManager.popups[popupManager.popups.length-1].close(false);
+                popupManager.popups.pop();
+            } catch(e) {
+                
+            }
         });
     };
     
     Popup.prototype.close = function(callback) {
-        if(currentpopup !== undefined)	
+        if(popupManager.currentpopup() !== undefined)	
             panelManager.onPopupClose(this.title);
 
-        currentpopup = undefined;
         if(callback !== false)
             $('.popup').foundation('reveal', 'close');
     };
 }
 
 function closePopup(callback) {
-    currentpopup.close();
+    popupManager.currentpopup().close();
 }
 
 //FUTURE Migration Compatibility

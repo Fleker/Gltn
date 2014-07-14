@@ -1757,6 +1757,7 @@ function resetTheme() {
             }
        }
    };
+   writeCss('table { background-color:inherit; } table, tr, td { color: '+theme.fontColor+'}');
 }
 function initTheme() {
     theme.palette.red.normal = "rgb(255,68,68)";

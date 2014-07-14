@@ -2,6 +2,7 @@
 function Panel(id, displayName, icon, url, key, service) {
     this.id = id || "";
     this.name = displayName || "";
+    this.title = this.name;
     this.icon = icon || "";
     this.url = url; 
     this.service = service || false;
@@ -94,7 +95,7 @@ function PanelManager() {
             panel.service = false;
         if(panel.key === undefined)
             panel.key = [];
-        panel.img = panel.img.replace(/&gt;/g, ">").replace(/&lt;/g, "<");
+        panel.icon = panel.icon.replace(/&gt;/g, ">").replace(/&lt;/g, "<");
         //Return keyboard shortcuts
         if(panel.service != true) {
             holoribbon_std['Panels'].push({text: panel.name, img: panel.img, action: "runPanel('"+panel.id+"')"});
@@ -339,6 +340,7 @@ function initPanel2s(num) {
 
 //Panel GUI
 function runPanel(panel_id_name) {
+    //TODO Optimize height, title size
 	//Get Properties of the Panel First
     var p = panelManager.getAvailablePanels()[panel_id_name];
     if(p === undefined) {
@@ -353,7 +355,7 @@ function runPanel(panel_id_name) {
     if(p.canMaximize()) {
         max = "<span class='PanelMaximizeEvent' data-status='0'></span><button onclick='maximizePanel()'><span class='fa fa-arrows-alt'></span></button>";
     }
-	$('.panel_plugin_title').html('<table class="panel_plugin_head" style="width:100%;background-color:initial;border:none;"><tr><td style="color:'+theme.fontColor+';padding-top:9px;">'+p.title+'&emsp;<span class="PanelPopupEvent"></span><span class="PanelKeyEvent" data-keycode="" data-alt="" data-ctrl="" data-shift=""></span><span id="PanelCloseEvent"></span><span id="PanelBuildEvent"></span></td><td style="text-align:right;padding:0px;line-height:1em;">'+max+ '<button onclick="hidePanelPlugin()" style="margin:0px;padding:9px; ">'+closeButton()+'</button></td></tr></table>');
+	$('.panel_plugin_title').html('<table class="panel_plugin_head" style="width:100%;background-color:initial;border:none;"><tr><td style="color:'+theme.fontColor+';padding-top:9px;">'+p.title+'&emsp;<span class="PanelPopupEvent"></span><span class="PanelKeyEvent" data-keycode="" data-alt="" data-ctrl="" data-shift=""></span><span id="PanelCloseEvent"></span><span id="PanelBuildEvent"></span></td><td style="text-align:right;padding:0px;line-height:1em;">'+max+ '<button onclick="hidePanelPlugin()" class="close" style="margin:0px;padding:9px; ">'+closeButton()+'</button></td></tr></table>');
 	$('#panel_plugin').css("border-color", p.bordercolor).css('display', 'inline-table');
 	window.paneloverride = p.override;
     if(p.width < 17)
