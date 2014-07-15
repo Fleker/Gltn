@@ -353,13 +353,13 @@ document.onkeydown = function(e) {
 		break;*/
 		case 68: /*D*/
 			if(e.altKey) {
-				runPanel('main_Dictionary');	
+				runPanel('Main_Dictionary');	
 				e.preventDefault();	
 			} 
 		break;
 		case 70: /*F*/
 			if(e.altKey) {
-				runPanel('main_Find');
+				runPanel('Main_Find');
 				e.preventDefault();		
 			} 
 		break;

@@ -1,5 +1,5 @@
 // File.js handles the saves and restores, changing the formatting, and other file-related functions (convert to PDF? LaTeX, .doc)
-GLTN_VERSION = "1.3.0.11";
+GLTN_VERSION = "1.3.0.12";
 //For backwards compatibility, will return true 
 function greaterThanVersion(version) {
     var split = version.split(".");
@@ -194,7 +194,7 @@ function startSaveFile() {
     }
     else if(isCloudSaved()) {
         cloudRead(getFileData("inkblob_url"), "RF2", jsonsave.gluten_doc.file.last_modified);
-    } else {
+    } else if(window.dirty) {
         saveFile();   
     }
     
@@ -275,7 +275,7 @@ function saveFile() {
 	if(window.settings !== undefined) {	
 		for(i in window.settings) {
 //			console.warn("WS "+i);
-			writeToSettings(i, window.settings[i]);
+			writeToSettings(i, getSettings(i));
 			opbj[i] = getSettings(i);
 		}
 	}
@@ -583,9 +583,13 @@ function writeToFile(att, val) {
 function getSettings(att) {
     return decodeURIComponent(window.settings[att]);   
 }
+function hasSetting(att) {
+    return getSettings(att) !== undefined && getSettings(att) != "undefined";   
+}
 function writeToSettings(att, val) {
-	if(val != undefined && att != undefined) {
+	if(val !== undefined && att !== undefined) {
         try {
+//            val = encodeURIComponent(val);
             val = encodeURIComponent(decodeURIComponent(val));
         } catch(e) {
             console.warn(att, val);
@@ -593,8 +597,9 @@ function writeToSettings(att, val) {
         }
 //		val = val.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/&nbsp;/g, " ").replace(/&emsp;/g, ' ');		
 	}
-	if(window.settings == undefined)
+	if(window.settings === undefined)
 		window.settings = {};	
+//    console.log(val);
 	window.settings[att] = val;
 }
 //Nifty UI for saving
@@ -836,7 +841,6 @@ function checkLocalStorageLength() {
 }
 function getShare() {
     if(window.saved == undefined) {
-        //CHANGES Uncaught ReferenceError: initiatePopup is not defined
         var p = new Popup({
             title: "Share...",
             ht: "You must export the document to a cloud service before you can share it."

@@ -93,6 +93,8 @@ In many cases you want user data to persist not just between sessions, but betwe
 
 To access the data, simply call `getSettings({att})`
 
+As a side note, to query whether a certain settings value exists or should be overriden, you can call `hasSetting({att})`
+
 ### Export
 In some cases you may wish to use a panel for prototyping, such as for an outline. A few functions are available for developers to create a solid experience.
 #### Mimicking the Build System

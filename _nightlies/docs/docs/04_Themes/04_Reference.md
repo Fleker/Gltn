@@ -34,12 +34,63 @@ Note that the default values are already provided. If you don't want to change e
         * `accent100: "#ff9e80"`
         * `accent400: "#ff3d00"`
         * `accent700: "#dd2c00"`
-        
+    * `grey: { ... }`
+        * `white: "#fafafa"`
+        * `light: "#f5f5f5"`
+        * `normal: "#9e9e9e"`
+        * `thick: "#212121"`
+        * `accent100: "#cfd8dc"`
+        * `accent400: "#607d8b"`
+        * `accent700: "#263238"`
+    * `green: { ... }`
+        * `white: "#d0f8ce"`
+        * `light: "#a3e9a4"`
+        * `normal: "#259b24"`
+        * `thick: "#0d5302"`
+        * `accent100: "#a2f78d"`
+        * `accent400: "#14e715"`
+        * `accent700: "#12c700"`
+    * `orange: { ... }`
+        * `white: "#fff3e0"`
+        * `light: "#ffe0b2"`
+        * `normal: "#ff9800"`
+        * `thick: "#e65100"`
+        * `accent100: "#ffd180"`
+        * `accent400: "#ff9100"`
+        * `accent700: "#ff6d00"
+    * `purple: { ... }`
+        * `white: "#f3e5f5"`
+        * `light: "#e1bee7"`
+        * `normal: "#9c27b0"`
+        * `thick: "#4a148c"`
+        * `accent100: "#ea80fc"`
+        * `accent400: "#d500f9"`
+        * `accent700: "#aa00ff"`
+    * `red: { ... }`
+        * `white: "#fde0dc"`
+        * `light: "#f9bdbb"`
+        * `normal: "#e51c23"`
+        * `thick: "#b0120a"`
+        * `accent100: "#ff7997"`
+        * `accent400: "#ff2d6f"`
+        * `accent700: "#e00032"`
+    * `yellow: { ... }`
+        * `white: "#fffde7"`
+        * `light: "#fff9c4"`
+        * `normal: "#ffeb3b"`
+        * `thick: "#f57f17"`
+        * `accent100: "#ffff8d"`
+        * `accent400: "#ffea00"`
+        * `accent700: "#ffd600"`
 
 ##Palette
 The palette allows both theme developers and other plugin developers to access a large variety of colors in a dynamic way. If the theme's value for red is used instead of a custom value, the plugin will always look consistent, even if the user changes themes. 
 
-Below are the different types of color weights that can be selected for each palette object, and a description of what it is
+Below are the different types of color weights that can be selected for each palette object, and a description of what it is.
+
+Each palette has a minified version of Google's Material Design Palette
+See everything at google.com/design/spec/style/color.html#color-ui-color-palette
+Instead of including every color, which would take time to implement from a theme standpoint, as well as each item having limited use, only a few colors from each are included
 
 * white - weight 50,   essentially being white with that color as an accent; if this is in red, it would be white with a redish tint
 * light - weight 100,  being a light version of that color; if this is in red, it would be pink
@@ -48,56 +99,3 @@ Below are the different types of color weights that can be selected for each pal
 * accent100 - weight 100 accent, a light accent color in the same color idea; if this is in red it would be a high contrast light pink
 * accent400 - weight 400 accent, an accent color in the same color idea; if this is in red it would be a high contrast pink
 * accent700 - weight 700 accent, a dark accent color in the same color idea; if this is in red it would be a high contrast dark pink 
-            grey: {
-                white: "#fafafa",
-                light: "#f5f5f5",
-                normal: "#9e9e9e",
-                thick: "#212121",
-                accent100: "#cfd8dc",
-                accent400: "#607d8b",
-                accent700: "#263238"
-            },
-            green: {
-                white: "#d0f8ce",
-                light: "#a3e9a4",
-                normal: "#259b24",
-                thick: "#0d5302",
-                accent100: "#a2f78d",
-                accent400: "#14e715",
-                accent700: "#12c700"
-            },
-            orange: {
-                white: "#fff3e0",
-                light: "#ffe0b2",
-                normal: "#ff9800",
-                thick: "#e65100",
-                accent100: "#ffd180",
-                accent400: "#ff9100",
-                accent700: "#ff6d00"
-            },
-            purple: {
-                white: "#f3e5f5",
-                light: "#e1bee7",
-                normal: "#9c27b0",
-                thick: "#4a148c",
-                accent100: "#ea80fc",
-                accent400: "#d500f9",
-                accent700: "#aa00ff"
-            },
-            red: {
-                white: "#fde0dc",
-                light: "#f9bdbb",
-                normal: "#e51c23",
-                thick: "#b0120a",
-                accent100: "#ff7997",
-                accent400: "#ff2d6f",
-                accent700: "#e00032"
-            },
-            yellow: {
-                white: "#fffde7",
-                light: "#fff9c4",
-                normal: "#ffeb3b",
-                thick: "#f57f17",
-                accent100: "#ffff8d",
-                accent400: "#ffea00",
-                accent700: "#ffd600"

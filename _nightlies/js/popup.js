@@ -1,7 +1,6 @@
 // JavaScript Document - Handles Popup Creation and Behavior
 
 //PopupManager Enum
-//TODO Use an array to manage popups. Pop the stack to close last one, keep ones underneath
 function PopupManager() {
     this.TINY = "tiny";
     this.SMALL = "small";

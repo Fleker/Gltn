@@ -7,7 +7,6 @@ function Panel(id, displayName, icon, url, key, service) {
     this.url = url; 
     this.service = service || false;
     this.override = key || [];
-    console.log(displayName);
     this.bordercolor = /*theme.darkcolor||*/"#000";
     this.width = 25;
     this._canMaximize = false;
@@ -80,9 +79,36 @@ function PanelManager() {
         Main_Table: new Panel("Main_Table", "Spreadsheets"),
         Main_Themes: new Panel("Main_Themes", "Theme Selector")
     };
+    //FIXME service and override are the same
+    PanelManager.prototype.fromString = function(j) {
+        var json = JSON.parse(j);
+        for(var i in json) {
+            if(this.availablePanels[i] !== undefined)
+                continue;
+            
+            if(json[i].service === true)
+                var p = new Service(json[i].id, json[i].name, json[i].icon, json[i].url, json[i].override, json[i].service);            
+            else
+                var p = new Panel(json[i].id, json[i].name, json[i].icon, json[i].url, json[i].override, json[i].service);  
+            this.availablePanels[i] = p;
+        }
+    };
+    PanelManager.prototype.getAvailablePanelsLength = function() {
+        a = 1;
+        for(var i in this.availablePanels) { 
+//            console.log(a++);
+            a++;
+        }
+        return a;
+    };
     PanelManager.prototype.getAvailablePanels = function() {
         //TODO Grab all panels     
         return this.availablePanels;
+    };
+    //TODO Later
+    this.activePanels = [];
+    PanelManager.prototype.getActivePanels = function() {
+        return this.activePanels;
     };
     PanelManager.prototype.getAvailableServices = function() {
         //TODO Grab panels, filter only services   
@@ -97,22 +123,22 @@ function PanelManager() {
             panel.key = [];
         panel.icon = panel.icon.replace(/&gt;/g, ">").replace(/&lt;/g, "<");
         //Return keyboard shortcuts
-        if(panel.service != true) {
+        if(panel.service !== true) {
             holoribbon_std['Panels'].push({text: panel.name, img: panel.img, action: "runPanel('"+panel.id+"')"});
             newRibbon('.header', holoribbon_std);
-            console.log("Installing "+name+"...  "+num);
+            console.log("Installing "+panel.name+"...  "+num);
             ribbonSwitch(ribbon_index,false);
             ribbonLoad();
         }
-        writeToSettings('panels_'+id, id+","+url);
+        writeToSettings('panels_'+panel.id, panel.id+","+panel.url);
         this.availablePanels[panel.id] = panel;
 
         if(window.offline !== true) {
             //Now store script offline - this really sucks though
-            loadjscssfile(url, "js");
-            $('#themeframe').attr('src', url);
+            loadjscssfile(panel.url, "js");
+            $('#themeframe').attr('src', panel.url);
             downloadingpanel = "null";
-            window.setTimeout(function() {download_panel(id,num)}, 200);
+            window.setTimeout(function() {download_panel(panel.id,num);}, 200);
         }
     };
     PanelManager.prototype.uninstall = function(id) {
@@ -131,11 +157,11 @@ function PanelManager() {
         //We set a short timer so that if it doesn't exist, it doesn't ruin the flow of the function
         if(this.availablePanels[id].onUninstall !== undefined)
             this.availablePanels[id].onUninstall();
-        var a = getSettings('panels').split(', ');
-        var b = [];
+        a = getSettings('panels').split(', ');
+        b = [];
         for(i in a) {
             if(a[i] != id) {
-                b.push(a[i])
+                b.push(a[i]);
             }	
         }	
         writeToSettings('panels', b.join(', '));
@@ -158,10 +184,12 @@ function PanelManager() {
 
         $('#panel_content').show(200);
         window.paneltitle = undefined;
-        paneloverride = [];       
+        paneloverride = [];    
+        //TODO Pop the stack based on the panel that is being closed.
+        this.activePanels = [];
     };
     PanelManager.prototype.onMaximize =  function() {
-        if($('.PanelMaximizeEvent').attr('data-status') == 0) {
+        if($('.PanelMaximizeEvent').attr('data-status') === 0) {
             //Maximize
             $('#panel_content').hide(200);
             $('#panel_plugin').animate({
@@ -173,13 +201,16 @@ function PanelManager() {
             //Minimize
             $('#panel_content').show(200);
             sizePanel(panelwidth);
-            $('.PanelMaximizeEvent').attr('data-status', 0)
+            $('.PanelMaximizeEvent').attr('data-status', 0);
         }
         $('.PanelMaximizeEvent').click();
     };
     PanelManager.prototype.onPopupClose = function(title) {
         $('.PanelPopupEvent').attr('data-title', title);
         $('.PanelPopupEvent').click();	
+    };
+    PanelManager.prototype.toString = function() {
+        return JSON.stringify(this.availablePanels);   
     };
 }
 panelManager = new PanelManager();
@@ -240,8 +271,7 @@ function Permission(permission_key) {
 //PERMISSION ENUM
 Permissions = {
     UNRESTRICTED: new Permission().setId("UNRESTRICTED").setDescription("Have unrestricted access to the webpage")
-  };
-
+};
 
 //Other panels are here by default, but don't need to be called on init
 currentpanel = undefined;
@@ -259,51 +289,67 @@ function download_panel(id,num) {
             return;
         window.setTimeout(function() {download_panel(id,num);}, 100);
     } else {
-        console.log("Installed");
+        console.log("Installed "+id);
         localStorage['zpanels_'+id] = $('#themeframe').contents().text();  
         console.log("eval('InitPanel"+id+"();');  "+num);
         eval("availablePanels['"+id+"'] = "+id);
         console.log("availablePanels['"+id+"'] = "+id);
         if(availablePanels[id].onInit !== undefined)
             availablePanels[id].onInit();
-        initPanels(num+1);
+        num++;
+        initPanels(num);
     }
 }
 
 function uninstall_panel(id) {
     panelManager.uninstall(id);
 }
-
+function getPanelIndex(index) {
+    var a = 0;
+    for(i in panelManager.availablePanels) {
+        if(a == index)
+            return i;
+        a++;
+    }
+}
+//TODO I know this is being called twice somehow. I just can't figure out how
 function initPanels(num) {
-    var a = getSettings('panels').split(',');
-    var a_nm = a.length;
+    console.log("!n!t");
+    if(!hasSetting("panels")) {
+        writeToSettings("panels", panelManager.toString());   
+    }
+    var a = panelManager.fromString(getSettings('panels'));
+    var a_nm = panelManager.getAvailablePanelsLength();
+    if(num === undefined) {
+        initPanels(0);
+        return;
+    }   
     if(isNaN(num))
         return null;
-    if(a.length - 1 < num)
+    if(num >= a_nm - 1)
         return null;
     
-    var b = getSettings('panels_'+a[num]).split(',');
-    if(b[5] == true) {
-        var plugin = new Panel(b[0], b[1], b[2], b[3], b[4], b[5]);    
-    } else {
-        var plugin = new Service(b[0], b[1], b[2], b[3], b[4], b[5]);
-    }
-    //FIXME Uncaught TypeError: Cannot read property 'indexOf' of undefined 
-    if(a[num].indexOf('main') > -1) 
+    if(getPanelIndex(num).indexOf('Main') !== 0) {
+        console.log("Must install panel "+getPanelIndex(num));
         panelManager.install(plugin, num);
-    else {
+    } else {
+        plugin = panelManager.getAvailablePanels()[getPanelIndex(num)];
+        console.log("Panel "+getPanelIndex(num)+".onInit is "+(plugin.onInit !== undefined));
         if(plugin.onInit !== undefined)
             plugin.onInit();
+        num++;
+        console.log(num);
+        initPanels(num);
     }
 }
 
+//CHANGES I Think I can killl this
 function initPanel2s(num) {
     if(num === undefined)
         num = 0;
     if(getSettings('panels') === undefined) {
 		writeToSettings('panels', mainpanels);	
 	}
-    
 	var a = getSettings('panels').split(',');
     if(num === NaN)
         return null;
@@ -347,6 +393,8 @@ function runPanel(panel_id_name) {
         alert("Panel "+panel_id_name+" does not exist");
         return;
     }
+    //TODO Don't hack it
+    panelManager.activePanels = [p];
     if(p.onBeforeRun !== undefined)
         p.onBeforeRun();
     var max = "";
@@ -548,7 +596,7 @@ function clear_panel_data() {
 panelManager.getAvailablePanels().Main_Character.setBordercolor("#009").setWidth(25).setOverride([13]);
 
 function RunPanelmain_Character() {
-    //TODO switch to full JSON to be prettier/easier to manage
+    //TODO integrate into plgin
 	//var main = new Array('', '', '', '', '', '', '', '', '', '—');
     var collection = {
         Checkmark: {val: '✔', title: 'Checkmark', tag: 'checkmark check'},
@@ -717,10 +765,10 @@ function RunPanelmain_Character() {
 }
 panelManager.getAvailablePanels().Main_Character.onRun = RunPanelmain_Character;
 function InitPanelmain_Character() {
-	keyboardShortcut('main_Character', {alt: true, key: 67});
+//	keyboardShortcut('Nain_Character', {alt: true, key: 67});
 	$(document).on('keydown', function(e) {
 		if(e.keyCode == 67 && e.altKey) {
-			runPanel('main_Character');	
+			runPanel('Nain_Character');	
 		}
 	});
 	//initService('main_Character', 'Character', 'C');
@@ -1004,7 +1052,7 @@ function StylePanelmain_Outline() {
 	$('.Outline').css('border', 'solid 1px black').css('width', '85%');
 } 
 panelManager.getAvailablePanels().Main_Outline.setBordercolor('#7f8c8d').setWidth(25);
-panelManager.getAvailablePanels().Main_Outline.title = '<span class="fa fa-folder-open" style="font-size:15pt"></span>&nbsp;My Documents';
+panelManager.getAvailablePanels().Main_Filesys.title = '<span class="fa fa-folder-open" style="font-size:15pt"></span>&nbsp;My Documents';
 //TODO X Circle Button cut off on top
 //TODO Shorten search width a little, color in tables
 function GetPanelmain_Filesys() {
@@ -1385,48 +1433,140 @@ function Dictionary(format, url, name, id, icon) {
     this.name = name||"";
     this.id = id||"";
     this.icon = icon||"";
+    this.toString = function() {
+        var json = {format: this.format, url: this.url, name: this.name, id: this.id, icon: this.icon};
+        return JSON.stringify(json);
+    }
+    this.fromString = function(j) {
+        console.log(j);
+        var json = JSON.parse(j);
+        this.format = json.format;
+        this.url = json.url;
+        this.name = json.name;
+        this.id = json.id;
+        this.icon = json.icon;
+    }
 }
-
+//TODO fix panel iframe
+//TODO Change display names to id in settings
+//TODO Fix input/click issue
+//TODO Empty String should not work
+//FIXME Uncaught SyntaxError: Unexpected token } on click to act
+//TODO Click to act style
+//TODO Keyboard Nain_Character
 //DictionaryManager Class
 function DictionaryManager() {
-    this.installedDictionaries = {
+    DictionaryManager.prototype.installedDictionaries = {
         ouvert: new Dictionary("XML", "http://felkerdigitalmedia.com/gltn/dictionaries/dictionary.php", "Ouvert Dictionary", "ouvert", "G"),
-        wiktionary: new Dictionary("HTML", "http://felkerdigitalmedia.com/gltn/dictionaries/dictionary_wik.php", "Wikitionary", "wikitionary", '<span class="fa fa-terminal"></span>'),
+        wiktionary: new Dictionary("HTML", "http://felkerdigitalmedia.com/gltn/dictionaries/dictionary_wik.php", "Wikitionary", "wiktionary", '<span class="fa fa-terminal"></span>'),
         wikipedia: new Dictionary("HTML", "http://felkerdigitalmedia.com/gltn/dictionaries/dictionary_wiki.php", "Wikipedia", "wikipedia", '<span class="fa fa-globe"></span>')
     };
-    this.previousSearches = {
-        //TODO Get previous searches into a chrono array  
+    DictionaryManager.prototype.install = function(dic) {
+        if(getSettings('dictionary').indexOf(dic.id) == -1) {
+            this.installedDictionaries[dic.id] = dic;
+            writeToSettings('dictionary', getSettings('dictionary') + ";"+dic.toString());
+            writeToSettings('dictionarysort', getSettings('dictionarysort') + ";"+dic.id);
+        } else
+            console.error("You've already installed "+id); 	
+    };  
+    DictionaryManager.prototype.uninstall = function(id) {
+        var a = getSettings('dictionary').split(';');
+        var b = [];
+        for(i in a) {
+            var dic = new Dictionary().fromString(a[i]);
+            if(dic.id != id) {
+                b.push(dic.toJSON())
+            }	
+        }	
+        writeToSettings('dictionary', b.join(';'));
+        
+        var a = getSettings('dictionarysort').split(';');
+        var b = [];
+        for(i in a) {
+            if(a[i] != id) {
+                b.push(a[i])
+            }	
+        }	
+        writeToSettings('dictionarysort', b.join(';'));   
+    }
+    DictionaryManager.prototype.previousSearches = [];
+    DictionaryManager.prototype.appendPreviousSearch = function(string) {
+        this.previousSearches.unshift(string);
+        //TODO Update settings
+        //NOTE
+        //TODO Keep limit to 5 or so
     };
+    DictionaryManager.prototype.getPreviousSearch = function(index) {
+        //Returns the given text or returns false if index is invalid
+        if(this.previousSearches.length <= index) 
+            return false;
+        else
+            return this.previousSearches[index];
+    };
+    DictionaryManager.prototype.hasPreviousSearch = function(index) {
+        //Same idea, but true/false
+        if(this.getPreviousSearch(index) === false)
+            return false;
+        else
+            return true;
+    };
+    DictionaryManager.prototype.toString = function() {
+        return JSON.stringify(this.installedDictionaries);     
+    };
+    DictionaryManager.prototype.fromString = function(j) {
+        var json = JSON.parse(j);
+        for(i in json) {
+            this.install(json[i]);   
+        }
+    };
+    DictionaryManager.prototype.getDictionary = function(index) {
+        //Returns a given dictionary based on dictionarysort
+        var b = getSettings("dictionarysort").split(';');
+        return this.installedDictionaries[b[index]];
+    };
+    DictionaryManager.prototype.getDictionaryLength = function() {
+        var a = 1;
+        for(i in this.installedDictionaries) {
+            a++;   
+        }
+        return a;
+    };  
 }
 dictionaryManager = new DictionaryManager();
 
 function install_dictionary(format, url, name, id, icon) {
-	if(getSettings('dictionary').indexOf(id) == -1) {
-		writeToSettings('dictionary', getSettings('dictionary') + ", "+id);
-		writeToSettings('dictionary_'+id, format+', '+url+', '+name+', '+id+', '+icon);
-		writeToSettings('dictionarysort', getSettings('dictionarysort') + ", "+id);
-	} else
-		console.error("You've already installed "+id); 	
+	var dic = new Dictionary(format, url, name, id, icon);
+    dictionaryManager.install(dic);
 }	
 function uninstall_dictionary(id) {
-	var a = getSettings('dictionary').split(', ');
-	var b = new Array();
-	for(i in a) {
-		if(a[i] != id) {
-			b.push(a[i])
-		}	
-	}	
-	writeToSettings('dictionary', b.join(', '));
-	writeToSettings('dictionary_'+id, undefined);
-	
-	var a = getSettings('dictionarysort').split(', ');
-	var b = new Array();
-	for(i in a) {
-		if(a[i] != id) {
-			b.push(a[i])
-		}	
-	}	
-	writeToSettings('dictionarysort', b.join(', '));
+    dictionaryManager.uninstall(id);
+}
+panelManager.getAvailablePanels().Main_Dictionary.onInit = function() {
+    //TODO Install any misc. dictionaries
+    console.log("TODO Install any misc. dictionaries");
+    if(!hasSetting("dictionary")) {
+        writeToSettings("dictionary", dictionaryManager.toString());   
+    }
+    if(!hasSetting("dictionarysort")) {
+        var a = dictionaryManager.installedDictionaries;
+        var b = [];
+        for(i in a) {
+            b.push(a[i].id);
+        }   
+        writeToSettings("dictionarysort", b.join(";"));
+    }
+};
+//NOTE
+function startDictionarySearch(query) {
+    if(panelManager.getActivePanels()[0] !== undefined) {
+        if(panelManager.getActivePanels()[0].id == "Main_Dictionary")
+            $('#DictionaryIn').val(query).click();   
+    } else {
+        runPanel("Main_Dictionary");
+        setTimeout(function() {
+            $('#DictionaryIn').val(query).click(); 
+        },600);
+    }   
 }
 function GetPanelmain_Dictionary() {
 	return {title:"Dictionary", bordercolor: "#2980b9", width: 40};	
@@ -1435,85 +1575,64 @@ function RunPanelmain_Dictionary() {
 	var no_results = "<span style='font-size:16pt'>No Results</span><br>This does not appear in any of your dictionaries. Try to:<ul><li> Install a new dictionary</li>OR<li>Change your search.</li></ul>";
 	var no_connection = "<span style='font-size:16pt'>Sorry</span><br>The dictionary does not work offline.";
 	var connect_time = 0;
-	var ajaxrequests = new Array();
-	//Check stock dictionaries and 'install' if null
-	if(getSettings('dictionary') == undefined) {
-		writeToSettings('dictionary', 'gltn, wiktionary, wikipedia');
-		writeToSettings('dictionary_gltn', 'XML, http://felkerdigitalmedia.com/gltn/dictionaries/dictionary.php, Ouvert Dictionary, gltn, <span class="fa fa-leaf"></span>');
-		writeToSettings('dictionary_wiktionary', 'HTML, http://felkerdigitalmedia.com/gltn/dictionaries/dictionary_wik.php, Wiktionary, wiktionary, <span class="fa fa-terminal"></span>');
-		writeToSettings('dictionary_wikipedia', 'HTML, http://felkerdigitalmedia.com/gltn/dictionaries/dictionary_wiki.php, Wikipedia, wikipedia, <span class="fa fa-globe"></span>');
-	}	
-	if(getSettings('dictionarysort') == undefined || getSettings('dictionarysort') == "undefined")
-		writeToSettings('dictionarysort', getSettings('dictionary'));
+	var ajaxrequests = [];
 	function openApp() {
 		out = "<input type='search' id='DictionaryIn' style='width:65%;display:inline;'><button id='DictionarySettings'><span class='fa fa-cog'></span></button>";
 		out += "<div id='DictionaryOut'><span style='font-size:16pt'>Welcome</span><br>Search for something<br><br><br><div style='text-align:center;padding-left:80%;font-size:30pt;margin-top:25%;' class='fa-stack fa-lg'><span class='fa fa-circle-o fa-stack-2x'></span><span class='fa fa-quote-left fa-stack-1x'></span></div>";
+        //TODO Recent Searches
+        if(dictionaryManager.hasPreviousSearch(0))
+           out += "<br><br><br><span style='text-decoration:underline;' onclick='startDictionarySearch(\'"+dictionaryManager.getPreviousSearch(0)+"\')'>Try "+dictionaryManager.getPreviousSearch(0)+"</span><br>";
+        if(dictionaryManager.hasPreviousSearch(1))
+            out += "<span style='text-decoration:underline;' onclick='startDictionarySearch(\'"+dictionaryManager.getPreviousSearch(1)+"\')'>Or "+dictionaryManager.getPreviousSearch(1)+"</span><br>";
+        if(dictionaryManager.hasPreviousSearch(2))
+            out += "<span style='text-decoration:underline;' onclick='startDictionarySearch(\'"+dictionaryManager.getPreviousSearch(2)+"\')'>Maybe "+dictionaryManager.getPreviousSearch(2)+"</span><br>";
 		out += "</div>";
 		postPanelOutput(out);	
 		$('#DictionaryIn').focus();
 		$('#DictionarySettings').on('click', function() {
 			openSettings();
 		});	
-		$('#DictionaryIn').on('input', function() {
+		$('#DictionaryIn').on('input, click', function() {
 			var end = false;
-			/*var opts = {
-				  lines: 7, // The number of lines to draw
-				  length: 10, // The length of each line
-				  width: 3, // The line thickness
-				  radius: 13, // The radius of the inner circle
-				  corners: 1, // Corner roundness (0..1)
-				  rotate: 0, // The rotation offset
-				  direction: 1, // 1: clockwise, -1: counterclockwise
-				  color: theme.normcolor, // #rgb or #rrggbb or array of colors
-				  speed: 0.7, // Rounds per second
-				  trail: 20, // Afterglow percentage
-				  shadow: false, // Whether to render a shadow
-				  hwaccel: false, // Whether to use hardware acceleration
-				  className: 'spinner', // The CSS class to assign to the spinner
-				  zIndex: 2e9, // The z-index (defaults to 2000000000)
-				  top: '30px', // Top position relative to parent in px
-				  left: '50' // Left position relative to parent in px
-				};
-				$('#DictionaryOut').empty();
-				var target = document.getElementById('DictionaryOut');
-				var spinner = new Spinner(opts).spin(target);*/
             if($('#DictionaryOut .loader10').length == 0)
                 getLoader("DictionaryOut");
 			for(i in ajaxrequests) {
 				ajaxrequests[i].abort();	
 			}
-			var d = window.settings.dictionarysort.split(', ');
+			var d = window.settings.dictionarysort.split(';');
 			var end = false;
 			ajaxrequests = [];
 			index = 0;
 			function tryDictionary(i) {
-				console.log(i, d[i]);
-				j = getSettings('dictionary_'+d[i]).split(', ');
-				console.log(j[2], $('#DictionaryIn').val());
+                console.log(i);
+                j = dictionaryManager.getDictionary(i);
+				console.log(i, j.name, $('#DictionaryIn').val(), j.url);
 				$('#DictionaryOut').css('background-color', 'inherit').css('padding-left', '0').css('padding-top', '0').css('padding-bottom', '0').css('border', 'none').css('margin-top', '0').css('width', '100%').css('color', 'inherit');
-				var req = $.get(j[1], {word: $('#DictionaryIn').val()}, function (data) {
-					if(j[0] == "XML") {
+				var req = $.get(j.url, {word: $('#DictionaryIn').val()}, function (data) {
+					if(j.format == "XML") {
 						console.log(data);
 						data = $.parseJSON(data);
 						if(data.error != "404") {
 							//style='background-color: white;padding-left: 6px;padding-top: 8px;padding-bottom: 50px;border: solid 1px #999;margin-top: 4px;width: 95%;
 							$('#DictionaryOut').html(xmlDictionaryParse(data)).css('background-color', 'white').css('padding-left', '6px').css('padding-top', '8px').css('border', 'solid 1px #999').css('margin-top', '4px').css('width', '95%').css('color', 'black');
+                            dictionaryManager.appendPreviousSearch($('#DictionaryIn').val());
 							end = true;	
 						} else {
-							if(i == d.length-1)
+							if(i == dictionaryManager.getDictionaryLength)
 								$('#DictionaryOut').html(no_results);
 							else 
 								tryDictionary(i+1);
 						}	
 					} else {
-						if(data != "404") {
+						if(data != "404" && data != '{"error":"404"}') {
 							//console.log(data);
 							$('#DictionaryOut').html('<iframe style="width:100%;height:'+(window.innerHeight-210)+'px" id="DictionaryFrame" seamless></iframe>');
 							//$('#DictionaryFrame').attr('srcdoc', data);
-							$('#DictionaryFrame').attr('src', j[1]+"?word="+$('#DictionaryIn').val());
+							$('#DictionaryFrame').attr('src', j.url+"?word="+$('#DictionaryIn').val());
+                            dictionaryManager.appendPreviousSearch($('#DictionaryIn').val());
 							end = true;	
 						} else {
-							if(i == d.length-1)
+							if(i == dictionaryManager.getDictionaryLength)
 								$('#DictionaryOut').html(no_results);
 							else 
 								tryDictionary(i+1);	
@@ -1534,20 +1653,16 @@ function RunPanelmain_Dictionary() {
 		});
 	}
 	function openSettings() {
+        //TODO Arrow back
 		out = "<button id='DictionaryBack'><span class='fa fa-angle-left'></span></button><br>";
-		out += "Sort the dictionaries that you want to access, separated by a comma then a space.<br>";
+		out += "Sort the dictionaries that you want to access, separated by a semicolon.<br>";
 		out += "<input id='DictionarySort' value='"+getSettings("dictionarysort")+"' style='width:95%'>";
-		//out += "<button id='DictionarySortSave'>Save Order</button>";
 		out += "<br><br><u>Accessible Dictionaries</u><ul style='margin-left:20px;margin-top:0px;'>";
-		var a = getSettings('dictionary').split(', ');
+		var a = dictionaryManager.installedDictionaries;
 		for(i in a) {
-			console.log('dictionary_'+a[i]);
-            //FIXME Fix Settings
-			var b = getSettings('dictionary_'+a[i]).split(', ');
-			//"<span class='fa fa-circle-o' style='font-size:9pt'></span>"+	
-			b[4] = b[4].replace(/&gt;/g, ">").replace(/&lt;/g, "<");
-			out += b[4]+" "+a[i]+"<br>";
-			console.log(b);
+			a[i].icon = a[i].icon.replace(/&gt;/g, ">").replace(/&lt;/g, "<");
+			out += a[i].icon+" "+a[i].name+"<br>";
+			console.log(a[i]);
 		}	
 		out += "</ul><button id='DictionaryStore' class='textbutton' onclick='launchStore()'>Download More Dictionaries</button>";
 		postPanelOutput(out);
@@ -1555,7 +1670,6 @@ function RunPanelmain_Dictionary() {
 			openApp();
 		});
 		$('#DictionarySort').on('input', function() {
-			//$('#DictionarySortSave').attr('disabled', false);
 			writeToSettings('dictionarysort', $('#DictionarySort').val());
 		});
 	}
