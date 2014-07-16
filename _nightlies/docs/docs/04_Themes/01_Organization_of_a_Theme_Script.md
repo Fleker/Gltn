@@ -1,22 +1,3 @@
-Themes alter the look and feel of the editor, but they should not alter the actual content on-screen. A theme makes the editor look fresh and new while giving the user a consistent user experience.
-
-What is a theme? It is a collection of attributes that alter the look of the editor without altering the actual content on-screen. This gives the Gltn Editor a fresh look that may be modern while at the same time giving users a consistent user experience. How is a theme written? It is a collection of colors, standardized, that developers can use in their plugins for a consistent color palette across all plugins and devices. A theme developer can make up their own set of colors and the user's editor should accurately refect that theme. In addition to colors, developers may also give general CSS commands and run Javascript. If a developer may also create a settings menu for users to have even more customization.
-
-## Installing
-Themes may be installed manually from a console. 
-`install_theme(id, name, url, icon)`
-
-* id - A unique internal id for this theme
-* name - The name of the theme
-* url - The location of this theme
-* icon - The icon of the theme
-
-After being installed, the theme is available in window.settings.theme but it is not immediately turned chosen. To select your theme, either choose it from the Themes Panel, or give the command:
-`selectTheme(id)` 
-Where id is the internal id for the theme.
-
-Themes can be submitted and placed in the Gltn Store for anyone to install.
-
 ## Theme Script
 A javascript file is all that is required for a theme. It is easy to set up, and it can be organized into several different components
 
@@ -77,7 +58,7 @@ By commanding `themeCss('color', 'white')`, the font color for the entire editor
 ## Don't Theme
 There are certainly a few occasions where a developer will place extra time into a great UI widget, and it wouldn't be fair to overwrite all of the developer's CSS rules. That would leave a subset of users unable to appreciate the design as it was intended.
 
-For developers, there is a tag that may be added to an HTML item: `data-theme`. If that is set to true, then the theme should not theme it. This would be done as shown below. The demo grabs all input fields that are not marked with `data-theme` or where `data-theme` is false. For general CSS theming, this attribute checker should also be present.
+For developers, there is a tag that may be added to an HTML item: `data-theme`. If that is set to false, then the theme should not theme it. This would be done as shown below. The demo grabs all input fields that are not marked with `data-theme` or where `data-theme` is true. For general CSS theming, this attribute checker should also be present.
 
 ```Javascript
     $('input[data-theme!=false]')

@@ -4,6 +4,7 @@
 //TODO Include a darker colorset for people working VERY late at night.
 //TODO Replace document
 //TODO Take Advantage of New System Stuff
+//TODO New Structure -- ribbonbuttons are small
 theme.bodyColor = "rgb(34,34,34)";
 theme.bodyColorDark = "rgb(1,1,1)";
 theme.fontColor = "#efefef";
@@ -14,8 +15,10 @@ theme.fullscreen.fontColor = "white";
 theme.fullscreenDark.bodyColor = "rgb(41,41,41)";
 theme.fullscreenDark.fontColor = "white";
 theme.ribbon.highlight = "#09f";
- if(getSettings("ribbonhighlight") !== undefined && getSettings("ribbonhighlight").length > 0)
-        theme.ribbon.hightlight = getSettings("ribbonhighlight"); 
+if(hasSetting('ribbonhighlight'))
+    theme.ribbon.hightlight = getSettings("ribbonhighlight"); 
+else
+    writeToSettings("ribbonhighlight", "#09f");
 
 function initTheme() {
     //TODO Handle some of these automatically in a second built-in theme function
@@ -28,16 +31,13 @@ function initTheme() {
 	$('button').css('font-family', '"Roboto Condensed", sans-serif');
 	$('.toolbar, .overflow').css('background-color', '#444');
 	$('.popuptop').css('color', 'white').css('background-color', theme.bodyColor);
-	$('.popuptitle').css('color', theme.fontColorAlt);
-    $('.content_textarea').css('line-height','1.4em').css('padding-right', '5px');
+	$('.content_textarea').css('line-height','1.4em').css('padding-right', '5px');
 	$('.hovertag').css('font-size', '10pt');
-    $('.timeago').css('color', theme.fontColor);
+
 	
 	//Misc panel support
 	$('.tfile').css('background-color', '#444');	
 	$('.tfile.selected').css('background-color', theme.palette.blue.normal);	
-    //Theme parameters for content_textarea not necessary (unless we removed the reload requirement for themes - but for now it'll stay due to a lack of default parameters)
-	$('.content_textarea').css('background-color', theme.bodyColor).css('color', theme.fontColor);
 }	
 function loadThemeSettings() {
     out = 'Highlight Color: <select id="ThemeColor">';
@@ -69,22 +69,18 @@ function executeSettings() {
 }
 initTheme();
 writeCss("@import url(http://fonts.googleapis.com/css?family=Roboto+Condensed:300italic,400italic,700italic,400,300,700);");
-//set theme colors/css
-
-//TODO Future set these bodycolor/fontcolor attributes automatically
-	themeCss('font-family', '"Roboto Condensed", sans-serif');
-	themeCss('background-color', theme.bodyColor);
-	themeCss('color', theme.fontColor);
-//writeCss('input { background-color: #444; color: '+theme.fontColor+';font-family:"Roboto Condensed", sans-serif;font-size:11pt; }');
-//
+themeCss('font-family', '"Roboto Condensed", sans-serif');
 	
 setLoaderColor('255,255,255');
-writeCss("button.textbutton {text-indent:0;	border:1px solid white;	display:inline-block;	color:"+theme.bodyColor+";	font-style:normal;	text-decoration:none;	text-align:center;padding:3px; text-transform:uppercase; min-width:80px; color:white; background-color: transparent; border-radius: 30px; font-weight:100; font-size:10pt; letter-spacing: 1px; margin-left: 3px; padding-left: 8px; padding-right: 7px;}");
-writeCss("button.ribbonbutton { padding-top:2px;height:77px; }");
-writeCss(".ribbonbutton { padding-top:2px;height:77px; }");
-writeCss("button { background-color:transparent }");
-writeCss("select { background-color:#999;color:black;}");
-writeCss('table, tr, td { color: '+theme.fontColor+'}');
+writeCss("button.textbutton {text-indent:0;	border:1px solid white;	display:inline-block; color:"+theme.bodyColor+";	font-style:normal;	text-decoration:none;	text-align:center;padding:3px; text-transform:uppercase; min-width:80px; color:white; background-color: transparent; border-radius: 30px; font-weight:100; font-size:10pt; letter-spacing: 1px; margin-left: 3px; padding-left: 8px; padding-right: 7px;}");
+writeCss("button.ribbonbutton { padding-top:2px;height:77px;color:"+theme.fontColor+" }");
+writeCss("button { background-color:transparent; color: "+theme.fontColor+" }");
+writeCss("select { background-color:#333;color:"+theme.fontColorAlt+";} select:hover { background-color:#555 }");
+writeCss(".has-tip:hover { border-bottom: solid 1px #ccc; color:inherit; }");
 
 executeSettings();
-writeCss(".has-tip:hover { border-bottom: solid 1px #ccc; color:inherit; }");
+//RESET THEME
+writeCss('table { background-color:inherit; } table, tr, td { color: '+theme.fontColor+'}');
+$('button').css('text-transform', 'inherit').css('letter-spacing', '0px').css('color', theme.fontColorAlt).css('border-radius', '0px').css('font-size','11pt');
+$('button.textbutton').css('border-radius', '30px').css('text-transform', 'inherit').css('letter-spacing', '0px');
+$('.ribbonheader').css('color', theme.fontColor);

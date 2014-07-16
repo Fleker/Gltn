@@ -1491,10 +1491,20 @@ function DictionaryManager() {
     }
     DictionaryManager.prototype.previousSearches = [];
     DictionaryManager.prototype.appendPreviousSearch = function(string) {
+        if(string == "")
+            return;
+        if(this.previousSearches.indexOf(string) > -1)
+            return; //We don't want repetitive inputs
         this.previousSearches.unshift(string);
-        //TODO Update settings
-        //NOTE
-        //TODO Keep limit to 5 or so
+        if(this.previousSearches.length > 5)
+            this.previousSearches.length = 5;
+        
+        var settings;
+        for(i in this.previousSearches) {
+            settings += this.previousSearches[i]+",";
+        }
+        writeToSettings("dictionarySearches", settings);
+        //TODO Make this optional, have it opt-out through a checkbox in dictionary settings
     };
     DictionaryManager.prototype.getPreviousSearch = function(index) {
         //Returns the given text or returns false if index is invalid
@@ -1555,6 +1565,10 @@ panelManager.getAvailablePanels().Main_Dictionary.onInit = function() {
         }   
         writeToSettings("dictionarysort", b.join(";"));
     }
+    if(hasSetting("dictionarySearches"))
+       dictionaryManager.previousSearches = getSettings("dictionarySearches").split(",");
+    else
+       dictionaryManager.previousSearches = [];
 };
 //NOTE
 function startDictionarySearch(query) {
@@ -1576,23 +1590,29 @@ function RunPanelmain_Dictionary() {
 	var no_connection = "<span style='font-size:16pt'>Sorry</span><br>The dictionary does not work offline.";
 	var connect_time = 0;
 	var ajaxrequests = [];
+    $('.panel_plugin_content').css('overflow-y', 'inherit');
+    
 	function openApp() {
 		out = "<input type='search' id='DictionaryIn' style='width:65%;display:inline;'><button id='DictionarySettings'><span class='fa fa-cog'></span></button>";
 		out += "<div id='DictionaryOut'><span style='font-size:16pt'>Welcome</span><br>Search for something<br><br><br><div style='text-align:center;padding-left:80%;font-size:30pt;margin-top:25%;' class='fa-stack fa-lg'><span class='fa fa-circle-o fa-stack-2x'></span><span class='fa fa-quote-left fa-stack-1x'></span></div>";
-        //TODO Recent Searches
-        if(dictionaryManager.hasPreviousSearch(0))
-           out += "<br><br><br><span style='text-decoration:underline;' onclick='startDictionarySearch(\'"+dictionaryManager.getPreviousSearch(0)+"\')'>Try "+dictionaryManager.getPreviousSearch(0)+"</span><br>";
-        if(dictionaryManager.hasPreviousSearch(1))
-            out += "<span style='text-decoration:underline;' onclick='startDictionarySearch(\'"+dictionaryManager.getPreviousSearch(1)+"\')'>Or "+dictionaryManager.getPreviousSearch(1)+"</span><br>";
-        if(dictionaryManager.hasPreviousSearch(2))
-            out += "<span style='text-decoration:underline;' onclick='startDictionarySearch(\'"+dictionaryManager.getPreviousSearch(2)+"\')'>Maybe "+dictionaryManager.getPreviousSearch(2)+"</span><br>";
+        
+        out += "<br><br><br><br><br>";
+        phrases = ["Try", "Or", "Maybe", "Perhaps", "How About", "Want"];
+        for(i=0;i<5;i++) {
+            if(dictionaryManager.hasPreviousSearch(i))
+                out += "<div style='margin-bottom:6px;font-weight:bold;cursor:pointer;text-transform:uppercase;' onclick='startDictionarySearch(\""+dictionaryManager.getPreviousSearch(i)+"\")'>"+phrases[i]+"&nbsp;"+dictionaryManager.getPreviousSearch(i)+"</div>";
+        }
 		out += "</div>";
 		postPanelOutput(out);	
+        //FIXME
+        $('.panel_plugin_content').css('overflow-y', 'inherit');
+        
 		$('#DictionaryIn').focus();
 		$('#DictionarySettings').on('click', function() {
 			openSettings();
 		});	
-		$('#DictionaryIn').on('input, click', function() {
+		$('#DictionaryIn').on('input click keydown', function() {
+            console.log("D!");
 			var end = false;
             if($('#DictionaryOut .loader10').length == 0)
                 getLoader("DictionaryOut");
@@ -1654,17 +1674,17 @@ function RunPanelmain_Dictionary() {
 	}
 	function openSettings() {
         //TODO Arrow back
-		out = "<button id='DictionaryBack'><span class='fa fa-angle-left'></span></button><br>";
+		out = "<button id='DictionaryBack'><span class='fa fa-arrow-left'></span></button><br>";
 		out += "Sort the dictionaries that you want to access, separated by a semicolon.<br>";
 		out += "<input id='DictionarySort' value='"+getSettings("dictionarysort")+"' style='width:95%'>";
 		out += "<br><br><u>Accessible Dictionaries</u><ul style='margin-left:20px;margin-top:0px;'>";
 		var a = dictionaryManager.installedDictionaries;
 		for(i in a) {
 			a[i].icon = a[i].icon.replace(/&gt;/g, ">").replace(/&lt;/g, "<");
-			out += a[i].icon+" "+a[i].name+"<br>";
-			console.log(a[i]);
+			out += a[i].icon+"&ensp;"+a[i].id+"<br>";
+//			console.log(a[i]);
 		}	
-		out += "</ul><button id='DictionaryStore' class='textbutton' onclick='launchStore()'>Download More Dictionaries</button>";
+		out += "</ul><button id='DictionaryStore' class='textbutton' onclick='launchStore(\"Dictionary\")'>Download More Dictionaries</button>";
 		postPanelOutput(out);
 		$('#DictionaryBack').on('click', function() {
 			openApp();
@@ -1725,39 +1745,51 @@ panelManager.getAvailablePanels().Main_Dictionary.setBordercolor("#2980b9").setW
 
 
 //*** Theme Panel ***/
+panelManager.getAvailablePanels().Main_Themes.onInit = function() {
+    //TODO Move stuff here
+    startThemer();
+    console.log("themes are heere");
+    if(!hasSetting("themes"))
+        writeToSettings("themes", themeManager.toString());
+    if(!hasSetting('activeTheme'))
+        writeToSettings("activeTheme", "enterprise");
+    
+    setInterval("iterateTheme()", 500);
+};
 function GetPanelmain_Themes() {
-	return {title:"Change Theme", bordercolor: '#2ecc71', width: 20};	
+	return {title:"Change Theme", bordercolor: '#2ecc71', width: 25};	
 }
 function RunPanelmain_Themes() {
 	function loadThemes() {
-		var a = getSettings('theme').split(', ');
-        try {
-            loadThemeSettings();
-		    out = "<button id='ThemeSettings' class='textbutton'><span class='fa fa-cog'></span>&nbsp;Theme Settings</button><br>";
-        } catch(e) {
+		var a = themeManager.availableThemes;
+        //TODO Improve this here with OOP
+        console.log(loadThemeSettings);
+        if(loadThemeSettings === undefined)
             out = "";
-        }
-		for(i in a) {
-			var b = getSettings('theme_'+a[i]).split(', ');
-			var bg = theme.palette.red;
-			console.log(a[i], getSettings('currenttheme'))
-			if(a[i] == getSettings('currenttheme'))
-				bg = theme.palette.blue;
-			out += "<div style='background-color:"+bg+";min-height:50px;margin-bottom:15px;cursor:pointer;padding-left: 4px;padding-top: 3px;' class='ThemesCard' data-c='"+a[i]+"'>";
-//			b[3] = b[3].replace(/&gt;/g, ">").replace(/&lt;/g, "<");
-			out += b[3]+"&nbsp;<span style='font-size:16pt'>"+b[1]+"</span>";
+        else
+		    out = "<button id='ThemeSettings' class='textbutton'><span class='fa fa-cog'></span>&nbsp;Theme Settings</button><br>";
+
+        for(i in a) {
+			var bg = "inherit";
+			if(a[i].id == getSettings('activeTheme'))
+				bg = theme.palette.blue.normal;
+			out += "<div style='background-color:"+bg+";min-height:50px;margin-bottom:15px;cursor:pointer;padding-left: 6px;padding-top: 7px;padding-bottom:5px;' class='ThemesCard' data-c='"+a[i].id+"'>";
+			out += getIcon(a[i].icon, 16)+"&nbsp;<span style='font-size:16pt'>"+a[i].name+"</span>";
 			out += "</div>";
 		}
-		out += "<br><br><button class='textbutton' onclick='launchStore()'>Download More Themes</button>";
+		out += "<br><br><button class='textbutton' onclick='launchStore(\"Theme\")'>Download More Themes</button>";
 		postPanelOutput(out);
 		$('.ThemesCard').on('click', function() {
 			var c = $(this).attr('data-c');
-			selectTheme(c);
-			window.location.reload();
+			themeManager.pickTheme(c);
+            console.warn("reload for "+c);
+            loadThemes();/*
+            alert("reload");
+			window.location.reload();*/
 		});
         $('#ThemeSettings').on('click', function() {
-           var out = "<button id='ThemeCards'><span class='fa fa-times'></span></button><br>"+loadThemeSettings();
-           postPanelOutput(out);
+           var out = "<button id='ThemeCards'><span class='fa fa-arrow-left'></span></button><br>"+loadThemeSettings();
+            postPanelOutput(out);
             runThemeSettings();
             $('#ThemeCards').on('click', function() {
                 loadThemes();
@@ -1801,7 +1833,7 @@ function RunPanelmain_PageCount() {
 panelManager.getAvailablePanels().Main_Pagecount.onRun = RunPanelmain_PageCount;
 function postPageCount() {
     var i = Math.round(onGetPageCount()*10)/10;  
-    initService("main_PageCount", "Page Count", Math.ceil(i)+" Page"+(Math.ceil(i)==1?"":"s")); 
+    initService("Main_PageCount", "Page Count", Math.ceil(i)+" Page"+(Math.ceil(i)==1?"":"s")); 
     return i;
 }
 function onGetPageCount() {

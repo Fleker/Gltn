@@ -1666,8 +1666,8 @@ function resetTheme() {
             bodyColor: "rgb(41,41,41)"
        },
        ribbon: {
-            highlight: "rgba(44,62,80,1)",
-            plain: "rgba(0,0,0,0)"
+            highlight: "rgb(44,62,80)",
+            plain: "transparent"
        },
        palette: {
             /*
@@ -1757,10 +1757,47 @@ function resetTheme() {
             }
        }
    };
-   writeCss('table { background-color:inherit; } table, tr, td { color: '+theme.fontColor+'}');
+    writeCss('table { background-color:inherit; } table, tr, td { color: '+theme.fontColor+'}');
+    $('button').css('text-transform', 'initial').css('letter-spacing', '0px').css('color', theme.fontColor).css('border-radius', '0px').css('font-size', '11pt').css('font-weight','initial');
+    $('button.textbutton').css('border-radius', '0px');
+    $('.ribbonheader').css('color', theme.fontColor);
 }
-function initTheme() {
+function initThemeDefault() {
     theme.palette.red.normal = "rgb(255,68,68)";
+    $('.header').css('background-color', "#eee").css('border-bottom', 'solid 1px #bbb');
+	$('input[data-theme!=false]').css('font-family', 'Lato, sans-serif').css('font-size', '11pt');
+    $('button').css('font-family', 'Lato, sans-serif').css('border-radius','0px');
+	$('.popuptop').css('color', 'white').css('background-color', theme.bodyColor);
+	$('.content_textarea').css('line-height','1.4em').css('padding-right', '5px');
+	$('.hovertag').css('font-size', '10pt');
+    $('.main').css('padding-top', '100px');
+    themeCss('font-family', '"Lato", sans-serif');
+		themeCss('font-size', '10pt');
+        themeCss('background-color', '#ecf0f1');
+}
+
+//Normalizes the themes
+function iterateTheme() {
+    themeCss('background-color', theme.bodyColor);
+	themeCss('color', theme.fontColor);
+    themeCss('font-size', '11pt');
+    $('.timeago').css('color', theme.fontColor);
+    $('.popuptitle').css('color', theme.fontColorAlt);
+    $('.content_textarea').css('background-color', theme.bodyColor).css('color', theme.fontColor);
+    $('.toolbar, .overflow').css('background-color', theme.bodyColor);
+    $('.toolbar').css('color', theme.fontColor);
+    $('#panel_content').css('background-color', theme.bodyColor);
+	$('#panel_plugin').css('background-color', theme.bodyColor);
+    $('td[data-theme!=false]').css('color', theme.fontColor);
+    $('label').css('color', theme.fontColor);
+    $('input[data-theme!=false]').css('background-color', theme.bodyColor).css('color', theme.fontColor)
+    if(themeManager.isDefault())
+        initThemeDefault();
+    else {
+        try {
+            initTheme();
+        } catch(e) {}
+    }
 }
 
 function themeCss(rule, val) {
@@ -1770,59 +1807,127 @@ function themeCss(rule, val) {
 function writeCss(rules) {
 	$('body').append('<style>'+rules+'</style>');
 }
-//TODO Theme Manager
-function startThemer() {
-	//isn't called until settings are grabbed because otherwise window.settings.theme wouldn't exist
-	//grab current theme
-	//if not set reset themes
-    resetTheme();
-    initTheme();
-	var url;
-	if(getSettings('theme') === undefined) {
-		writeToSettings('theme', "default, blackout");
-		writeToSettings('currenttheme', "default");
-		writeToSettings('theme_default', "default, Default, js/themes/kernel.js, <span class='fa fa-heart-o'></span>");
-		writeToSettings('theme_blackout', "blackout, Blackout, js/themes/theme_blackout.js, <span class='fa fa-heart'></span>");
-	} //else {
-
-	var a = getSettings('theme').split(', ');
-	var b = getSettings('theme_'+getSettings("currenttheme")).split(', ');
-		
-    //Data validation
-    //console.log(b,b.length);
-    if(b.length == 3) {
-        b[2] = b[2].substring(0,b[2].length - 1);  
-        b[3] = "?";
+// Theme Class
+function Theme(id, name, url, icon) {
+    this.id = id || "";
+    this.name = name || "Untitled";
+    this.url = url;
+    this.icon = icon || "U";
+    this.toString = function() {
+        var json = {id: this.id, name: this.name, url: this.url, icon: this.icon};
+        return JSON.stringify(json);
     }
-    console.log(b,b.length);
-    url = b[2];
-    writeToSettings('theme_'+getSettings("currenttheme"), b[0]+", "+b[1]+", "+b[2]+", "+b[3]);
+    this.fromString = function(j) {
+        var json = JSON.parse(j);
+        this.id = json.id;
+        this.name = json.name;
+        this.url = json.url;
+        this.icon = json.icon;
+    }
+}
+
+// ThemeManager Class
+function ThemeManager() {
+    this.DEFAULT = "enterprise";
+    this.availableThemes = {
+        enterprise: new Theme("enterprise", "Enterprise", undefined, "envelope"),
+        blackout: new Theme("blackout", "Blackout", "js/themes/theme_blackout.js", "heart"),
+        blackout_c: new Theme("blackout_c", "Blackout Condensed", "js/themes/theme_blackoutc.js", "heart")
+    };
+    this.install = function(theme) {
+        if(getSettings('themes').indexOf(theme.id) == -1) {
+            writeToSettings("themes", getSettings("themes") + ";"+theme.toString());
+//            writeToSettings('theme_'+id, id+', '+name+', '+url+', '+icon);	
+        }
+        if(offline !== true) {
+            //Now store script offline - this really sucks though
+            $('#themeframe').attr('src', url);
+            setTimeout("localStorage['ztheme_"+id+"'] = $('#themeframe').contents().text();", 1000);
+        }
+    };
+    this.uninstall = function(id) {
+        var a = this.availableThemes;
+        var b = [];
+        for(i in a) {
+            var thm = new Theme().fromString(a[i]);
+            if(thm.id != id)
+                b.push(thm.toString());
+        }
+        writeToSettings("themes", b.join(';'));
+
+        if(localStorage['theme_'+id] !== undefined)
+            localStorage.removeItem('theme_'+id);
+        if(localStorage['ztheme_'+id] !== undefined)
+            localStorage.removeItem('ztheme_'+id);
+    };
+    this.toString = function() {
+        return JSON.stringify(this.availableThemes); 
+    };
+    this.fromString = function(string) {
+        var json = JSON.parse(j);
+        for(i in json) {
+            this.install(json[i]);   
+        }
+    };
+    this.getActiveTheme = function() {
+        if(this.availableThemes[getSettings('activeTheme')] !== undefined)
+            return this.availableThemes[getSettings("activeTheme")];  
+        else
+            return this.availableThemes[this.DEFAULT];
+    };
+    this.checkActiveTheme = function() {
+        return this.getActiveTheme().id;   
+    }
+    this.pickTheme = function(id) {
+        var old = this.getActiveTheme();
+        var a = this.availableThemes;
+        if(this.availableThemes[id] !== undefined) 
+            writeToSettings('activeTheme', id);	
+        else   
+            writeToSettings('activeTheme', this.DEFAULT);
+
+        markAsDirty();
+        startThemer();
+        //TODO Hot swap  
+        //TODO Change activetheme
+    };
+    this.isDefault = function() {
+        return this.getActiveTheme().id == this.DEFAULT || this.getActiveTheme().url === undefined;
+    };
+}
+themeManager = new ThemeManager();
+resetTheme();
+
+function startThemer(oldtheme) {
+    resetTheme();
+    url = themeManager.getActiveTheme().url;
+    id = themeManager.getActiveTheme().id;
 	//if not default insert JS
-	if(url !== undefined && b[0] != "default") {
-		console.log("Loading theme "+b[1]+" @ "+url);
+	if(!themeManager.isDefault()) {
+		console.log("Loading theme "+themeManager.getActiveTheme().name+" @ "+url);
 		console.log(window.offline !== true);
 		if(window.offline !== true) {
-			loadjscssfile(url, 'js');
+            if(oldtheme !== undefined)
+                replacejscssfile(themeManager.availableThemes[oldtheme].url, url, "js");
+            else if(url !== undefined)
+                loadjscssfile(url, 'js');
 			//Load script and save it
 			//Now store script offline - this really sucks though
 			$('#themeframe').attr('src', url);		
 			setTimeout("localStorage['ztheme_"+id+"'] = $('#themeframe').contents().text();", 1000);
 		}
-		//JS will have same function and call that script
-	} else if(b[0] == "default") {
-		initTheme();
+	} else {
         setLoaderColor('32,32,32');
         writeCss('@import url(http://fonts.googleapis.com/css?family=Lato:100,300,400);');
 //		writeCss('@import url(http://fonts.googleapis.com/css?family=Merriweather+Sans:400,300,700&subset=latin,latin-ext);');
-        themeCss('font-family', '"Lato", sans-serif');
-		themeCss('font-size', '10pt');
-        themeCss('background-color', '#ecf0f1');
-		writeCss("button { font-family:Lato,sans-serif;background-color:rgba(255,255,255,0.00);border-radius:3;text-indent:0;border:0px solid #888;display:inline-block;color:#333333;font-weight:bold;font-style:normal;text-decoration:none;text-align:center;padding:5px;min-width:30px;}");
-        writeCss("button.ribbonbutton, button.toolbar_button { font-weight:400; }");
-        writeCss("button.textbutton { border: solid 1px #999;padding: 8px;background-color: #f9f9f9;font-weight: 400; }");
+        writeCss("button { font-family:Lato,sans-serif;background-color:rgba(255,255,255,0.00);border-radius:3;text-indent:0;border:0px solid #888;display:inline-block;color:#333333;font-weight:bold;font-style:normal;text-decoration:none;text-align:center;padding:5px;min-width:30px;}");
+        writeCss("button.ribbonbutton, button.toolbar_button { font-weight:400;color:#333; }");
+        writeCss("button.textbutton { border: solid 1px #999;padding: 8px;background-color: #f9f9f9;font-weight: 400;color:#333;}");
+        writeCss("button.close:hover { background-color:"+theme.palette.red.normal+"}");
         writeCss("button:hover { background-color: #34495e; color: #ecf0f1; } button:active {position:relative;top:1px;}");
+        loadThemeSettings = function() { return "" };
+        $('button').css('text-transfor','initial');
     }
-    setInterval("initTheme()", 1000);
 }
 
 function setLoaderColor(col) {
@@ -1892,42 +1997,16 @@ function setLoaderColor(col) {
 }
 
 function install_theme(id, name, url, icon) {
-	if(getSettings('theme').indexOf(id) == -1) {
-		writeToSettings(getSettings() + ", "+id);
-		writeToSettings('theme_'+id, id+', '+name+', '+url+', '+icon);	
-	}
-	if(offline !== true) {
-		//Now store script offline - this really sucks though
-		$('#themeframe').attr('src', url);
-		setTimeout("localStorage['ztheme_"+id+"'] = $('#themeframe').contents().text();", 1000);
-	}
+    var t = new Theme(id, name, url, icon);
+    themeManager.install(t);
 }
 
 function uninstall_theme(id) {
-	var a = window.settings.theme.split(', ');
-	var b = new Array();
-	for(i in a) {
-		if(a[i] != id)
-			b.push(a[i]);	
-		if(a[i] == settings.currenttheme)
-			settings.currenttheme = a[i-1];
-	}
-	window.settings.theme = b.join(', ');
-	localStorage.removeItem('theme_'+id);
-	if(localStorage['ztheme_'+id] != undefined)
-		localStorage.removeItem('ztheme_'+id);
+    themeManager.uninstall(id);
 }
 
 function selectTheme(id) {
-	var a = window.settings.theme.split(', ');
-	for(i in a) {
-		if(a[i] == id)
-			writeToSettings('currenttheme', id);	
-	}
-	//startThemer();
-    markAsDirty();
-    startSaveFile();
-    startThemer();
+	themeManager.pickTheme(id);
 }
 
 

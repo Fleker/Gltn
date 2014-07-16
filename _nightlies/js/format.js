@@ -428,7 +428,7 @@ window.fullscreenOn = false;
 toolbar_width = 0;
 sy_save = 0;
 function update_toolbar_style() {
-	initTheme();
+//	initTheme();
 }
 function refreshBodyDesign() {
     if(fullscreenOn === false) {

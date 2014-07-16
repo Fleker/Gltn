@@ -16,7 +16,7 @@ Note that the default values are already provided. If you don't want to change e
     * `bodyColor:"rgb(41,41,41)"` - The color of the background in night mode
 * `ribbon: { ... }` - A set of colors relating to the ribbon
     * `highlight:"rgb(44,62,80)"` - The background color a ribbon button turns when hovered over
-    * `plain:rgba(0,0,0,0)"` - The background color of a ribbon ordinarily (transparent -- it adopts the parent's background color)
+    * `plain:"transparent"` - The background color of a ribbon ordinarily (transparent -- it adopts the parent's background color)
 * `palette: { ... }` - A variety of colors based on common color themes. See more at the bottom.
     * `blue: { ... }`
         * `white: "#e7e9fd"`

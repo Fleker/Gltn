@@ -1,5 +1,5 @@
 // File.js handles the saves and restores, changing the formatting, and other file-related functions (convert to PDF? LaTeX, .doc)
-GLTN_VERSION = "1.3.0.12";
+GLTN_VERSION = "1.3.1.0";
 //For backwards compatibility, will return true 
 function greaterThanVersion(version) {
     var split = version.split(".");
@@ -275,8 +275,9 @@ function saveFile() {
 	if(window.settings !== undefined) {	
 		for(i in window.settings) {
 //			console.warn("WS "+i);
+//            console.warn(getSettings(i));
 			writeToSettings(i, getSettings(i));
-			opbj[i] = getSettings(i);
+			opbj[i] = window.settings[i];
 		}
 	}
 	op.gluten_prefs = opbj;
@@ -289,7 +290,7 @@ function saveFile() {
         window.dirty = false;
     }
 	$('.content_save').show();
-	$('.content_save').html("<span class='fa fa-file-text' style='color:"+window.theme.coloralt+"'></span>&nbsp;<span class='fa fa-check' style='color:"+window.theme.coloralt+"'></span>");
+	$('.content_save').html("<span class='fa fa-file-text' style='color:"+theme.fontColorAlt+"'></span>&nbsp;<span class='fa fa-check' style='color:"+theme.fontColorAlt+"'></span>");
 }
 
 
@@ -313,7 +314,7 @@ function restoreFile(full) {
 	if(xpref != undefined) {
 		window.settings = {};
 		for(i in xpref) {
-			writeToSettings(i, xpref[i]);	
+			writeToSettings(i, decodeURIComponent(xpref[i]));	
 		}
 	}
 	} catch(e) {
@@ -326,13 +327,7 @@ function restoreFile(full) {
 		if(y == true)
 			localStorage.removeItem("settings");
 	}
-	try {
-        if(!full)
-		  startThemer();	
-	} catch(e) {
-		
-	}
-	
+
 	//var x = xml2json(jQuery.parseHTML(localStorage[fileid]),"  ");
     if(localStorage[fileid]) {
 	try {
@@ -599,6 +594,7 @@ function writeToSettings(att, val) {
 	}
 	if(window.settings === undefined)
 		window.settings = {};	
+//    console.warn(att);
 //    console.log(val);
 	window.settings[att] = val;
 }
