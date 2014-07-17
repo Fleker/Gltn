@@ -46,3 +46,38 @@ The panel can also be easily run from the console as well.
 * url - The place where this file currently exists so that it can be loaded
 * keys overriden - An array of keys that will not complete their specified function in a browser or Gltn. They will be overriden for control in the panel as long as the panel's life. By default this is an empty array.
 * service - This is a boolean that specifies whether this is a service. This is true by default in services, false by default in panels.
+
+
+## *Inspiration and Ideas*
+If you want to make a dictionary, but don't know where to start, look at some of these ideas:
+
+### Calculator
+A very simple tool, but also very effective at computing things while you're writing a lab report.
+
+### Simple Speechmaking
+On the news, it is recommended that a sentence have no more than 20 syllables. This makes the information more digestible. How about creating a panel that checks one's speech and advises the user on how to improve sentence structure?
+
+### Virtual Assistant
+You may think Siri is innovative, but Microsoft had their own virtual assistant in early versions of Word. Clippy was an iconic figure who used natural language to answer user questions.
+
+#### Challenges - Go Further
+* A simple chatbot can be set up in a panel, but what if the user wants to open a different panel? It may be better for this bot to be present outside of a panel. Since it'll take site space, it should be movable with the mouse or finger.
+* Text is one way to interact with a bot, but it doesn't seem very natural. Take the idea of a tutor to the digital world: use text-to-speech and speech-to-text APIs to make a better chatbot
+
+### Words / Day
+Writers occasionally set daily goals for themselves. They may want to write 5,000 words that day. While Gltn has a word counter, it doesn't have a way to track words over time and measure goals. An author may appreciate this tool giving them constant feedback in the services bar.
+
+#### Challenges - Go Further
+* Make an API for this data so that a user can select this source for their spreadsheet.
+* Add a timer so writers can track how much time they're spending
+* If the user wants to take a break every hour or so, you should notify them
+    * But ONLY if they are having writer's block. If they're on a roll, don't disturb them
+    
+### Image Manager
+Gltn supports image imports, but there's no central manager for all images in a paper like there is with citations.
+
+#### Challenges - Go Further
+* Intercept with the default image picker. Let the user upload an image OR pick one from their library already
+* Allow the user to store images per-file or store all of them in the same place, allowing for more image sharing
+* Pull from popular royalty-free image sites to offer another source for the user
+    * Even if they don't put it in their "library", offer a way to star certain photos

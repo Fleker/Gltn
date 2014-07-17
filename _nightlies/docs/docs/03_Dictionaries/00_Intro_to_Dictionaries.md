@@ -31,3 +31,18 @@ An HTML dictionary loads HTML from a website into an iframe. A PHP script is cal
 * UI may not be optimized
 * UI may not fit the user's theme
 * iFrames may have issues loading certain webpages
+
+## *Inspiration and Ideas*
+If you want to make a dictionary, but don't know where to start, look at some of these ideas:
+
+### Fan Bases
+A fan of comic books, video games, or tv shows may want to put their fandom to good use. A custom Dictionary could ping a wiki or fan site to pull content. For example, pulling data from Bulbapedia to make a Pokemon dictionary.
+
+### Maps
+There's a lot of location data today. How about a very detailed atlas, which provides this data from various sources. Maybe Foursquare.
+
+#### Challenges - Go Further
+* Don't just pull data from a maps provider. Also get data from Wikipedia and mix it to create a more detailed look at a place. Don't forget, this is meant to be glanceable information.
+
+### Politifact 
+Politifact is just one reputable source for rumor checking. How about mixing one or more together to create the ultimate fact checker? You could query a question and then check the search results, showing the results of the first one.

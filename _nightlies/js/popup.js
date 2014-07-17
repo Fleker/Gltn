@@ -12,6 +12,8 @@ function PopupManager() {
     };
     this.popups = [];
 };
+//TODO Closebutton
+//TODO title style
 popupManager = new PopupManager();
 //Popup class
 function Popup(data) {

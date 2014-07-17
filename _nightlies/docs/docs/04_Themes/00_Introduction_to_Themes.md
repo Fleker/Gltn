@@ -23,6 +23,12 @@ Themes can be submitted and placed in the Gltn Store for anyone to install.
 ## *Inspiration and Ideas*
 If you want to make a theme, but don't know where to start, look at some of these ideas:
 
+### Favorite Color / Favorite Other Thing
+What do you like most in the world? Turn that into a theme. Include photos or artwork, and try to create a color palette that would match that.
+
+#### Challenge - Go Further
+Try to blend your favorite things with the user's favorite things. Modify the theme to work in a variety of the user's favorite colors. For example, if you like cats, allow the cat theme to work if the user likes green, or if they like blue, etc.
+
 ### Day & Night
 Make the editor resemble a day on earth. Make the sun circle across the screen, altering the tint of the background. When it's night, show the moon instead and populate the background with stars.
 
@@ -31,3 +37,10 @@ Make the editor resemble a day on earth. Make the sun circle across the screen, 
 
 ### Holidays
 Make a theme for holidays using their color palette. For example, an Easter theme would have light, low-contrast colors.
+
+### Warm Tint
+A piece of software called f.lux tints the screen, making it warmer. This benefits those who are up late at night because they don't need to look at a bright bluish screen. Try to recreate the same idea for Gltn.
+
+#### Challenge - Go Further
+* Look at how daylight savings time is implemented and adjust your theme accordingly
+* For color sensitive work, allow users to disable this feature temporarily. (This might be a Theme Setting or could appear in the service bar)

@@ -66,7 +66,7 @@ These two functions will translate a command into formatted output.
     postLatex("$x^2$");
     var x = getLatex();
 ```
-* postLatex(cmd, callback) - Receives a command as a string and translates it into formatted output. Due to the Mathjax library, the output can't be retrieved directly. Rather, you must call a separate function to access the output.
+* postLatex(cmd, callback) - Receives a command as a string and translates it into formatted output. The MathJax library may take some time to process the input, so the output shouldn't be retrieved directly. Rather, you must call a separate function to access the output.
 * getLatex() - Retrieves the formatted output as HTML
 
 ##### LatexAPI
@@ -112,4 +112,4 @@ Where el is a jQuery selector
 ### Removing Panel
 With the Gltn Store, users will be able to install panels. Also, they'll be able to uninstall them. There is an additional function you may include which is called only when the panel is being uninstalled. It is recommended that you remove any relevant settings and file properties inside of this function. 
 
-`RemovePanel{PanelID}()`
+`panel.onUninstall = function() { ... }`

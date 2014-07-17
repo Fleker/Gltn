@@ -595,116 +595,395 @@ function clear_panel_data() {
 //TODO, use JSON to enable search
 panelManager.getAvailablePanels().Main_Character.setBordercolor("#009").setWidth(25).setOverride([13]);
 
+function getChar(val, title, tag) {
+    return {val: val, title: title, tag: tag};   
+}
+function getCharAccent(char, accent, or) {
+    return getChar(char, or+" w/ "+accent, or+" "+char+" "+accent);  
+}
+// SPECIALCHARACTERS
+specialCharacters = {
+    Checkmark: {val: '✔', title: 'Checkmark', tag: 'checkmark check'},
+
+    //  MUSIC
+    EighthNote: {val:'♪', title: 'Eighth Note', tag: 'music note eighth'},
+    QuarterNote: {val:'♩', title: 'Quarter Note', tag: 'music note quarter'},
+    TwoEighthNotes: {val:'♫', title:'Two Eigth Notes', tag:'music note eighth'},
+    TwoSixteenthNotes: {val:'♬', title: 'Two Sixteenth Notes', tag: 'music note sixteenth'},
+    FlatNote: {val:"♭", title:"Flat", tag:"music note flat"},
+    NeutralNote:{val:"♮", title:"Neutral", tag:"music note neutral"},
+    SharpNote:{val:"♯", title:"Sharp", tag:"music note sharp"},
+
+    // GENDER
+    Female: {val:'♀', title: 'Female', tag: 'gender sex female'},
+    Male: {val:'♂', title:'Male', tag:'gender sex male'},
+    MaleFemale: getChar("⚥", "Male and Female", "gender sex male femae"),
+    DoubleFemale: getChar("⚢", "Double Female", "gender sex female double"),
+    DoubleMale: getChar("⚣", "Double Male", "gender sex male double"),
+    Mercury: {val:"☿", title:"Mercury", tag:"Mercury"},
+    Earth:{val:"♁", title:"Earth", tag:"Earth"},
+
+    // Currency
+    Yen: {val:'¥', title:'Yen', tag: 'money currency yen japan'},
+    Euro: {val:'€', title:'Euro', tag:'money currency euro europe'},
+    Pound: {val:'£', title:'British Pound', tag:'money currency british england pound'},
+    Cent: {val:'¢',title:'Cent',tag:'money currency american cent'},
+    Austral:{val:"₳", title:"Austral Sign", tag:"money currency austral"},
+    Baht: {val:"฿", title:"Baht", tag:"money currency thai baht"},
+    Rupee: {val:"₹", title:"Rupee", tag:"money currency india rupee"},
+
+
+    // LEGAL
+    Copyright: {val:'©', title:'Copyright', tag:'legal copyright'},
+    Reserved: {val:'®',title:'Reserved',tag:'legal reserved'},
+    SoundRecording: getChar("℗","Sound Recording Copyright", "legal sound recording record"),
+    Servicemark: getChar("℠", "Service Mark", "legal servicemark trademark"),
+    Trademark: {val:'™',title:'Trademark', tag:'legal trademark trademarked'},
+
+    // Greek Math
+    Alpha: getChar("Α", "Alpha", "greek alpha sapphire"),
+    alpha: getChar("α","Alpha", "greek alpha sapphire rotation"),
+    Beta: getChar("Β", "Beta", "greek beta"),
+    beta: getChar("β","Beta", "greek beta"),
+    Gamma: getChar("Γ", "Gamma", "greek gamma radiation"),
+    gamma: getChar("γ","Gamma", "greek gamma radiation"),
+    Delta: getChar("Δ", "Delta", "greek delta change"),
+    delta: getChar("δ", "Delta", "greek delta change"),
+    epsilon: getChar("ε", "Epsilon", "greek epsilon"),
+    Epsilon: getChar("Ε", "Epsilon", "greek epsilon"),
+    Zeta: getChar("Ζ", "Zeta", "greek zeta"),
+    zeta: getChar("ζ", "Zeta", "greek zeta"),
+    Eta: getChar("Η", "Eta", "greek eta"),
+    eta: getChar("η", "Eta", "greek eta"),
+    Theta: getChar("Θ","Theta","greek theta degrees sphere circle"),
+    theta: getChar("θ","Theta","greek theta degrees sphere circle"),
+    Iota: getChar("Ι","Iota", "greek iota"),
+    iota: getChar("ι","Iota", "greek iota"),
+    Kappa: getChar("Κ","Kappa", "greek kappa"),
+    kappa: getChar("κ","Kappa", "greek kappa"),
+    Lambda: getChar("Λ","Lambda", "greek lambda"),
+    lambda: getChar("λ","Lambda", "greek lambda wavelength waves light sound"),
+    Mu: getChar("Μ", "Mu", "greek mu"),
+    mu: getChar("μ", "Mu", "greek mu mew micro statistics"),
+    Nu: getChar("Ν","Nu", "greek nu"),
+    nu: getChar("ν","Nu", "greek nu"),
+    Xi: getChar("Ξ","Xi", "greek xi"),
+    xi: getChar("ξ","Xi", "greek xi"),
+    Omicron: getChar("Ο","Omicron", "greek omicron"),
+    omicron: getChar("ο","Omicron", "greek omicron"),
+    Pi: getChar("Π","Pi", "math pi greek product"),
+    pi: getChar("π","Pi", "math pi greek product"),
+    Rho: getChar("Ρ","Rho", "greek rho"),
+    rho: getChar("ρ","Rho", "greek rho calculus sphere"),
+    Sigma: getChar("Σ", "Sigma", "greek sigma math sum"),
+    sigma: getChar("σ", "Sigma", "greek sigma math standard deviation"),
+    sigmaFinal: getChar("ς", "Final Sigma", "final greek sigma math sum"),
+    Tau: getChar("Τ","Tau","greek tau humility franciscans"),
+    tau: getChar("τ","Tau","greek tau humility franciscans"),
+    Upsilon: getChar("Υ","Upsilon","greek upsilon"),
+    upsilon: getChar("υ","Upsilon","greek upsilon"),
+    Phi: getChar("Φ","Phi","greek phi calculus"),
+    phi: getChar("φ","Phi","greek phi calculus"),
+    Chi: getChar("Χ","Chi","chi greek statistics chi-squared"),
+    chi: getChar("χ","Chi","chi greek statistics chi-squared"),
+    Psi: getChar("Ψ","Psi", "greek psi"),
+    psi: getChar("ψ","Psi", "greek psi"),
+    Omega: getChar("Ω","Omega","greek omega end ruby"),
+    omega: getChar("ω","Omega","greek omega end ruby"),
+    Pi_:{val:'π',title:'Lowercase Pi',tag:'math greek pi'},
+    Pi: {val:'Π',title:'Uppercase Pi',tag:'math greek pi'},
+    //TODO Get Lambda, Beta, Omega - Separate out non-math symbols
+    //Similar Symbols
+    Micro: getChar("µ", "Micro", "micro metric"),
+
+    // Punctuation
+    Emdash: {val:'—',title:'Emdash',tag:'dash emdash'},
+    Elipsis: {val:'…',title:'Elipsis',tag:'elipsis dot'},
+    Tilde: {val:'~', title:'tilde', tag:'tilde about'},
+    Upside_DownQuestion: {val:'¿',title:'Upside-Down Question',tag:'question mark upside down'},
+    Upside_DownExclamation: {val:'¡',title:'Upside-Down Exclamation Point',tag:'exclamation point upside down'},
+    Interrobang: {val:'‽',title:'Interrobang',tag:'question mark exclamation point interrobang interabang'},
+    Asterim: getChar("⁂", "Asterim", "asterisk"),
+    InsertCaret: getChar("⁁","Insert Caret", "punctuation review caret insert"),
+    Tie: getChar("⁀", "Tie", "punctuation review tie"),
+    UnderTie: getChar("‿", "Bottom Tie", "punctuation review tie"),
+    AsteriskArabic: getChar("٭","Arabic Star", "arabic star asterisk"),
+    AsteriskEastAsia: getChar("※","East Asian Asterisk", "asterisk east asian"),
+    AsteriskTeardrop: getChar("✻","Teardrop Asterisk", "asterisk teardrop"),
+    AsteriskHexadecimal: getChar("✺","Hexadecimal Asterisk", "asterisk sixteen hexadecimal"),
+
+
+    // Math
+    PlusMinus: {val:'±', title:'Plus-Minus', tag:'math plus minus'},
+    Root: {val:'√',title:'Root',tag:'math square root'},
+    Divide: {val:'÷',title:'Divide',tag:'math divide quotient'},
+    Times: {val:'×',title:'Multiply',tag:'math times multiply multiplication'},
+    Dot: {val:'•',title:'Dot',tag:'math dot product multiply'},
+    Degrees: {val:'°',title:'Degrees',tag:'math degrees'},
+    Minutes: {val:'′',title:'Minutes',tag:'math degrees minutes'},
+    Seconds: {val:'″',title:'Seconds',tag:'math degrees minutes seconds'},
+    Permille: {val:'℅',title:'Permille',tag:'permille percent'},
+    BasisPoint: {val:'‱',title:'Basis Point',tag:'permille percent'},
+    InfinitySymbol: {val:'∞',title:'Infinity',tag:'math infinite infinity'},
+    ApproxEqual: {val:"≈", title:"Approximately Equal", tag:"math approximately equal"},
+    NotEqual: getChar("≠", "Not Equal", "not equal math"),
+    Integral: getChar("∫", "Integral", "integral calculus"),
+    DoubleIntegral: getChar("∬","Double Integral", "double integral calculus"),
+    TripleIntegral: getChar("∭","Triple Integral", "triple integral calculus"),
+    Proportional: getChar("∝", "Proportional To", "proportional logic"),
+    ContourIntegral: getChar("∮","Line Integral","line integral calculus"),
+    ClosedSurfaceIntegral: getChar("∯","Double Line Integral", "double line integral calculus"),
+    ClosedVolumeIntegral: getChar("∰", "Triple Line Integral", "triple line integral calculus"),
+    ClockwiseIntegral: getChar("∱","Clockwise Integral","clockwise integral calculus"),
+    AnticlockwiseIntegral: getChar("⨑","Anticlockwise Integral", "anti clockwise integral calculus"),
+    ClockwiseContour: getChar("∲","Clockwise Contour Integral", "clockwise contour integral calculus"),
+    AnticlockwiseContour: getChar("∳", "Anticlockwise Contour Integral", "anticlockwise contour integral calculus"),
+    Angle: getChar("∠","Angle","angle triangle"),
+    Angle2: getChar("∡","Angle", "angle triangle"),
+    Angle3: getChar("∢","Angle", "angle triangle"),
+    Parallel: getChar("∥","Parallel", "math geometry parallel"),
+    NotParallel: getChar("∦","Not Parallel", "math geometry not parallel"),
+    EqualParallel: getChar("⋕","Equal and Parallel to", "math geometry parallel equal"),
+    Perpendicular: getChar("⊥","Perpendicular","math geometry perpendicular"),
+    
+    //Accents
+    Diaeresis: getChar("¨", "Diaeresis", "diaeresis accent"),
+    Acute: getChar("´", "Acute", "acute accent"),
+    a_grave: getCharAccent("à", "Grave", "a"),
+    A_grave: getChar("À", "A w/ Grave", "a grave"),
+    a_acute: getCharAccent("á", "Acute", "a"),
+    A_acute: getChar("Á", "A w/ Acute", "a acute"),
+    a_circum: getCharAccent("â", "Circumflex", "a"),
+    A_circum: getChar("Â", "A w/ Circumflex", "a circumflex"),
+    a_tilde: getCharAccent("ã", "Tilde", "a"),
+    A_tilde: getChar("Ã", "A w/ Tilde", "a tilde"),
+    a_diaer: getCharAccent("ä", "Diaeresis", "a"),
+    A_diaer: getChar("Ä", "A w/ Diaeresis", "a diaeresis"),
+    a_ring: getCharAccent("å", "Ring", "a"),
+    A_ring: getChar("Å", "A w/ Ring", "a ring"),
+    ae: getChar("æ", "AE", "ae and"),
+    AE: getChar("Æ", "AE", "ae and"),
+    c_cedil: getCharAccent("ç", "Cedilla", "c"),
+    C_cedil: getChar("Ç", "C w/ Cedilla", "c cedilla"),
+    e_grave: getCharAccent("è", "Grave", "E"),
+    E_grave: getCharAccent("È", "Grave", "E"),
+    e_acute: getCharAccent("é", "Acute", "E"),
+    E_acute: getCharAccent("É", "Acute", "E"),
+    e_circum: getCharAccent("ê", "Circumflex", "E"),
+    E_circum: getCharAccent("Ê", "Circumflex", "E"),
+    e_diaer: getCharAccent("ë", "Diaeresis", "E"),
+    E_diaer: getCharAccent("Ë", "Diaeresis", "E"),
+    i_grave: getCharAccent("ì", "Grave", "I"),
+    I_grave: getCharAccent("Ì", "Grave", "I"),
+    i_acute: getCharAccent("í", "Acute", "I"),
+    I_acute: getCharAccent("Í", "Acute", "I"),
+    i_circum: getCharAccent("î", "Circumflex", "I"),
+    I_circum: getCharAccent("Î", "Circumflex", "I"),
+    i_diaer: getCharAccent("ï", "Diaeresis", "I"),
+    I_diaer: getCharAccent("Ï", "Diaeresis", "I"),
+    n_tilde: getCharAccent("ñ", "Tilde", "N"),
+    N_tilde: getCharAccent("Ñ", "Tilde", "N"),
+    o_grave: getCharAccent("ò", "Grave", "O"),
+    O_grave: getCharAccent("Ò", "Grave", "O"),
+    o_acute: getCharAccent("ó", "Acute", "O"),
+    O_acute: getCharAccent("Ó", "Acute", "O"),
+    o_circum: getCharAccent("ô", "Circumflex", "O"),
+    O_circum: getCharAccent("Ô", "Circumflex", "O"),
+    o_tilde: getCharAccent("õ", "Tilde", "O"),
+    O_tilde: getCharAccent("Õ", "Tilde", "O"),
+    o_diaer: getCharAccent("ö", "Diaeresis", "O"),
+    O_diaer: getCharAccent("Ö", "Diaeresis", "O"),
+    o_stroke: getChar("ø", "Crossed Out O", "0 O stroke cross"),
+    O_stroke: getChar("Ø", "Crossed Out O", "0 O stroke cross"),
+    u_grave: getCharAccent("ù", "Grave", "U"),
+    U_grave: getCharAccent("Ù", "Grave", "U"),
+    u_acute: getCharAccent("ú", "Acute", "U"),
+    U_acute: getCharAccent("Ú", "Acute", "U"),
+    u_circum: getCharAccent("û", "Circumflex", "U"),
+    U_circum: getCharAccent("Û", "Circumflex", "U"),
+    u_diaer: getCharAccent("ü", "Diaeresis", "U"),
+    U_diaer: getCharAccent("Ü", "Diaeresis", "U"),
+    y_acute: getCharAccent("ý", "Acute", "Y"),
+    Y_acute: getCharAccent("Ý", "Acute", "Y"),
+    y_diaer: getCharAccent("ÿ", "Diaeresis", "Y"),
+    
+    //Logic
+    NOT: getChar("¬", "Not (Logic)", "logic not"),
+    Therefore: getChar("∴","Therefore", "logic therefore hence so "),
+    Because: getChar("∵","Because", "logic because since"),
+    Contradiction: getChar("↯","Downward Zigzag", "downward zigzag logic contradiction"),
+    XOR: getChar("⊕","Exclusive Or", "logic xor or exclusive"),
+    Imply: getChar("→","Implies", "implies if then logic"),
+    SubsetEqual: getChar("⊆","Subset and Equal","subset set equal"),
+    Subset: getChar("⊂","Subset", "subset set"),
+    SupersetEqual: getChar("⊇","Superset and Equal","superset set equal"),
+    Superset: getChar("⊃","Superset", "superset set"),
+    Infer: getChar("⊢","Infers","infers is derived from logic"),
+    IsElement: getChar("∈","Element of", "set is element member"),
+    NotElement: getChar("∉","Not Element of", "set not element member"),
+    NotContain: getChar("∌","Doesn't Contain Element", "set not contain element member"),
+    SuchThat: getChar("∋","Such That", "such that logic"),
+    Union: getChar("∪","Union", "union logic u"),
+    Intersect: getChar("∩","Intersect","intersect logic n"),
+    Join: getChar("∨","Join","join logic V"),
+    EmptySet: getChar("∅","Empty Set","empty set logic"),
+    
+    Exists: getChar("∃","Existenstialist Quantification", "There exists are is Existenstialist Quantification"),
+    Unique: getChar("∃!","Uniqueness Quantification", "There exists exactly one unique Uniqueness Quantification"),
+    Entailment: getChar("⊧","Entailment","entailment entails"),
+    From: getChar("→","From...to","from to"),    
+    NormalSubgroup: getChar("◅","Normal Subgroup", "normal subgroup"),
+    Ideal: getChar("▻","Ideal/Antijoin", "ideal anti join antijoin subgroup"),
+    Expected: getChar("E","Expected Value","expected value function"),
+
+    // Cards
+    Clubs: {val:'♣',title:'Clubs',tag:'symbol cards club'},
+    Spades:  {val:'♠',title:'Spades',tag:'symbol cards spade'},
+    Hearts: {val:'♥',title:'Hearts',tag:'symbol cards heart'},
+    Diamond: {val:'♦',title:'Diamond',tag:'symbol cards diamond'},
+
+    // Symbols
+    Carat: {val:'^',title:'Carat',tag:'carat v'},
+    LeftArrow: {val:'←',title:'Left Arrow',tag:'direction arrow left'},
+    UpArrow: {val:'↑',title:'Up Arrow',tag:'direction arrow forward up'},
+    DownArrow: {val:'↓',title:'Down Arrow',tag:'direction arrow backward down'},
+    RightArrow: {val:'→',title:'Right Arrow',tag:'direction arrow right'},
+    PlaceOfInterest:{val:"⌘", title:"Place of Interest", tag:"place interest"},
+
+    // Document Symbols
+    Section: {val:'§',title:'Section Symbol',tag:'markup section'},
+    Paragraph: {val:'¶',title:'Paragraph Break',tag:'markup paragraph enter newline'},
+    Keyboard: {val: "⌨", title:"Keyboard", tag:"markup writing keyboard"},
+    
+    //Keys
+    Search: getChar("⌕","Search","search icon"),
+    Enter: getChar("⌤","Enter Key", "enter key"),
+    Option: getChar("⌥","Option Key", "option key"),
+    Delete: getChar("⌦","Delete Key", "delete key"),
+    Backspace: getChar("⌫","Backspace Key","backspace key"),
+    Eject: getChar("⏏","Eject Key", "eject key cd"),
+    Alt: getChar("⎇","Alt Key", "alt key"),
+    Parental: getChar("⚿","Parental Controls","parental controls"),
+
+    // Nature
+    BlackFlorette: {val: '✿', title:"Flower", tag:"nature flower"},
+    Flower: getChar("⚘","Flower","flower nature"),
+    BlackSun: {val:"☀", title:"Sun", tag:"nature sun"},
+    PartlyCloudy: getChar("⛅","Partly Cloudy","partly cloudy sunny nature"),
+    Sunshine: {val: "☼", title: "Sun Outline", tag:"nature sun"},
+    Umbrella: {val: "☂", title:"Umbrella", tag:"nature umbrella"},
+    WetUmbrella: getChar("☔","Umbrella", "nature umbrella rain"),
+    Snowman: {val:"☃", title:"Snowman", tag:"nature snow snowman"},
+    Cloud: {val:"☁", title:"Cloud", tag:"cloud nature"},
+    Snowflake: {val: "❄", title:"Snowflake", tag:"snowflake nature"},
+    SnowflakeTrifoliate: {val:"❅", title:"Snowflake", tag:"snowflake nature"},
+    SnowflakeHeavyChevron: {val: "❆", title:"Snowflake", tag:"snowflake nature"},
+    Comet: {val: "☄", title:"Comet", tag:"nature comet meteor"},
+    StarOutline: getChar("☆", "Star Outline", "outline star"),
+    StarFill: getChar("★","Star Fill", "fill star"),
+    Coffee: getChar("☕","Coffee", "coffee joe drink mug steam"),
+    Clover: getChar("☘","Clover", "three leaf clover irish"),
+    Pepper: getChar("☙","Hot Pepper", "hot pepper ow"),
+    Rain: getChar("⛆","Rain","rain wet drizzle downpour"),
+    Thundercloud: getChar("⛈","Thundercloud","thundercloud cloud lightning rain"),
+
+    // Culture
+    USSR: {val: "☭", title:"Hammer & Sickle", tag: "former soviet russia"},
+    Cross: {val: "✞", title:"Cross", tag: "christian cross"},
+    DavidStar: {val: "✡", title:"Star of David", tag:"jewish star david"},
+    StarCrescent: getChar("☪","Star and Crescent", "star crescent muslim moslem"),
+    Ankh: getChar("☥","Anhk", "egyptian ankh"),
+    Peace: getChar("☮","Peace", "peace hippie wawa hoagiefest"),
+    YinYang: getChar("☯","Yin and Yang", "asian yin yang"),
+    HammerPick: getChar("⚒","Hammer and Pick", "hammer pick"),
+    Pickaxe: getChar("⛏","Pickaxe", "pickaxe pick"),
+    Anchor: getChar("⚓","Anchor","anchors away"),
+    Duel: getChar("⚔","Duelling Swords", "duel swords"),
+    Scale:getChar("⚖","Weighing Scale", "weigh scale measurements grams metric"),
+    Fleur: getChar("⚜","Fleur-de-lis","fleur de lis boy scouts"),
+
+    // Transport
+    Airplane: {val:"✈", title:"Airplane", tag:"airplane"},
+    Sailboat: getChar("⛵","Sailboat","sailboat yacht boat"),
+    Ferry: getChar("⛴","Ferry","ferry boat"),
+    
+    // Sports
+    Football: getChar("⚽","Football (Soccer)","soccer football sports"),
+    Baseball: getChar("⚾","Baseball", "baseball ballgame"),
+    IceSkate: getChar("⛸","Ice Skate", "ice skate skating"),
+    Ski: getChar("⛷","Ski", "Ski skier snowboard"),
+    GolfFlag: getChar("⛳","Flag in Hole","flag hole golf"),
+
+    // Hazard
+    Skull: {val:"☠", title:"Skull & Crossbones", tag:"skull crossbones pirate"},
+    Radioactive: {val:"☢", title:"Radioactive", tag:"radioactive imagine dragons"},
+    Biohazard: {val:"☣", title:"Biohazard", tag:"biohazard"},
+    Caduceus: {val:"☤", title:"Caduceus", tag:"caduceus medicine snake pole"},
+    Recycling: getChar("♺", "Recycling", "recycling reuse recycle"), //Because I didn't know where else to put it :/
+    PermPaper: getChar("♾","Permanent Paper", "recycling paper permanent"),
+    ElectricArrow: getChar("⌁","Electric Arrow", "electric arrow"),
+    Warning: getChar("⚠","Warning","alert warning yellow"),
+    HighVoltage: getChar("⚡","High Voltage","electricity warning voltage high pikachu"),
+
+    //Emoticons
+    WhiteSmiling: getChar("☺","White Smiling","white smiling face happy"),
+    BlackSmiling: getChar("☻", "Black Smiling", "black smiling face happy"),
+    WhiteFrown: getChar("☹", "White Frowning", "white frowning face sad"),
+
+    //Science
+    Atom: getChar("⚛", "Atomic Model", "atom"),
+    Benzene: getChar("⌬","Benzene", "benzene molecule chemical"),
+    Alembic: getChar("⚗","Alembic","alchemy alembic"),
+    
+    //Other Latin Characters
+    Eth: getChar("Ð", "Eth", "Latin Icelandic eth"),
+    eth: getChar("ð", "Eth", "Latin Icelandic eth"),
+    Thorn: getChar("Þ", "Thorn", "Thorn born latin norse"),
+    thorn: getChar("þ", "Thorn", "Thorn born latin norse"),
+    sharps: getChar("ß", "Sharp S", "German sharp s"),
+
+    //Symbols
+    Watch: getChar("⌚","Watch","watch clock time"),
+    Hourglass: getChar("⌛","Hourglass", "sand watch clock time hourglass"),
+    AlarmClock: getChar("⏰","Alarm Clock", "clock time alarm"),
+    
+    // Automobiles
+    Collision: getChar("⛌","Traffic Collision", "traffic collision"),
+    Breakdown: getChar("⛍","Vehicle Breakdown", "vehicle breakdown"),
+    Road: getChar("⛑","Road", "road"),
+    RoadCondition: getChar("⛐","Road Conditions","road conditions"),
+    RoadBlock: getChar("⛒","Roadblock", "roadblock"),
+    Snowchains: getChar("⛓","Snow Chains", "snow icy black ice chains snowchains"),
+    HandTraffic: getChar("⛕","Right and Left Hand Traffic", "right left traffic road"),
+    NoEntry: getChar("⛔","No Entry", "no entry car"),
+    TwoWay: getChar("⛖","Two Way Traffic", "two way traffic highway"),
+    LaneEnds: getChar("⛙","Lane Ends","lane is ending"),
+    LaneCross: getChar("⛌","Lane Crossing", "crossing lane"),
+    BlackTruck: getChar("⛟","Black Truck", "black truck"),
+    Fuel: getChar("⛽","Fuel Pump","pump fuel"),
+    
+    Wheelchair: getChar("♿","Wheelchair",'wheelchair chair'),
+    Fountain: getChar("⛲","Fountain","fountain water park"),
+    UmbrellaBeach: getChar("⛱","Umbrella on Beach", "umbrella on beach bathing"),
+    Mountain: getChar("⛰","Mountain","mountain rock tunnel"),
+    Scissors: getChar("✂","Scissors","scissors incision scyther scisor cut"),
+    
+    // Games
+    Die1: getChar("⚀","Die Face-1", "die face dice"),
+    Die2: getChar("⚁","Die Face-2", "die face dice"),
+    Die3: getChar("⚂","Die Face-3", "die face dice"),
+    Die4: getChar("⚃","Die Face-4", "die face dice"),
+    Die5: getChar("⚄","Die Face-5", "die face dice"),
+    Die6: getChar("⚅","Die Face-6", "die face dice"),
+    CheckerW: getChar("⛀","White Draughts Man", "checkers piece"),
+    CheckerW2: getChar("⛁","White Draughts King", "checkers piece"),
+    CheckerB: getChar("⛂","White Draughts Man", "checkers piece"),
+    CheckerB2: getChar("⛃","White Draughts Man", "checkers piece"),
+    
+};
+
 function RunPanelmain_Character() {
     //TODO integrate into plgin
-	//var main = new Array('', '', '', '', '', '', '', '', '', '—');
-    var collection = {
-        Checkmark: {val: '✔', title: 'Checkmark', tag: 'checkmark check'},
-        
-        //  MUSIC
-        EighthNote: {val:'♪', title: 'Eighth Note', tag: 'music note eighth'},
-        QuarterNote: {val:'♩', title: 'Quarter Note', tag: 'music note quarter'},
-        TwoEighthNotes: {val:'♫', title:'Two Eigth Notes', tag:'music note eighth'},
-        TwoSixteenthNotes: {val:'♬', title: 'Two Sixteenth Notes', tag: 'music note sixteenth'},
-        FlatNote: {val:"♭", title:"Flat", tag:"music note flat"},
-        NeutralNote:{val:"♮", title:"Neutral", tag:"music note neutral"},
-        SharpNote:{val:"♯", title:"Sharp", tag:"music note sharp"},
-        
-        // GENDER
-        Female: {val:'♀', title: 'Female', tag: 'gender sex female'},
-        Male: {val:'♂', title:'Male', tag:'gender sex male'},
-        Mercury: {val:"☿", title:"Mercury", tag:"Mercury"},
-        Earth:{val:"♁", title:"Earth", tag:"Earth"},
-        
-        // Currency
-        Yen: {val:'¥', title:'Yen', tag: 'money currency yen japan'},
-        Euro: {val:'€', title:'Euro', tag:'money currency euro europe'},
-        Pound: {val:'£', title:'British Pound', tag:'money currency british england pound'},
-        Cent: {val:'¢',title:'Cent',tag:'money currency american cent'},
-        Austral:{val:"₳", title:"Austral Sign", tag:"money currency austral"},
-        Baht: {val:"฿", title:"Baht", tag:"money currency thai baht"},
-        Rupee: {val:"₹", title:"Rupee", tag:"money currency india rupee"},
-        
-        
-        // LEGAL
-        Copyright: {val:'©', title:'Copyright', tag:'legal copyright'},
-        Reserved: {val:'®',title:'Reserved',tag:'legal reserved'},
-        Trademark: {val:'™',title:'Trademark', tag:'legal trademark trademarked'},
-        
-        // Greek Math
-        Pi_:{val:'π',title:'Lowercase Pi',tag:'math greek pi'},
-        Delta: {val:'∆',title:'Delta',tag:'math greek delta'},
-        Pi: {val:'Π',title:'Uppercase Pi',tag:'math greek pi'},
-        //TODO Get Lambda, Beta, Omega - Separate out non-math symbols
-    
-        // Punctuation
-        Emdash: {val:'—',title:'Emdash',tag:'dash emdash'},
-        Elipsis: {val:'…',title:'Elipsis',tag:'elipsis dot'},
-        Tilde: {val:'~', title:'tilde', tag:'tilde'},
-        Upside_DownQuestion: {val:'¿',title:'Upside-Down Question',tag:'question mark upside down'},
-        Upside_DownExclamation: {val:'¡',title:'Upside-Down Exclamation Point',tag:'exclamation point upside down'},
-        Interrobang: {val:'‽',title:'Interrobang',tag:'question mark exclamation point interrobang interabang'},
-            
-        // Math
-        PlusMinus: {val:'±', title:'Plus-Minus', tag:'math plus minus'},
-        Root: {val:'√',title:'Root',tag:'math square root'},
-        Divide: {val:'÷',title:'Divide',tag:'math divide quotient'},
-        Times: {val:'×',title:'Multiply',tag:'math times multiply multiplication'},
-        Dot: {val:'•',title:'Dot',tag:'math dot product multiply'},
-        Degrees: {val:'°',title:'Degrees',tag:'math degrees'},
-        Minutes: {val:'′',title:'Minutes',tag:'math degrees minutes'},
-        Seconds: {val:'″',title:'Seconds',tag:'math degrees minutes seconds'},
-        Permille: {val:'℅',title:'Permille',tag:'permille percent'},
-        InfinitySymbol: {val:'∞',title:'Infinity',tag:'math infinite infinity'},
-        ApproxEqual: {val:"≈", title:"Approximately Equal", tag:"math approximately equal"},
-        
-        // Cards
-        Clubs: {val:'♣',title:'Clubs',tag:'symbol cards club'},
-        Spades:  {val:'♠',title:'Spades',tag:'symbol cards spade'},
-        Hearts: {val:'♥',title:'Hearts',tag:'symbol cards heart'},
-        Diamond: {val:'♦',title:'Diamond',tag:'symbol cards diamond'},
-        
-        // Symbols
-        Carat: {val:'^',title:'Carat',tag:'carat v'},
-        LeftArrow: {val:'←',title:'Left Arrow',tag:'direction arrow left'},
-        UpArrow: {val:'↑',title:'Up Arrow',tag:'direction arrow forward up'},
-        DownArrow: {val:'↓',title:'Down Arrow',tag:'direction arrow backward down'},
-        RightArrow: {val:'→',title:'Right Arrow',tag:'direction arrow right'},
-        PlaceOfInterest:{val:"⌘", title:"Place of Interest", tag:"place interest"},
-        
-        // Document Symbols
-        Section: {val:'§',title:'Section Symbol',tag:'markup section'},
-        Paragraph: {val:'¶',title:'Paragraph Break',tag:'markup paragraph enter newline'},
-        Keyboard: {val: "⌨", title:"Keyboard", tag:"markup writing keyboard"},
-        
-        // Nature
-        BlackFlorette: {val: '✿', title:"Flower", tag:"nature flower"},
-        BlackSun: {val:"☀", title:"Sun", tag:"nature sun"},
-        Sunshine: {val: "☼", title: "Sun Outline", tag:"nature sun"},
-        Umbrella: {val: "☂", title:"Umbrella", tag:"nature umbrella"},
-        Snowman: {val:"☃", title:"Snowman", tag:"nature snow snowman"},
-        Cloud: {val:"☁", title:"Cloud", tag:"cloud nature"},
-        Snowflake: {val: "❄", title:"Snowflake", tag:"snowflake nature"},
-        SnowflakeTrifoliate: {val:"❅", title:"Snowflake", tag:"snowflake nature"},
-        SnowflakeHeavyChevron: {val: "❆", title:"Snowflake", tag:"snowflake nature"},
-        Comet: {val: "☄", title:"Comet", tag:"nature comet meteor"},
-        
-        // Culture
-        USSR: {val: "☭", title:"Hammer & Sickle", tag: "former soviet russia"},
-        Cross: {val: "✞", title:"Cross", tag: "christian cross"},
-        DavidStar: {val: "✡", title:"Star of David", tag:"jewish star david"},
-        
-        // Transport
-        Airplane: {val:"✈", title:"Airplane", tag:"airplane"},
-        
-        // Hazard
-        Skull: {val:"☠", title:"Skull & Crossbones", tag:"skull crossbones pirate"},
-        Radioactive: {val:"☢", title:"Radioactive", tag:"radioactive imagine dragons"},
-        Biohazard: {val:"☣", title:"Biohazard", tag:"biohazard"},
-        Caduceus: {val:"☤", title:"Caduceus", tag:"caduceus medicine snake pole"},
-        
-    };
-			var main = new Array({val: '✔', title: 'Checkmark', tag: 'checkmark check'});
 	
 	var out = "";
 	var searchbar = '<input type="search" id="popup_character_search" style="width:100%" placeholder="Search for Characters" ><br>';
@@ -718,24 +997,25 @@ function RunPanelmain_Character() {
         list = data;
 		$('#popup_character_search').focus();
 		var out = "";
-		for(i=0;i<data.length;i++) {
-			out = out + '<div style="display:inline-block" onclick="contentAddText(\''+data[i].val+'\')" title="'+data[i].title+'" class="character_palette_character">' + data[i].val + '</div>&emsp;';
+		for(i in data) {
+			out = out + '<div style="display:inline-block;padding-left:8px;padding-bottom:16px;font-size:16pt;" onclick="contentAddText(\''+data[i].val+'\')" title="'+data[i].title+'" class="character_palette_character">' + data[i].val + '</div>';
 		}
 		$('.character_palette_display').html(out);
 		character = data[0].val;
 		console.log(character);
 		
-		StylePanelClass('character_palette_character', ["cursor", "pointer", "border-bottom", "solid 1px #09f"]);
+//		StylePanelClass('character_palette_character', ["cursor", "pointer", "border-bottom", "solid 1px #09f"]);
+        $('.character_palette_character').css('cursor','pointer');
 	}
 	$('#popup_character_search').on('input', function() {
 			var st = $('#popup_character_search').val().toLowerCase();
 			var sr = new Array();
 			var word = false;
-			for(i=0;i<main.length;i++) {
+			for(i in specialCharacters) {
 				word = false;
-				for(ii=0;ii<main[i].tag.split(' ').length;ii++) {
-					if(main[i].tag.split(' ')[ii].indexOf(st) == 0 && !word) {
-						sr.push(main[i]);
+				for(ii=0;ii<specialCharacters[i].tag.split(' ').length;ii++) {
+					if(specialCharacters[i].tag.split(' ')[ii].indexOf(st) == 0 && !word) {
+						sr.push(specialCharacters[i]);
 						word = true;
 					}
 				}
@@ -744,7 +1024,7 @@ function RunPanelmain_Character() {
 			createCharacterPalette(sr);
 		});	
 		
-	createCharacterPalette(main);
+	createCharacterPalette(specialCharacters);
 	$('.PanelKeyEvent').on('click', function() {
 			//console.log('click');
 			if($(this).attr('data-keycode') == 13) {
@@ -752,11 +1032,7 @@ function RunPanelmain_Character() {
                 console.log(character);
                 
 				contentAddText(character);
-				$(this).attr('data-keycode', '');	
-				if(introdisabled) {
-					hidePanelPlugin();	
-					setTimeout('introJsStart(11);', 600);
-				}
+				$(this).attr('data-keycode', '');
 			}
 		});
 	
@@ -916,7 +1192,7 @@ function RunPanelmain_Outline() {
 		range = obtainRange();
 	function generatePanel() {
 		ht = "<div id='outlineButtons'><button id='outlineBuild'><span class='fa fa-file'></span></button>&nbsp;Use '-' to denote levels.</div>";
-		ht += "<div style='overflow-y:auto;/*height:"+(window.innerHeight-215)+"px*/'><div contenteditable='true' style='line-height:1.5em;background-color:"+theme.normbg+";color:"+theme.normcolor+"' class='Outline'>"+outline;+"</div></div>";
+		ht += "<div style='overflow-y:auto;/*height:"+(window.innerHeight-215)+"px*/'><div contenteditable='true' style='line-height:1.5em;background-color:"+theme.bodyColor+";color:"+theme.fontColor+"' class='Outline'>"+outline;+"</div></div>";
 		postPanelOutput(ht);
 		$('.Outline').on('input', function() {
 			writeToSaved('main_outline', $('.Outline').html());
@@ -1447,16 +1723,11 @@ function Dictionary(format, url, name, id, icon) {
         this.icon = json.icon;
     }
 }
-//TODO fix panel iframe
-//TODO Change display names to id in settings
-//TODO Fix input/click issue
-//TODO Empty String should not work
-//FIXME Uncaught SyntaxError: Unexpected token } on click to act
-//TODO Click to act style
+
 //TODO Keyboard Nain_Character
 //DictionaryManager Class
 function DictionaryManager() {
-    DictionaryManager.prototype.installedDictionaries = {
+    this.installedDictionaries = {
         ouvert: new Dictionary("XML", "http://felkerdigitalmedia.com/gltn/dictionaries/dictionary.php", "Ouvert Dictionary", "ouvert", "G"),
         wiktionary: new Dictionary("HTML", "http://felkerdigitalmedia.com/gltn/dictionaries/dictionary_wik.php", "Wikitionary", "wiktionary", '<span class="fa fa-terminal"></span>'),
         wikipedia: new Dictionary("HTML", "http://felkerdigitalmedia.com/gltn/dictionaries/dictionary_wiki.php", "Wikipedia", "wikipedia", '<span class="fa fa-globe"></span>')
@@ -1489,7 +1760,7 @@ function DictionaryManager() {
         }	
         writeToSettings('dictionarysort', b.join(';'));   
     }
-    DictionaryManager.prototype.previousSearches = [];
+    this.previousSearches = [];
     DictionaryManager.prototype.appendPreviousSearch = function(string) {
         if(string == "")
             return;
@@ -1746,7 +2017,6 @@ panelManager.getAvailablePanels().Main_Dictionary.setBordercolor("#2980b9").setW
 
 //*** Theme Panel ***/
 panelManager.getAvailablePanels().Main_Themes.onInit = function() {
-    //TODO Move stuff here
     startThemer();
     console.log("themes are heere");
     if(!hasSetting("themes"))
@@ -1762,12 +2032,7 @@ function GetPanelmain_Themes() {
 function RunPanelmain_Themes() {
 	function loadThemes() {
 		var a = themeManager.availableThemes;
-        //TODO Improve this here with OOP
-        console.log(loadThemeSettings);
-        if(loadThemeSettings === undefined)
-            out = "";
-        else
-		    out = "<button id='ThemeSettings' class='textbutton'><span class='fa fa-cog'></span>&nbsp;Theme Settings</button><br>";
+        out = "<button id='ThemeSettings' class='textbutton'><span class='fa fa-cog'></span>&nbsp;Theme Settings</button><br>";
 
         for(i in a) {
 			var bg = "inherit";

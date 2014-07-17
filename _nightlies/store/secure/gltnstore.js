@@ -109,6 +109,10 @@ function launchStore2(storetype) {
             loadStoreClickHandlers();
         }
         function loadStoreCategory(catName) {
+            if(catName == "undefined") {
+                loadHome(); 
+                return;
+            }
             $('#store_display').empty();
             $('#store_display').append("<div style='text-align:left;font-size:20pt;padding-bottom:16px;margin-left:-16px;text-transform:lowercase;'>"+catName+"</div>");
             for(i in d) {

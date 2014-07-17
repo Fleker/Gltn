@@ -10,6 +10,7 @@ theme.fullscreenDark.bodyColor = "rgba(41,41,41)";
 theme.fullscreenDark.fontColor = 'white';
 theme.fullscreenDark.bodyColor = 'white';
 theme.ribbon.highlight = '#3498db';
+
 function initTheme() {
 //	window.theme = {};
 	//set theme variables
@@ -31,16 +32,15 @@ function initTheme() {
 }	
 initTheme();
 writeCss("@import url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900,900italic);");
-//set theme colors/css
+
 	themeCss('font-family', '"Roboto", sans-serif');
 	
 setLoaderColor('255,255,255');
-writeCss("button { font-family:Roboto;background-color:rgba(255,255,255,0.01);border-radius:3;text-indent:0;border:1px solid #888;display:inline-block;color:#ccc;font-weight:bold;font-style:normal;text-decoration:none;text-align:center;padding:5px;min-width:30px;} button:hover { background-color: "+theme.ribbon.highlight+"; color: #222; } button:active {position:relative;top:1px;}");
+writeCss("button { font-family:Roboto;background-color:rgba(255,255,255,0.01);border-radius:3;text-indent:0;border:1px solid #888;display:inline-block;color:#ccc;font-weight:bold;font-style:normal;text-decoration:none;text-align:center;padding:5px;min-width:30px;letter-spacing:0px;} button:hover { background-color: "+theme.ribbon.highlight+"; color: #222; } button:active {position:relative;top:1px;}");
 
 writeCss("button.textbutton {	background-color:"+theme.fontColor+";	border-radius:3;	text-indent:0;	border:1px solid #888;	display:inline-block;	color:"+theme.bodyColor+";	font-weight:bold;	font-style:normal;	text-decoration:none;	text-align:center;padding:3px;min-width:30px;}");
 writeCss("button.ribbonbutton { border:none; padding-top:2px;height:77px; }");
 writeCss("button { background-color:transparent;color:"+theme.fontColor+" }");
 writeCss("button:hover {	background-color:"+theme.ribbon.highlight+";color:black;}button:active {	position:relative;	top:1px;}");
 writeCss("button.ribbonbutton:hover {	background-color:"+theme.ribbon.highlight+";color:black;}button:active {	position:relative;	top:1px;}");
-//Theme parameters for content_textarea not necessary (unless we removed the reload requirement for themes - but for now it'll stay due to a lack of default parameters)
-	//$('.content_textarea').css('background-color', theme.normbg).css('color', theme.normcolor);
+writeCss("button.close:hover { background-color:"+theme.palette.red.normal+"}");

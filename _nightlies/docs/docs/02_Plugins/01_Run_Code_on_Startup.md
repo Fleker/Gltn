@@ -39,11 +39,3 @@ Additionally, this function will not add the keyboard shortcut to the ribbon. Th
 #### Services
 This can also be used to create a persistent service, such as an extension that syncs your files with Dropbox. Gltn provides a way to show this service to the end user. When this function is called, it adds an icon next to the word count and save indicator. The icon, when hovered over, displays the name of the service. Clicking on the icon opens the panel where you can display status information about this service.
 
-//TODO Move this section to 7
-
-`initService(id, title, icon)`
-
-* id - The id of the panel
-* title - The title for the service
-* icon - What will appear next to the word count; if you want to have an icon that changes, give it a unique id and manipulate the icon using the id
-

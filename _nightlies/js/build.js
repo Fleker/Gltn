@@ -585,7 +585,10 @@ function latexFormatted(input,eqn,fig,title) {
     string = string.replace(/EQN/g, eqn);
 	return string;
 }
-function smallcaps(inp) {
+function smallcaps(string) {
+    return "<span style='font-variant:small-caps'>"+string+"</span>";   
+}
+function smallcapsX(inp) {
 	//console.warn(inp);
     if(inp == undefined)
         return "";

@@ -1757,10 +1757,20 @@ function resetTheme() {
             }
        }
    };
-    writeCss('table { background-color:inherit; } table, tr, td { color: '+theme.fontColor+'}');
-    $('button').css('text-transform', 'initial').css('letter-spacing', '0px').css('color', theme.fontColor).css('border-radius', '0px').css('font-size', '11pt').css('font-weight','initial');
-    $('button.textbutton').css('border-radius', '0px');
+    //TODO Erase CSS
+    $('#ThemeScriptCSS').empty();
+//    writeCss('table { background-color:inherit; } table, tr, td { color: '+theme.fontColor+'}');
+    $('button.textbutton').css('border-radius', '0px').css('color', 'inherit');
     $('.ribbonheader').css('color', theme.fontColor);
+    $('body').css('font-family', '');
+    $('button').css('text-transform', '').css('letter-spacing', '').css('color', '').css('border-radius', '').css('font-size','');
+//    $('button.textbutton').css('border-radius', '').css('text-transform', '').css('letter-spacing', '').css('color','');
+    $('.ribbonheader').css('color', '');
+    loadThemeSettings = function() { return "" };
+}
+//Once the theme is loaded, it resets some CSS stuff
+function resetThemeParameters() {   
+
 }
 function initThemeDefault() {
     theme.palette.red.normal = "rgb(255,68,68)";
@@ -1790,7 +1800,13 @@ function iterateTheme() {
 	$('#panel_plugin').css('background-color', theme.bodyColor);
     $('td[data-theme!=false]').css('color', theme.fontColor);
     $('label').css('color', theme.fontColor);
-    $('input[data-theme!=false]').css('background-color', theme.bodyColor).css('color', theme.fontColor)
+    $('input[data-theme!=false]').css('background-color', theme.bodyColor).css('color', theme.fontColor);
+    
+    if(loadThemeSettings() == "" || loadThemeSettings === undefined)
+        $('#ThemeSettings').hide();
+    else
+        $('#ThemeSettings').show();
+    
     if(themeManager.isDefault())
         initThemeDefault();
     else {
@@ -1805,7 +1821,9 @@ function themeCss(rule, val) {
 }
 
 function writeCss(rules) {
-	$('body').append('<style>'+rules+'</style>');
+    if($('#ThemeScriptCSS').length == 0)
+        $('body').append('<style id="ThemeScriptCSS"></style>');
+	$('#ThemeScriptCSS').append(rules);
 }
 // Theme Class
 function Theme(id, name, url, icon) {
@@ -1834,7 +1852,7 @@ function ThemeManager() {
         blackout: new Theme("blackout", "Blackout", "js/themes/theme_blackout.js", "heart"),
         blackout_c: new Theme("blackout_c", "Blackout Condensed", "js/themes/theme_blackoutc.js", "heart")
     };
-    this.install = function(theme) {
+    ThemeManager.prototype.install = function(theme) {
         if(getSettings('themes').indexOf(theme.id) == -1) {
             writeToSettings("themes", getSettings("themes") + ";"+theme.toString());
 //            writeToSettings('theme_'+id, id+', '+name+', '+url+', '+icon);	
@@ -1845,7 +1863,7 @@ function ThemeManager() {
             setTimeout("localStorage['ztheme_"+id+"'] = $('#themeframe').contents().text();", 1000);
         }
     };
-    this.uninstall = function(id) {
+    ThemeManager.prototype.uninstall = function(id) {
         var a = this.availableThemes;
         var b = [];
         for(i in a) {
@@ -1860,25 +1878,25 @@ function ThemeManager() {
         if(localStorage['ztheme_'+id] !== undefined)
             localStorage.removeItem('ztheme_'+id);
     };
-    this.toString = function() {
+    ThemeManager.prototype.toString = function() {
         return JSON.stringify(this.availableThemes); 
     };
-    this.fromString = function(string) {
+    ThemeManager.prototype.fromString = function(string) {
         var json = JSON.parse(j);
         for(i in json) {
             this.install(json[i]);   
         }
     };
-    this.getActiveTheme = function() {
+    ThemeManager.prototype.getActiveTheme = function() {
         if(this.availableThemes[getSettings('activeTheme')] !== undefined)
             return this.availableThemes[getSettings("activeTheme")];  
         else
             return this.availableThemes[this.DEFAULT];
     };
-    this.checkActiveTheme = function() {
+    ThemeManager.prototype.checkActiveTheme = function() {
         return this.getActiveTheme().id;   
     }
-    this.pickTheme = function(id) {
+    ThemeManager.prototype.pickTheme = function(id) {
         var old = this.getActiveTheme();
         var a = this.availableThemes;
         if(this.availableThemes[id] !== undefined) 
@@ -1891,7 +1909,7 @@ function ThemeManager() {
         //TODO Hot swap  
         //TODO Change activetheme
     };
-    this.isDefault = function() {
+    ThemeManager.prototype.isDefault = function() {
         return this.getActiveTheme().id == this.DEFAULT || this.getActiveTheme().url === undefined;
     };
 }
@@ -1925,8 +1943,7 @@ function startThemer(oldtheme) {
         writeCss("button.textbutton { border: solid 1px #999;padding: 8px;background-color: #f9f9f9;font-weight: 400;color:#333;}");
         writeCss("button.close:hover { background-color:"+theme.palette.red.normal+"}");
         writeCss("button:hover { background-color: #34495e; color: #ecf0f1; } button:active {position:relative;top:1px;}");
-        loadThemeSettings = function() { return "" };
-        $('button').css('text-transfor','initial');
+//        $('button').css('text-transform','initial').css('letter-spacing', '1px');
     }
 }
 

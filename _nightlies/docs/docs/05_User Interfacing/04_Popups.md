@@ -101,13 +101,18 @@ The class `Popup` is responsible for creating and managing popups.
 | `.run()`   | void    | Function that executes when the popup opens. It can be overriden. |
 | `.show()`  | void    | Displays the popup                                                |
 
-###*Enum PopupManager*
-The enum `PopupManager` gives the values for each popup size.
+###*Class PopupManager*
+The class `PopupManager` gives the values for each popup size and manages a few popup related elements. It can be accessed using the variable `popupManager`
 
 | Properties | Value          | Description                             | 
-| ---------- | -------------: | --------------------------------------- |
+| ---------- | -------------: | ---------------------------------------: |
 | `TINY `    | String "tiny"  | Represents a very small popup           |
 | `SMALL`    | String "small" | Represents a small popup                |
 | `MEDIUM`   | String "medium"| Represents a popup of the default size  |
 | `LARGE`    | String "large" | Represents a large popup                |
 | `XLARGE`   | String "xlarge"| Represents a very large popup           |
+| `popups`   | [Popup] | An array of popups currently active    |
+
+| Methods    | Return  | Description                                                       |
+| ---------- | :-----: | ----------------------------------------------------------------: |
+| `.currentpopup()` | Popup    | Returns the most recent popup (Likely the one on-screen) |

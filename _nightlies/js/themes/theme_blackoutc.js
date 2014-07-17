@@ -19,7 +19,8 @@ if(hasSetting('ribbonhighlight'))
     theme.ribbon.hightlight = getSettings("ribbonhighlight"); 
 else
     writeToSettings("ribbonhighlight", "#09f");
-
+//RESET THEME
+resetThemeParameters();
 function initTheme() {
     //TODO Handle some of these automatically in a second built-in theme function
 	$('.header').css('background-color', '#333').css('border-bottom', 'solid 1px rgba(255,255,255,0.4)');
@@ -69,18 +70,14 @@ function executeSettings() {
 }
 initTheme();
 writeCss("@import url(http://fonts.googleapis.com/css?family=Roboto+Condensed:300italic,400italic,700italic,400,300,700);");
-themeCss('font-family', '"Roboto Condensed", sans-serif');
+//themeCss('font-family', '"Roboto Condensed", sans-serif');
+writeCss("body { font-family: 'Roboto Condensed', sans-serif }");
 	
 setLoaderColor('255,255,255');
 writeCss("button.textbutton {text-indent:0;	border:1px solid white;	display:inline-block; color:"+theme.bodyColor+";	font-style:normal;	text-decoration:none;	text-align:center;padding:3px; text-transform:uppercase; min-width:80px; color:white; background-color: transparent; border-radius: 30px; font-weight:100; font-size:10pt; letter-spacing: 1px; margin-left: 3px; padding-left: 8px; padding-right: 7px;}");
 writeCss("button.ribbonbutton { padding-top:2px;height:77px;color:"+theme.fontColor+" }");
-writeCss("button { background-color:transparent; color: "+theme.fontColor+" }");
+writeCss("button { background-color:transparent; color: "+theme.fontColor+"; padding:6px; padding-left: 10px; padding-right:10px; }");
 writeCss("select { background-color:#333;color:"+theme.fontColorAlt+";} select:hover { background-color:#555 }");
 writeCss(".has-tip:hover { border-bottom: solid 1px #ccc; color:inherit; }");
 
 executeSettings();
-//RESET THEME
-writeCss('table { background-color:inherit; } table, tr, td { color: '+theme.fontColor+'}');
-$('button').css('text-transform', 'inherit').css('letter-spacing', '0px').css('color', theme.fontColorAlt).css('border-radius', '0px').css('font-size','11pt');
-$('button.textbutton').css('border-radius', '30px').css('text-transform', 'inherit').css('letter-spacing', '0px');
-$('.ribbonheader').css('color', theme.fontColor);
