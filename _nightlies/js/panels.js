@@ -1,4 +1,5 @@
 //PANEL CLASS
+//function Panel(id, displayName, icon, url, key, service) {
 function Panel(id, displayName, icon, url, key, service) {
     this.id = id || "";
     this.name = displayName || "";
@@ -7,13 +8,22 @@ function Panel(id, displayName, icon, url, key, service) {
     this.url = url; 
     this.service = service || false;
     this.override = key || [];
-    this.bordercolor = /*theme.darkcolor||*/"#000";
+    this.bordercolor = "#000";
     this.width = 25;
     this._canMaximize = false;
     this._isMaximized = false;
     Panel.prototype.getManifest = function() {
         return {id: this.id, name: this.name, icon: this.icon, url: this.url, service: this.service, key:this.key, bordercolor:this.bordercolor, width:this.width, maximize:this.canMaximize };   
     };
+    Panel.prototype.setManifest = function(json) {
+        this.setBordercolor(json.bordercolor);
+        this.setMaximize(json.canMaximize);
+        this.setName(json.name);
+        this.setOverride(json.override);
+        this.setWidth(json.width);
+        this.title = json.title;
+        this.icon = json.icon;
+    }
     Panel.prototype.hasBordercolor = function() {
         return this.bordercolor !== undefined && this.bordercolor.length > 0;   
     }
@@ -598,6 +608,9 @@ panelManager.getAvailablePanels().Main_Character.setBordercolor("#009").setWidth
 function getChar(val, title, tag) {
     return {val: val, title: title, tag: tag};   
 }
+function getEmoji(val, title, tag) {
+    return getChar(val, title, tag+" emoji emoticon");   
+}
 function getCharAccent(char, accent, or) {
     return getChar(char, or+" w/ "+accent, or+" "+char+" "+accent);  
 }
@@ -962,6 +975,30 @@ specialCharacters = {
     BlackTruck: getChar("⛟","Black Truck", "black truck"),
     Fuel: getChar("⛽","Fuel Pump","pump fuel"),
     
+    //TODO Emoji
+    // Emotions
+    
+    //http://en.wikipedia.org/wiki/Emoji
+    // Regional Indicators
+    Cyclone: getEmoji("🌀","Cyclone","cyclone hurricane"),
+    Foggy: getEmoji("🌁","Foggy","fog foggy frog"),
+    ClosedUmbrella: getEmoji("🌂","Closed Umbrella", "closed umbrella"),
+    NightWithStars: getEmoji("🌃", "Night with Stars", "night stars city"),
+    SunriseOverMountains: getEmoji("🌄","Sunrise over Mountains", "sunrise mountains country"),
+    Sunrise: getEmoji("🌅","Sunrise","sunrise"),
+    CityscapeAtDusk: getEmoji("🌆", "Cityscape at Dusk", "cityscape dusk"),
+    SunsetOverBuildings: getEmoji("🌇","Sunset over Buildings", "sunset buildings city"),
+    Rainbow: getEmoji("🌈","Rainbow", "rainbow lucky charms"),
+    BridgeAtNight: getEmoji("🌉","Bridge at Night", "bridge nighttime"),
+    WaterWave: getEmoji("🌉","Water Wave", "beach water wave"),
+    Volcano: getEmoji("🌋", "Volcano", "volcano lava"),
+    MilkyWay: getEmoji("🌌","Milky Way", "milky way galaxy space universe"),
+    EarthEA: getEmoji("🌍", "Earth Europe-Africa", "earth europe africa"),
+    EarthAs: getEmoji("🌎", "Earth Americas", "north south america earth"),
+    EarthAA: getEmoji("🌏", "Earth Asia-Australia", "earth asia australia"),
+    GlobeMeridians: getEmoji("🌐", "Globe with Meridians", "globe meridians earth"),
+    Moon_N: getEmoji("🌑", "New Moon", "new moon"),
+    
     Wheelchair: getChar("♿","Wheelchair",'wheelchair chair'),
     Fountain: getChar("⛲","Fountain","fountain water park"),
     UmbrellaBeach: getChar("⛱","Umbrella on Beach", "umbrella on beach bathing"),
@@ -979,6 +1016,7 @@ specialCharacters = {
     CheckerW2: getChar("⛁","White Draughts King", "checkers piece"),
     CheckerB: getChar("⛂","White Draughts Man", "checkers piece"),
     CheckerB2: getChar("⛃","White Draughts Man", "checkers piece"),
+    //TODO Chess, Dominos, Cards
     
 };
 
@@ -988,24 +1026,31 @@ function RunPanelmain_Character() {
 	var out = "";
 	var searchbar = '<input type="search" id="popup_character_search" style="width:100%" placeholder="Search for Characters" ><br>';
 	out += searchbar;
-	out += "<div class='character_palette_display'></div>";
+	out += "<div class='character_palette_display' style='width:95%;'></div>";
 	postPanelOutput(out);
 	character = "";
     list = [];
-    
+    $('.panel_plugin_content').css('height', (window.innerHeight-160)+"px").css('overflow-y','auto');
 	function createCharacterPalette(data) {
         list = data;
 		$('#popup_character_search').focus();
 		var out = "";
+        var index = 0;
+        var first;
 		for(i in data) {
-			out = out + '<div style="display:inline-block;padding-left:8px;padding-bottom:16px;font-size:16pt;" onclick="contentAddText(\''+data[i].val+'\')" title="'+data[i].title+'" class="character_palette_character">' + data[i].val + '</div>';
+            if(index == 0)
+                first = i;
+			out = out + '<div style="display:inline-block;padding-left:8px;margin-bottom:12px;padding-bottom:4px;font-size:16pt;" onclick="contentAddText(\''+data[i].val+'\')" title="'+data[i].title+'" class="character_palette_character">' + data[i].val + '</div>';
+            index++;
 		}
 		$('.character_palette_display').html(out);
-		character = data[0].val;
-		console.log(character);
+//        console.log(data);
+        if(first !== undefined)
+            character = data[first].val;
+//		console.log(character);
 		
 //		StylePanelClass('character_palette_character', ["cursor", "pointer", "border-bottom", "solid 1px #09f"]);
-        $('.character_palette_character').css('cursor','pointer');
+        $('.character_palette_character').css('cursor','pointer').css('border-bottom', 'solid 1px '+theme.palette.blue.accent400);
 	}
 	$('#popup_character_search').on('input', function() {
 			var st = $('#popup_character_search').val().toLowerCase();
@@ -1026,7 +1071,6 @@ function RunPanelmain_Character() {
 		
 	createCharacterPalette(specialCharacters);
 	$('.PanelKeyEvent').on('click', function() {
-			//console.log('click');
 			if($(this).attr('data-keycode') == 13) {
 				console.log(list);
                 console.log(character);
@@ -1044,7 +1088,7 @@ function InitPanelmain_Character() {
 //	keyboardShortcut('Nain_Character', {alt: true, key: 67});
 	$(document).on('keydown', function(e) {
 		if(e.keyCode == 67 && e.altKey) {
-			runPanel('Nain_Character');	
+			runPanel('Main_Character');	
 		}
 	});
 	//initService('main_Character', 'Character', 'C');
@@ -2098,7 +2142,8 @@ function RunPanelmain_PageCount() {
 panelManager.getAvailablePanels().Main_Pagecount.onRun = RunPanelmain_PageCount;
 function postPageCount() {
     var i = Math.round(onGetPageCount()*10)/10;  
-    initService("Main_PageCount", "Page Count", Math.ceil(i)+" Page"+(Math.ceil(i)==1?"":"s")); 
+//    initService("Main_PageCount", "Page Count", Math.ceil(i)+" Page"+(Math.ceil(i)==1?"":"s")); 
+    initService("Main_PageCount", "Page Count", "<b>"+Math.ceil(i)+",/b>"); 
     return i;
 }
 function onGetPageCount() {

@@ -1,5 +1,6 @@
+## Framework
+Your format script should contain the following functions to take full advantage of the system. If there's no plan to use a function, it is recommended that it is included anyway to prevent any errors that may occur.
 
-### Framework
 * `onInitFormat()` - Sets up format UI
 * `onInitToolbar()` - Adds items to the toolbar
 * `onStylePaper()` - Adds global rules for a paper build
@@ -10,17 +11,51 @@
 * `onBuildBibliogaphy()` - Sets up the bibliography (if applicable)
 * `onStyleMarkup()` - Integrate with the Context API
 
-### Installing
-To add a format to your paper, you must enter this command into the console:
+##Reference
+###*Class GltnFormat*
+The class `GltnFormat` stores information about a single format.
 
-```Javascript
-install_gluten_format(name, type, uri)
-```
+| Properties   | Return  | Description                                 |
+| ----------   | :-----: | ------------------------------------------: |  
+| `id`     | String  | The unique name for the format       |
+| `name`        | String     | Name of the format                | 
+| `type  `     | String  | Writing group the format belongs to                     |
+| `url  `       | URL  | Location of the format script            |
+| `hidden    `   | Boolean    | Whether the format should be displayed in the list of available formats|
 
-* name - The name of the format. This is what the user types in to choose this format.
-* type - A one-word description of the format type, eg. Essay, Report, Novel, etc.
-* uri - The url of the format script
+###*Class FormatManager*
+The class `FormatManager` handles formats and controlling which one is currently active for the document. It can be accessed using the variable `formatManager`.
 
-If uri is not included, the format must exist as a javascript file in /js/themes/ with a pathname identical to the format name. 
+| Properties   | Return  | Description                                 |
+| ----------   | :-----: | ------------------------------------------: |  
+| `formats`     | [GltnFormat]  | An array of all existing formats       |
+| `currentFormat`        | GltnFormat     | The format that currently is being used in the document           | 
 
-Note that at the moment formats aren't saved, so you will need to manually reinstall the format every time you load the page.
+| Methods    | Return  | Description                                                       |
+| ---------- | :-----: | ----------------------------------------------------------------: |
+| `.getFormats()` | [GltnFormat]    | Returns an array of all formats stored in the object                    |
+| `.postFormats()` | void   | Refreshes the format input field with all contained formats                    |
+| `.addFormat(GltnFormat)`   | void    | Adds a new `GltnFormat` to the list of formats, in escence installing it |
+| `.getCurrentFormat()`   | GltnFormat    | Returns the format that is currently being used in the document |
+
+###*Class Language*
+The class `Language` stores information about a single language which is used in the writing of a document
+
+| Properties   | Return  | Description                                 |
+| ----------   | :-----: | ------------------------------------------: |  
+| `code`     | String | The unique language code   |
+| `name`        | String     | The name of the language or dialect           | 
+
+###*Class LanguageManager*
+The class `LanguageManager` handles languages and controlling which one is currently active for the document. It can be accessed using the variable `languageManager`.
+
+| Properties   | Return  | Description                                 |
+| ----------   | :-----: | ------------------------------------------: |  
+| `languages`     | [Language]  | An array of all existing languages       |
+
+| Methods    | Return  | Description                                                       |
+| ---------- | :-----: | ----------------------------------------------------------------: |
+| `.getLanguages()` | [Language]    | Returns an array of all languages stored in the object                    |
+| `.postFormats()` | void   | Refreshes the language input field with all contained language                    |
+
+

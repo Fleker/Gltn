@@ -392,7 +392,7 @@ document.onkeydown = function(e) {
 		
 		break;
 	}
-	if(window.paneltitle != undefined) {
+	if(panelManager.getActivePanels().length != 0) {
 		var el = '.PanelKeyEvent';
 		$(el).attr('data-keycode', e.keyCode);
 		$(el).attr('data-alt',e.altKey);

@@ -14,10 +14,10 @@ function FormatManager() {
         IEEE: new GltnFormat("IEEE", "IEEE", "Report", "js/formats/IEEE.js", false),
         Lab: new GltnFormat("Lab", "Lab", "Report", "js/formats/Lab.js", false)
     };
-    this.getFormats = function() {
+    FormatManager.prototype.getFormats = function() {
         return this.formats;
     };
-    this.postFormats = function() {
+    FormatManager.prototype.postFormats = function() {
         var a = this.getFormats();
         var out = "";
         for(i in a) {
@@ -29,7 +29,8 @@ function FormatManager() {
 		//Now output
 		$('#gluten_formats').html(out);
     };
-    this.addFormat = function(format) {
+    FormatManager.prototype.addFormat = function(format) {
+        //TODO No longer need this bulky code
         this.formats[format.id] = format;
         if(getSettings('formats_name') == "undefined") {
             writeToSettings('formats_name', "");
@@ -43,10 +44,9 @@ function FormatManager() {
     };
     //MLA is the default format
     this.currentFormat = this.getFormats().MLA;
-    this.getCurrentFormat = function() {
+    FormatManager.prototype.getCurrentFormat = function() {
         return this.currentFormat;   
     }
-    //TODO Run code here to install all of the formats stored in settings, don't use the constructor. Then you can remove the formatManager code in the item constructor
 }
 formatManager = new FormatManager();
 function new_gluten_formats() {		
@@ -1801,6 +1801,8 @@ function iterateTheme() {
     $('td[data-theme!=false]').css('color', theme.fontColor);
     $('label').css('color', theme.fontColor);
     $('input[data-theme!=false]').css('background-color', theme.bodyColor).css('color', theme.fontColor);
+    $('table[data-theme!=false]').css('background-color', '').css('border', '');
+    $('kbd[data-theme!=false]').css('background-color', '').css('border-color','').css('color','').css('border-style','').css('border-width','').css('font-family','').css('padding','').css('border-radius','');
     
     if(loadThemeSettings() == "" || loadThemeSettings === undefined)
         $('#ThemeSettings').hide();

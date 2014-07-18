@@ -33,7 +33,7 @@ function Popup(data) {
     Popup.prototype.show = function() {
         hideHovertag();
         popupManager.popups.push(this);
-        $('#myModal').html('<div style="width:100%;text-align:right"><button class="close-reveal-modal" style="color:inherit;font-size:1.5em">&#215;</button></div><table style="width:100%;vertical-align:top;" class="popupstatic"><tr><td style="vertical-align:top;width:100%;"><span class="popuptitle"></span><span class="popupsubtitle"></span><div class="popupbody"></div></td><td style="text-align:right"><img id="popupimg" src=""></img></td></tr></table><div class="popupcontent"></div>');
+        $('#myModal').html('<div style="width:100%;text-align:right"><button class="close-reveal-modal close" style="color:inherit;font-size:1.5em">&#215;</button></div><table style="width:100%;vertical-align:top;" class="popupstatic"><tr><td style="vertical-align:top;width:100%;"><span class="popuptitle"></span><span class="popupsubtitle"></span><div class="popupbody"></div></td><td style="text-align:right"><img id="popupimg" src=""></img></td></tr></table><div class="popupcontent"></div>');
         if(this.title !== undefined)
             $('.popuptitle').html(this.title+"<br>");
         if(this.subtitle !== undefined)
