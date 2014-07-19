@@ -1905,7 +1905,11 @@ panelManager.getAvailablePanels().Main_Dictionary.onInit = function() {
     else
        dictionaryManager.previousSearches = [];
 };
-//NOTE
+panelManager.getAvailablePanels().Main_Dictionary.setManifest({
+    bordercolor: "#2980b9",
+    width: 40,
+    title: "Dictionary"
+});
 function startDictionarySearch(query) {
     if(panelManager.getActivePanels()[0] !== undefined) {
         if(panelManager.getActivePanels()[0].id == "Main_Dictionary")
@@ -1917,10 +1921,7 @@ function startDictionarySearch(query) {
         },600);
     }   
 }
-function GetPanelmain_Dictionary() {
-	return {title:"Dictionary", bordercolor: "#2980b9", width: 40};	
-}
-function RunPanelmain_Dictionary() {
+panelManager.getAvailablePanels().Main_Dictionary.onRun = function() {
 	var no_results = "<span style='font-size:16pt'>No Results</span><br>This does not appear in any of your dictionaries. Try to:<ul><li> Install a new dictionary</li>OR<li>Change your search.</li></ul>";
 	var no_connection = "<span style='font-size:16pt'>Sorry</span><br>The dictionary does not work offline.";
 	var connect_time = 0;
@@ -1928,7 +1929,7 @@ function RunPanelmain_Dictionary() {
     $('.panel_plugin_content').css('overflow-y', 'inherit');
     
 	function openApp() {
-		out = "<input type='search' id='DictionaryIn' style='width:65%;display:inline;'><button id='DictionarySettings'><span class='fa fa-cog'></span></button>";
+		out = "<input type='search' id='DictionaryIn' style='width:calc(100% - 64px);display:inline;'><button id='DictionarySettings'><span class='fa fa-cog'></span></button>";
 		out += "<div id='DictionaryOut'><span style='font-size:16pt'>Welcome</span><br>Search for something<br><br><br><div style='text-align:center;padding-left:80%;font-size:30pt;margin-top:25%;' class='fa-stack fa-lg'><span class='fa fa-circle-o fa-stack-2x'></span><span class='fa fa-quote-left fa-stack-1x'></span></div>";
         
         out += "<br><br><br><br><br>";
@@ -2011,21 +2012,31 @@ function RunPanelmain_Dictionary() {
         //TODO Arrow back
 		out = "<button id='DictionaryBack'><span class='fa fa-arrow-left'></span></button><br>";
 		out += "Sort the dictionaries that you want to access, separated by a semicolon.<br>";
-		out += "<input id='DictionarySort' value='"+getSettings("dictionarysort")+"' style='width:95%'>";
-		out += "<br><br><u>Accessible Dictionaries</u><ul style='margin-left:20px;margin-top:0px;'>";
-		var a = dictionaryManager.installedDictionaries;
-		for(i in a) {
-			a[i].icon = a[i].icon.replace(/&gt;/g, ">").replace(/&lt;/g, "<");
-			out += a[i].icon+"&ensp;"+a[i].id+"<br>";
-//			console.log(a[i]);
-		}	
+		out += "<input type='text' id='DictionarySort' value='"+getSettings("dictionarysort")+"' style='width:calc(100% - 16px)'>";
+		out += "<br><br><u>Accessible Dictionaries</u><ul style='margin-left:20px;margin-top:0px;' id='availableDictionaries'>";
 		out += "</ul><button id='DictionaryStore' class='textbutton' onclick='launchStore(\"Dictionary\")'>Download More Dictionaries</button>";
 		postPanelOutput(out);
+        
+        function displayDictionaries() {
+            var out = "";
+            var a = dictionaryManager.installedDictionaries;
+            var b = $('#DictionarySort').val();
+            for(i in a) {
+                a[i].icon = a[i].icon.replace(/&gt;/g, ">").replace(/&lt;/g, "<");
+                if(b.split(';').indexOf(a[i].id) > -1)
+                    out += "<div style='text-decoration:line-through;opacity:0.6; margin-left:-1px; transform:scale(0.97,0.97); color:"+theme.palette.red.accent100+"; '><span style='color: "+theme.fontColor+"'>" +a[i].icon+"&ensp;"+a[i].id+"</span></div>";
+                else
+                    out += "<b>"+a[i].icon+"&ensp;"+a[i].id+"</b><br>";
+            }	
+            $('#availableDictionaries').html(out);
+        }
+        displayDictionaries();
 		$('#DictionaryBack').on('click', function() {
 			openApp();
 		});
 		$('#DictionarySort').on('input', function() {
 			writeToSettings('dictionarysort', $('#DictionarySort').val());
+            displayDictionaries();
 		});
 	}
 	function xmlDictionaryParse(d) {
@@ -2076,7 +2087,9 @@ function RunPanelmain_Dictionary() {
 	}
 	openApp();
 }
-panelManager.getAvailablePanels().Main_Dictionary.setBordercolor("#2980b9").setWidth(40).onRun = RunPanelmain_Dictionary;
+
+
+
 
 
 //*** Theme Panel ***/
