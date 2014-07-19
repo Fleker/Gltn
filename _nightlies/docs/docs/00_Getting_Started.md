@@ -1,9 +1,7 @@
 ##What is Gltn? 
-###(pronounced Gluten)
-
 **Try it out!** http://felkerdigitalmedia.com/gltn/edit.php
 
-The goal is to build a better word processor. Word, OpenOffice, Google Docs are current products, but all of them are limited in features. You can type things and style things.
+Gltn **(pronounced Gluten)** is based around the goal to build a better word processor. Word, OpenOffice, Google Docs are current products, but all of them are limited in features. You can type things and style things.
 But everything you style has to be done yourself.
 
 As a student, I've spent countless hours formatting papers. I spent about an hour formatting a single paper and doing the bibliography.
@@ -34,3 +32,20 @@ Not only is **Gltn** perfect for writers, but it also is a great developer proje
 * Simple API - Want to create a plugin? It's all simple JavaScript. There's no learning curve.
 * Open Source - Want to replicate a feature? Go as far into the Gltn source as you want to make an amazing project.
 * Store - Want to publish your extension? Send it to the Gltn Store and let others check it out.
+
+## *Getting Started*
+It's really easy to start using Gltn. Everything happens in the browser. 
+
+### Setting Up the Environment
+#### Using a Server
+You may want to download the Gltn Editor and set it up on your own server. This will make it possible for you to install custom extensions and execute them in a real environment. With the source files, just upload them using FTP or a different way to a folder on your web server. Once that's complete, just open `edit.php` and you should have the full editor running. You can use the browser console to give commands for things like installing or executing a function.
+
+Alternatively, you can just host the plugins you want to run on your server. You can use the hosted editor, using the console to execute installation commands.
+
+#### Locally
+If you don't have a web server to try it out, Gltn should run fairly well locally in your web browser when you download the editor. You will be able to do a lot of interaction using the browser's console, such as installing local files and executing commands.
+
+The source files are readily available on GitHub. Just download a zip or fork the code to get a copy. Then, run `edit.php` in your browser locally and pretty much everything should work. Of course, some features such as the store and dictionary will be unaccessible locally.
+
+#### Read the Documentation
+There's a variety of plugin types you can develop for Gltn: formats, themes, dictionaries, panels. Each system is different in how they work and you should read the specific articles for more help on setting up your environment for a given plugin. Additionally, each section includes examples of already used code to help you get started, ideas for inspiration, and API guides and references.

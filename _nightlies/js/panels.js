@@ -1,13 +1,13 @@
 //PANEL CLASS
 //function Panel(id, displayName, icon, url, key, service) {
-function Panel(id, displayName, icon, url, key, service) {
+function Panel(id, displayname, url) {
     this.id = id || "";
-    this.name = displayName || "";
-    this.title = this.name;
-    this.icon = icon || "";
+    this.name = "";
+    this.title = displayname || this.name;
+    this.icon = "";
     this.url = url; 
-    this.service = service || false;
-    this.override = key || [];
+    this.service = false;
+    this.override = [];
     this.bordercolor = "#000";
     this.width = 25;
     this._canMaximize = false;
@@ -32,11 +32,11 @@ function Panel(id, displayName, icon, url, key, service) {
         return this;
     }
     Panel.prototype.enableMaximize = function() {
-        this.maximize = true;
+        this._canMaximize = true;
         return this;
     }
     Panel.prototype.setMaximize = function(max) {
-        this.maximize = max;
+        this._canMaximize = max;
         return this;
     };  
     Panel.prototype.setName = function(name) {
@@ -75,7 +75,7 @@ function PanelManager() {
     //  on both the developer side and the engine side
     //TODO Move panel parameters to manifest, use id & url only
     this.availablePanels = {
-        Main_Character: new Panel("Main_Character", "Character Panel", "", undefined, false, [13]),
+        Main_Character: new Panel("Main_Character"),
         Main_Citation: new Panel("Main_Citation", "Citation Editor"),
         Main_Dictionary: new Panel("Main_Dictionary", "Dictionary"),
         Main_Filesys: new Panel("Main_Filesys", "My Documents"),
@@ -106,16 +106,13 @@ function PanelManager() {
     PanelManager.prototype.getAvailablePanelsLength = function() {
         a = 1;
         for(var i in this.availablePanels) { 
-//            console.log(a++);
             a++;
         }
         return a;
     };
     PanelManager.prototype.getAvailablePanels = function() {
-        //TODO Grab all panels     
         return this.availablePanels;
     };
-    //TODO Later
     this.activePanels = [];
     PanelManager.prototype.getActivePanels = function() {
         return this.activePanels;
@@ -125,12 +122,13 @@ function PanelManager() {
     };  
     PanelManager.prototype.getPlugin = function(id) {
         return this.availablePanels[id];   
-    }
+    };
     PanelManager.prototype.install = function(panel, num) {
-        if(panel.service === undefined)
+        if(panel.service === undefined) {
             panel.service = false;
-        if(panel.key === undefined)
+        } if(panel.key === undefined) {
             panel.key = [];
+        }
         panel.icon = panel.icon.replace(/&gt;/g, ">").replace(/&lt;/g, "<");
         //Return keyboard shortcuts
         if(panel.service !== true) {
@@ -231,13 +229,13 @@ function addNewPanel(panel) {
 }
 //SERVICES CLASS
 //TODO Constructor
-function Service(id, displayName, icon, url, key, service) {
+function Service(id, url) {
     this.id = id || "";
-    this.name = displayName || "";
-    this.icon = icon || "";
+    this.name = "";
+    this.icon = "";
     this.url = url; 
     this.service = true;
-    this.override = key || [];
+    this.override = [];
     
     this.servicesBarIcon = "";    
     this.servicesBarTitle = "";
@@ -245,6 +243,7 @@ function Service(id, displayName, icon, url, key, service) {
     this.onHeartbeat = undefined; //Function to call every so often
     this.heartRate = 1000; //MS per beat
     this.heart = undefined; //Interval variable
+    //TODO initService function
 }
 Service.prototype = new Panel();
 
@@ -602,8 +601,22 @@ function clear_panel_data() {
 //TODO Move to Polymer
 
 /*** Character Palette */
-//TODO, use JSON to enable search
-panelManager.getAvailablePanels().Main_Character.setBordercolor("#009").setWidth(25).setOverride([13]);
+panelManager.getAvailablePanels().Main_Character.setManifest({
+    bordercolor: "#a6baff",
+    width: 25,
+    override: [13],
+    title: "Character Palette"
+});
+panelManager.getAvailablePanels().Main_Character.onExport = function(isDocument, content) {
+    if(isDocument) {
+        var callback = function() {
+            alert("IC "+content.length);   
+        }
+        return {name: "Demo", icon: "check", callback: callback};
+    } else {
+        return null;
+    }   
+}
 
 function getChar(val, title, tag) {
     return {val: val, title: title, tag: tag};   
@@ -998,6 +1011,20 @@ specialCharacters = {
     EarthAA: getEmoji("🌏", "Earth Asia-Australia", "earth asia australia"),
     GlobeMeridians: getEmoji("🌐", "Globe with Meridians", "globe meridians earth"),
     Moon_N: getEmoji("🌑", "New Moon", "new moon"),
+    Moon_WC: getEmoji("🌒", "Waxing Moon Crescent", "moon crescent waxing"),
+    Moon_FC: getEmoji("🌓", "First Quarter Moon", "moon quarter"),
+    Moon_WG: getEmoji("🌔", "Waxing Gibbous Moon", "moon gibbous waxing"),
+    Moon_F: getEmoji("🌕", "Full Moon", "moon full"),
+    Moon_WNG: getEmoji("🌖", "Waning Gibbous Moon", "moon gibbous waning"),
+    Moon_LQ: getEmoji("🌗", "Last Quarter Moon", "moon quarter last"),
+    Moon_WNC: getEmoji("🌘", "Waning Moon Crescent", "moon waning crescent"),
+    Moon_C: getEmoji("🌙", "Crescent Moon", "moon crescent"),
+    Moon_Face_N: getEmoji("🌚", "New Moon w/ Face", "new moon face"),
+    Moon_Face_FQ: getEmoji("🌛", "First Quarter Moon w/ Face", "first quarter moon face"),
+    Moon_Face_LQ: getEmoji("🌜", "Last Quarter Moon w/ Face", "last quarter moon face"),
+    Moon_Face_F: getEmoji("🌝", "Full Moon w/ Face", "full moon face"),
+    Sun_F: getEmoji("🌞", "Sun w/ Face", "sun face"),
+    GlowingStar: getEmoji("🌟", "Glowing Star", "star glow"),
     
     Wheelchair: getChar("♿","Wheelchair",'wheelchair chair'),
     Fountain: getChar("⛲","Fountain","fountain water park"),
@@ -1020,9 +1047,7 @@ specialCharacters = {
     
 };
 
-function RunPanelmain_Character() {
-    //TODO integrate into plgin
-	
+panelManager.getAvailablePanels().Main_Character.onRun = function() {
 	var out = "";
 	var searchbar = '<input type="search" id="popup_character_search" style="width:100%" placeholder="Search for Characters" ><br>';
 	out += searchbar;
@@ -1040,7 +1065,7 @@ function RunPanelmain_Character() {
 		for(i in data) {
             if(index == 0)
                 first = i;
-			out = out + '<div style="display:inline-block;padding-left:8px;margin-bottom:12px;padding-bottom:4px;font-size:16pt;" onclick="contentAddText(\''+data[i].val+'\')" title="'+data[i].title+'" class="character_palette_character">' + data[i].val + '</div>';
+			out = out + '<div style="display:inline-block;padding-left:4px;margin-left:4px;padding-right:4px;margin-bottom:8px;padding-bottom:8px;font-size:16pt;" onclick="contentAddText(\''+data[i].val+'\')" title="'+data[i].title+'" class="character_palette_character">' + data[i].val + '</div>';
             index++;
 		}
 		$('.character_palette_display').html(out);
@@ -1083,8 +1108,7 @@ function RunPanelmain_Character() {
 	//if I want to hide symbols, I can always put additional main attributes here, maybe call them a different name, like all_ch
 	
 }
-panelManager.getAvailablePanels().Main_Character.onRun = RunPanelmain_Character;
-function InitPanelmain_Character() {
+panelManager.getAvailablePanels().Main_Character.onInit = function() {
 //	keyboardShortcut('Nain_Character', {alt: true, key: 67});
 	$(document).on('keydown', function(e) {
 		if(e.keyCode == 67 && e.altKey) {
@@ -1093,7 +1117,6 @@ function InitPanelmain_Character() {
 	});
 	//initService('main_Character', 'Character', 'C');
 }
-panelManager.getAvailablePanels().Main_Character.onInit = InitPanelmain_Character;
 panelManager.getAvailablePanels().Main_Citation.setBordercolor("#09f").setWidth(25);
 function GetPanelmain_Citation() {
 	return {title: "Citation Editor", bordercolor: "#09f", width: 25};
@@ -1150,10 +1173,11 @@ function RunPanelmain_Citation() {
 	//figure out a way to repopulate citations after editing
 }
 panelManager.getAvailablePanels().Main_Citation.onRun = RunPanelmain_Citation;
-panelManager.getAvailablePanels().Main_Idea.setBordercolor("#f1c40f").setWidth(40);
-function GetPanelmain_Idea() { 
-	return {title: "Document Notes", bordercolor: "#f1c40f", width: 40};	
-}
+panelManager.getAvailablePanels().Main_Idea.setManifest({
+    title: "Document Notes",
+    bordercolor: "#f1c40f",
+    width: 40
+});
 function RunPanelmain_Idea() {
 	function populateIdeas() {
 		
@@ -1212,14 +1236,12 @@ function RunPanelmain_Idea() {
 	populateIdeas();
 }
 panelManager.getAvailablePanels().Main_Idea.onRun = RunPanelmain_Idea;
-function StylePanelmain_Idea() {
-	$('.PanelIdea').css('width', '90%');
-	$('.PanelIdea').css('max-height', '50%');
-}
-panelManager.getAvailablePanels().Main_Outline.setBordercolor("#2c3e50").setWidth(40);
-function GetPanelmain_Outline() {
-	return {title: "Outline", bordercolor: "#2c3e50", width: 40};	
-}
+
+panelManager.getAvailablePanels().Main_Outline.setManifest({
+    title: "Outline",
+    bordercolor: "#2c3e50",
+    width: 40
+});
 function RunPanelmain_Outline() {
 	range = null;
 	raw = "";
@@ -1368,10 +1390,8 @@ function RunPanelmain_Outline() {
 		});
 }
 panelManager.getAvailablePanels().Main_Outline.onRun = RunPanelmain_Outline;
-function StylePanelmain_Outline() {
-	$('.Outline').css('border', 'solid 1px black').css('width', '85%');
-} 
-panelManager.getAvailablePanels().Main_Outline.setBordercolor('#7f8c8d').setWidth(25);
+//panelManager.getAvailablePanels().Main_Outline.setBordercolor('#7f8c8d').setWidth(25);
+
 panelManager.getAvailablePanels().Main_Filesys.title = '<span class="fa fa-folder-open" style="font-size:15pt"></span>&nbsp;My Documents';
 //TODO X Circle Button cut off on top
 //TODO Shorten search width a little, color in tables
@@ -2068,7 +2088,7 @@ panelManager.getAvailablePanels().Main_Themes.onInit = function() {
     if(!hasSetting('activeTheme'))
         writeToSettings("activeTheme", "enterprise");
     
-    setInterval("iterateTheme()", 500);
+    setInterval("iterateTheme()", 50);
 };
 function GetPanelmain_Themes() {
 	return {title:"Change Theme", bordercolor: '#2ecc71', width: 25};	
@@ -2129,7 +2149,7 @@ function GetPanelmain_PageCount() {
 function RunPanelmain_PageCount() {
     out = "<div style='text-align:center'>This document is</div><br><br>";
     out += "<div style='font-size:24pt;text-align:center;font-weight:100;'>~"+postPageCount()+" Page"+(postPageCount()==1?"":"s")+"</div>";
-    out += "<br><div style='text-align:center;font-size:8pt;font-style:italic;'>Based on the number of words that can fit on a page. This does not factor additional formatting like bibliographies or cover pages.</div><br><br><br><br><br>"; 
+    out += "<br><div style='text-align:center;font-size:8pt;font-style:italic;'>Based on the number of words that can fit on a page.This does not factor additional formatting like bibliographies or cover pages.</div><br><br><br><br><br>"; 
     
     out += "<div style='text-align:center'>Spoken, it is</div><br><br>";
     out += "<div style='font-size:24pt;text-align:center;font-weight:100;'>~"+Math.round(10*getWords().length/130)/10+" Minute"+(postPageCount()==1?"":"s")+"</div>";
@@ -2143,7 +2163,7 @@ panelManager.getAvailablePanels().Main_Pagecount.onRun = RunPanelmain_PageCount;
 function postPageCount() {
     var i = Math.round(onGetPageCount()*10)/10;  
 //    initService("Main_PageCount", "Page Count", Math.ceil(i)+" Page"+(Math.ceil(i)==1?"":"s")); 
-    initService("Main_PageCount", "Page Count", "<b>"+Math.ceil(i)+",/b>"); 
+    initService("Main_Pagecount", "Page Count", "<b>"+Math.ceil(i)+"</b>"); 
     return i;
 }
 function onGetPageCount() {

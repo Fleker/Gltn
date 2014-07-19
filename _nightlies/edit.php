@@ -8,7 +8,7 @@
 <link rel="shortcut icon" sizes="196x196" href="gltn_f.png">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 
-<link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
 <script src="http://code.jquery.com/jquery-2.1.1.js"></script>
 <script src="http://code.jquery.com/color/jquery.color-2.1.2.min.js"></script>
@@ -115,10 +115,10 @@ ga('send', 'pageview');
 <div class="popup reveal-model" id="popup" data-reveal></div>
     
     <div id="myModal" class="reveal-modal" data-reveal>
-  <h2>Awesome. I have it.</h2>
+<!--  <h2>Awesome. I have it.</h2>
   <p class="lead">Your couch.  It is mine.</p>
   <p>Im a cool paragraph that lives inside of an even cooler modal. Wins</p>
-  <button class="close-reveal-modal">&#215;</button>
+  <button class="close-reveal-modal">&#215;</button>-->
 </div>
 
 <div class="hovertag">

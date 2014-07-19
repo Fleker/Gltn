@@ -27,7 +27,7 @@ If the user does not like the plugin anymore, `onUninstall` is called when the p
 Designing both types of plugins are very similar. Before they can be run, they must be installed. This may occur manually or via the Gltn Store. The code to install a panel or service is:
 
 ```Javascript
-    var panel = new Panel("MyPanel", "My Panel", "my_panel.png", [], false); 
+    var panel = new Panel("MyPanel", "js/mypanel.js"); 
     //This could be a service too. They are initiated using the same constructor parameters
     panelManager.install(panel);
 ```
@@ -35,18 +35,13 @@ Designing both types of plugins are very similar. Before they can be run, they m
 This can be run from the console for debugging.
 
 The panel can also be easily run from the console as well.
-`runPanel("MyPanel") //Using  the panel's id`
+`panelManager.run("MyPanel") //Using  the panel's id`
 
 ### Plugin Constructor
-`new Panel/Service(id, name, img, url, keys, service)`
+`new Panel/Service(id, url)`
 
 * id - The internal panel name ie. "MyPanel"
-* name - The user-facing name
-* img - An icon or symbol that will be seen in the holoribbon for panels
 * url - The place where this file currently exists so that it can be loaded
-* keys overriden - An array of keys that will not complete their specified function in a browser or Gltn. They will be overriden for control in the panel as long as the panel's life. By default this is an empty array.
-* service - This is a boolean that specifies whether this is a service. This is true by default in services, false by default in panels.
-
 
 ## *Inspiration and Ideas*
 If you want to make a dictionary, but don't know where to start, look at some of these ideas:

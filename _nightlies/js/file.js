@@ -1,5 +1,5 @@
 // File.js handles the saves and restores, changing the formatting, and other file-related functions (convert to PDF? LaTeX, .doc)
-GLTN_VERSION = "1.3.1.1";
+GLTN_VERSION = "1.3.1.3";
 //For backwards compatibility, will return true 
 function greaterThanVersion(version) {
     var split = version.split(".");

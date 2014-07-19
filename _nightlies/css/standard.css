@@ -17,7 +17,7 @@ body {
 	width: calc(100% + 4px);
 }
 .main {
-	padding-top:102px;	
+	padding-top:100px;	
     max-width:inherit; 
     width: 100%;
 margin-left: auto;
@@ -345,14 +345,12 @@ button[disabled] {
 .popuptitle {
 	font-size: 24pt;
 	margin-left: 15px;
-	color: #333;
     font-weight: 100;
     opacity: .5;
 }
 .popupsubtitle {
 	font-size: 13pt;
-	margin-left: 35px;
-	color: #999;	
+	margin-left: 35px;	
 }
 .popupbody {
 	margin-left: 60px;

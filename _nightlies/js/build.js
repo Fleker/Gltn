@@ -2,7 +2,7 @@
 //TODO B - Change %sc and its effect to improve speed
 //FIXME C - This NEEDS to display correctly. Make a demo if necessary. It cannot be imperfect
 builddate = 0;
-buildPrint = '<button onclick="window.print()" class="noprint textbutton"><span class="fa fa-print"></span>&nbsp;Print</button><button onclick="printHelp()" class="noprint textbutton"><span class="fa fa-question"></span>&nbsp;Print Help</button><button onclick="convertDoc()" class="noprint textbutton">Export</button>';
+buildPrint = '<button onclick="window.print()" class="noprint textbutton"><span class="fa fa-print"></span>&nbsp;Print</button><button onclick="printHelp()" class="noprint textbutton"><span class="fa fa-question"></span>&nbsp;Print Help</button><button onclick="convertDoc()" class="noprint textbutton"><span class="fa fa-download"></span>&nbsp;Export</button>';
 function falseBuild(printr) {
 	window.section_name = "";
 	$('.build').fadeIn(500);
@@ -40,24 +40,8 @@ function startBuild(el) {
     },500    );
     setTimeout('updateBuildProgress("Compiling...");',400);
     
-    //Search for all services and see if any of them support the ExportFile{panel} function which will let them add an export option
-    var a = window.settings.panels.split(', ');
-    for(i in a) {
-        try {
-//            console.log(a, i, a[i]);
-            var b = window.settings['panels_'+a[i]].split(', ');
-            var c = b[4];
-            if(c == true) {
-                try {
-                    eval("ExportFile"+a[i]);   
-                } catch(e) {
-                    //
-                }
-            }
-        } catch(e) {
-            
-        }
-    }
+   
+   
 }
 function add_export_button(title, icon, fnc) {
     $('.buildRow').append('<button class="export_'+title+'" style="width:60px">'+icon+"&nbsp;"+title+"</button>"); 
@@ -71,26 +55,47 @@ function printHelp() {
     initiatePopup({ht: ht, title:"Help with Printing"});   
 }
 function convertDoc() {
-    function createConvertButton(format) {
-        return "<button class='convertButton textbutton' data-format='"+format+"' style='min-width:60px;text-align:center;'>" +format.substring(0,1).toUpperCase()+format.substring(1)+"</button>";
+    function createConvertButton(format, icon) {
+        ic = "";
+        if(icon !== undefined)
+            ic = getIcon(icon, 11);
+    
+        return "<button class='convertButton textbutton' data-format='"+format+"' style='min-width:60px;text-align:center;'>"+ic+"&nbsp;" +format.substring(0,1).toUpperCase()+format.substring(1)+"</button>";
     }
-    ht = "<div id='convertDocBox'><span style='font-weight:200;font-size:16pt;'>Export to Which Format?</span><br><span style='font-style:italic;font-size:10pt;'>This feature is currently in beta</span><br><br><br>";
-    ht += createConvertButton('html');
+    ht = "<div id='convertDocBox'><span style='font-weight:200;font-size:19pt;'>Export to Which Format?</span><br><span style='font-style:italic;font-size:10pt;'>This feature is currently in beta</span><br><br><br>";
+    ht += createConvertButton('html', 'file-code-o');
     /*ht += createConvertButton('docx');
     ht += createConvertButton('odt');
     ht += createConvertButton('pdf');
     ht += createConvertButton('epub'); 
     ht += createConvertButton('mobi');*/ 
-    ht += createConvertButton('txt');
+    ht += createConvertButton('txt', 'file-text-o');
+    customFormats = {};
+    
+     //Search for all services and see if any of them support the export method which will let them add an export option
+    for(i in panelManager.getAvailablePanels()) {
+        if(panelManager.getAvailablePanels()[i].onExport !== undefined) {
+            var exportOptions = panelManager.getAvailablePanels()[i].onExport(true, $('.build').html());
+            if(exportOptions !== null) {
+                ht += createConvertButton(exportOptions.name, exportOptions.icon);
+                customFormats[exportOptions.name] = exportOptions.callback;
+                console.log(exportOptions);
+            }
+        }
+    }
+    
     ht += "</div>";
-    fnc = function x() {
+    fnc = function () {
         $('.convertButton').on('click', function() {
             var export_format = $(this).attr('data-format')
             if(export_format == "html")
                 startExportHTML();
-            else
+            else if(export_format == "txt")
                 startConversion(export_format);
-           $('#convertDocBox').html("<font size='12pt'>Please Wait</font><br>Your file will be converted and downloaded soon<br>"+getLoader()); 
+            else
+                customFormats[export_format]();
+           $('#convertDocBox').fadeOut(500).delay(500).fadeIn(500);
+            setTimeout(function() { $('#convertDocBox').html("<span style='font-size:19pt;font-weight:200;'>Please Wait</span><br><span style='font-style:italic;font-size:10pt;'>Your file will be converted and downloaded soon</span><br>"+getLoader()) },500);
         });
     };
     initiatePopup({title: "Convert Document", ht: ht, fnc: fnc});

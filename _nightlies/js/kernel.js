@@ -1757,15 +1757,13 @@ function resetTheme() {
             }
        }
    };
-    //TODO Erase CSS
     $('#ThemeScriptCSS').empty();
-//    writeCss('table { background-color:inherit; } table, tr, td { color: '+theme.fontColor+'}');
     $('button.textbutton').css('border-radius', '0px').css('color', 'inherit');
     $('.ribbonheader').css('color', theme.fontColor);
     $('body').css('font-family', '');
     $('button').css('text-transform', '').css('letter-spacing', '').css('color', '').css('border-radius', '').css('font-size','');
-//    $('button.textbutton').css('border-radius', '').css('text-transform', '').css('letter-spacing', '').css('color','');
     $('.ribbonheader').css('color', '');
+    
     loadThemeSettings = function() { return "" };
 }
 //Once the theme is loaded, it resets some CSS stuff
@@ -1782,12 +1780,12 @@ function initThemeDefault() {
 	$('.hovertag').css('font-size', '10pt');
     $('.main').css('padding-top', '100px');
     themeCss('font-family', '"Lato", sans-serif');
-		themeCss('font-size', '10pt');
-        themeCss('background-color', '#ecf0f1');
+    themeCss('font-size', '10pt');
+    themeCss('background-color', '#ecf0f1');
 }
 
-//Normalizes the themes
 function iterateTheme() {
+    //Normalizes the themes
     themeCss('background-color', theme.bodyColor);
 	themeCss('color', theme.fontColor);
     themeCss('font-size', '11pt');
@@ -1801,7 +1799,8 @@ function iterateTheme() {
     $('td[data-theme!=false]').css('color', theme.fontColor);
     $('label').css('color', theme.fontColor);
     $('input[data-theme!=false]').css('background-color', theme.bodyColor).css('color', theme.fontColor);
-    $('table[data-theme!=false]').css('background-color', '').css('border', '');
+    //TODO Erase css rules from foundation.min. css
+    $('table').css('background-color', 'inherit').css('border', 'none');
     $('kbd[data-theme!=false]').css('background-color', '').css('border-color','').css('color','').css('border-style','').css('border-width','').css('font-family','').css('padding','').css('border-radius','');
     
     if(loadThemeSettings() == "" || loadThemeSettings === undefined)

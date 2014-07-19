@@ -1,11 +1,15 @@
-This will document how to create a dictionary and implement it in Gltn.
+This will document how to create a dictionary and implement it in Gltn. A dictionary is a collection of information. Like a real dictionary, it may contain a bunch of words, but it can have any set of data that can be presented. In the Gltn Editor, a user will do a text search for data. The editor will examine all installed dictionaries. This happens in a prioritized list set by the user. If a dictionary indicates that it has relevant information, that will be sent back to the editor to be displayed in the Dictionary Panel.
 
-//TODO Explain what a dictionary is, class structure
-//TODO Search API, saved searches
+All the user's dictionaries are stored in a `DictionaryManager` which also includes methods for installing dictionaries and storing previous searches.
+
 ### Installation
-`install_dictionary(format, url, name, id, icon)`
+```Javascript
+    var dictionary = new Dictionary(format, url, name, id, icon)
+    dictionaryManager.install(dictionary);
+```
 
 This function installs the dictionary and makes it lowest priority in the dictionary. You may need to move it higher on the list in order for your dictionary content to appear.
+
 * format - "XML" or "HTML"
 * url - The url to send a request to
 * name - The name of the dictionary
@@ -31,6 +35,16 @@ An HTML dictionary loads HTML from a website into an iframe. A PHP script is cal
 * UI may not be optimized
 * UI may not fit the user's theme
 * iFrames may have issues loading certain webpages
+
+## *Getting Started*
+### Installing
+Use the `dictionaryManager` variable to install your dictionary.
+
+### Server
+Using a server, you can upload PHP files and use URLs to test your code and make sure it works.
+
+### Locally
+Locally, it is difficult to test a dictionary. You would need to install a server on your computer and set it up to run PHP. Then, migrate your local source of Gltn to that server. If Gltn is able to complete AJAX calls, your system should work.
 
 ## *Inspiration and Ideas*
 If you want to make a dictionary, but don't know where to start, look at some of these ideas:

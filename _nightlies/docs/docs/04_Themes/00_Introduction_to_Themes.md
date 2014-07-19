@@ -1,5 +1,3 @@
-## Getting Started
-
 Themes alter the look and feel of the editor, but they should not alter the actual content on-screen. A theme makes the editor look fresh and new while giving the user a consistent user experience.
 
 What is a theme? It is a collection of attributes that alter the look of the editor without altering the actual content on-screen. This gives the Gltn Editor a fresh look that may be modern while at the same time giving users a consistent user experience. How is a theme written? It is a collection of colors, standardized, that developers can use in their plugins for a consistent color palette across all plugins and devices. A theme developer can make up their own set of colors and the user's editor should accurately refect that theme. In addition to colors, developers may also give general CSS commands and run Javascript. If a developer may also create a settings menu for users to have even more customization.
@@ -19,6 +17,12 @@ Where id is the internal id for the theme.
 
 Themes can be submitted and placed in the Gltn Store for anyone to install.
 
+##*Getting Started*
+###Server
+Upload the theme script to your server, and use the `themeManager` to install your theme. Then, you can either use the command line to pick a theme or use the built-in theme panel to select your theme.
+
+###Locally
+Use the `themeManager` to install your theme. Then, you can either use the command line to pick a theme or use the built-in theme panel to select your theme.
 
 ## *Inspiration and Ideas*
 If you want to make a theme, but don't know where to start, look at some of these ideas:
