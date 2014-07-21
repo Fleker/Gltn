@@ -11,6 +11,7 @@ theme.fullscreen.bodyColor = "rgb(41,41,41)";
 theme.fullscreen.fontColor = "white";
 theme.fullscreenDark.bodyColor = "rgb(41,41,41)";
 theme.fullscreenDark.fontColor = "white";
+theme.isRelativeDark = true;
 theme.ribbon.highlight = "#09f";
 if(hasSetting('ribbonhighlight'))
     theme.ribbon.hightlight = getSettings("ribbonhighlight"); 

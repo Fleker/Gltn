@@ -61,6 +61,7 @@ Note that the default values are already provided. If you don't want to change e
 * `ribbon: { ... }` - A set of colors relating to the ribbon
     * `highlight:"rgb(44,62,80)"` - The background color a ribbon button turns when hovered over
     * `plain:"transparent"` - The background color of a ribbon ordinarily (transparent -- it adopts the parent's background color)
+* `isRelativeDark: false` - Mark this as true if your theme is relatively dark. This way, developers can target a different color using `getApprpriateColor()`
 * `palette: { ... }` - A variety of colors based on common color themes. See more at the bottom.
     * `blue: { ... }`
         * `white: "#e7e9fd"`

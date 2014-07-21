@@ -512,15 +512,17 @@ function setHeader() {
 		About: new Array(
 			{text: 'GitHub', img: '<span style="font-size:18pt" class="fa fa-github-alt"></span>', action: "openTab('http://www.github.com/fleker/gltn')"},
 			{text: 'Documentation', img: '<span style="font-size:18pt" class="fa fa-book"></span>', action: "openTab('http://felkerdigitalmedia.com/gltn/docs')"},
-			{text: 'Send Feedback', img: '<span style="font-size:18pt" class="fa fa-envelope"></span>', action: "openTab('mailto:handnf+gltn@gmail.com')"},
+			{text: 'Send Feedback', img: '<span style="font-size:18pt" class="fa fa-envelope"></span>', action: "openFeedback()"},
 			{text: 'Gltn Blog', img: '<span style="font-size:18pt" class="fa fa-bullhorn"></span>', action:"openTab('http://gltndev.wordpress.com/')"},
 			{text: 'Credits', img: '<span style="font-size:18pt" class="fa fa-legal"></span>', action: 'postLegal()'}
 		),
 
 		Me: new Array(
-			{group: 'Name', value:'<div style="margin-top:2px"><input id="me_name" type="text" placeholder="Name"></div>'}
+            {group: '', value:"<img style='overflow:hidden;border-radius:50%;width:60px;height:60px;' class='me_avatar_img'>"},
+			{group: 'Name', value:'<div style="margin-top:2px"><input id="me_name" type="text" placeholder="Name"></div>'},
+			{group: 'Email', value:'<div style="margin-top:2px"><input id="me_email" type="email" placeholder="Email Address"></div>'},
+            {text: 'Settings...', img:'<span class="fa fa-cog" style="font-size:18pt"></span>', action:"openPersonalFavorites()"}
 		)
-
 	};
 	newRibbon('.header', holoribbon_std);
 	ribbonSwitch(0,false);
@@ -552,12 +554,37 @@ function ribbonLoad() {
 			setTimeout('window.location = "?file='+v+'";', 250);
 		}
 	});
-	$('#me_name').attr('value', getSettings("me_name"));
-	$('#me_name').attr('defaultValue', getSettings("me_name"));
+    //Initialize Personalization
+    if(!hasSetting("personal_name")) {
+        writeToSettings("personal_name", "Me");   
+    }
+    if(!hasSetting("personal_avatar")) {
+        writeToSettings("personal_avatar", STOCK_AVATAR);   
+    }
+    if(!hasSetting("personal_email")) {
+        writeToSettings("personal_email", "");
+    }   
+    if(!hasSetting("personal_color")) {
+        writeToSettings("personal_color", "blue");   
+    }
+    
+	$('#me_name').attr('value', getSettings("personal_name"));
+	$('#me_name').attr('defaultValue', getSettings("personal_name"));
 	$('#me_name').on('input', function() {
-		writeToSettings('me_name', $('#me_name').val());		
+		writeToSettings('personal_name', $('#me_name').val());		
 	});
+	$('#me_avatar').attr('value', getSettings("personal_avatar")).click();
+	$('#me_avatar').on('input click', function() {
+		writeToSettings('personal_avatar', $('#me_avatar').val());		
+        $('#me_avatar_img').attr('src', $('#me_avatar').val());
+	});
+	$('#me_email').attr('value', getSettings("personal_email"));
+	$('#me_email').on('input', function() {
+		writeToSettings('personal_email', $('#me_email').val());		
+	});
+     $('.me_avatar_img').attr('src', getSettings("personal_avatar"));
 }
+STOCK_AVATAR = "http://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Isidor_von_Sevilla.jpeg/640px-Isidor_von_Sevilla.jpeg";
 function appendHoloSelection() {
 	var selection = {
 		Selection: new Array(
@@ -570,6 +597,75 @@ function appendHoloSelection() {
 	newRibbon('.header', $.extend({}, holoribbon_std, selection));
 	ribbonSwitch(ribbon_index, false);
 }
+function openFeedback() {
+    //Instead of a simple email prompt, it will let users send an email or go to Github issues
+    var output = "<div style='display:inline-table;width:49%;border-right: solid 1px rgba(128,128,128,1);margin-right: 10px;'><span style='font-size:16pt;cursor:pointer;color: "+getAppropriateColor(theme.palette.blue.accent700, theme.palette.blue.accent100)+"; ' onclick='openTab(\"mailto:handnf+gltn@gmail.com\")'>Send an Email</span><br><span style='font-size:11pt'>Do you want to email the developer directly with a bug or suggestion? Do so here.</span></div>";
+    output += "<div style='display:inline-table;width:49%;'><span style='font-size:16pt;cursor:pointer;color: "+getAppropriateColor(theme.palette.blue.accent700, theme.palette.blue.accent100)+"; ' onclick='openTab(\"http://github.com/fleker/gltn/issues\")'>File New Issue</span><br><span style='font-size:11pt'>Already have a GitHub account? File an issue for your bug or suggestion instead.</span></div>";
+    var p = new Popup({title: "Send Feedback", ht: output}).show();
+}   
+function openPersonalFavorites() {
+    //Personalization Settings Popup
+    
+    var colors = ["blue", "red", "green"];
+    var output = "<span style='font-size:16pt;font-weight:200;'>"+getSettings("personal_name")+"</span><div class='row'><br><br>";
+    
+    //Avatar
+    output += "<div class='preference_card'><h1>AVATAR</h1><br><img style='overflow:hidden;border-radius:50%;width:60px;height:60px;' class='me_avatar_img'><br><br><input id='me_avatar' type='url' placeholder='Image URL'></div>";
+    
+    //Colors
+    output += "<div class='preference_card'><h1>FAVORITE COLOR</h1><br><div id='me_color_blob' style='background-color:"+getSettings("personal_color")+";width:60px;height:60px;text-align:center;border-radius:100%;'></div><br><select id='me_color'>";
+    for(i in colors) {
+        output += "<option value='"+colors[i]+"' selected='"+(colors[i]==getSettings("personal_color"))+"'>"+colors[i].substring(0,1).toUpperCase()+colors[i].substring(1)+"</option>";   
+    }   
+    output += "</select><br></div>";
+    
+    //Sync Settings
+    output += "<div class='preference_card'><h1>SYNC SETTINGS</h1><br>";
+    if(hasSetting("inkpicker_url")) {
+        output += "<span class='fa fa-check' style='font-size:9pt;color:"+theme.palette.green.normal+";'></span>&nbsp;<span style='font-size:8pt'>SETTINGS SYNCED</span>";   
+    }
+    output += "<button class='textbutton' id='up_settings'>Upload Settings</button><br><br><button class='textbutton' id='down_settings'>Download Settings</button><br><span id='validate_settings'></span><span style='font-size:8pt'>";
+    if(hasSetting("inkpicker_url")) 
+        output += "File available at "+getSettings('inkpicker_url');
+    output += "</span></div>";
+    
+    output += "</div>";
+    
+    
+    //Info
+    output += "<br><br><br><br><div style='font-size:9pt;'>You may personalize some aspects of Gltn. These settings will be synced to all devices when your settings load, but will not be centrally collected. Plugins may access these settings and formats may use this information to populate metadata fields.</div>";
+    
+    var f = function() {
+        $('#me_color').on('change', function() {
+            writeToSettings("personal_color", $(this).val());
+            $('#me_color_blob').css('background-color', $(this).val());
+        }); 
+        $('#me_avatar').attr('value', getSettings("personal_avatar")).click();
+        $('#me_avatar').on('input click', function() {
+            writeToSettings('personal_avatar', $('#me_avatar').val());		
+            $('.me_avatar_img').attr('src', $('#me_avatar').val());
+        });
+        $('.me_avatar_img').attr('src', $('#me_avatar').val());
+        $('.preference_card').css('width','calc(50% - 32px)').css('display','inline-table').css('font-weight','200')/*.css('border-right','solid 1px rgba(128,128,128,1);' )*/.css( 'margin-right','16px').css('padding-right','16px').css('border-bottom','solid 1px #999').css('padding-top','8px');
+        $('.preference_card>h1').css('color', theme.fontColorAlt).css('text-transform', 'uppercase').css('font-size','13pt').css('font-weight','200').css('margin-left', '-10px').css('font-family', 'inherit');
+    }   
+    var p = new Popup({title: "Personal Settings", ht: output, fnc: f, size: popupManager.XLARGE}).show();
+    
+}   
+
+function postLegal() {
+    var favorite = theme.palette[getSettings("personal_color")];
+    out = "<span style='color:"+getAppropriateColor(favorite.accent700, favorite.accent100)+"'>Gltn version "+GLTN_VERSION+"</span><br><br>";
+	out += "2014 Made by Nick Felker&emsp;<a href='http://twitter.com/handnf'>@HandNF</a><br>";
+    out += "Made using libraries from Mathjax, Font Awesome, jQuery, Rangy, InkFilepicker, and others<br>";
+    out += "Shoutout to everyone who posted online about stuff like replacing text nodes and the ample amount of help from StackOverflow.<br>";
+    out += '<br>Stock Images:<br>&emsp;"<a href="http://commons.wikimedia.org/wiki/File:Isidor_von_Sevilla.jpeg#mediaviewer/File:Isidor_von_Sevilla.jpeg">Isidor von Sevilla</a>" by <a href="//en.wikipedia.org/wiki/Bartolom%C3%A9_Esteban_Murillo" class="extiw" title="en:Bartolomé Esteban Murillo">Bartolomé Esteban Murillo</a> - <a rel="nofollow" class="external free" href="http://www.museumsyndicate.com/artist.php?artist=442">http://www.museumsyndicate.com/artist.php?artist=442</a>. Licensed under Public domain via <a href="//commons.wikimedia.org/wiki/">Wikimedia Commons</a>.'
+
+	f = function() { };
+	initiatePopup({title:'Credits', value: out, fnc: f});
+
+}
+
 
 function doesThisWork() {
 	var flag = new Array();

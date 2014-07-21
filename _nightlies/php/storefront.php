@@ -15,7 +15,9 @@
     echo mysql_error();
     mysql_select_db($mysql_database, $connect) or die($error);
     
-    $query = mysql_query("SELECT * FROM `gltn_plugins`");
+    $query = mysql_query("SELECT * 
+FROM  `gltn_plugins` 
+INNER JOIN  `gltn_users` ON gltn_users.id = gltn_plugins.credit");
     $data = array();
     while($row = mysql_fetch_assoc($query)) {
         array_push($data, array(
@@ -29,10 +31,13 @@
             "updated_last"=>$row['updated_last'],
             "version"=>$row['version'],
             "github" =>$row['github'],
+            "twitter" => $row['twitter'],
             "featured" =>$row['featured'],
             "featured_c"=>$row['featured_c'],
             "install"=>$row['install'],
-            "uninstall"=>$row['uninstall']
+            "uninstall"=>$row['uninstall'],
+            "uid" => $row['uid'],
+            "dev_twitter" => $row['dev_twitter']
         ));
     }
     echo json_encode($data);

@@ -1,21 +1,17 @@
-currentpanel = "fleker_TODO";
-//TODO Change to new API
-//TODO: NOTE, FIXME, CHANGES, FUTURE
-//TODO Orange
-//FUTURE Blue
-//NOTE Green
-//FIXME Red
-//CHANGES Dark blue grey
-function GetPanelfleker_TODO() {
-    return {title: "TODO LIST", width:30, bordercolor: "#d35400"};
-}
-function RunPanelfleker_TODO() {
+//currentpanel = "fleker_TODO";
+
+var p = panelManager.getAvailablePanels().Fleker_TODO;
+p.setManifest({
+    title: "TODO LIST",
+    width: 30,
+    bordercolor: "#d35400"
+});
+p.onRun = function() {
     function restart() {
-        out = "Write {TODO ...} or {FUTURE ...} to take a note. These notes will be collected here. You can also @ someone to designate a role.<br><br>";
+        out = "Write {TODO,FUTURE ...} to take a note. These notes will be collected here. You can also @ someone to designate a role.<br><br>";
         input = $('.content_textarea').html();
-        arr = input.match(/{(TODO|FUTURE) [^}]*}/g);
+        arr = input.match(/{(TODO|FUTURE|NOTE|FIXME|CHANGES) [^}]*}/g);
         out += "<table style='width:95%'>";
-//        console.log(arr);
         for(i in arr) {
             console.warn(arr[i]);
             var user = undefined;
@@ -25,10 +21,17 @@ function RunPanelfleker_TODO() {
             }
             //Construct a Card for each item
             out += "<tr><td style='background-color:"+theme.normbg+";padding-bottom: 15px;padding-left: 15px;padding-top: 6px;'><b>";
-            if(arr[i].split(' ')[0] == "{TODO")
-               out += "<span style='color:#d35400'>TODO</span>";
-            else
-               out += "<span style='color:#8e44ad'>FUTURE</span>";
+            var kind = arr[i].split(' ')[0];
+            if(kind == "{TODO")
+                out += "<span style='color:#d35400'>TODO</span>";
+            else if(kind == "{FUTURE")
+                out += "<span style='color:#8e44ad'>FUTURE</span>";
+            else if(kind == "{NOTE")
+                out += "<span style='color:#14e715'>NOTE</span>";
+            else if(kind == "{FIXME")
+                out += "<span style='color:#e00032'>FIXME</span>";
+            else if(kind == "{CHANGES")
+                out += "<span style='color:#607d8b'>CHANGES</span>";
             out += "</b><br>";
             if(user != undefined) {
                 out += "<b>For "+user+"</b><div style='padding-left:1em'>";
@@ -51,6 +54,12 @@ function RunPanelfleker_TODO() {
         }
         out += "</tr></table>";
         postPanelOutput(out);
+        $('.PanelKeyEvent').off().on('click', function() {
+            restart();
+        });
+        
     }   
     restart();
 }
+p.activate();
+console.log("Activate TODO");

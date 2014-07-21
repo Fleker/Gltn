@@ -1634,23 +1634,10 @@ function showLatexReference(str) {
 }
 
 
-function postLegal() {
-    out = "Gltn version "+GLTN_VERSION+"<br><br>";
-	out += "2014 Made by Nick Felker<br>(@HandNF)<br>";
-    out += "Made using libraries from Mathjax, Font Awesome, jQuery, Rangy, InkFilepicker, and others<br>";
-    out += "Shoutout to everyone who posted online about stuff like replacing text nodes and the ample amount of help from StackOverflow.<br>";
-
-	f = function() { };
-	initiatePopup({title:'Credits', value: out, fnc: f});
-
-}
-
-
-
 /*** Custom Theming -- THEMES -- Theme Class -- Theme Enum***/
-//TODO Finish migrating
 function resetTheme() {
     //TODO Change Dark for Opposite
+    //isRelativeDark
    window.theme = {
        fontColor: "black",
        fontColorAlt: "#222",
@@ -1669,6 +1656,7 @@ function resetTheme() {
             highlight: "rgb(44,62,80)",
             plain: "transparent"
        },
+       isRelativeDark: false,
        palette: {
             /*
                 Each palette has a minified version of Google's Material Design Palette
@@ -1769,6 +1757,15 @@ function resetTheme() {
 //Once the theme is loaded, it resets some CSS stuff
 function resetThemeParameters() {   
 
+}
+function getAppropriateColor(ifLight, ifDark) {
+    if(theme.isRelativeDark !== undefined) {
+        if(theme.isRelativeDark === true)
+            return ifDark;
+        else
+            return ifLight;
+    } else
+        return ifLight;
 }
 function initThemeDefault() {
     theme.palette.red.normal = "rgb(255,68,68)";
@@ -2036,7 +2033,8 @@ function initNotifications() {
 	}
     postNotificationsIcon();
 	//since appcache is too fast:
-	console.log(appcachestatus);
+    if(appcachestatus !== undefined)
+        console.log(appcachestatus);
 	if(appcachestatus == "Found new version - Refresh to update")
 		postNotification("appcache", "A new version of the app was downloaded. Click to update.", "window.location.reload()");
 }

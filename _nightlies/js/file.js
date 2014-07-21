@@ -1,5 +1,5 @@
 // File.js handles the saves and restores, changing the formatting, and other file-related functions (convert to PDF? LaTeX, .doc)
-GLTN_VERSION = "1.3.1.3";
+GLTN_VERSION = "1.3.1.4";
 //For backwards compatibility, will return true 
 function greaterThanVersion(version) {
     var split = version.split(".");
@@ -528,14 +528,15 @@ function newFile(x,xc) {
 }	
 function newFile2() {
 	console.log('Creating new file...');
-	//Add me data
+	//Add personal data
 	for(i in window.metadata) {
-	//	console.log(window.metadata[i].id, i);
 		if(window.metadata[i].id == "Author") {
 			console.log(i, window.settings.me_name);
-			//console.log($('#f'+i));
-			$('#format_item_'+i).val(getSettings('me_name'));
+			$('#format_item_'+i).val(getSettings('personal_name'));
 		}
+        if(window.metadata[i].id == "Email") {
+            $('#format_item_'+i).val(getSettings("personal_email"));   
+        }
 	}
 	//Call {format}
 			

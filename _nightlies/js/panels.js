@@ -1,11 +1,13 @@
 //PANEL CLASS
 //function Panel(id, displayName, icon, url, key, service) {
 function Panel(id, displayname, url) {
+//function Panel(id, url)
+    // is the second constructor
     this.id = id || "";
     this.name = "";
     this.title = displayname || this.name;
     this.icon = "";
-    this.url = url; 
+    this.url = url || displayname; 
     this.service = false;
     this.override = [];
     this.bordercolor = "#000";
@@ -134,11 +136,11 @@ function PanelManager() {
         if(panel.service !== true) {
             holoribbon_std['Panels'].push({text: panel.name, img: panel.img, action: "runPanel('"+panel.id+"')"});
             newRibbon('.header', holoribbon_std);
-            console.log("Installing "+panel.name+"...  "+num);
+            console.log("Installing "+panel.id+"...  "+num);
             ribbonSwitch(ribbon_index,false);
             ribbonLoad();
         }
-        writeToSettings('panels_'+panel.id, panel.id+","+panel.url);
+//        writeToSettings('panels_'+panel.id, panel.id+","+panel.url);
         this.availablePanels[panel.id] = panel;
 
         if(window.offline !== true) {
@@ -146,7 +148,7 @@ function PanelManager() {
             loadjscssfile(panel.url, "js");
             $('#themeframe').attr('src', panel.url);
             downloadingpanel = "null";
-            window.setTimeout(function() {download_panel(panel.id,num);}, 200);
+            window.setTimeout("download_panel("+panel.id+","+num+");", 200);
         }
     };
     PanelManager.prototype.uninstall = function(id) {
@@ -293,8 +295,8 @@ function install_panel(id, name, img, url, service, key, num) {
 
 function download_panel(id,num) {
     if(downloadingpanel !== id) {
-        console.log(id, downloadingpanel);
-        if(!downloadingpanel.length)
+        console.log(id+", "+downloadingpanel);
+        if(!downloadingpanel.length || id.length)
             return;
         window.setTimeout(function() {download_panel(id,num);}, 100);
     } else {
@@ -619,13 +621,13 @@ panelManager.getAvailablePanels().Main_Character.onExport = function(isDocument,
 }
 
 function getChar(val, title, tag) {
-    return {val: val, title: title, tag: tag};   
+    return {val: val, title: title, tag: tag+" "+title};   
 }
 function getEmoji(val, title, tag) {
     return getChar(val, title, tag+" emoji emoticon");   
 }
 function getCharAccent(char, accent, or) {
-    return getChar(char, or+" w/ "+accent, or+" "+char+" "+accent);  
+    return getChar(char, or+" w/ "+accent, or+" "+char+" "+accent+" accent latin");  
 }
 // SPECIALCHARACTERS
 specialCharacters = {
@@ -1025,6 +1027,19 @@ specialCharacters = {
     Moon_Face_F: getEmoji("🌝", "Full Moon w/ Face", "full moon face"),
     Sun_F: getEmoji("🌞", "Sun w/ Face", "sun face"),
     GlowingStar: getEmoji("🌟", "Glowing Star", "star glow"),
+    ShootingStar: getEmoji("🌠", "Shooting Star", "star shooting"),
+    Thermometer: getEmoji("🌡", "Thermometer", "thermometer temperature"),
+    BlackDroplet: getEmoji("🌢", "Black Droplet", "drop rain"),
+    WhiteSun: getEmoji("🌣", "White Sun", "solar"),
+    WhiteSunSmallCloud: getEmoji("🌤", "White Sun w/ Small Cloud", ""),
+    WhiteSunBehindCloud: getEmoji("🌥", "White Sun Behind Cloud", ""),
+    WhiteSunCloudRain: getEmoji("🌦", "White Sun Behind Cloud with Rain", ""),
+    CloudWithRain: getEmoji("🌧", "Cloud with Rain", ""),
+    CloudWithSnow: getEmoji("🌨", "Cloud with Snow", ""),
+    CloudWithLightning: getEmoji("🌩", "Cloud with Lightning", ""),
+    CloudWithTornado: getEmoji("🌪", "Cloud with Tornado", ""),
+    Fog: getEmoji("🌫", "Fog", ""),
+    WindBlowingFace: getEmoji("🌬", "Wind Blowing Face", ""),
     
     Wheelchair: getChar("♿","Wheelchair",'wheelchair chair'),
     Fountain: getChar("⛲","Fountain","fountain water park"),
@@ -1930,19 +1945,18 @@ panelManager.getAvailablePanels().Main_Dictionary.onRun = function() {
     
 	function openApp() {
 		out = "<input type='search' id='DictionaryIn' style='width:calc(100% - 64px);display:inline;'><button id='DictionarySettings'><span class='fa fa-cog'></span></button>";
-		out += "<div id='DictionaryOut'><span style='font-size:16pt'>Welcome</span><br>Search for something<br><br><br><div style='text-align:center;padding-left:80%;font-size:30pt;margin-top:25%;' class='fa-stack fa-lg'><span class='fa fa-circle-o fa-stack-2x'></span><span class='fa fa-quote-left fa-stack-1x'></span></div>";
+		out += "<div id='DictionaryOut'><span style='font-size:16pt'>Welcome</span><br>Search for something<br><br><br><div style='text-align:center;width:100%;font-size:30pt;margin-top:25%;' class='fa-stack fa-lg'><span class='fa fa-circle-o fa-stack-2x'></span><span class='fa fa-quote-left fa-stack-1x'></span></div>";
         
         out += "<br><br><br><br><br>";
         phrases = ["Try", "Or", "Maybe", "Perhaps", "How About", "Want"];
         for(i=0;i<5;i++) {
             if(dictionaryManager.hasPreviousSearch(i))
-                out += "<div style='margin-bottom:6px;font-weight:bold;cursor:pointer;text-transform:uppercase;' onclick='startDictionarySearch(\""+dictionaryManager.getPreviousSearch(i)+"\")'>"+phrases[i]+"&nbsp;"+dictionaryManager.getPreviousSearch(i)+"</div>";
+                out += "<div style='margin-bottom:6px;padding-left:40px;font-weight:bold;cursor:pointer;text-transform:uppercase;' onclick='startDictionarySearch(\""+dictionaryManager.getPreviousSearch(i)+"\")'>"+phrases[i]+"&nbsp;"+dictionaryManager.getPreviousSearch(i)+"</div>";
         }
 		out += "</div>";
 		postPanelOutput(out);	
         //FIXME
         $('.panel_plugin_content').css('overflow-y', 'inherit');
-        
 		$('#DictionaryIn').focus();
 		$('#DictionarySettings').on('click', function() {
 			openSettings();
@@ -2009,7 +2023,9 @@ panelManager.getAvailablePanels().Main_Dictionary.onRun = function() {
 		});
 	}
 	function openSettings() {
-        //TODO Arrow back
+        for(i in ajaxrequests) {
+				ajaxrequests[i].abort();	
+			}
 		out = "<button id='DictionaryBack'><span class='fa fa-arrow-left'></span></button><br>";
 		out += "Sort the dictionaries that you want to access, separated by a semicolon.<br>";
 		out += "<input type='text' id='DictionarySort' value='"+getSettings("dictionarysort")+"' style='width:calc(100% - 16px)'>";

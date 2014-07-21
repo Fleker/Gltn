@@ -50,21 +50,25 @@ function getDownloadCount(number) {
 function getStoreCard(plugin, i) {
     var out = "";
     //console.log(d[i], d[i].parent);
-        out += "&emsp;"+getIcon(plugin.icon_fa, "large");
-        out += "&nbsp;<b>"+plugin.name+"</b>";
+        out += "<div style='display:inline-block'>&emsp;"+getIcon(plugin.icon_fa, 50)+"</div>";
+        out += "<div style='display:inline-block;width: calc(100% - 85px);'><div style='font-weight:600;padding-top:10px;padding-left:20px;'>"+plugin.name+"</div>";
         if(isInstalled(plugin)) {
             out += "&emsp;<span style='color:"+theme.palette.green.normal+";font-size:8pt' class='fa fa-check'></span><span style='font-size:6pt;color:green'>ADDED</span>";	
         }
-        out += "<br>&emsp;&emsp;<i style='font-size:10pt'>"+plugin.credit+"</i>";
-        if(plugin.description.length > 100)
-            out += "<div style='font-size:8pt;padding-left:40px;padding-right:5px;padding-top:8px;'>"+plugin.description.substring(0,100)+"...</div>";	
+//        out += "<br>&emsp;&emsp;<i style='font-size:10pt'>"+plugin.credit+"</i>";
+        if(plugin.description.length > 140)
+            out += "<div style='font-size:8pt;padding-left:40px;padding-right:5px;padding-top:8px;'>"+plugin.description.substring(0,140)+"...</div>";	
         else
             out += "<div style='font-size:8pt;padding-left:40px;padding-right:5px;padding-top:8px;'>"+plugin.description+"</div>";
+        out += "</div>";
 
-        outt = "<div style='border:solid 1px "+theme.palette.grey.accent700+";font-size:13pt;cursor:pointer;background-color:"+theme.palette.grey.white+";padding-top:5px;margin-top:-1px;color:"+theme.palette.grey.thick+";min-height:100px;' class='store_item' data-id='"+i+"'>"+out+"</div>";
+        outt = "<div style='border:solid 1px "+getAppropriateColor(theme.palette.grey.accent700, theme.palette.grey.accent100)+";font-size:13pt;cursor:pointer;background-color:"+getAppropriateColor(theme.palette.grey.white, theme.palette.grey.thick)+";padding-top:5px;margin-top:-1px;color:"+getAppropriateColor(theme.palette.grey.thick, theme.palette.grey.light)+";min-height:100px;display: inline-table; width: 400px; margin-right: 24px; margin-bottom: 16px;' class='store_item' data-id='"+i+"'>"+out+"</div>";
         return outt;
 }   
+//FIXME THis is wrong
 function isInstalled(datum) {
+    return panelManager.getAvailablePanels()[datum] !== undefined;
+    //TODO themes, dictionaries
     return ((datum.type == "Panel" || datum.type == "Service") && window.settings.panels.indexOf(datum.id) > -1) || (datum.type == "Dictionary" && window.settings.dictionary.indexOf(datum.id) > -1) || (datum.type == "Theme" && window.settings.theme.indexOf(datum.id) > -1)
 }
 function launchStore(storetype) {
@@ -94,7 +98,7 @@ function launchStore2(storetype) {
 		d = $.parseJSON(data);
         window.store = d;
         //Layout will have large search area at top, categories on side, featured on front. Each category will have featured. Like Chrome Webstore
-        out = "<div id='storebody' class='row'> <div id='store_categories' class='small-4 medium-3 large-2 columns'></div> <div id='store_display' class='small-8 medium-9 large-10 columns'></div> </div>";
+        out = "<div id='storebody' class='row' style='max-width:100%'> <div id='store_categories' class='small-4 medium-3 large-2 columns'></div> <div id='store_display' class='small-8 medium-9 large-10 columns'></div> </div>";
         $('#build_inner').html(out);
         //TODO Maybe switch to Flatbuttons
         $('#store_categories').html("<button id='store_c_home'>Home</button><br><button id='store_c_panels'>Panels</button><br><button id='store_c_services'>Services</button><br><button id='store_c_dictionaries'>Dictionaries</button><br><button id='store_c_themes'>Themes</button><br><button id='store_c_plugins'>Plugins</button><br><button id='store_c_submit'>Developers Portal</button>");
@@ -109,7 +113,7 @@ function launchStore2(storetype) {
             loadStoreClickHandlers();
         }
         function loadStoreCategory(catName) {
-            if(catName == "undefined") {
+            if(catName.toLowerCase() == "undefined" || catName === undefined ) {
                 loadHome(); 
                 return;
             }
@@ -130,9 +134,13 @@ function launchStore2(storetype) {
         function loadStoreClickHandlers() {
             $('.store_item').on('click', function() {
                 var i = store[$(this).attr('data-id')];
-                title = getIcon(i.icon_fa, "xlarge")+"&emsp;"+i.name;
-                ht = threeColumnText("<div style='padding-left:16px;opacity:0.7;'>"+i.type+"<br>"+i.credit+"</div>", "<div style='font-size:9pt;opacity:0.7;'>v "+i.version+"<br>"+getDownloadCount(i.install)+"</div>", "")+"<br>";
+                title = getIcon(i.icon_fa, 30)+"&emsp;"+i.name;
+                ht = threeColumnText("<div style='padding-left:16px;opacity:0.7;'>"+i.type+"<br>"+"</div>", "<div style='font-size:9pt;opacity:0.7;'>v "+i.version+"<br>"+getDownloadCount(i.install)+"</div>", "<div style='opacity:0.7'>"+i.uid+"<br>"+((i.dev_twitter.length > 0)?"<a href='http://twitter.com/"+ i.dev_twitter +"' target='_blank'>Twitter</a> ":"")+"</div>");
                 ht += "<div style='margin-left:10%;width:80%;font-size:12pt;'>"+i.description+"</div>";
+                if(i.github.length > 0) 
+                    ht += "<div onclick='openTab(\"http://github.com/"+i.github+"\")'><span class='fa fa-github'></span>&nbsp;Fork Me on Github!</div>";
+                if(i.twitter.length > 0) 
+                     ht += "<div onclick='openTab(\"http://twitter.com/"+i.twitter+"\")'><span class='fa fa-twitter'></span>&nbsp;Follow Me on Twitter!</div>";
                 if(isInstalled(i)) 
                     ht += "<br><br><br>&emsp;<span style='color:green;font-size:12pt' class='fa fa-check'></span><span style='font-size:10pt;color:green'>&nbsp;You've already installed this.</span><br><button class='textbutton store_uninstall' data-id='"+$(this).attr('data-id')+"'>Uninstall</button>";	
                 else
@@ -143,22 +151,27 @@ function launchStore2(storetype) {
                     y = confirm("Install "+i.name+"?");
                     if(y == true) {
                         if(i.type == "Panel" || i.type == "Service") {
-                            install_panel(i.id, i.name, getIcon(i.icon_fa, "large"), i.url, (i.type != "Panel"), i.key);
-                            $.get('storepost.php', {item: i.id, action: 'Download'}, function() {
+//                            install_panel(i.id, i.name, getIcon(i.icon_fa, "large"), i.url, (i.type != "Panel"), i.key);
+                            var p = new Panel(i.plugin_id, i.url);
+                            console.log("Getting Panel "+i.plugin_id+" from "+i.url);
+                            panelManager.install(p);
+                            $.get('php/storepost.php', {item: i.plugin_id, action: 'Download'}, function() {
                                 console.log('Panel installed');
                             });
                             alert('Panel installed');
                         }
                         else if(i.type == "Dictionary") {
+                            //FIXME New Class
                             install_dictionary(i.type_d, i.url, i.name, i.id, getIcon(i.icon_fa, "large"));	
-                            $.get('storepost.php', {item: i.id, action: 'Download'}, function() {
+                            $.get('php/storepost.php', {item: i.id, action: 'Download'}, function() {
                                 console.log('Dictionary installed');
                             });
                             alert('Dictionary added')
                         }
                         else if(i.type == "Theme") {
+                            //FIXME New Class
                             install_theme(i.id, i.name, i.url, getIcon(i.icon_fa, "large"));
-                            $.get('storepost.php', {item: i.id, action: 'Download'}, function() {
+                            $.get('php/storepost.php', {item: i.id, action: 'Download'}, function() {
                                 console.log('Theme installed');
                             });
                             alert('Theme added');
@@ -174,21 +187,21 @@ function launchStore2(storetype) {
                         if(i.type == "Panel" || i.type == "Service" || i.type == "Spreadsheet Library" || i.type == "Converter") {
                             //install_panel(i.id, i.name, getIcon(i), i.url);
                             uninstall_panel(i.id);
-                            $.get('storepost.php', {item: i.id, action: 'Uninstall'}, function() {
+                            $.get('php/storepost.php', {item: i.id, action: 'Uninstall'}, function() {
                                 console.log('Panel uninstalled');
                             });
                             alert('The panel was uninstalled.');
                         }
                         else if(i.type == "Dictionary") {
                             uninstall_dictionary(i.id);	
-                            $.get('storepost.php', {item: i.id, action: 'Uninstall'}, function() {
+                            $.get('php/storepost.php', {item: i.id, action: 'Uninstall'}, function() {
                                 console.log('Dictionary uninstalled');
                             });
                             alert('The dictionary was removed.')
                         }
                         else if(i.type == "Theme") {
                             uninstall_theme(i.id);
-                            $.get('storepost.php', {item: i.id, action: 'Uninstall'}, function() {
+                            $.get('php/storepost.php', {item: i.id, action: 'Uninstall'}, function() {
                                 console.log('Theme uninstalled');
                             });
                             alert('The theme was removed.');

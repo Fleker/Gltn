@@ -9,6 +9,7 @@ theme.fullscreen.bodyColor = "rgba(41,41,41)";
 theme.fullscreenDark.bodyColor = "rgba(41,41,41)";
 theme.fullscreenDark.fontColor = 'white';
 theme.fullscreenDark.bodyColor = 'white';
+theme.isRelativeDark = true;
 theme.ribbon.highlight = '#3498db';
 
 function initTheme() {

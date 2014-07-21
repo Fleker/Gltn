@@ -31,6 +31,7 @@ Designing both types of plugins are very similar. Before they can be run, they m
     //This could be a service too. They are initiated using the same constructor parameters
     panelManager.install(panel);
 ```
+After the panel is installed, it is cached locally and can be recalled each time the webpage loads.
 
 This can be run from the console for debugging.
 
