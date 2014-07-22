@@ -25,6 +25,21 @@ function Panel(id, displayname, url) {
         this.setWidth(json.width);
         this.title = json.title;
         this.icon = json.icon;
+        if(typeof(holoribbon_std) == "undefined")
+            return this;
+        for(i in holoribbon_std['Panels']) {
+            if(holoribbon_std['Panels'][i].plugin_id !== undefined) {
+                if(holoribbon_std['Panels'][i].plugin_id == this.id) {
+                    holoribbon_std['Panels'][i].text = this.name;   
+                    holoribbon_std['Panels'][i].img = getIcon(this.icon, 18);   
+                }
+            }
+        }
+        newRibbon('.header', holoribbon_std);
+        ribbonSwitch(ribbon_index,false);
+        ribbonLoad();
+        markAsDirty();
+        return this;
     }
     Panel.prototype.hasBordercolor = function() {
         return this.bordercolor !== undefined && this.bordercolor.length > 0;   
@@ -89,7 +104,7 @@ function PanelManager() {
         Main_Pagecount: new Panel("Main_Pagecount", "Page Count"),
         Main_Sync: new Panel("Main_Sync", "Synchronization Status"),
         Main_Table: new Panel("Main_Table", "Spreadsheets"),
-        Main_Themes: new Panel("Main_Themes", "Theme Selector")
+        Main_Themes: new Panel("Main_Themes")
     };
     //FIXME service and override are the same
     PanelManager.prototype.fromString = function(j) {
@@ -97,11 +112,11 @@ function PanelManager() {
         for(var i in json) {
             if(this.availablePanels[i] !== undefined)
                 continue;
-            
+            //TODO Revise constuctors
             if(json[i].service === true)
-                var p = new Service(json[i].id, json[i].name, json[i].icon, json[i].url, json[i].override, json[i].service);            
+                var p = new Service(json[i].id, json[i].name, json[i].url, json[i].override, json[i].service);            
             else
-                var p = new Panel(json[i].id, json[i].name, json[i].icon, json[i].url, json[i].override, json[i].service);  
+                var p = new Panel(json[i].id, json[i].name, /*json[i].icon, */json[i].url, json[i].override, json[i].service);  
             this.availablePanels[i] = p;
         }
     };
@@ -132,27 +147,29 @@ function PanelManager() {
             panel.key = [];
         }
         panel.icon = panel.icon.replace(/&gt;/g, ">").replace(/&lt;/g, "<");
-        //Return keyboard shortcuts
+        
         if(panel.service !== true) {
-            holoribbon_std['Panels'].push({text: panel.name, img: panel.img, action: "runPanel('"+panel.id+"')"});
+            holoribbon_std['Panels'].push({text: panel.name, img: panel.img, action: "runPanel('"+panel.id+"')", plugin_id: panel.id});
             newRibbon('.header', holoribbon_std);
             console.log("Installing "+panel.id+"...  "+num);
             ribbonSwitch(ribbon_index,false);
             ribbonLoad();
         }
-//        writeToSettings('panels_'+panel.id, panel.id+","+panel.url);
         this.availablePanels[panel.id] = panel;
 
         if(window.offline !== true) {
             //Now store script offline - this really sucks though
+            console.log(panel, panel.url);
             loadjscssfile(panel.url, "js");
             $('#themeframe').attr('src', panel.url);
             downloadingpanel = "null";
-            window.setTimeout("download_panel("+panel.id+","+num+");", 200);
+            window.setTimeout("download_panel('"+panel.id+"',"+num+");", 200);
         }
+        writeToSettings("panels", this.toString());
     };
     PanelManager.prototype.uninstall = function(id) {
         //For removing the ribbon, need to compare the name of the ribbon with the name of the panel
+        //TODO Revise with new API
         var a = getSettings('panels_'+id).split(', ');
         var b = [];
         for(var i in holoribbon_std.Panels) {
@@ -289,8 +306,8 @@ currentpanel = undefined;
 downloadingpanel = "";
 
 //PANEL INSTALL
-function install_panel(id, name, img, url, service, key, num) {
-    panelManager.install(new Panel(id, name, img, url, key, service),num);
+function install_panel(id, name, url) {
+    panelManager.install(new Panel(id, name, url),num);
 }
 
 function download_panel(id,num) {
@@ -302,11 +319,11 @@ function download_panel(id,num) {
     } else {
         console.log("Installed "+id);
         localStorage['zpanels_'+id] = $('#themeframe').contents().text();  
-        console.log("eval('InitPanel"+id+"();');  "+num);
-        eval("availablePanels['"+id+"'] = "+id);
-        console.log("availablePanels['"+id+"'] = "+id);
-        if(availablePanels[id].onInit !== undefined)
-            availablePanels[id].onInit();
+//        console.log("eval('InitPanel"+id+"();');  "+num);
+//        eval("availablePanels['"+id+"'] = "+id);
+//        console.log("availablePanels['"+id+"'] = "+id);
+        if(panelManager.availablePanels[id].onInit !== undefined)
+            panelManager.availablePanels[id].onInit();
         num++;
         initPanels(num);
     }
@@ -325,7 +342,6 @@ function getPanelIndex(index) {
 }
 //TODO I know this is being called twice somehow. I just can't figure out how
 function initPanels(num) {
-    console.log("!n!t");
     if(!hasSetting("panels")) {
         writeToSettings("panels", panelManager.toString());   
     }
@@ -340,59 +356,18 @@ function initPanels(num) {
     if(num >= a_nm - 1)
         return null;
     
+    plugin = panelManager.getAvailablePanels()[getPanelIndex(num)];
     if(getPanelIndex(num).indexOf('Main') !== 0) {
-        console.log("Must install panel "+getPanelIndex(num));
+        console.log("Must install panel "+getPanelIndex(num), num);
         panelManager.install(plugin, num);
     } else {
-        plugin = panelManager.getAvailablePanels()[getPanelIndex(num)];
         console.log("Panel "+getPanelIndex(num)+".onInit is "+(plugin.onInit !== undefined));
         if(plugin.onInit !== undefined)
             plugin.onInit();
         num++;
-        console.log(num);
+//        console.log(num);
         initPanels(num);
     }
-}
-
-//CHANGES I Think I can killl this
-function initPanel2s(num) {
-    if(num === undefined)
-        num = 0;
-    if(getSettings('panels') === undefined) {
-		writeToSettings('panels', mainpanels);	
-	}
-	var a = getSettings('panels').split(',');
-    if(num === NaN)
-        return null;
-    if(a.length - 1 < num)
-        return null;
-    console.log("Initializing Panel #"+num+": "+a[num]);
-    a[num] = a[num].trim();
-    
-		if(a[num].indexOf('main') > -1) {
-			try {
-				//
-				eval('InitPanel'+a[num]+'();');	
-				console.log('InitPanel'+a[num]);
-			} catch(e) {
-				//console.error(e.message);
-			}
-            initPanels(num+1);
-		} else {
-			//Need to add script
-            console.log(a[num], getSettings('panels_'+a[num]));
-			var b = getSettings('panels_'+a[num]).split(',');
-            console.log("Panel Manifest "+b.length, b);
-			if(b.length == 4)
-				install_panel(b[0], b[1], b[2], b[3], false, " ", num);
-			else if(b.length == 5)
-				install_panel(b[0], b[1], b[2], b[3], b[4], " ", num);
-			else if(b.length == 6)
-				install_panel(b[0], b[1], b[2], b[3], b[4], b[5], num);
-            else if(b.length == 8) /* Data Validation */ {
-                install_panel(b[0], b[1].trim(), "?", b[3], b[4].trim(), b[5].trim(), num);     
-            }
-		}
 }
 
 //Panel GUI
@@ -1040,6 +1015,22 @@ specialCharacters = {
     CloudWithTornado: getEmoji("🌪", "Cloud with Tornado", ""),
     Fog: getEmoji("🌫", "Fog", ""),
     WindBlowingFace: getEmoji("🌬", "Wind Blowing Face", ""),
+    Chestnut: getEmoji("🌰","Chestnut",""),
+    Seedling: getEmoji("🌱","Seedling",""),
+    EvergreenTree: getEmoji("🌲","Evergreen Tree", "pine christmas"),
+    DeciduousTree: getEmoji("🌳","Deciduous Tree", ""),
+    PalmTree: getEmoji("🌴","Palm Tree", "tropical"),
+    Cactus: getEmoji("🌵", "Cactus", "cacti"),
+    HotPepper: getEmoji("🌶", "Hot Pepper", "red chili peppers"),
+    Tulip: getEmoji("🌷", "Tulip", ""),
+    CherryBlossom: getEmoji("🌸", "Cherry Blossom", "japan"),
+    Rose: getEmoji("🌹", "Rose", ""),
+    Hibiscus: getEmoji("🌺", "Hibiscus", ""),
+    Sunflower: getEmoji("🌻", "Sunflower", ""),
+    Blossom: getEmoji("🌼", "Blossom", ""),
+    EarOfMaize: getEmoji("🌽", "Ear of Maize", ""),
+    EarOfRice: getEmoji("🌾", "Ear of Rice", ""),
+    Herb: getEmoji("🌿", "Herb", "spice"),
     
     Wheelchair: getChar("♿","Wheelchair",'wheelchair chair'),
     Fountain: getChar("⛲","Fountain","fountain water park"),
@@ -1061,7 +1052,7 @@ specialCharacters = {
     //TODO Chess, Dominos, Cards
     
 };
-
+//TODO Revise tag & search
 panelManager.getAvailablePanels().Main_Character.onRun = function() {
 	var out = "";
 	var searchbar = '<input type="search" id="popup_character_search" style="width:100%" placeholder="Search for Characters" ><br>';
@@ -1407,21 +1398,19 @@ function RunPanelmain_Outline() {
 panelManager.getAvailablePanels().Main_Outline.onRun = RunPanelmain_Outline;
 //panelManager.getAvailablePanels().Main_Outline.setBordercolor('#7f8c8d').setWidth(25);
 
-panelManager.getAvailablePanels().Main_Filesys.title = '<span class="fa fa-folder-open" style="font-size:15pt"></span>&nbsp;My Documents';
-//TODO X Circle Button cut off on top
-//TODO Shorten search width a little, color in tables
-function GetPanelmain_Filesys() {
-	return {title: '<span class="fa fa-folder-open" style="font-size:15pt"></span>&nbsp;My Documents', bordercolor: '#7f8c8d', width:25};
-}
-function InitPanelmain_Filesys() {
-	$(document).on('keydown', function(e) {
+panelManager.getAvailablePanels().Main_Filesys.setManifest({
+    title: '<span class="fa fa-folder-open" style="font-size:15pt"></span>&nbsp;My Documents',
+    bordercolor: "#7f8c8d",
+    width: 33
+});
+panelManager.getAvailablePanels().Main_Filesys.onInit = function() {
+    $(document).on('keydown', function(e) {
 		if(e.keyCode == 79 && e.altKey) {
-			runPanel('main_Filesys'); 
+			runPanel('Main_Filesys'); 
 		}
 	});
 }
-panelManager.getAvailablePanels().Main_Filesys.onInit = InitPanelmain_Filesys;
-//Modal for new file creation and implementation
+//TODO Shorten search width a little, color in tables
 function createNewFile() {
     ht = '<div class="row collapse"><div class="small-3 medium-3 columns"><input id="FileName" type="text" value="untitled" /></div><div class="small-3 medium-1 columns"><span class="postfix">.gltn</span></div>';
     ht += "<div class='small-6 medium-8 columns end'>&emsp;<input type='search' id='FormatFinder' style='width:40%;display:inline-block' placeholder='Choose a Format'>&ensp;<button id='FormatOk' class='textbutton' style='margin-left:30px;font-size:16pt;'>Create</button></div></div><br><span style='font-size:14pt;'>&emsp;Search for a Format<br></span><br><div id='FormatSearch' style='text-align:center'><div>";
@@ -1459,9 +1448,9 @@ function createNewFile() {
             window.location = "?file="+nFileid+"&format="+$('#FormatFinder').val();
         });
     }
-    initiatePopup({title: "New File", ht:ht, fnc:fnc,size:"large"});
+    initiatePopup({title: "Create New File", ht:ht, fnc:fnc,size:"large"});
 }
-function RunPanelmain_Filesys() {
+panelManager.getAvailablePanels().Main_Filesys.onRun = function () {
 	function c(i) {
 		//console.log(i);	
 	}
@@ -1471,17 +1460,7 @@ function RunPanelmain_Filesys() {
 	}
 	function post(out,term) {
 		postPanelOutput(out);
-		$('.Filesys_delete').on('click', function() {
-			$('.Filesys_delete').attr('data-end', true);
-			x = confirm('Delete '+$(this).attr('data-f')+'.gltn? This cannot be undone.');
-			if(x == true) {
-				y = confirm('Are you positive that you want this file to be completely erased?');
-				if(y == true) {
-					deleteFile($(this).attr('data-f'));
-					resetFolder($('#filesys_s').val());
-				}
-			}
-		});
+		
 		$('.Filesys_delete').hover(function() {
 			$(this).css('color', theme.bodyColor).css('background-color', theme.palette.red.normal).css('border-radius', 100);
 		}, function() {
@@ -1489,9 +1468,62 @@ function RunPanelmain_Filesys() {
 		});
 		
 		$('.tfile').on('click', function() {
-			if($('.Filesys_delete').attr('data-end') != "true")
+			/*if($('.Filesys_delete').attr('data-end') != "true")*/
 				wl($(this).attr('data-v'));
 		});
+        $('.tinfo').on('click', function() {
+            var id = $(this).attr('data-v');
+            var doc = $.xml2json(localStorage[id]);
+            out = "<div class='tinfo'><h1>"+doc.metadata.Title+"</h1>";
+            out += "<h2>By "+doc.metadata.Author+"</h2>";
+            out += "<h3>"+id+".gltn&nbsp;&nbsp;"+truncateFloat(getLocalStorageOf(id)+getLocalStorageOf(id+"_c"))+"KB</h3>";
+            out += "<h4 class='filedata'>"+doc.file.format+"&emsp;"+doc.file.language+"&emsp;"
+            if(doc.file.gltn_version !== undefined)
+                out += "From Gltn v"+doc.file.gltn_version;
+            out += "</h4>";
+            
+//            time = jQuery.timeago(new Date().setTime(doc.file.last_modified));
+            timeiso = new Date();
+            timeiso.setTime(decodeURIComponent(doc.file.last_modified));
+            timeiso = timeiso.toISOString();
+            out += "<h4 class='lastedit'>";
+            if(doc.saved != undefined) {
+                if(doc.saved.inkblob_url != undefined)
+                    out += "<span class='fa fa-cloud' style='font-size:12pt' title='File is available on the cloud'></span>&nbsp;&nbsp;";
+            }
+            out += "Last edited <abbr class='timeago' title='"+timeiso+"'></abbr></h4>";
+            out += "<h5>"+doc.file.tags+"</h5>";
+            
+            out += "<button class='textbutton openFile' data-v='"+id+"'><span class='fa fa-sign-in'></span>&nbsp;Open File</button>&emsp;&emsp;<button class='textbutton downloadFile' data-v='"+id+"'><span class='fa fa-download'></span>&nbsp;Download</button>&emsp;&emsp;<button class='textbutton deleteFile' data-v='"+id+"'><span class='fa fa-times' style='color:"+theme.palette.red.normal+"'></span>&nbsp;Delete</button></div>";
+            //TODO Download handler
+            var f = function() {
+                $('.tinfo > h1').css('color', theme.fontColor).css('font-size', '15pt').css('font-family','inherit').css('margin-top','-16px');
+                $('.tinfo > h2').css('color', theme.fontColor).css('font-size', '13pt').css('font-family','inherit').css('margin-left', '32px')/*.css('margin-top', '-8px')*/.css('margin-bottom', '24px');
+                $('.tinfo > h3').css('color', theme.fontColor).css('font-size', '13pt').css('font-family', 'inherit').css('opacity', '0.8');
+                $('.tinfo > .filedata').css('color', theme.fontColor).css('font-size', '11pt').css('text-align', 'right').css('margin-top','-24px').css('opacity', '0.8');
+                $('.tinfo > .lastedit').css('color', theme.fontColor).css('font-size', '12pt').css('font-family', 'inherit');
+                $('.tinfo > h5').css('color', theme.fontColor).css('opacity', '0.5').css('font-family', 'inherit').css('font-size','10pt').css('margin-bottom','32px').css('padding-top', '8px').css('margin-left', '32px');
+                
+                jQuery("abbr.timeago").timeago();
+                $('.openFile').on('click', function() {
+                    wl($(this).attr('data-v'));
+                });
+                $('.deleteFile').on('click', function() {
+                    x = confirm('Delete '+$(this).attr('data-v')+'.gltn? This cannot be undone.');
+                    if(x == true) {
+                        y = confirm('Are you positive that you want this file to be completely erased?');
+                        if(y == true) {
+                            deleteFile($(this).attr('data-v'));
+                            resetFolder($('#filesys_s').val());
+                        }
+                    }
+                });
+                $('.downloadFile').on('click', function() {
+                    alert("TODO EXport"); 
+                });
+            };
+            p = new Popup({title: "File Properties", ht: out, fnc: f, size: popupManager.LARGE}).show(); 
+        });
 		$('#filesys_new').on('click', function() {
 			createNewFile();
 		});
@@ -1580,7 +1612,7 @@ function RunPanelmain_Filesys() {
 			sterm = "";
 		else
 			sterm = term.toLowerCase();
-		out = "<button class='textbutton' id='filesys_new'><span class='fa fa-plus'></span>&nbsp;New</button><input type='file' id='filesys_u' style='display:none' name='file[]'><button class='textbutton' id='filesys_up'><span class='fa fa-cloud-upload'>&nbsp;</span>Upload</button><br><span class='fa fa-search' style='font-size:16pt'></span>&nbsp;&nbsp;&nbsp;<input type='search' id='filesys_s' style='width:85%;display:inline' value='"+sterm+"'><table style='width:100%'><input type='hidden' id='filesys_file'>";
+		out = "<button class='textbutton' id='filesys_new'><span class='fa fa-plus'></span>&nbsp;New</button><input type='file' id='filesys_u' style='display:none' name='file[]'>&ensp;<button class='textbutton' id='filesys_up'><span class='fa fa-cloud-upload'>&nbsp;</span>Upload</button><br><span class='fa fa-search' style='font-size:16pt'></span>&nbsp;&nbsp;&nbsp;<input type='search' id='filesys_s' style='width:calc(100% - 64px);display:inline' value='"+sterm+"'><input type='hidden' id='filesys_file'>";
 		fstotal = 0;
 		for(i in localStorage){
 			c(i);
@@ -1596,7 +1628,7 @@ function RunPanelmain_Filesys() {
 				if(title == undefined)
 					title = "";
                 
-                bgc = theme.fontColorAlt;
+                bgc = theme.bodyColor;
 				if(i == fileid)
 					bgc = theme.palette.blue.normal;
 					
@@ -1617,7 +1649,7 @@ function RunPanelmain_Filesys() {
                     timeiso = undefined;
                     try {
                          //console.log(xx.file.last_modified, time);
-                       time = jQuery.timeago(new Date().setTime(xx.file.last_modified));
+                        time = jQuery.timeago(new Date().setTime(xx.file.last_modified));
                         timeiso = new Date();
                         timeiso.setTime(decodeURIComponent(xx.file.last_modified));
                         //console.log(xx.file.last_modified,timeiso, timeiso.getTime());
@@ -1628,25 +1660,29 @@ function RunPanelmain_Filesys() {
                         timeiso = undefined;
                         //console.error(e.message);
                     } 
-                    //#2c3e50
-					out += "<tr><td class='tfile "+((i==fileid)?"selected":"")+"' style='background-color:"+bgc+";border:solid 0px "+bgc+";padding-bottom:8px;width:98%;cursor:pointer;' data-v='"+i+"'><table style='font-size:7pt;font-family:sans-serif;width:100%;'><tr><td style='text-align:left'><span style='font-size:8pt' class='fa fa-file-text'></span>&nbsp;"+i+".gltn</td><td style='text-align:center;width:36px' class='Filesys_delete' data-f='"+i+"'>X</td></tr></table>";
-					if(title != undefined)
-						out += "<div style='margin-left:3px'><b>"+title+"</b></div>";	
-					out += "<span style='font-size:8pt'>&emsp;"+xx.file.format+"&nbsp;&nbsp;"+xx.file.language+"&nbsp;&nbsp;"+fsout+"</span><br>";
+                    
+					/*out += "<div class='tfile "+((i==fileid)?"selected":"")+"' style='background-color:"+bgc+";border:solid 0px "+bgc+";padding-bottom:8px;width:98%;cursor:pointer;' data-v='"+i+"'><table style='font-size:7pt;font-family:sans-serif;width:100%;'><tr><td style='text-align:left'><span style='font-size:8pt' class='fa fa-file-text'></span>&nbsp;"+i+".gltn</td><td style='text-align:center;width:36px' class='Filesys_delete' data-f='"+i+"'>X</td></tr></table>";*/
+//                    out += "<div style='background-color:"+bgc+"; border-bottom: solid 1px "+theme.palette.grey.accent400+";padding-bottom:8px;margin-bottom: 8px; width: 98%;'><span style='font-size:8pt;'>"+i+".gltn</span>";
+                    out += "<div style='background-color:"+bgc+"; padding-bottom:8px;margin-bottom: 8px;'>";
+                    out += "<div style='margin-left:3px;padding:8px;'><b>"+((title !== undefined && title.length > 2)?title:i+".gltn")+"</b></div>";
+                    console.log('"'+title+'"', i);
+					out += "<span style='font-size:8pt'>&emsp;"+xx.file.format+/*"&nbsp;&nbsp;"+xx.file.language+*/"&nbsp;&nbsp;"+fsout+"</span>";
                     time = "";
                     out += "&emsp;";
                     if(xx.saved != undefined) {
                         if(xx.saved.inkblob_url != undefined)
-                            out += "<span class='fa fa-cloud' style='font-size:7pt'></span>&nbsp;";
+                            out += "<span class='fa fa-cloud' style='font-size:8pt' title='File is available on the cloud'></span>&nbsp;";
                     }
                         
                     if(timeiso != undefined)
-                        out += "<span style='font-size:7pt'>Last edited <abbr class='timeago' title='"+timeiso+"'></abbr>"+time+"</span>";
-					out += "</td></tr>";	
+                        out += "<span style='font-size:8pt'>Last edited <abbr class='timeago' title='"+timeiso+"'></abbr>"+time+"</span>";
+                    var actioncolor = getAppropriateColor(theme.palette[getSettings("personal_color")].accent700, theme.palette[getSettings("personal_color")].accent100);
+                    out += "<br><div class='tfile fa fa-sign-in' data-v='"+i+"' style='color:"+actioncolor+"; display:inline-block; width:24px; padding-top:8px; padding-left: 8px; cursor:pointer;'></div>&emsp;<div class='tinfo fa fa-info' data-v='"+i+"' style='color:"+actioncolor+";display:inline-block; width:24px; cursor:pointer;'></div>";
+					out += "</div>";	
 				}
 			}	
 		}
-		out += "</table>";
+//		out += "</table>";
 		fstotal += localStorage['settings'].length;
 		fstotalout = "<br><span style='font-size:10pt'>&emsp;"+getLocalStorageLength()+"KB stored</span><br><button class='textbutton exportall'>Export All Data</button>"
 		out += fstotalout;
@@ -1659,7 +1695,7 @@ function RunPanelmain_Filesys() {
 	}	
 	resetFolder();
 }
-panelManager.getAvailablePanels().Main_Filesys.onRun = RunPanelmain_Filesys;
+
 function GetPanelmain_Guide() {
 	return {title: '<span class="fa fa-info-circle" style="font-size:13pt"></span>&nbsp;Style Guide', bordercolor: '#7f8c8d', width:30};
 }
@@ -2119,10 +2155,7 @@ panelManager.getAvailablePanels().Main_Themes.onInit = function() {
     
     setInterval("iterateTheme()", 50);
 };
-function GetPanelmain_Themes() {
-	return {title:"Change Theme", bordercolor: '#2ecc71', width: 25};	
-}
-function RunPanelmain_Themes() {
+panelManager.getAvailablePanels().Main_Themes.onRun = function() {
 	function loadThemes() {
 		var a = themeManager.availableThemes;
         out = "<button id='ThemeSettings' class='textbutton'><span class='fa fa-cog'></span>&nbsp;Theme Settings</button><br>";
@@ -2156,7 +2189,12 @@ function RunPanelmain_Themes() {
 	}
 	loadThemes();
 }	
-panelManager.getAvailablePanels().Main_Themes.setBordercolor('#2ecc71').setWidth(20).onRun = RunPanelmain_Themes;
+panelManager.getAvailablePanels().Main_Themes.setManifest({
+    bordercolor: "#2ecc71",
+    width:20,
+    title: "Theme Picker",
+    name: "Themes"
+});
 
 /** Page Count **/
 function InitPanelmain_PageCount() {

@@ -1,11 +1,13 @@
-//currentpanel = "fleker_TODO";
-
 var p = panelManager.getAvailablePanels().Fleker_TODO;
+//console.log(p);
 p.setManifest({
     title: "TODO LIST",
+    name: "Todo",
     width: 30,
-    bordercolor: "#d35400"
+    bordercolor: "#d35400",
+    icon: "check-circle-o"
 });
+//TODO Move to DIVs
 p.onRun = function() {
     function restart() {
         out = "Write {TODO,FUTURE ...} to take a note. These notes will be collected here. You can also @ someone to designate a role.<br><br>";
@@ -13,7 +15,7 @@ p.onRun = function() {
         arr = input.match(/{(TODO|FUTURE|NOTE|FIXME|CHANGES) [^}]*}/g);
         out += "<table style='width:95%'>";
         for(i in arr) {
-            console.warn(arr[i]);
+//            console.warn(arr[i]);
             var user = undefined;
             if(arr[i].search(/@ ([^\s]*)/g) != -1) {
                 //Pull out username
@@ -62,4 +64,4 @@ p.onRun = function() {
     restart();
 }
 p.activate();
-console.log("Activate TODO");
+//console.log("Activate TODO");

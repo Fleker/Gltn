@@ -1751,6 +1751,7 @@ function resetTheme() {
     $('body').css('font-family', '');
     $('button').css('text-transform', '').css('letter-spacing', '').css('color', '').css('border-radius', '').css('font-size','');
     $('.ribbonheader').css('color', '');
+    $('.ribbonbody').css('height','78px');
     
     loadThemeSettings = function() { return "" };
 }
@@ -1796,6 +1797,8 @@ function iterateTheme() {
     $('td[data-theme!=false]').css('color', theme.fontColor);
     $('label').css('color', theme.fontColor);
     $('input[data-theme!=false]').css('background-color', theme.bodyColor).css('color', theme.fontColor);
+    $('h1, h2, h3, h4, h5').css('font-family', 'inherit').css('color', 'inherit');
+    $('abbr').css('font-size', '100%');
     //TODO Erase css rules from foundation.min. css
     $('table').css('background-color', 'inherit').css('border', 'none');
     $('kbd[data-theme!=false]').css('background-color', '').css('border-color','').css('color','').css('border-style','').css('border-width','').css('font-family','').css('padding','').css('border-radius','');
@@ -2041,9 +2044,9 @@ function initNotifications() {
 
 function postNotificationsIcon() {
     if(notifications.length == 0)
-        initService("main_Notifications", "Notifications (0)", "<span class='fa fa-bell-o'></span>");
+        initService("Main_Notifications", "Notifications (0)", "<span class='fa fa-bell-o'></span>");
     else
-        initService("main_Notifications", "Notifications ("+notifications.length+")", "<span class='fa fa-bell'></span>&nbsp;"+notifications.length);
+        initService("Main_Notifications", "Notifications ("+notifications.length+")", "<span class='fa fa-bell'></span>&nbsp;"+notifications.length);
 }
 
 function InitPanelmain_Notifications() {}

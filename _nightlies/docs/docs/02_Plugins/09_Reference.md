@@ -17,7 +17,8 @@ The class `Panel` is a self-contained plugin with functions and stored data abou
 | ----------   | :-----: | ------------------------------------------: |  
 | `id`     | String  | Unique identifier for this plugin      |
 | `url`        | URL     | URL of the panel script to execute                | 
-| `name`     | String  | Name of the panel                      |
+|  `name`     | String  | Name of the panel, appears in the ribbon                     |
+|   `title`   | String  | Title of the panel that appears at the top when opened |
 | `service`       | Boolean  | Whether or not the plugin is a service (default is `false`)           |
 | `icon    `   | Icon    | An image or icon representing the panel in the ribbon |
 | `override    `   | [int]    | An array of keycodes to override (preventing default browser/Gltn function) |

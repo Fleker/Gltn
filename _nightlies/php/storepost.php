@@ -25,6 +25,6 @@ if($_GET['action'] == "Download")
 else
     $q = "SET `uninstall` = `uninstall` + 1";
 
-mysql_query("UPDATE `gltn_plugins` ".$q." WHERE `plugin_id` = $id");
+mysql_query("UPDATE `gltn_plugins` ".$q." WHERE `plugin_id` = '$id'");
 echo mysql_error();
 ?>

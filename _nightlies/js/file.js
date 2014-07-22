@@ -1,28 +1,4 @@
 // File.js handles the saves and restores, changing the formatting, and other file-related functions (convert to PDF? LaTeX, .doc)
-GLTN_VERSION = "1.3.1.4";
-//For backwards compatibility, will return true 
-function greaterThanVersion(version) {
-    var split = version.split(".");
-    var V = GLTN_VERSION.split(".");
-    if(split[0] < V[0])
-        return true;
-    //1.X v 1.X OR 2.X v 1.Y
-    if(split[0] > V[1])
-        return false;
-    //1.1.X v 1.2.X
-    if(split[1] < V[1])
-        return true;
-    if(split[1] > V[1])
-        return false;
-    if(split[2] < V[2])
-        return true;
-    if(split[2] > V[2])
-        return false;
-    if(split[3] <= V[3])
-        return true;
-    else
-        return false;
-}
 
 //Since the file initiates when it loads, you can do some initization 
 //TODO Push everything to File

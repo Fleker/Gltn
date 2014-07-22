@@ -1,4 +1,29 @@
-	/*** RANGY ***/
+GLTN_VERSION = "1.3.1.5";
+//For backwards compatibility, will return true 
+function greaterThanVersion(version) {
+    var split = version.split(".");
+    var V = GLTN_VERSION.split(".");
+    if(split[0] < V[0])
+        return true;
+    //1.X v 1.X OR 2.X v 1.Y
+    if(split[0] > V[1])
+        return false;
+    //1.1.X v 1.2.X
+    if(split[1] < V[1])
+        return true;
+    if(split[1] > V[1])
+        return false;
+    if(split[2] < V[2])
+        return true;
+    if(split[2] > V[2])
+        return false;
+    if(split[3] <= V[3])
+        return true;
+    else
+        return false;
+}
+
+/*** RANGY ***/
 	//RANGY OBJECTS DO NOT UPDATE WHEN THE DOM CHANGES -> CREATE NEW OBJECT IF SOMETHING 
 range = null;
 function debug_buttons() {
@@ -649,8 +674,8 @@ function openPersonalFavorites() {
         $('.preference_card').css('width','calc(50% - 32px)').css('display','inline-table').css('font-weight','200')/*.css('border-right','solid 1px rgba(128,128,128,1);' )*/.css( 'margin-right','16px').css('padding-right','16px').css('border-bottom','solid 1px #999').css('padding-top','8px');
         $('.preference_card>h1').css('color', theme.fontColorAlt).css('text-transform', 'uppercase').css('font-size','13pt').css('font-weight','200').css('margin-left', '-10px').css('font-family', 'inherit');
     }   
-    var p = new Popup({title: "Personal Settings", ht: output, fnc: f, size: popupManager.XLARGE}).show();
     
+    var p = new Popup({title: "Personal Settings", ht: output, fnc: f, size: popupManager.XLARGE}).show();
 }   
 
 function postLegal() {
@@ -661,9 +686,10 @@ function postLegal() {
     out += "Shoutout to everyone who posted online about stuff like replacing text nodes and the ample amount of help from StackOverflow.<br>";
     out += '<br>Stock Images:<br>&emsp;"<a href="http://commons.wikimedia.org/wiki/File:Isidor_von_Sevilla.jpeg#mediaviewer/File:Isidor_von_Sevilla.jpeg">Isidor von Sevilla</a>" by <a href="//en.wikipedia.org/wiki/Bartolom%C3%A9_Esteban_Murillo" class="extiw" title="en:Bartolomé Esteban Murillo">Bartolomé Esteban Murillo</a> - <a rel="nofollow" class="external free" href="http://www.museumsyndicate.com/artist.php?artist=442">http://www.museumsyndicate.com/artist.php?artist=442</a>. Licensed under Public domain via <a href="//commons.wikimedia.org/wiki/">Wikimedia Commons</a>.'
 
-	f = function() { };
-	initiatePopup({title:'Credits', value: out, fnc: f});
-
+	f = function() {
+        $('#myModal a').css('color', theme.palette[getSettings("personal_color")].normal);
+    };
+	initiatePopup({title:'About', value: out, fnc: f});
 }
 
 
@@ -712,10 +738,10 @@ window.applicationCache.addEventListener('error', function() {
 	console.error("Error caching files for offline use.");
 	if(window.offline != true) {
 		window.appcachestatus = "Error caching files for offline use";
-		initService("main_Offline", "App caching", "&nbsp;");
+		initService("Main_Offline", "App caching", "&nbsp;");
 	} else {
 		window.appcachestatus = "You are currently working offline";
-		setTimeout('initService("main_Offline", "App available offline", "<span class=\'fa fa-plane\'></span>");', 2000);
+		setTimeout('initService("Main_Offline", "App available offline", "<span class=\'fa fa-plane\'></span>");', 2000);
 	}
 });
 
@@ -723,7 +749,7 @@ window.appcachestatus = "App available offline";
 
 function appcache() {
 	console.log("App is now available for offline use.");
-    setTimeout('initService("main_Offline", "App available offline", "<span class=\'fa fa-plane\'></span>");', 2000);
+    setTimeout('initService("Main_Offline", "App available offline", "<span class=\'fa fa-plane\'></span>");', 2000);
 	//hot swap	
 	try {
 		window.applicationCache.swapCache();

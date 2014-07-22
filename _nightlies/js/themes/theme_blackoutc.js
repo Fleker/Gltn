@@ -24,16 +24,11 @@ function initTheme() {
 	$('#panel_plugin').css('background-color', '#333');
     $('input[data-theme!=false]').css('background-color', '#444').css('color', theme.fontColor).css('font-family', '"Roboto Condensed", sans-serif').css('font-size', '11pt');
     $('td[data-theme!=false]').css('color', theme.fontColor);
-    //NOTE data-theme!=false
-	$('button').css('font-family', '"Roboto Condensed", sans-serif');
+    $('button').css('font-family', '"Roboto Condensed", sans-serif');
 	$('.toolbar, .overflow').css('background-color', '#444');
 	$('.popuptop').css('color', 'white').css('background-color', theme.bodyColor);
 	$('.content_textarea').css('line-height','1.4em').css('padding-right', '5px');
 	$('.hovertag').css('font-size', '10pt');
-
-	//Misc panel support -- Can be placed into the system again using smarter palettes
-	$('.tfile').css('background-color', '#444');	
-	$('.tfile.selected').css('background-color', theme.palette.blue.normal);	
 }	
 function loadThemeSettings() {
     out = 'Highlight Color: <select id="ThemeColor">';

@@ -599,11 +599,11 @@
 
   $.fn.foundation = function () {
     var args = Array.prototype.slice.call(arguments, 0);
-      console.log(this);
+//      console.log(this);
       this.each(function(i, el) {
-         console.log(i); 
+//         console.log(i); 
       });
-      console.log([this].concat(args));
+//      console.log([this].concat(args));
     return this.each(function (i, el) {
       Foundation.init.apply(Foundation, [this].concat(args));
       return this;

@@ -27,9 +27,6 @@ function initTheme() {
 	$('.hovertag').css('font-size', '10pt');
     $('button').css('font-family', '"Roboto", sans-serif').css('border-radius', '0px');
     $('button').css('text-transform', 'initial').css('letter-spacing', '0px');
-	
-	//Misc panel support
-	$('.tfile').css('background-color', '#444');	
 }	
 initTheme();
 writeCss("@import url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900,900italic);");
