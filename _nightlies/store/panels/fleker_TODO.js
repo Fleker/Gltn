@@ -1,5 +1,4 @@
 var p = panelManager.getAvailablePanels().Fleker_TODO;
-//console.log(p);
 p.setManifest({
     title: "TODO LIST",
     name: "Todo",
@@ -64,4 +63,3 @@ p.onRun = function() {
     restart();
 }
 p.activate();
-//console.log("Activate TODO");

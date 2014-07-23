@@ -14,6 +14,36 @@ function File() {
     File.prototype.clearMetadata = function() {
         this.metadata = [];
     };  
+    File.prototype.getCitations = function() {
+        return citation;  
+    };
+    File.prototype.getIdeas = function() {
+        return idea;
+    };  
+    File.prototype.getIdeaDefault = function() {
+        return ideadefault;  
+    };
+    File.prototype.getFileid = function() {
+        return fileid;     
+    };
+    File.prototype.getShareid = function() {
+        return shareid;  
+    };
+    File.prototype.getMinChar = function() {
+        return min_char;
+    };
+    File.prototype.getMaxChar = function() {
+        return max_char;
+    };
+    File.prototype.getMinWord = function() {
+        return min_word;
+    };
+    File.prototype.getMaxWord = function() {
+        return max_word;
+    };
+    File.prototype.getHovertagRegistrar = function() {
+        return hovertagRegistrar;  
+    };
 }
 file = new File();
 
@@ -51,16 +81,12 @@ for(var i in GETarr) {
 hovertagRegistrar = [];
 obj = {};
 currentformat = "";
-document.ready = function() {
-console.log('...');
-    
-}
-document.onload = function() {
-	console.log('Gltn has woken up: v '+GLTN_VERSION);
 
-}
 $(document).ready(function() {
     console.log('Gltn has awakened: v '+GLTN_VERSION);
+    //Setup Filepicker
+        filepicker.setKey("AePnevdApT62LvpkSSsiVz");
+    setUpGlobalSettings();    
     setUpFoundation();
     setUpFilepicker();
 });
@@ -115,8 +141,6 @@ function setUpFoundation() {
 */
 function setUpFilepicker() {
      x = {};
-    //Setup Filepicker
-    filepicker.setKey("AePnevdApT62LvpkSSsiVz");
     
     //Let's check the file to determine whether we should grab it locally or online
     if(localStorage[fileid] !== undefined) {
@@ -125,6 +149,7 @@ function setUpFilepicker() {
             cloudRead("https://www.filepicker.io/api/file/"+c, "RF", fileid);
         } else if(localStorage[fileid].indexOf('<inkblob_filename') > -1) {
             //First, let's get the last time the local file was modified
+            //TODO Really Nick? Is there a reason why yo're doing it this way? Answer: No. There's NO REASON for this ugly hack
             var a = localStorage[fileid].indexOf('<last_modified>')+15;
             var b = localStorage[fileid].indexOf('</last_modified>');
             console.log(localStorage[fileid].substring(a,b));
@@ -157,6 +182,93 @@ function setUpFilepicker() {
             restoreFile();
     }
 }   
+function setUpGlobalSettings() {
+    //Load Global Settings
+	try {
+        xpref = $.xml2json(localStorage['settings']);
+        if(xpref !== undefined) {
+            window.settings = {};
+            for(var i in xpref) {
+                writeToSettings(i, decodeURIComponent(xpref[i]));	
+            }
+        }
+	} catch(e) {
+		console.error(e.message);
+		var z=confirm("Your settings file isn't working. Click okay to send a bug report.");
+		var y=confirm("You'll need to reset your settings. Click okay to clear settings.");
+		if(z === true) {
+			window.location = "mailto:handnf+gltn@gmail.com?subject=Settings%20Error&body="+encodeURIComponent(localStorage['settings']);
+		}
+		if(y === true)
+			localStorage.removeItem("settings");
+	}   
+    
+    //Now we need to grab settings if necessary
+    if(hasSetting('inkblob_url')) {
+        //pull, check for date, sync if needed. Then continue
+         filepicker.read(getSettings("inkblob_url"), function(data){
+            var cloudversion = $.xml2json(data);
+            if(cloudversion.inkblob_modified > getSettings('inkblob_modified')) {
+                console.log("User settings need to be updated");
+                localStorage.settings = data;
+                setUpGlobalSettings();
+                markAsDirty();
+            } else {
+                console.log("User settings are up-to-date");   
+            }
+             return;
+//         }            
+             var a = data.indexOf('<last_modified>')+15;
+                var b = data.indexOf('</last_modified>');
+                var c = parseInt(data.substring(a,b));
+                localMod = parseInt(localMod);
+    //            console.log(localMod, c, localMod >= c, "a >= b");
+                if(localMod >= c) {
+    //                console.log("Not synced: "+c+", "+localMod);
+                    if(callback == "RF") {
+                        restoreFile();
+                        closePopup();
+                    }
+                    setSyncStatus(getSyncStatusGood());
+                    return;
+                } else if(localMod == c) {
+                    setSyncStatus(getSyncStatusGood());
+                    closePopup();
+                    return;
+                }
+                setSyncStatus("Downloading New Copy");  
+                initService("main_Sync", "Downloading...", "<span style='border-radius:100%'><span class='fa fa-cloud-download'></span>&nbsp;<i class='fa fa-refresh fa-spin'></i><span>");
+
+                //If so, let's keep going
+                var xmli = data.indexOf('</gluten_doc>')+13;
+                var xml = data.substring(data.indexOf('<'),xmli);
+                try {
+                    var i = $.xml2json(xml);
+                } catch(e) {
+                    //$('.progress').html('<span style="color:red">Error: Not a proper Gltn file</span>');
+                    //setTimeout('closePopup();', 4000);
+                    console.log(xml);
+                    console.error(e.message);
+                    return null;
+                }
+                var ht = data.substring(xmli);
+
+                //Now sync the files. Then we read the file.
+                try {
+                    localStorage[fileid] = xml;
+                    localStorage[fileid+"_c"] = ht;
+                } catch(e) {
+                    console.error("There is a pretty big issue here: "+e.message);
+                }
+               // closePopup();
+                console.log("Downloaded file.", c, localMod);
+                restoreFile(callback == "RF2");
+                 initService("main_Sync", "Synced", "<span class='fa fa-cloud'></span>");
+            });   
+        
+    }
+}
+
 function startSaveFile() {
     //Will only sync if dirty -- else it syncs down instead
     //If not a cloud doc, saves as usual
@@ -283,27 +395,6 @@ function restoreFile(full) {
 		formatShift();
 	});
 	
-	
-	//Load Global Settings
-	try {
-	xpref = $.xml2json(localStorage['settings']);
-	if(xpref != undefined) {
-		window.settings = {};
-		for(i in xpref) {
-			writeToSettings(i, decodeURIComponent(xpref[i]));	
-		}
-	}
-	} catch(e) {
-		console.error(e.message);
-		var z=confirm("Your settings file isn't working. Click okay to send a bug report.");
-		var y=confirm("You'll need to reset your settings. Click okay to clear settings.");
-		if(z == true) {
-			window.location = "mailto:handnf+gltn@gmail.com?subject=Settings%20Error&body="+encodeURIComponent(localStorage['settings']);
-		}
-		if(y == true)
-			localStorage.removeItem("settings");
-	}
-
 	//var x = xml2json(jQuery.parseHTML(localStorage[fileid]),"  ");
     if(localStorage[fileid]) {
 	try {

@@ -63,13 +63,13 @@ function convertDoc() {
         return "<button class='convertButton textbutton' data-format='"+format+"' style='min-width:60px;text-align:center;'>"+ic+"&nbsp;" +format.substring(0,1).toUpperCase()+format.substring(1)+"</button>";
     }
     ht = "<div id='convertDocBox'><span style='font-weight:200;font-size:19pt;'>Export to Which Format?</span><br><span style='font-style:italic;font-size:10pt;'>This feature is currently in beta</span><br><br><br>";
-    ht += createConvertButton('html', 'file-code-o');
+//    ht += createConvertButton('html', 'file-code-o');
     /*ht += createConvertButton('docx');
     ht += createConvertButton('odt');
     ht += createConvertButton('pdf');
     ht += createConvertButton('epub'); 
     ht += createConvertButton('mobi');*/ 
-    ht += createConvertButton('txt', 'file-text-o');
+//    ht += createConvertButton('txt', 'file-text-o');
     customFormats = {};
     
      //Search for all services and see if any of them support the export method which will let them add an export option
@@ -77,9 +77,14 @@ function convertDoc() {
         if(panelManager.getAvailablePanels()[i].onExport !== undefined) {
             var exportOptions = panelManager.getAvailablePanels()[i].onExport(true, $('.build').html());
             if(exportOptions !== null) {
-                ht += createConvertButton(exportOptions.name, exportOptions.icon);
-                customFormats[exportOptions.name] = exportOptions.callback;
-                console.log(exportOptions);
+                if(!Array.isArray(exportOptions)) {
+                    exportOptions = [exportOptions];    
+                }
+                for(var ii in exportOptions) {
+                    ht += createConvertButton(exportOptions[ii].name, exportOptions[ii].icon);
+                    customFormats[exportOptions[ii].name] = exportOptions[ii].callback;
+                    console.log(exportOptions[ii]);
+                }
             }
         }
     }
@@ -88,12 +93,7 @@ function convertDoc() {
     fnc = function () {
         $('.convertButton').on('click', function() {
             var export_format = $(this).attr('data-format')
-            if(export_format == "html")
-                startExportHTML();
-            else if(export_format == "txt")
-                startConversion(export_format);
-            else
-                customFormats[export_format]();
+            customFormats[export_format]();
            $('#convertDocBox').fadeOut(500).delay(500).fadeIn(500);
             setTimeout(function() { $('#convertDocBox').html("<span style='font-size:19pt;font-weight:200;'>Please Wait</span><br><span style='font-style:italic;font-size:10pt;'>Your file will be converted and downloaded soon</span><br>"+getLoader()) },500);
         });

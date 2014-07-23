@@ -1,26 +1,30 @@
-GLTN_VERSION = "1.3.1.5";
+var GLTN_VERSION = "1.3.1.6";
 //For backwards compatibility, will return true 
 function greaterThanVersion(version) {
     var split = version.split(".");
     var V = GLTN_VERSION.split(".");
-    if(split[0] < V[0])
+    if(split[0] < V[0]) {
         return true;
+    }
     //1.X v 1.X OR 2.X v 1.Y
-    if(split[0] > V[1])
+    if(split[0] > V[1]) {
         return false;
+    }
     //1.1.X v 1.2.X
-    if(split[1] < V[1])
+    if(split[1] < V[1]) {
         return true;
-    if(split[1] > V[1])
+    }
+    if(split[1] > V[1]) {
         return false;
-    if(split[2] < V[2])
+    }
+    if(split[2] < V[2]) {
         return true;
-    if(split[2] > V[2])
+    } if(split[2] > V[2]) {
         return false;
-    if(split[3] <= V[3])
+    } if(split[3] <= V[3]) {
         return true;
-    else
-        return false;
+    }
+    return false;
 }
 
 /*** RANGY ***/
@@ -76,7 +80,7 @@ window.onload = function() {
                     	//id: "citation"+0,						
                     }
              });
-}
+};
 
 content_textarea_var = null;
 function postRange(origin) {
@@ -194,7 +198,7 @@ function contentAddSpan(t) {
 		var el = document.createElement(t.node);
 		el.className = t.class;
 		el.setAttribute("id", t.id);
-        if(t.ce != undefined) 
+        if(t.ce !== undefined) 
             el.contentEditable = t.ce;
 		if(!t.leading_quote && t.class == "citation")
 			el.textContent = '" ';
@@ -417,7 +421,7 @@ document.onkeydown = function(e) {
 		
 		break;
 	}
-	if(panelManager.getActivePanels().length != 0) {
+	if(panelManager.getActivePanels().length !== 0) {
 		var el = '.PanelKeyEvent';
 		$(el).attr('data-keycode', e.keyCode);
 		$(el).attr('data-alt',e.altKey);
@@ -425,19 +429,19 @@ document.onkeydown = function(e) {
 		$(el).attr('data-shift',e.shiftKey);
 		$('.PanelKeyEvent').click();	
 		//console.log($(".PanelKeyEvent").attr('data-keycode'));
-		if(paneloverride != undefined) {
+		if(paneloverride !== undefined) {
 			if(paneloverride.indexOf(e.keyCode) > -1)
 				e.preventDefault();
 		}
 	}
-}
+};
 function postWordCount() {
 	//Right now, this only does the words in the content_textarea; it should get the build count
 	//Get input - Right now the text
 	var a = getWords();
 	var char = a.join('').length;
 	var word = 0;
-	if(char == 0)
+	if(char === 0)
 		return;
 	/*for(i in a.split(' ')) {
 		if(a[i] != ' ' && a[i].length) {
@@ -566,7 +570,7 @@ function ribbonLoad() {
 		var v = $('#file_name').val();
 		v = v.replace(/ /g, "");
 		ovr = true;
-		if(localStorage[v] != undefined) {
+		if(localStorage[v] !== undefined) {
 			ovr = confirm('This file already exists: '+v+'; Overwrite the contents of this file?');	
 		}
 		if(ovr) {
@@ -639,7 +643,7 @@ function openPersonalFavorites() {
     
     //Colors
     output += "<div class='preference_card'><h1>FAVORITE COLOR</h1><br><div id='me_color_blob' style='background-color:"+getSettings("personal_color")+";width:60px;height:60px;text-align:center;border-radius:100%;'></div><br><select id='me_color'>";
-    for(i in colors) {
+    for(var i in colors) {
         output += "<option value='"+colors[i]+"' selected='"+(colors[i]==getSettings("personal_color"))+"'>"+colors[i].substring(0,1).toUpperCase()+colors[i].substring(1)+"</option>";   
     }   
     output += "</select><br></div>";
@@ -649,9 +653,8 @@ function openPersonalFavorites() {
     if(hasSetting("inkpicker_url")) {
         output += "<span class='fa fa-check' style='font-size:9pt;color:"+theme.palette.green.normal+";'></span>&nbsp;<span style='font-size:8pt'>SETTINGS SYNCED</span>";   
     }
-    output += "<button class='textbutton' id='up_settings'>Upload Settings</button><br><br><button class='textbutton' id='down_settings'>Download Settings</button><br><span id='validate_settings'></span><span style='font-size:8pt'>";
-    if(hasSetting("inkpicker_url")) 
-        output += "File available at "+getSettings('inkpicker_url');
+    output += "<button class='textbutton' id='up_settings'>Upload Settings</button><br><br><button class='textbutton' id='down_settings'>Download Settings</button><br><span id='validate_settings'></span><br><span id='url_settings' style='font-size:8pt'>";
+    
     output += "</span></div>";
     
     output += "</div>";
@@ -673,10 +676,75 @@ function openPersonalFavorites() {
         $('.me_avatar_img').attr('src', $('#me_avatar').val());
         $('.preference_card').css('width','calc(50% - 32px)').css('display','inline-table').css('font-weight','200')/*.css('border-right','solid 1px rgba(128,128,128,1);' )*/.css( 'margin-right','16px').css('padding-right','16px').css('border-bottom','solid 1px #999').css('padding-top','8px');
         $('.preference_card>h1').css('color', theme.fontColorAlt).css('text-transform', 'uppercase').css('font-size','13pt').css('font-weight','200').css('margin-left', '-10px').css('font-family', 'inherit');
-    }   
+        
+        if(hasSetting("inkblob_url")) 
+            $('#url_settings').html("Settings are being synced at "+getSettings('inkblob_url'));
+        
+        $('#up_settings').on('click', function() {
+            //Settings Sync Handler 
+            input = localStorage.settings;
+            filepicker.store(input, function(InkBlob){
+                filepicker.exportFile(
+                  InkBlob,
+                  {extension:'.xml',
+                    suggestedFilename: "gltn-preferences",
+                    base64decode: false
+                  },
+                  function(InkBlob){
+                      console.log(event);
+                      writeToSettings("inkblob_url", InkBlob.url);
+                      writeToSettings("inkblob_modified", new Date().getTime());
+                      $('#url_settings').html("File available at "+getSettings('inkpicker_url'));
+                      saveFile();
+                      filepicker.write(InkBlob,
+                         localStorage.settings,
+                        function(InkBlob){
+                            markAsDirty();
+                            console.log("Complete sync for now");
+                        }, function(FPError) {
+                            console.log("Error: "+FPError.toString());
+                        }
+                    );
+                    console.log(InkBlob.url);
+                    console.log("Store successful:", JSON.stringify(InkBlob));
+                });
+                closePopup();
+            }, function(FPError) {
+                closePopup();
+                console.log(FPError.toString());
+            }, function(progress) {
+                console.log("Loading: "+progress+"%");
+            });       
+        });
+        $('#down_settings').on('click', function() {
+            filepicker.pick({
+                extension: '.xml'
+            },
+            function(InkBlob){
+                filepicker.read(InkBlob, function(data) {
+                    var djson;
+                    try {
+                        djson = $.xml2json(data);
+                        $('#validate_settings').html("Settings Imported");
+                        $('#url_settings').html("File available at "+InkBlob.url);
+                    } catch(e) {
+                        $('#validate_settings').html("<span style='color:"+theme.palette.red.normal+"'>Invalid XML</span>");
+                        return;
+                    }
+                    localStorage.settings = data;
+                    //TODO Hot swap settings, don't require a reload
+                    setTimeout("window.location.reload();", 2500);
+                });
+            },
+            function(FPError){
+                console.log(FPError.toString());
+            }
+            );
+        }); 
+    }
     
     var p = new Popup({title: "Personal Settings", ht: output, fnc: f, size: popupManager.XLARGE}).show();
-}   
+}
 
 function postLegal() {
     var favorite = theme.palette[getSettings("personal_color")];
@@ -717,13 +785,13 @@ function doesThisWork() {
 		alert('Blobs are not supported');
 		flag.push('Blobs are not supported');	
 	}
-	if(window.applicationCache == undefined) {
+	if(window.applicationCache === undefined) {
 		alert('You do not have Application Cache in your browser. You may still use Gltn, but it will not work offline.');	
 	}
 	return !flag.length;
 }
 function closeButton(i) {
-	if(i == 1)
+	if(i === 1)
 		return "<span class='fa fa-times'/>"
 	else
 		return '<span class="fa fa-times"/>'	
@@ -736,7 +804,7 @@ function onUpdateReady() {
 
 window.applicationCache.addEventListener('error', function() {
 	console.error("Error caching files for offline use.");
-	if(window.offline != true) {
+	if(window.offline !== true) {
 		window.appcachestatus = "Error caching files for offline use";
 		initService("Main_Offline", "App caching", "&nbsp;");
 	} else {
@@ -812,7 +880,8 @@ function restoreSelection() {
 //			console.log($('.content_textarea').html());
 		}, 1);
 	}
-}/* Takes a percent and converts it to the nearest column value in a 12-column system */
+}
+/* Takes a percent and converts it to the nearest column value in a 12-column system */
 function columnCount(p, trunc) {
     var a = 100/12;
     var b = p/a;

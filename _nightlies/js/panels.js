@@ -151,7 +151,7 @@ function PanelManager() {
         if(panel.service !== true) {
             holoribbon_std['Panels'].push({text: panel.name, img: panel.img, action: "runPanel('"+panel.id+"')", plugin_id: panel.id});
             newRibbon('.header', holoribbon_std);
-            console.log("Installing "+panel.id+"...  "+num);
+//            console.log("Installing "+panel.id+"...  "+num);
             ribbonSwitch(ribbon_index,false);
             ribbonLoad();
         }
@@ -159,7 +159,7 @@ function PanelManager() {
 
         if(window.offline !== true) {
             //Now store script offline - this really sucks though
-            console.log(panel, panel.url);
+//            console.log(panel, panel.url);
             loadjscssfile(panel.url, "js");
             $('#themeframe').attr('src', panel.url);
             downloadingpanel = "null";
@@ -312,12 +312,12 @@ function install_panel(id, name, url) {
 
 function download_panel(id,num) {
     if(downloadingpanel !== id) {
-        console.log(id+", "+downloadingpanel);
+//        console.log(id+", "+downloadingpanel);
         if(!downloadingpanel.length || id.length)
             return;
         window.setTimeout(function() {download_panel(id,num);}, 100);
     } else {
-        console.log("Installed "+id);
+//        console.log("Installed "+id);
         localStorage['zpanels_'+id] = $('#themeframe').contents().text();  
 //        console.log("eval('InitPanel"+id+"();');  "+num);
 //        eval("availablePanels['"+id+"'] = "+id);
@@ -358,10 +358,10 @@ function initPanels(num) {
     
     plugin = panelManager.getAvailablePanels()[getPanelIndex(num)];
     if(getPanelIndex(num).indexOf('Main') !== 0) {
-        console.log("Must install panel "+getPanelIndex(num), num);
+//        console.log("Must install panel "+getPanelIndex(num), num);
         panelManager.install(plugin, num);
     } else {
-        console.log("Panel "+getPanelIndex(num)+".onInit is "+(plugin.onInit !== undefined));
+//        console.log("Panel "+getPanelIndex(num)+".onInit is "+(plugin.onInit !== undefined));
         if(plugin.onInit !== undefined)
             plugin.onInit();
         num++;
@@ -1031,6 +1031,22 @@ specialCharacters = {
     EarOfMaize: getEmoji("🌽", "Ear of Maize", ""),
     EarOfRice: getEmoji("🌾", "Ear of Rice", ""),
     Herb: getEmoji("🌿", "Herb", "spice"),
+    FourLeafClover: getEmoji("🍀", "Four Leaf Clover", "shamrock leprechaun irish"),
+    MapleLeaf: getEmoji("🍁", "Maple Leaf", "Canada Robin Sparkles"),
+    FallenLeaf: getEmoji("🍂", "Fallen Leaf", "autumn"),
+    LeafInWind: getEmoji("🍃", "Leaf Fluttering in Wind", ""),
+    Mushroom: getEmoji("🍄", "Mushroom", "Toadstool mario 1 up"),
+    Tomato: getEmoji("🍅", "Tomato", ""),
+    Aubergine: getEmoji("🍆", "Aubergine", ""),
+    Grapes: getEmoji("🍇", "Grapes", ""),
+    Melon: getEmoji("🍈", "Melon", ""),
+    Watermelon: getEmoji("🍉", "Watermelon", ""),
+    Tangerine: getEmoji("🍊", "Tangerine", ""),
+    Lemon: getEmoji("🍋", "Lemon", "life lemonade"),
+    Banana: getEmoji("🍌", "Banana", "phone"),
+    Pineapple: getEmoji("🍍", "Pineapple", "trudy"),
+    RedApple: getEmoji("🍎", "Red Apple", ""),
+    GreenApple: getEmoji("🍏", "Green Apple", ""),
     
     Wheelchair: getChar("♿","Wheelchair",'wheelchair chair'),
     Fountain: getChar("⛲","Fountain","fountain water park"),
@@ -1451,6 +1467,7 @@ function createNewFile() {
     initiatePopup({title: "Create New File", ht:ht, fnc:fnc,size:"large"});
 }
 panelManager.getAvailablePanels().Main_Filesys.onRun = function () {
+    //TODO SPinner
 	function c(i) {
 		//console.log(i);	
 	}
@@ -1474,8 +1491,11 @@ panelManager.getAvailablePanels().Main_Filesys.onRun = function () {
         $('.tinfo').on('click', function() {
             var id = $(this).attr('data-v');
             var doc = $.xml2json(localStorage[id]);
-            out = "<div class='tinfo'><h1>"+doc.metadata.Title+"</h1>";
-            out += "<h2>By "+doc.metadata.Author+"</h2>";
+            out = "<div class='tinfo'>";
+            if(doc.metadata.Title !== undefined && doc.metadata.Title.length > 0)
+                out += "<h1>"+doc.metadata.Title+"</h1>";
+            if(doc.metadata.Author !== undefined && doc.metadata.Author.length > 0)
+                out += "<h2>By "+doc.metadata.Author+"</h2>";
             out += "<h3>"+id+".gltn&nbsp;&nbsp;"+truncateFloat(getLocalStorageOf(id)+getLocalStorageOf(id+"_c"))+"KB</h3>";
             out += "<h4 class='filedata'>"+doc.file.format+"&emsp;"+doc.file.language+"&emsp;"
             if(doc.file.gltn_version !== undefined)
@@ -1494,14 +1514,15 @@ panelManager.getAvailablePanels().Main_Filesys.onRun = function () {
             out += "Last edited <abbr class='timeago' title='"+timeiso+"'></abbr></h4>";
             out += "<h5>"+doc.file.tags+"</h5>";
             
-            out += "<button class='textbutton openFile' data-v='"+id+"'><span class='fa fa-sign-in'></span>&nbsp;Open File</button>&emsp;&emsp;<button class='textbutton downloadFile' data-v='"+id+"'><span class='fa fa-download'></span>&nbsp;Download</button>&emsp;&emsp;<button class='textbutton deleteFile' data-v='"+id+"'><span class='fa fa-times' style='color:"+theme.palette.red.normal+"'></span>&nbsp;Delete</button></div>";
-            //TODO Download handler
+            out += "<button class='textbutton openFile' data-v='"+id+"'><span class='fa fa-sign-in'></span>&nbsp;Open File</button>&emsp;&emsp;<button class='textbutton downloadFile' data-v='"+id+"'><span class='fa fa-download'></span>&nbsp;Download</button>&emsp;&emsp;<button class='textbutton deleteFile' data-v='"+id+"'><span class='fa fa-times' style='color:"+theme.palette.red.normal+"'></span>&nbsp;Delete</button>";
+            out += "<div class='fileExportMenu'></div></div>";
+            
             var f = function() {
                 $('.tinfo > h1').css('color', theme.fontColor).css('font-size', '15pt').css('font-family','inherit').css('margin-top','-16px');
                 $('.tinfo > h2').css('color', theme.fontColor).css('font-size', '13pt').css('font-family','inherit').css('margin-left', '32px')/*.css('margin-top', '-8px')*/.css('margin-bottom', '24px');
                 $('.tinfo > h3').css('color', theme.fontColor).css('font-size', '13pt').css('font-family', 'inherit').css('opacity', '0.8');
                 $('.tinfo > .filedata').css('color', theme.fontColor).css('font-size', '11pt').css('text-align', 'right').css('margin-top','-24px').css('opacity', '0.8');
-                $('.tinfo > .lastedit').css('color', theme.fontColor).css('font-size', '12pt').css('font-family', 'inherit');
+                $('.tinfo > .lastedit').css('color', theme.fontColor).css('font-size', '11pt').css('font-family', 'inherit');
                 $('.tinfo > h5').css('color', theme.fontColor).css('opacity', '0.5').css('font-family', 'inherit').css('font-size','10pt').css('margin-bottom','32px').css('padding-top', '8px').css('margin-left', '32px');
                 
                 jQuery("abbr.timeago").timeago();
@@ -1519,8 +1540,58 @@ panelManager.getAvailablePanels().Main_Filesys.onRun = function () {
                     }
                 });
                 $('.downloadFile').on('click', function() {
-                    alert("TODO EXport"); 
-                });
+                    var id = $(this).attr('data-v');
+                    var blob = localStorage[id]+localStorage[id+"_c"];
+                    function createConvertButton(format, icon) {
+                        ic = "";
+                        if(icon !== undefined)
+                            ic = getIcon(icon, 11);
+
+                        return "<button class='convertButton textbutton' data-format='"+format+"' style='min-width:60px;text-align:center;'>"+ic+"&nbsp;" +format.substring(0,1).toUpperCase()+format.substring(1)+"</button>";
+                    }
+                    customFormats = {};
+                    ht = "Export To: ";
+                    for(i in panelManager.getAvailablePanels()) {
+                        if(panelManager.getAvailablePanels()[i].onExport !== undefined) {
+                            var exportOptions = panelManager.getAvailablePanels()[i].onExport(false, blob);
+                            if(exportOptions !== null) {
+                                if(!Array.isArray(exportOptions)) {
+                                   exportOptions = [exportOptions]
+                                }
+                                for(var ii in exportOptions) {
+                                    ht += createConvertButton(exportOptions[ii].name, exportOptions[ii].icon);
+                                    customFormats[exportOptions[ii].name] = exportOptions[ii];
+                                }
+                            }
+                        }
+                    }
+                    $('.fileExportMenu').html(ht).fadeOut(1).fadeIn(300);
+                    $('.convertButton').on('click', function() {
+                        format = $(this).attr('data-format');
+//                        console.log(customFormats);
+                        console.log("."+customFormats[format].extension, id);
+                        blob = customFormats[format].callback();
+                        filepicker.store(blob, function(InkBlob){
+                            filepicker.exportFile(
+                              InkBlob,
+                              {extension:"."+customFormats[format].extension,
+                               suggestedFilename: id,
+                               base64decode: false
+                              },
+                              function(InkBlob){
+                                  
+                              });
+                            closePopup();
+                        }, function(FPError) {
+                            closePopup();
+                            console.log(FPError.toString());
+                        }, function(progress) {
+                            console.log("Loading: "+progress+"%");
+                        }
+                        )
+                    });
+                    });           
+                    
             };
             p = new Popup({title: "File Properties", ht: out, fnc: f, size: popupManager.LARGE}).show(); 
         });
@@ -1665,8 +1736,7 @@ panelManager.getAvailablePanels().Main_Filesys.onRun = function () {
 //                    out += "<div style='background-color:"+bgc+"; border-bottom: solid 1px "+theme.palette.grey.accent400+";padding-bottom:8px;margin-bottom: 8px; width: 98%;'><span style='font-size:8pt;'>"+i+".gltn</span>";
                     out += "<div style='background-color:"+bgc+"; padding-bottom:8px;margin-bottom: 8px;'>";
                     out += "<div style='margin-left:3px;padding:8px;'><b>"+((title !== undefined && title.length > 2)?title:i+".gltn")+"</b></div>";
-                    console.log('"'+title+'"', i);
-					out += "<span style='font-size:8pt'>&emsp;"+xx.file.format+/*"&nbsp;&nbsp;"+xx.file.language+*/"&nbsp;&nbsp;"+fsout+"</span>";
+                    out += "<span style='font-size:8pt'>&emsp;"+xx.file.format+/*"&nbsp;&nbsp;"+xx.file.language+*/"&nbsp;&nbsp;"+fsout+"</span>";
                     time = "";
                     out += "&emsp;";
                     if(xx.saved != undefined) {
@@ -1694,6 +1764,23 @@ panelManager.getAvailablePanels().Main_Filesys.onRun = function () {
 		//setTimeout("post(out);", 50);
 	}	
 	resetFolder();
+}
+//TODO Allow the ability to return multiple types of formats. Add in XML. Also, use this panel to implement docView versions of files to be more native
+panelManager.getAvailablePanels().Main_Filesys.onExport = function(docView, blob) {
+    if(docView === false) {
+        var callback = function() {
+            return blob;   
+        }
+        return [{name: "gltn", icon: "file-text-o",  callback: callback, extension:"gltn"}, {name:"xml", icon: "file-code-o", callback:callback, extesion:"xml"}];
+    } else {
+        var toHTML = function() {
+            startExportHTML();
+        }
+        var toTXT = function() {
+            startConversion("txt");
+        } 
+        return [{name: "html", icon: "file-code-o", callback: toHTML}, {name:"txt", icon:"file-text-o", callback: toTXT}];
+    }
 }
 
 function GetPanelmain_Guide() {

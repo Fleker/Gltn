@@ -9,9 +9,16 @@ There are a few conditions you need in order to enable your panel or service to 
 
 It must have a function assigned to the `onExport` method. Without that function being defined, the panel will not be notified that the user is trying to export the file.
 
-The boolean that is passed, `docView`, indicates whether the export is printer optimized (true), or for file metadata (false). If your plugin is only meant to export one type or the other, return `null` for the export type you do not wish to support. Then your service will not appear in that export menu.
+The boolean that is passed, `docView`, indicates whether the export is printer optimized (true), or for file metadata (false). The opposite of `docView` can also be referred to as `editView` (as you're editing the document using the Gltn Editor). If your plugin is only meant to export one type or the other, return `null` for the export type you do not wish to support. Then your service will not appear in that export menu.
 
 The second parameter, `content`, is the filedata that the custom function must parse and convert into a different file. If `docView` is true, it is the HTML of the document, including pages and pageheaders. Otherwise, it is the raw data of the file from `localStorage`.
+
+If you wish to support a more than one format in a single plugin, provide an array of JSON objects instead of a single JSON object.
+
+### Notes when Exporting
+When `docView == true`, you will need to write the downloading yourself. Your callback should both perform a conversion and export sequence. You may use InkFilepicker APIs if you wish.
+
+When `docView == false`, you are likely using the file browser. If so, you should return your converted file at the end of your callback as raw data. This data will be turned into a blob and InkFilepicker will be used to save the file wherever the user wishes.
 
 ### JSON Return
 This function must return a valid JSON object containing a few attributes.
@@ -19,3 +26,7 @@ This function must return a valid JSON object containing a few attributes.
 * name - This is the name of your format, what will be displayed in the export button
 * icon - This is an optional icon for your format. It can be an image or a font-awesome icon (without 'fa-' included)
 * callback - This is the function that will run if the user selects your export button. This function should take the input, convert the file, and download it to the user's computer
+
+If docView is `false`, you should also supply an additional parameter
+
+* extension - The file extension that will be used for the converted file
