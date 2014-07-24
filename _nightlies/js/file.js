@@ -286,6 +286,18 @@ function startSaveFile() {
         saveFile();   
     }
     
+    if(hasSetting("inkblob_url")) {
+        filepicker.write(getSettings("inkblob_url"),
+                     localStorage.settings,
+                    function(InkBlob){
+                        saveFile();
+                        console.log("Settings synced for now");
+                    }, function(FPError) {
+                        console.log("Settings sync Error: "+FPError.toString());
+                    }
+                );   
+    }
+    
     try {
 		window.document.title = "✎"+valMetadata('Title');
 	} catch(e) {
@@ -396,6 +408,7 @@ function restoreFile(full) {
 	});
 	
 	//var x = xml2json(jQuery.parseHTML(localStorage[fileid]),"  ");
+    //TODO Check for password
     if(localStorage[fileid]) {
 	try {
 //        console.log('"'+localStorage[fileid]+'"');
@@ -606,6 +619,9 @@ function newFile2() {
         }
 	}
 	//Call {format}
+    if(getSettings("autoUpload") == true) {
+        getShare();   
+    }
 			
 }
 function exportFile() {
@@ -1185,79 +1201,7 @@ function formatShift() {
     console.log("Wait for script to load");
     //TODO Maybe offline support
 }
-function formatShiftX() {
-	//unload js file
-	//console.log(formats);
-	format2 = $('#file_format').val();
-	docformat = docformat+'.js';
-	for(i in formats) {
-		if(formats[i].name == docformat && formats[i].uri != undefined)
-			docformat = formats[i].uri;
-		else if(formats[i].name == docformat)
-			docformat = docformat+'.js';
-	}
-	for(i in formats) {
-		if(formats[i].name == format2) {
-			console.log(docformat, formats[i].name, formats[i].uri);
-			//replacejscssfile('formats/'+docformat+'/format.js', 'formats/'+format2+'/format.js', 'js');
-			if(window.offline != true || formats[i].uri == undefined) {
-				if($('#formatscript').length == 0) {
-					$('body').append('<div id="formatscript" style="visibility:hidden"></div>');
-				}			
-				
-				if(formats[i].uri == undefined) {
-					//try {	
-                    console.log(docformat, format2, formats[i].name);
-                    try {
-                        var v = '<script src="js/formats/'+format2+'.js'+'"></script>'; 
-                        //console.log(v);
-                        $('#formatscript').html(v);
-                    } catch(e) {
-                        console.error(e.message);
-                        replacejscssfile(docformat, "js/formats/"+format2+".js", "js");	
-                    }
-						setTimeout("download_format2('"+format2+"')", 100);
-					//}
-				} else {
-					console.log('Load format from '+formats[i].uri);
-					try {
-						$('#formatscript').html('<script src="'+formats[i].uri+'"></script>');
-					} catch(e) {
-						
-					}
-					//replacejscssfile(docformat, formats[i].uri, "js");
-					//save it
-					$('#themeframe').attr('src', formats[i].uri);
-					setTimeout("download_format('"+format2+"')", 100);
-				}
-				docformat = format2;
-				//alert("Shift formats");
-				//setTimeout("save();$('#body').empty();input();save();", 500)
-				window.metadata2 = JSON.stringify(x.metadata);
-				//console.error(window.metadata2);
-//				setTimeout("onInitFormat();$('.content_textarea').html(xc);", 500);
-//				setTimeout('formatShift2(window.metadata2)', 900);
-				console.log('The document format is shifting.');
-			} else {
-				if($('#formatscript').length == 0) {
-					$('body').append('<div id="formatscript" style="visibility:hidden"></div>');
-				}
-				$('#formatscript').html('<script>'+localStorage['zformat_'+format2]+'</script>');
-				
-				docformat = format2;
-				//alert("Shift formats");
-				//setTimeout("save();$('#body').empty();input();save();", 500)
-				window.metadata2 = JSON.stringify(x.metadata);
-                
-                setTimeout("download_format2('"+format2+"')", 100);
-				//console.error(window.metadata2);
-//				setTimeout("onInitFormat();$('.content_textarea').html(xc);", 500);
-//				setTimeout('formatShift2(window.metadata2)', 900);
-				console.log('The document format is shifting.');
-			}
-		}
-	}
-}
+
 function download_format(y) {
     if(!currentformat.length)
          return;
@@ -1280,39 +1224,26 @@ function download_format2(y) {
     } 
 }
 function formatShift2(d) {
-//		console.log(d, x.metadata, window.metadata2);	
-
 	//Set up parameters	
 	if(d == undefined)
 		d = x.metadata;
 	else
 		d = JSON.parse(d);
-//	console.log(d);
 	for(i in d) {
-			//window.metadata[i] = x['metadata'][i];	
-			//console.log(4);
-			//$('#format_item_'+i).val(window.metadata[i]['value']);
-			for(j in window.metadata) {
-				//console.log("'"+x.metadata[i].id+"'", "'"+window.metadata[j].id+"'");
-//				console.log(i,j,window.metadata[j],window.metadata[j].id.replace(/ /g, '_'),$('#format_item_'+j).val(),d[i]);
+        for(j in window.metadata) {
 			try {
 				if(i == window.metadata[j].id.replace(/ /g, '_') && $('#format_item_'+j).val().length == 0) {
-//					console.log("Insert "+d[i]+" for "+window.metadata[j].id);
-					//console.log($('#format_item_'+j).val(), i);
 					$('#format_item_'+j).val(decodeURIComponent(d[i]));
 					$('#format_item_'+j).html(decodeURIComponent(d[i]));
 				} else {
-					//console.log('-');	
 				}
-			} catch(e) {
-					
-			}
-			}
+			} catch(e) {}
+        }
 	}
 	if(window.services != undefined) {
 		for(i in services) {
 			initService(services[i].id, services[i].title, services[i].icon);	
 		}
 	}
-	console.log('The document format has shifted.');
+	console.log("The document's format has shifted.");
 }

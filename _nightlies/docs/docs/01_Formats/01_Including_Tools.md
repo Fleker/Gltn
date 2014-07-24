@@ -1,4 +1,3 @@
-//TODO Show new API
 ## Toolbar
 The code used to initiate controls for the toolbar is done inside the function
 `onInitToolbar() { [code] }`
@@ -6,10 +5,10 @@ The code used to initiate controls for the toolbar is done inside the function
 A sample function would look like this:
 
 ```JavaScript
-function onInitToolbar() {
-    var tools = ["citation", "heading1", "image", "longquote"];
-    post_toolbar(tools);
-}
+    function onInitToolbar() {
+        var tools = ["citation", "heading1", "image", "longquote"];
+        post_toolbar(tools);
+    }
 ```
 
 You state which tools should be displayed in the toolbar, then you commit these changes by using `post_toolbar({Array})`.

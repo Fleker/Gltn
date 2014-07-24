@@ -1,4 +1,4 @@
-var GLTN_VERSION = "1.3.1.6";
+var GLTN_VERSION = "1.3.1.7";
 //For backwards compatibility, will return true 
 function greaterThanVersion(version) {
     var split = version.split(".");
@@ -405,9 +405,11 @@ document.onkeydown = function(e) {
 		break;
         case 84:
             if(e.altKey) {
-                window.introdisabled = true;
-//                introJsStart();      
+     
             }
+        break;
+        case 112: //F1
+            openPersonalFavorites();            
         break;
 		case 122: /*F11*/
 			if(!fullscreenOn)
@@ -522,6 +524,7 @@ function setHeader() {
 			{group: "", value:'<div class="row collapse" style="margin-top:9px"><div class="small-2 medium-5 columns"><input id="file_name" type="text" value="'+fileid+'" /></div><div class="small-4 medium-1 columns"><span class="postfix">.gltn</span></div><div class="small-6 medium-3 columns end"><input type="hidden" id="file_name_internal"><button id="file_name_con" class="textbutton" disabled="true">Rename</button></div></div>'},
 			{text: 'Compile & Export', img: '<span style="font-size:18pt" class="fa fa-file"></span>', action: "startBuild()", key: "Alt+B"},
 			{text: 'Share', img: '<span style="font-size:18pt" class="fa fa-code-fork"></span>', action: "getShare();"}
+            //TODO File Info Popup
 		),
 
 		Panels: new Array(
@@ -550,7 +553,7 @@ function setHeader() {
             {group: '', value:"<img style='overflow:hidden;border-radius:50%;width:60px;height:60px;' class='me_avatar_img'>"},
 			{group: 'Name', value:'<div style="margin-top:2px"><input id="me_name" type="text" placeholder="Name"></div>'},
 			{group: 'Email', value:'<div style="margin-top:2px"><input id="me_email" type="email" placeholder="Email Address"></div>'},
-            {text: 'Settings...', img:'<span class="fa fa-cog" style="font-size:18pt"></span>', action:"openPersonalFavorites()"}
+            {text: 'Settings...', img:'<span class="fa fa-cog" style="font-size:18pt"></span>', action:"openPersonalFavorites()", key: "F1"}
 		)
 	};
 	newRibbon('.header', holoribbon_std);
@@ -596,6 +599,9 @@ function ribbonLoad() {
     if(!hasSetting("personal_color")) {
         writeToSettings("personal_color", "blue");   
     }
+    if(!hasSetting("autoUpload")) {
+        writeToSettings("autoUpload", "false");
+    }   
     
 	$('#me_name').attr('value', getSettings("personal_name"));
 	$('#me_name').attr('defaultValue', getSettings("personal_name"));
@@ -654,8 +660,15 @@ function openPersonalFavorites() {
         output += "<span class='fa fa-check' style='font-size:9pt;color:"+theme.palette.green.normal+";'></span>&nbsp;<span style='font-size:8pt'>SETTINGS SYNCED</span>";   
     }
     output += "<button class='textbutton' id='up_settings'>Upload Settings</button><br><br><button class='textbutton' id='down_settings'>Download Settings</button><br><span id='validate_settings'></span><br><span id='url_settings' style='font-size:8pt'>";
-    
     output += "</span></div>";
+    
+    //Autoupload Settings
+    output += "<div class='preference_card'><h1>Auto Upload</h1><br>";
+    output += "Enable:&nbsp;<input type='checkbox' id='auto_upload'";
+    if(hasSetting('autoUpload')) {
+        output += " checked="+((getSettings('autoUpload')==true)?"checked":"false");
+    }
+    output += "><br><br>By enabling auto upload, you will be notified to save your file online each time a new file is created.";
     
     output += "</div>";
     
@@ -741,6 +754,12 @@ function openPersonalFavorites() {
             }
             );
         }); 
+        $('#auto_upload').on('click', function() {
+            if($(this).attr('checked') == 'checked')
+                writeToSettings("autoUpload", 'true');
+            else
+                writeToSettings('autoUpload', 'false');
+        });
     }
     
     var p = new Popup({title: "Personal Settings", ht: output, fnc: f, size: popupManager.XLARGE}).show();

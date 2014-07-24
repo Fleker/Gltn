@@ -599,7 +599,8 @@ function getChar(val, title, tag) {
     return {val: val, title: title, tag: tag+" "+title};   
 }
 function getEmoji(val, title, tag) {
-    return getChar(val, title, tag+" emoji emoticon");   
+    tag = tag || "";
+    return getChar(val, title, tag+" emoji emoticon "+title);   
 }
 function getCharAccent(char, accent, or) {
     return getChar(char, or+" w/ "+accent, or+" "+char+" "+accent+" accent latin");  
@@ -1036,23 +1037,39 @@ specialCharacters = {
     FallenLeaf: getEmoji("🍂", "Fallen Leaf", "autumn"),
     LeafInWind: getEmoji("🍃", "Leaf Fluttering in Wind", ""),
     Mushroom: getEmoji("🍄", "Mushroom", "Toadstool mario 1 up"),
-    Tomato: getEmoji("🍅", "Tomato", ""),
-    Aubergine: getEmoji("🍆", "Aubergine", ""),
-    Grapes: getEmoji("🍇", "Grapes", ""),
-    Melon: getEmoji("🍈", "Melon", ""),
-    Watermelon: getEmoji("🍉", "Watermelon", ""),
-    Tangerine: getEmoji("🍊", "Tangerine", ""),
+    Tomato: getEmoji("🍅", "Tomato"),
+    Aubergine: getEmoji("🍆", "Aubergine"),
+    Grapes: getEmoji("🍇", "Grapes"),
+    Melon: getEmoji("🍈", "Melon"),
+    Watermelon: getEmoji("🍉", "Watermelon"),
+    Tangerine: getEmoji("🍊", "Tangerine"),
     Lemon: getEmoji("🍋", "Lemon", "life lemonade"),
     Banana: getEmoji("🍌", "Banana", "phone"),
     Pineapple: getEmoji("🍍", "Pineapple", "trudy"),
-    RedApple: getEmoji("🍎", "Red Apple", ""),
-    GreenApple: getEmoji("🍏", "Green Apple", ""),
+    RedApple: getEmoji("🍎", "Red Apple"),
+    GreenApple: getEmoji("🍏", "Green Apple"),
+    Pear: getEmoji("🍐", "Pear"),
+    Peach: getEmoji("🍑", "Peach"),
+    Cherries: getEmoji("🍒", "Cherries"),
+    Strawberry: getEmoji("🍓", "Strawberry"),
+    Hamburger: getEmoji("🍔", "Hamburger"),
+    PizzaSlice: getEmoji("🍕", "Slice of Pizza"),
+    MeatBone: getEmoji("🍖", "Meat on Bone"),
+    Poultry: getEmoji("🍗", "Poultry Leg"),
+    RiceCracker: getEmoji("🍘", "Rice Cracker"),
+    RiceBall: getEmoji("🍙", "Rice Ball"),
+    CookedRice: getEmoji("🍚", "Cooked Rice"),
+    Curry: getEmoji("🍛", "Curry and Rice"),
+    SteamingBowl: getEmoji("🍜", "Steaming Bowl"),
+    Spaghetti: getEmoji("🍝", "Spaghetti"),
+    Bread: getEmoji("🍞", "Bread"),
+    Fries: getEmoji("🍟", "French Fries", "happy meal supersize me"),
     
-    Wheelchair: getChar("♿","Wheelchair",'wheelchair chair'),
+    Wheelchair: getChar("♿","Wheelchair",'chair'),
     Fountain: getChar("⛲","Fountain","fountain water park"),
-    UmbrellaBeach: getChar("⛱","Umbrella on Beach", "umbrella on beach bathing"),
-    Mountain: getChar("⛰","Mountain","mountain rock tunnel"),
-    Scissors: getChar("✂","Scissors","scissors incision scyther scisor cut"),
+    UmbrellaBeach: getChar("⛱","Umbrella on Beach", "bathing"),
+    Mountain: getChar("⛰","Mountain","rock tunnel"),
+    Scissors: getChar("✂","Scissors","incision scyther scisor cut"),
     
     // Games
     Die1: getChar("⚀","Die Face-1", "die face dice"),
@@ -1771,7 +1788,7 @@ panelManager.getAvailablePanels().Main_Filesys.onExport = function(docView, blob
         var callback = function() {
             return blob;   
         }
-        return [{name: "gltn", icon: "file-text-o",  callback: callback, extension:"gltn"}, {name:"xml", icon: "file-code-o", callback:callback, extesion:"xml"}];
+        return [{name: "gltn", icon: "file-code-o",  callback: callback, extension:"gltn"}, {name:"txt", icon: "file-text-o", callback:callback, extesion:"txt"}];
     } else {
         var toHTML = function() {
             startExportHTML();
@@ -2067,7 +2084,7 @@ panelManager.getAvailablePanels().Main_Dictionary.onRun = function() {
     $('.panel_plugin_content').css('overflow-y', 'inherit');
     
 	function openApp() {
-		out = "<input type='search' id='DictionaryIn' style='width:calc(100% - 64px);display:inline;'><button id='DictionarySettings'><span class='fa fa-cog'></span></button>";
+		out = "<input type='search' id='DictionaryIn' style='width:calc(100% - 64px);display:inline;'><button id='DictionarySettings'><span class='fa fa-cog'></span></button><div class='dictionaryNav'></div>";
 		out += "<div id='DictionaryOut'><span style='font-size:16pt'>Welcome</span><br>Search for something<br><br><br><div style='text-align:center;width:100%;font-size:30pt;margin-top:25%;' class='fa-stack fa-lg'><span class='fa fa-circle-o fa-stack-2x'></span><span class='fa fa-quote-left fa-stack-1x'></span></div>";
         
         out += "<br><br><br><br><br>";
@@ -2086,7 +2103,7 @@ panelManager.getAvailablePanels().Main_Dictionary.onRun = function() {
 		});	
 		$('#DictionaryIn').on('input click keydown', function() {
             console.log("D!");
-			var end = false;
+            $('.dictionaryNav').html("<button id='dicNavB'><span class='fa fa-arrow-left'></span></button>&nbsp;<button id='dicNavF'><span class='fa fa-arrow-right'></span></button>&nbsp;<button id='dicNavC'><span class='fa fa-file-code-o'></span></button>");
             if($('#DictionaryOut .loader10').length == 0)
                 getLoader("DictionaryOut");
 			for(i in ajaxrequests) {
@@ -2109,6 +2126,7 @@ panelManager.getAvailablePanels().Main_Dictionary.onRun = function() {
 							//style='background-color: white;padding-left: 6px;padding-top: 8px;padding-bottom: 50px;border: solid 1px #999;margin-top: 4px;width: 95%;
 							$('#DictionaryOut').html(xmlDictionaryParse(data)).css('background-color', 'white').css('padding-left', '6px').css('padding-top', '8px').css('border', 'solid 1px #999').css('margin-top', '4px').css('width', '95%').css('color', 'black');
                             dictionaryManager.appendPreviousSearch($('#DictionaryIn').val());
+                            //TODO Navigation - Back: try0, forward: tryi+1, citation: Go to citation popup and scrape url
 							end = true;	
 						} else {
 							if(i == dictionaryManager.getDictionaryLength)
@@ -2123,6 +2141,7 @@ panelManager.getAvailablePanels().Main_Dictionary.onRun = function() {
 							//$('#DictionaryFrame').attr('srcdoc', data);
 							$('#DictionaryFrame').attr('src', j.url+"?word="+$('#DictionaryIn').val());
                             dictionaryManager.appendPreviousSearch($('#DictionaryIn').val());
+                            //TODO Same navigation
 							end = true;	
 						} else {
 							if(i == dictionaryManager.getDictionaryLength)

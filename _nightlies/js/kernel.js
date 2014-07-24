@@ -1504,32 +1504,37 @@ function refTextDetails(id) {
 
 }
 
-
-
-function LatexGreek(char) {
-    return {id:char, keywords: char+" "+char.toLocaleLowerCase(), cmd:"\\"+char.toLowerCase(), param:[], des:"Displays the letter "+char};
+function LatexDoc(id, keywords, script, parameters, description, title) {
+    return {id: id, keywords: keywords, cmd: script; param: parameters, des: description; title: title};   
+}
+function Parameter(id, description) {
+    return {id: id, des: description};
 }
 
- window.LatexAPI = {
-        /*** LATEX TEXT MARKUP ***/
-        Bar: {id:"Bar", keywords:"bar", cmd:"\\bar{x}", param:[{id:"x", des:"Value to get bar placed over it"}], des:"Places a bar over the input value"},
-        Subscript: {id:"Subscript", keywords:"element sub subscript", cmd:"_{exp}", param:[{id:"exp", des:"The expression you want subscripted"}], des:"Subscripts a specific input"},
-        Superscript: {id:"Superscript", keywords:"exponent sup superscript", cmd:"^{exp}", param:[{id:"exp", des:"The expression you want superscripted"}], des:"Superscripts a specific input"},
-        
-        /*** LATEX MATH MARKUP ***/
-        Fraction: {id:"Fraction", keywords:"frac, fraction, divide, division", cmd:"\\frac{n}{d}", param:[{id:"n", des:"Numerator"},{id:"d", des:"Denominator"}], des:"Displays a fraction"},
-        Sum: {id:"Sum", keywords:"sum, summation, sigma", cmd:"\\sum\\limits_{i}^{k}", param:[{id:"i", des:"The initial value"},{id:"k", des:"The final value"}],des:"Shows a summation using a sigma"},
-        Root: {id:"Root", keywords:"square root radical", cmd:"\\sqrt[root]{exp}", param:[{id:"root", des:"Opt. The root of the radical"},{id:"exp", des:"The expression you want under the radical"}], des:"Shows an expression under a radical"},
+function LatexGreek(char) {
+    return new LatexDoc(char, char+" "+char.toLocaleLowerCase(), "\\"+char.toLocaleLowerCase(), [], "Displays the letter "+char, "Display the Letter "+char);
+}
 
-        /*** LATEX CONSTANTS: GREEK ***/
-        Alpha: LatexGreek("Alpha"),
-        Pi: LatexGreek("Pi"),
-        Omega: LatexGreek("Omega"),
+window.LatexAPI = {
+    /*** LATEX TEXT MARKUP ***/
+    Bar: new LatexDoc("Bar", "bar overline line", "\\bar{x}", [new Parameter("X", "Value to get bar placed over it")], "Places a bar over the input value", "Display a Line over Text"),
+    Subscript: new LatexDoc("Subscript", "element sub subscript", "_{exp}", [new Parameter("exp", "The expression to get subscripted")], "Subscripts a specific input", "Using Subscript"),
+    Superscript: new LatexDoc("Superscript", "exponent sup superscript", "^{exp", [new Parameter("exp", "The expression to get superscripted")], "Superscripts a specific input", "Using Superscript"),
 
-        /*** LATEX SYMBOLS & CONSTANTS ***/
-        Times: {id:"Times", keywords:"multiplication multiply times", cmd:"\\times", param:[], des:"Displays the times symbol, often used for multiplication"},
-        Space: {id:"Space", keywords:"space tab whitespace", cmd:"\\, or \\: or \\;", param:[], des:"Displays a space that is thin, medium, or wide respectively."},
-        Bullet: {id:"Bullet", keywordS:"bullet dot times product", cmd:"\\bullet", param:[], des:"Displays a bullet"}
+    /*** LATEX MATH MARKUP ***/
+    Fraction: new LatexDoc("Fraction", "frac fraction divide division", "\\frac{n}{d}", [new Parameter("n", "Numerator"), new Parameter("d", "Denominator")], "Displays a fraction", "Make a Fraction"),
+    Sum: new LatexDoc("Sum", "sum, summation, sigma", "\\sum\\limits_{i}^{k}", [new Parameter("i", "The initial value"), new Parameter("k", "The final value")], "Displays a summation using a sigma", "Making a Sum"),
+    Root: new LatexDoc("Root", "square, root radical", "\\sqrt[root]{exp}", [new Parameter("root", "[Optional] The root of the radical"), new Parameter("exp", "The expression you want under the radical")], "Shows an expression under a radical", "How to Make Roots"),
+
+    /*** LATEX CONSTANTS: GREEK ***/
+    Alpha: LatexGreek("Alpha"),
+    Pi: LatexGreek("Pi"),
+    Omega: LatexGreek("Omega"),
+
+    /*** LATEX SYMBOLS & CONSTANTS ***/
+    Times: new LatexDoc("Times", "multiplication multiply times", "\\times", [], "Displays the times symbol, often used for multiplication", "Display Times"),
+    Space: new LatexDoc("Space", "space tab whitespace", "\\, or \\: or \\;", [], "Displays a space that is thin, medium, or wide respectively", "How to Make a Space"),
+    Bullet: new LatexDoc("Bullet", "bullet dot times product", "\\bullet", [], "Displays a bullet", "How do I Make a Dot"),
 };
 
 
@@ -1617,12 +1622,9 @@ function showLatexReference(str) {
         $('#latexRef').fadeIn(300);
         for(i in LatexAPI) {
             if(v == LatexAPI[i].id) {
-//                            console.log(v, console[i].id);
                 showReference(LatexAPI[i]); 
                 return;
-            }
-            
-            if(LatexAPI[i].keywords.indexOf(v) > -1) {
+            } else if(LatexAPI[i].keywords.indexOf(v) > -1) {
                 showReference(LatexAPI[i]); 
                 return;
             }
@@ -1752,12 +1754,9 @@ function resetTheme() {
     $('button').css('text-transform', '').css('letter-spacing', '').css('color', '').css('border-radius', '').css('font-size','');
     $('.ribbonheader').css('color', '');
     $('.ribbonbody').css('height','78px');
+    writeCss("button.toolbutton { border:none; background-color:inherit; color:inherit; }");
     
     loadThemeSettings = function() { return "" };
-}
-//Once the theme is loaded, it resets some CSS stuff
-function resetThemeParameters() {   
-
 }
 function getAppropriateColor(ifLight, ifDark) {
     if(theme.isRelativeDark !== undefined) {

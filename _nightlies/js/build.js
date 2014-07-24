@@ -604,20 +604,30 @@ function smallcapsX(inp) {
 	return out;
 }
 function numToLetter(capy, number) {
-	var cap = ["A", "B", "C","D","E","F","G"];
+	var cap = ["A", "B", "C","D","E","F","G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T","U","V","W","X","Y","Z"];
 	//TODO Complete Letter Set
 	if(capy == "A")
 		return cap[number-1];
 	else
 		return cap[number-1].toLowerCase();
 }
-function numToRoman(capy, number) {
-	var cap = ["I", "II", "III","IV","V","VI","VII","VIII","IX","X"];
-	//TODO Complete set
+function numToRoman(capy, num) {
+	if (!+num)
+        return false;
+    var digits = String(+num).split(""),
+        key = ["","C","CC","CCC","CD","D","DC","DCC","DCCC","CM",
+               "","X","XX","XXX","XL","L","LX","LXX","LXXX","XC",
+               "","I","II","III","IV","V","VI","VII","VIII","IX"],
+        roman = "",
+        i = 3;
+    while (i--)
+        roman = (key[+digits.pop() + (i * 10)] || "") + roman;
+    ans = Array(+digits.join("") + 1).join("M") + roman;
+        
 	if(capy == "I") 
-		return cap[number-1];
+		return ans;
 	else
-		return cap[number-1].toLowerCase();
+		return ans.toLowerCase();
 }
 function numToOrdinal(number) {
 	var ord = ["th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th"];

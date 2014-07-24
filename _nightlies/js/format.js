@@ -236,166 +236,119 @@ function post_format_content(m) {
 	return out;	
 }
 
-//TODO Toolbar Class
-function post_toolbar(tools) {
-	window.tools = tools;
+function Tool(id, name, action) {
+    this.id = id || "";
+    this.name = name || id;
+    this.action = action || function() { console.error("Tool "+id+" has no action."); };                                               
+    Tool.prototype.toHtml = function() {
+        return "<button class='toolbutton' data-tool='"+this.id+"'>&emsp;"+this.name+"&emsp;</button>";  
+    };
+}
+function ToolbarManager() {
+    this.availableTools = {
+        character: new Tool("character", "Character", function() {
+            panelManager.run("Main_Character");
+        }), 
+        heading1: new Tool("heading1", "H1", function() {
+            contentAddSpan({node:"span", class:"heading1 heading"});
+            formatHovertag("heading1", "'Heading-1'", 'null');
+        }),
+        heading2: new Tool("heading2", "H2", function() {
+            contentAddSpan({node:"span", class:"heading2 heading"});
+            formatHovertag("heading2", "'Heading-2'", 'null');
+        }),
+        heading3: new Tool("heading3", "H3", function() {
+            contentAddSpan({node:"span", class:"heading3 heading"});
+            formatHovertag("heading3", "'Heading-3'", 'null');
+        }),
+        heading4: new Tool("heading4", "H4", function() {
+            contentAddSpan({node:"span", class:"heading4 heading"});
+            formatHovertag("heading4", "'Heading-4'", 'null');
+        }),
+        heading5: new Tool("heading5", "H5", function() {
+            contentAddSpan({node:"span", class:"heading5 heading"});
+            formatHovertag("heading5", "'Heading-5'", 'null');
+        }),
+        image: new Tool("image", "Image", function() {
+            var imid = getObjectSize('img');
+            contentAddSpan({node:"div", class:"img inline img"+imid, ce: false});
+            imgDetails(imid);
+            formatHovertag("img", "'Image Details'", "'imgDetails('+$(this).attr('data-id')+');'");
+        }),
+        citation: new Tool("citation", "Citation", function() {
+            initiateCitationEditor();
+        }),
+        table: new Tool("table", "Table", function() {
+            var tid = getObjectSize('table');
+            contentAddSpan({node:"div", class:"table table"+tid+" inline", ce: false});
+            tableDetails(tid);
+            formatHovertag("table", "$(this).attr('data-title')", "'tableDetails('+$(this).attr('data-id')+');'");
+        }),
+        bold: new Tool("bold", "<button class='fontawesome-bold'></button>", function() {
+            console.warn("bold");
+            toggleBold();	
+        }),
+        italics: new Tool("italics", "<button class='fontawesome-italics'></button>", function() {
+            toggleItalics();
+        }),
+        reftext: new Tool("reftext", "Ref Text", function() {
+            var rtid = getObjectSize('reftext');
+            contentAddSpan({node:"span", class:"reftext reftext"+rtid, ce: false});
+            refTextDetails(rtid);
+            formatHovertag("reftext", "'Ref: '+$(this).attr('data-ref')", "'refTextDetails('+$(this).attr('data-id')+');'");
+        }),
+        LaTeX: new Tool("LaTeX", "LaTeX", function() {
+            var lid = getObjectSize('latex');
+            console.log("LATEX "+lid);
+            contentAddSpan({node:"kbd", class:"latex latex"+lid, ce: false});
+            latexDetails(lid);
+            formatHovertag("latex", "$(this).attr('data-cmd')", "'latexDetails('+$(this).attr('data-id')+');'");
+        }),
+        pbreak: new Tool("pbreak", "Page Break", function() {
+            contentAddSpan({node:"kbd", class:"pagebreak", ce: false});
+            formatHovertag("pagebreak", "'Page Break'", 'null');
+            setTimeout("$('.pagebreak').empty();", 1000);
+        }),
+        fullscreen: new Tool("fullscreen", "<span class='fa fa-expand'></span>", function() {
+            fullscreen();
+        })
+    };
+    this.stockTools = {};
+    for(i in this.availableTools) {
+        this.stockTools[i] = this.availableTools[i];   
+    }
+    ToolbarManager.prototype.getAvailableTools = function() {
+        return this.availableTools;   
+    };
+    ToolbarManager.prototype.addTool = function(tool) {
+        this.availableTools[tool.id] = tool;
+        
+        //TODO Allow tools to just appear w/ boolean
+        post_toolbar(window.tools, window.tools_freeform);
+    };
+}
+toolbarManager = new ToolbarManager();
+
+//TODO Allow tools to just appear w/ boolean
+function post_toolbar(tools, freeform) {
+	window.tools = tools || [];
+    window.tools_freeform = freeform || false;
 	var overflow = false;
 	$('.toolbar').empty();
 	$('.overflow').empty();
-	$('.toolbar').append("<div class='toolbar_options' style='display:inline'><span class='toolbar_button' data-t='character' id='CHARACTERPANEL'>&emsp;Character&emsp;</span>|");
-	//TODO Use labels to make prettier, maybe "new_toolbar/new_toolbar_item"
-	//TODO Use JSON objects to enable more powerful, third-party tools
-	for(i=0;i<tools.length;i++) {
-		if(typeof(tools[i] == "string")) {
-			var tool_pretty = tools[i];
-			var tool_t = tools[i];
-			switch(tool_pretty) {
-				case "heading1":
-					tool_pretty = "H1";
-				break;
-				case "heading2":
-					tool_pretty = "H2";
-				break;
-				case "heading3":
-					tool_pretty = "H3";
-				break;
-				case "image":
-					tool_pretty = "Image";
-				break;
-				case "citation":
-					tool_pretty = "Citation";
-				break;	
-				case "table":
-					tool_pretty = "Table";
-				break;
-				case "bold":
-					tool_pretty = "<button class='fontawesome-bold'></button>";
-				break;
-				case "italics":
-					tool_pretty = "<button class='fontawesome-italics'></button>";
-				break;
-                case "reftext":
-                    tool_pretty = "Ref Text";
-                break;
-                case "LaTeX":
-                    tool_pretty = "LaTeX";
-                break;
-                case "break":
-                    tool_pretty = "Page Break";
-                break;
-			}
-		} else {
-			tool_pretty = tools[i].label;
-			tool_t = tools[i].id;
-		}
-		var sum = 0;
-		var index = 0;
-		$('.toolbar_button').each(function(){ 
-			if($(this).width() > sum)
-			sum = $(this).width();
-		});
-		sum += 35;
-		//console.log("Tool",i,$('.toolbar_options').width() + sum >= $('.toolbar').width(),$('.toolbar_options').width() + sum,$('.toolbar').width());
-		if($('.toolbar_options').width() + sum >= $('.toolbar').width() & overflow == false) {
-			overflow = true;
-			$('.toolbar_options').append("<div class='toolbar_button' data-t='overflow' style='display:inline-block'>&nbsp;&nbsp;&nbsp;<span class='fa fa-ellipsis-v'></span>&nbsp;&nbsp;&nbsp;</div>|&emsp;");
-		}	
-		if(overflow)
-			$('.overflow').append("<span class='toolbar_button' data-t='"+tool_t+"'> &emsp; "+tool_pretty+"&emsp;</span>|");
-		else
-			$('.toolbar_options').append("<span class='toolbar_button' data-t='"+tool_t+"'>&emsp;"+tool_pretty+"&emsp;</span>|");
-	}
-	if(overflow)
-		$('.overflow').prepend("<span class='toolbar_button' data-t='fullscreen'>&emsp;<span class='fa fa-expand'></span>&emsp;</span>|</div>");
-	else
-		$('.toolbar_options').append("<span class='toolbar_button' data-t='fullscreen'>&emsp;<span class='fa fa-expand'></span>&emsp;</span>|</div>");
-	//if(overflow) 
-		//out += "</span></div>";
-	
-	//$('.toolbar').html(out);
-	$('.overflow').hide();
-	$('.toolbar_button').on('mouseenter', function() {
-		highlight_tool(this);
-	});
-	$('.toolbar_button').on('mouseleave', function() {
-		unlight_tool(this);
-	});
-	$('.toolbar_button').on("click", function() {
-		switch ($(this).attr('data-t')) {
-			case "character":
-				runPanel('Main_Character');
-			break;
-			case "fullscreen":
-				fullscreen();
-			break;
-			case "citation":
-				initiateCitationEditor();
-			break;
-			case "heading1":
-				contentAddSpan({node:"span", class:"heading1 heading"});
-				formatHovertag("heading1", "'Heading-1'", 'null');
-			break;
-			
-			case "heading2":
-				contentAddSpan({node:"span", class:"heading2 heading"});
-				formatHovertag("heading2", "'Heading-2'", 'null');
-			break;
-			
-			case "heading3":
-				contentAddSpan({node:"span", class:"heading3 heading"});
-				formatHovertag("heading3", "'Heading-3'", 'null');
-			break;
-			case "image":
-				var imid = getObjectSize('img');
-				contentAddSpan({node:"div", class:"img inline img"+imid, ce: false});
-				imgDetails(imid);
-				formatHovertag("img", "'Image Details'", "'imgDetails('+$(this).attr('data-id')+');'");
-			break;
-			case "table":
-			var tid = getObjectSize('table');
-				contentAddSpan({node:"div", class:"table table"+tid+" inline", ce: false});
-				tableDetails(tid);
-				formatHovertag("table", "$(this).attr('data-title')", "'tableDetails('+$(this).attr('data-id')+');'");
-			break;
-			case "bold":
-				console.warn("bold");
-				toggleBold();	
-			break;
-			case "italics":
-				toggleItalics();
-			break;
-            case "reftext":
-                var rtid = getObjectSize('reftext');
-                contentAddSpan({node:"span", class:"reftext reftext"+rtid, ce: false});
-                refTextDetails(rtid);
-                formatHovertag("reftext", "'Ref: '+$(this).attr('data-ref')", "'refTextDetails('+$(this).attr('data-id')+');'");
-            break;
-            case "LaTeX":
-                var lid = getObjectSize('latex');
-                console.log("LATEX "+lid);
-                contentAddSpan({node:"kbd", class:"latex latex"+lid, ce: false});
-                latexDetails(lid);
-                formatHovertag("latex", "$(this).attr('data-cmd')", "'latexDetails('+$(this).attr('data-id')+');'");
-            break;
-            case "break":
-                contentAddSpan({node:"kbd", class:"pagebreak", ce: false});
-                formatHovertag("pagebreak", "'Page Break'", 'null');
-                setTimeout("$('.pagebreak').empty();", 1000);
-            break;
-            
-			case 'overflow':
-				$('.overflow').toggle(150);
-			break;
-			default:
-				for(i in tools) {
-					if(typeof(tools[i]) == "object") {
-						if(tools[i].id == $(this).attr('data-t')) {
-							eval(tools[i].fnc);	
-						}
-					}
-				}
-			break;
-		}
+	$('.toolbar').append("<div class='toolbar_options' style='display:inline'>");
+    $('.toolbar').append(toolbarManager.getAvailableTools().character.toHtml()+toolbarManager.getAvailableTools().fullscreen.toHtml());
+    
+    for(i in tools) {
+        if(toolbarManager.getAvailableTools()[tools[i]] !== undefined)
+            $('.toolbar').append(toolbarManager.getAvailableTools()[tools[i]].toHtml());   
+        else if(freeform === true && toolbarManager.stockTools[tools[i]] === undefined) //This is a custom tool
+            $('.toolbar').append(toolbarManager.getAvailableTools()[tools[i]].toHtml());  
+    }
+    //TODO Need to redo overflow and make it more responsive
+    $('.toolbar_button').on("click", function() {
+        toolid = $(this).attr('data-tool');
+        toolbarManager.getAvailableTools()[toolid].action();
         recallHovertags();
 	});
 }
@@ -410,26 +363,11 @@ function getObjectSize(classname) {
     });
     return i;   
 }
-function highlight_tool(el) {
-	//console.log(jQuery(el).attr('class'));
-	jQuery(el).animate({
-		backgroundColor: theme.ribbon.highlight,
-        color: theme.bodyColor
-	}, 25);
-}
-function unlight_tool(el) {
-	jQuery(el).animate({
-		backgroundColor: theme.ribbon.plain,
-        color: theme.fontColor
-	}, 25);
-}
 window.fullscreenOn = false;
 /*$(window).resize(function () {*/
 toolbar_width = 0;
 sy_save = 0;
-function update_toolbar_style() {
-//	initTheme();
-}
+function update_toolbar_style() {}
 function refreshBodyDesign() {
     if(fullscreenOn === false) {
         var h = (window.innerHeight-100)*0.85;
@@ -462,5 +400,6 @@ function refreshBodyDesign1() {
 $( window ).resize(function() {
   refreshBodyDesign();
   ribbonSwitch(ribbon_index, true);
+    //TODO Fix readjust toolbar
 	//console.log(1);
 });

@@ -1,4 +1,4 @@
-In this page, the build APIs are detailed, showing you how to create the perfect paper.
+The compile APIs are explained here, showing you how to create the perfect paper.
 
 ## `onStylePaper()`
 This function is the first one called. This sets up all of the preliminary settings that apply to the entire paper.

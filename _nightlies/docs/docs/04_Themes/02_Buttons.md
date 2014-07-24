@@ -8,3 +8,4 @@ There are several types of buttons to target. Your code may wish to target each 
 * `button.textbutton` - Button that contains text / text & icon
 * `button.ribbonbutton` - An item in the ribbon
 * `button.close` - A close or exit button, denoted with an X.
+* `button.toolbutton` - A tool in Gltn is rendered as a button
