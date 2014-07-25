@@ -50,6 +50,11 @@ If you want to make a dictionary, but don't know where to start, look at some of
 ### Calculator
 A very simple tool, but also very effective at computing things while you're writing a lab report.
 
+#### Challenges - Go Further
+* Think up new practical uses for a calculator. Maybe get periodic table masses, or do some conversions
+* Try to incorporate spreadsheet functions. Reimagine the calculator as a 1x1 spreadsheet.
+* Ever use a TI calculator? Try to get a similar console-like system active, including variable assignments
+
 ### Simple Speechmaking
 On the news, it is recommended that a sentence have no more than 20 syllables. This makes the information more digestible. How about creating a panel that checks one's speech and advises the user on how to improve sentence structure?
 

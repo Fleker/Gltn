@@ -1,8 +1,7 @@
-
 ## Sample XML Dictionary
 
 ```PHP
-<?php
+    <?php
 	$word = $_GET['word'];
 	$url = 'dictionarydb.xml';
 	
@@ -29,7 +28,7 @@
 		}
 	}
 	echo $error;
-?>
+    ?>
 ```
 
 ### $plural_array

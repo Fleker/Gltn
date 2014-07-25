@@ -18,6 +18,7 @@ function Panel(id, displayname, url) {
         return {id: this.id, name: this.name, icon: this.icon, url: this.url, service: this.service, key:this.key, bordercolor:this.bordercolor, width:this.width, maximize:this.canMaximize };   
     };
     Panel.prototype.setManifest = function(json) {
+        //TODO Or reassign it to the same variable if not assigned
         this.setBordercolor(json.bordercolor);
         this.setMaximize(json.canMaximize);
         this.setName(json.name);
@@ -25,6 +26,7 @@ function Panel(id, displayname, url) {
         this.setWidth(json.width);
         this.title = json.title;
         this.icon = json.icon;
+        
         if(typeof(holoribbon_std) == "undefined")
             return this;
         for(i in holoribbon_std['Panels']) {
@@ -1064,6 +1066,22 @@ specialCharacters = {
     Spaghetti: getEmoji("🍝", "Spaghetti"),
     Bread: getEmoji("🍞", "Bread"),
     Fries: getEmoji("🍟", "French Fries", "happy meal supersize me"),
+    SweetPotato: getEmoji("🍠", "Roasted Sweet Potato"),
+    Dango: getEmoji("🍡", "Dango"),
+    Oden: getEmoji("🍢", "Oden"),
+    Sushi: getEmoji("🍣", "Sushi", "ninja"),
+    Shrimp: getEmoji("🍤", "Fried Shrimp"),
+    FishCake: getEmoji("🍥", "Fish Cake with Swirl Design"),
+    SoftIceCream: getEmoji("🍦", "Soft Ice Cream", "serve"),
+    ShavedIce: getEmoji("🍧", "Shaved Ice", "water"),
+    IceCream: getEmoji("🍨", "Ice Cream"),
+    Donut: getEmoji("🍩", "Doughnut", "donut"),
+    Cookie: getEmoji("🍪", "Cookie", "girl scouts"),
+    Chocolate: getEmoji("🍫", "Chocolate Bar", "hershey"),
+    Candy: getEmoji("🍬", "Candy", "strangers"),
+    Lollipop: getEmoji("🍭", "Lollipop"),
+    Custard: getEmoji("🍮", "Custard"),
+    Honey: getEmoji("🍯", "Honey", "pooh bother"),
     
     Wheelchair: getChar("♿","Wheelchair",'chair'),
     Fountain: getChar("⛲","Fountain","fountain water park"),
@@ -2081,31 +2099,43 @@ panelManager.getAvailablePanels().Main_Dictionary.onRun = function() {
 	var no_connection = "<span style='font-size:16pt'>Sorry</span><br>The dictionary does not work offline.";
 	var connect_time = 0;
 	var ajaxrequests = [];
-    $('.panel_plugin_content').css('overflow-y', 'inherit');
+    $('.panel_plugin_content').css('overflow-y', 'hidden');
+    //TODO May need to resume overflow-y: auto on close
     
 	function openApp() {
-		out = "<input type='search' id='DictionaryIn' style='width:calc(100% - 64px);display:inline;'><button id='DictionarySettings'><span class='fa fa-cog'></span></button><div class='dictionaryNav'></div>";
+		out = "<input type='search' id='DictionaryIn' style='width:calc(100% - 64px);display:inline;'><button id='DictionarySettings'><span class='fa fa-cog'></span></button><div class='dictionaryNav' style='display:inline-block'></div>";
 		out += "<div id='DictionaryOut'><span style='font-size:16pt'>Welcome</span><br>Search for something<br><br><br><div style='text-align:center;width:100%;font-size:30pt;margin-top:25%;' class='fa-stack fa-lg'><span class='fa fa-circle-o fa-stack-2x'></span><span class='fa fa-quote-left fa-stack-1x'></span></div>";
         
         out += "<br><br><br><br><br>";
         phrases = ["Try", "Or", "Maybe", "Perhaps", "How About", "Want"];
         for(i=0;i<5;i++) {
-            if(dictionaryManager.hasPreviousSearch(i))
-                out += "<div style='margin-bottom:6px;padding-left:40px;font-weight:bold;cursor:pointer;text-transform:uppercase;' onclick='startDictionarySearch(\""+dictionaryManager.getPreviousSearch(i)+"\")'>"+phrases[i]+"&nbsp;"+dictionaryManager.getPreviousSearch(i)+"</div>";
+            if(dictionaryManager.hasPreviousSearch(i)) {
+                if(dictionaryManager.getPreviousSearch(i).length > 0)
+                    out += "<div style='margin-bottom:6px;padding-left:40px;font-weight:bold;cursor:pointer;text-transform:uppercase;' onclick='startDictionarySearch(\""+dictionaryManager.getPreviousSearch(i)+"\")'>"+phrases[i]+"&nbsp;"+dictionaryManager.getPreviousSearch(i)+"</div>";
+            }
         }
 		out += "</div>";
 		postPanelOutput(out);	
-        //FIXME
-        $('.panel_plugin_content').css('overflow-y', 'inherit');
+ 
+        $('.panel_plugin_content').css('overflow-y', 'hidden');
 		$('#DictionaryIn').focus();
 		$('#DictionarySettings').on('click', function() {
 			openSettings();
 		});	
-		$('#DictionaryIn').on('input click keydown', function() {
+		$('#DictionaryIn').on('input click', function() {
             console.log("D!");
-            $('.dictionaryNav').html("<button id='dicNavB'><span class='fa fa-arrow-left'></span></button>&nbsp;<button id='dicNavF'><span class='fa fa-arrow-right'></span></button>&nbsp;<button id='dicNavC'><span class='fa fa-file-code-o'></span></button>");
-            if($('#DictionaryOut .loader10').length == 0)
-                getLoader("DictionaryOut");
+           
+            $('#DictionaryIn').animate({
+                width: "100%",
+                marginRight: "-160px"
+            }, 200, function() {
+                 $('.dictionaryNav').html("<button id='dicNavB'><span class='fa fa-arrow-left'></span></button>&nbsp;<button id='dicNavF'><span class='fa fa-arrow-right'></span></button>&nbsp;<button id='dicNavC'><span class='fa fa-file-code-o'></span></button>");
+            });
+            
+            if($('#DictionaryOut .spin').length === 0) {
+                $('#DictionaryOut').append(getloader());
+                spinloader(false);
+            }
 			for(i in ajaxrequests) {
 				ajaxrequests[i].abort();	
 			}
@@ -2117,16 +2147,25 @@ panelManager.getAvailablePanels().Main_Dictionary.onRun = function() {
                 console.log(i);
                 j = dictionaryManager.getDictionary(i);
 				console.log(i, j.name, $('#DictionaryIn').val(), j.url);
-				$('#DictionaryOut').css('background-color', 'inherit').css('padding-left', '0').css('padding-top', '0').css('padding-bottom', '0').css('border', 'none').css('margin-top', '0').css('width', '100%').css('color', 'inherit');
+                $('.panel_plugin_content').css('overflow-y', 'hidden');
+				
+                $('#DictionaryOut').css('background-color', 'inherit').css('padding-left', '0').css('padding-top', '0').css('padding-bottom', '0').css('border', 'none').css('margin-top', '0').css('width', '100%').css('color', 'inherit');
 				var req = $.get(j.url, {word: $('#DictionaryIn').val()}, function (data) {
 					if(j.format == "XML") {
 						console.log(data);
 						data = $.parseJSON(data);
 						if(data.error != "404") {
-							//style='background-color: white;padding-left: 6px;padding-top: 8px;padding-bottom: 50px;border: solid 1px #999;margin-top: 4px;width: 95%;
-							$('#DictionaryOut').html(xmlDictionaryParse(data)).css('background-color', 'white').css('padding-left', '6px').css('padding-top', '8px').css('border', 'solid 1px #999').css('margin-top', '4px').css('width', '95%').css('color', 'black');
+                            $('#DictionaryOut').html(xmlDictionaryParse(data)).css('background-color', 'white').css('padding-left', '6px').css('padding-top', '8px').css('border', 'solid 1px #999').css('margin-top', '4px').css('width', '95%').css('color', 'black');
                             dictionaryManager.appendPreviousSearch($('#DictionaryIn').val());
-                            //TODO Navigation - Back: try0, forward: tryi+1, citation: Go to citation popup and scrape url
+                            $('#dicNavB').on('click', function() {
+                                tryDictionary(0); 
+                            });
+                            $('#dicNavF').on('click', function() {
+                                tryDictionary(i+1);
+                            }); 
+                            $('#dicNavC').on('click', function() {
+                                //TODO  citation: Go to citation popup and scrape url
+                            });
 							end = true;	
 						} else {
 							if(i == dictionaryManager.getDictionaryLength)
@@ -2141,7 +2180,15 @@ panelManager.getAvailablePanels().Main_Dictionary.onRun = function() {
 							//$('#DictionaryFrame').attr('srcdoc', data);
 							$('#DictionaryFrame').attr('src', j.url+"?word="+$('#DictionaryIn').val());
                             dictionaryManager.appendPreviousSearch($('#DictionaryIn').val());
-                            //TODO Same navigation
+                            $('#dicNavB').on('click', function() {
+                                tryDictionary(0); 
+                            });
+                            $('#dicNavF').on('click', function() {
+                                tryDictionary(i+1);
+                            }); 
+                            $('#dicNavC').on('click', function() {
+                                //TODO  citation: Go to citation popup and scrape url
+                            });
 							end = true;	
 						} else {
 							if(i == dictionaryManager.getDictionaryLength)

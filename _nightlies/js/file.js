@@ -286,16 +286,18 @@ function startSaveFile() {
         saveFile();   
     }
     
-    if(hasSetting("inkblob_url")) {
-        filepicker.write(getSettings("inkblob_url"),
-                     localStorage.settings,
-                    function(InkBlob){
-                        saveFile();
-                        console.log("Settings synced for now");
-                    }, function(FPError) {
-                        console.log("Settings sync Error: "+FPError.toString());
-                    }
-                );   
+    if(window.dirty) {
+        if(hasSetting("inkblob_url")) {
+            filepicker.write(getSettings("inkblob_url"),
+                         localStorage.settings,
+                        function(InkBlob){
+                            saveFile();
+                            console.log("Settings synced for now");
+                        }, function(FPError) {
+                            console.log("Settings sync Error: "+FPError.toString());
+                        }
+                    );   
+        }
     }
     
     try {
@@ -303,6 +305,7 @@ function startSaveFile() {
 	} catch(e) {
 		window.document.title = 'Editing Document';
 	}    
+    window.dirty = false;
 }
 function saveFile() {	
 	fileid = $('#file_name_internal').val();
@@ -387,7 +390,7 @@ function saveFile() {
 	if(window.dirty == true) {
         if(isCloudSaved())
             cloudResave();
-        window.dirty = false;
+//        window.dirty = false;
     }
 	$('.content_save').show();
 	$('.content_save').html("<span class='fa fa-file-text' style='color:"+theme.fontColorAlt+"'></span>&nbsp;<span class='fa fa-check' style='color:"+theme.fontColorAlt+"'></span>");
@@ -474,18 +477,9 @@ function restoreFile(full) {
 				window.saved[i] = decodeURIComponent(x.saved[i]);	
 			}
 		}
-		
-        //TODO FIX STORAGE LEAK RIGHT HERE!!!
-		if(x.hovertagRegistrar == undefined) {
-			
-		} else if(x.hovertagRegistrar.length == undefined && x.hovertagRegistrar != undefined) {
-			hovertagRegistrar.push(x.hovertagRegistrar);
-		} else if(x.hovertagRegistrar.length > 1) {
-			for(i in x.hovertagRegistrar) {
-					hovertagRegistrar.push(x.hovertagRegistrar[i]);	
-				}
-		}
-		
+        if(hasFileData("hovertags"))
+            hovertagManager.fromString(getFileData('hovertags'));
+        hovertagManager.refresh();
 		setTimeout("finishRestore(x,xc,"+full+");", 300);		
 	} else {
 		//New document - most things initialize at the top of this file
@@ -632,6 +626,9 @@ function exportFile() {
 	add_to_page("Content HTML:<br><textarea style='width:95%;height:200px;'>"+localStorage[fileid+'_c']+"</textarea><br>");
 
 	//add_to_page('Execute this code in a web console to transfer the files over to a different computer:<br><textarea style="width:95%;height:200px;">localStorage["'+fileid+'5"] = \042'+localStorage[fileid].replace(/"/g, '\\"')+'\042;localStorage["'+fileid+'5_c"] = \042'+localStorage[fileid+"_c"].replace(/"/g, '\\"')+'\042;</textarea>');
+}
+function hasFileData(att) {
+    return getFileData(att) !== undefined && getFileData(att) != "undefined";   
 }
 function getFileData(att) {
     try {

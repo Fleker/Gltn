@@ -1,4 +1,4 @@
-var GLTN_VERSION = "1.3.1.7";
+var GLTN_VERSION = "1.3.1.8";
 //For backwards compatibility, will return true 
 function greaterThanVersion(version) {
     var split = version.split(".");
@@ -408,7 +408,7 @@ document.onkeydown = function(e) {
      
             }
         break;
-        case 112: //F1
+        case 113: //F2
             openPersonalFavorites();            
         break;
 		case 122: /*F11*/
@@ -553,7 +553,7 @@ function setHeader() {
             {group: '', value:"<img style='overflow:hidden;border-radius:50%;width:60px;height:60px;' class='me_avatar_img'>"},
 			{group: 'Name', value:'<div style="margin-top:2px"><input id="me_name" type="text" placeholder="Name"></div>'},
 			{group: 'Email', value:'<div style="margin-top:2px"><input id="me_email" type="email" placeholder="Email Address"></div>'},
-            {text: 'Settings...', img:'<span class="fa fa-cog" style="font-size:18pt"></span>', action:"openPersonalFavorites()", key: "F1"}
+            {text: 'Settings...', img:'<span class="fa fa-cog" style="font-size:18pt"></span>', action:"openPersonalFavorites()", key: "F2"}
 		)
 	};
 	newRibbon('.header', holoribbon_std);
@@ -659,16 +659,16 @@ function openPersonalFavorites() {
     if(hasSetting("inkpicker_url")) {
         output += "<span class='fa fa-check' style='font-size:9pt;color:"+theme.palette.green.normal+";'></span>&nbsp;<span style='font-size:8pt'>SETTINGS SYNCED</span>";   
     }
-    output += "<button class='textbutton' id='up_settings'>Upload Settings</button><br><br><button class='textbutton' id='down_settings'>Download Settings</button><br><span id='validate_settings'></span><br><span id='url_settings' style='font-size:8pt'>";
+    output += "<button class='textbutton' id='up_settings'>Enable Sync</button><br><br><button class='textbutton' id='down_settings'>Sync To This Computer</button><br><span id='validate_settings'></span><br><span id='url_settings' style='font-size:8pt'>";
     output += "</span></div>";
     
     //Autoupload Settings
     output += "<div class='preference_card'><h1>Auto Upload</h1><br>";
     output += "Enable:&nbsp;<input type='checkbox' id='auto_upload'";
     if(hasSetting('autoUpload')) {
-        output += " checked="+((getSettings('autoUpload')==true)?"checked":"false");
+        output += ((getSettings('autoUpload')=="true")?" checked='true'":"");
     }
-    output += "><br><br>By enabling auto upload, you will be notified to save your file online each time a new file is created.";
+    output += "><br><br>By enabling auto upload, you will be notified to save your file online each time a new file is created.<br><br>";
     
     output += "</div>";
     
@@ -755,7 +755,9 @@ function openPersonalFavorites() {
             );
         }); 
         $('#auto_upload').on('click', function() {
-            if($(this).attr('checked') == 'checked')
+            console.warn("AU clicked "+$(this)[0].checked);
+            console.warn($(this));
+            if($(this)[0].checked === true)
                 writeToSettings("autoUpload", 'true');
             else
                 writeToSettings('autoUpload', 'false');

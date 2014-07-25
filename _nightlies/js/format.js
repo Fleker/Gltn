@@ -241,7 +241,7 @@ function Tool(id, name, action) {
     this.name = name || id;
     this.action = action || function() { console.error("Tool "+id+" has no action."); };                                               
     Tool.prototype.toHtml = function() {
-        return "<button class='toolbutton' data-tool='"+this.id+"'>&emsp;"+this.name+"&emsp;</button>";  
+        return "<button class='toolbutton' data-tool='"+this.id+"'>&emsp;"+this.name+"&emsp;</button>|";  
     };
 }
 function ToolbarManager() {
@@ -337,7 +337,8 @@ function post_toolbar(tools, freeform) {
 	$('.toolbar').empty();
 	$('.overflow').empty();
 	$('.toolbar').append("<div class='toolbar_options' style='display:inline'>");
-    $('.toolbar').append(toolbarManager.getAvailableTools().character.toHtml()+toolbarManager.getAvailableTools().fullscreen.toHtml());
+    $('.toolbar').append(toolbarManager.getAvailableTools().fullscreen.toHtml()+toolbarManager.getAvailableTools().character.toHtml());
+    $('.toolbutton[data-tool="fullscreen"]').css('margin-left','-15px')
     
     for(i in tools) {
         if(toolbarManager.getAvailableTools()[tools[i]] !== undefined)
@@ -346,7 +347,8 @@ function post_toolbar(tools, freeform) {
             $('.toolbar').append(toolbarManager.getAvailableTools()[tools[i]].toHtml());  
     }
     //TODO Need to redo overflow and make it more responsive
-    $('.toolbar_button').on("click", function() {
+    $('.overflow').hide();
+    $('.toolbutton').on("click", function() {
         toolid = $(this).attr('data-tool');
         toolbarManager.getAvailableTools()[toolid].action();
         recallHovertags();

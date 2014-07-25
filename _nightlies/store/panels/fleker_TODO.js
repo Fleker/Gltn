@@ -1,3 +1,7 @@
+//TODO Tables to divs
+//TODO See your items only
+//TODO Remove need for brackets
+//TODO Training section
 var p = panelManager.getAvailablePanels().Fleker_TODO;
 p.setManifest({
     title: "TODO LIST",

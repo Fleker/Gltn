@@ -1,6 +1,8 @@
+## TODO
+This is a simple TODO app. By typing TODO or FUTURE, it will put that into a list where you are able to see all your tasks. You can also assign tasks to other people.
+
 ```Javascript
     var p = panelManager.getAvailablePanels().Fleker_TODO;
-    //console.log(p);
     p.setManifest({
         title: "TODO LIST",
         name: "Todo",
@@ -8,7 +10,6 @@
         bordercolor: "#d35400",
         icon: "check-circle-o"
     });
-    //TODO Move to DIVs
     p.onRun = function() {
         function restart() {
             out = "Write {TODO,FUTURE ...} to take a note. These notes will be collected here. You can also @ someone to designate a role.<br><br>";
@@ -16,7 +17,6 @@
             arr = input.match(/{(TODO|FUTURE|NOTE|FIXME|CHANGES) [^}]*}/g);
             out += "<table style='width:95%'>";
             for(i in arr) {
-    //            console.warn(arr[i]);
                 var user = undefined;
                 if(arr[i].search(/@ ([^\s]*)/g) != -1) {
                     //Pull out username
@@ -65,5 +65,48 @@
         restart();
     }
     p.activate();
-    //console.log("Activate TODO");
 ```
+
+## *Breaking it Down*
+######Let's examine this theme piece by piece
+
+### Setting Attributes
+The first things that are done are that the panel is found in the panel manager and the manifest is set.
+```Javascript
+    var p = panelManager.getAvailablePanels().Fleker_TODO;
+    p.setManifest({
+        title: "TODO LIST",
+        name: "Todo",
+        width: 30,
+        bordercolor: "#d35400",
+        icon: "check-circle-o"
+    });
+```
+
+Note how you set the title and name as two separate things? The name "Todo" appears in the holoribbon as the name of the panel. When opened, "TODO LIST" is displayed at the top so you know what panel is active. Other attributes are also set here, such as the width of the panel, color of the border, and the icon to be displayed. In this case, the icon is a Font Awesome character. 
+
+### Running
+The panel will run as the `onRun` method is called. The method includes functions inside the scope in order to make cleaner and more organized code.
+```Javascript
+    p.onRun = function() {
+        function restart() {
+            out = "Write {TODO,FUTURE ...} to take a note. These notes will be collected here. You can also @ someone to designate a role.<br><br>";
+            ...
+            postPanelOutput(out);
+        }
+        restart();
+    }
+```
+
+### Respond to Keys
+The TODO panel, if it continues to be open, should continually refresh to make sure that all TODOs are displayed. To respond to keypresses, the panel adds a click event for the panel key event.
+
+```Javascript
+    $('.PanelKeyEvent').off().on('click', function() {
+        restart();
+    });
+```
+
+### Activate
+The panel must be activated before it can be used. This is your way of telling the `PanelManager`, "Hey, I'm downloaded and ready to be used." This can be done with one simple line of code.
+`p.activate();`

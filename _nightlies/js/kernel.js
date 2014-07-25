@@ -495,41 +495,123 @@ function initiateCitationEditor(q, hovertag, h2) {
 			if(window.citationrestore == true) {
 				citationRestore();
 			}
-		};
-	
-			initiatePopup({title: "Citations", bordercolor: "#09f", ht: ht, fnc: fnc, size: "large"});
+		};	
+        initiatePopup({title: "Citations", bordercolor: "#09f", ht: ht, fnc: fnc, size: "large"});
 }
 
 function citationHovertag(recall) {
     formatHovertag('citation', 'citation[$(this).attr("data-id")].Title', 'initiateCitationEditor(undefined,$(this).attr("data-i")) ');
-//    formatHovertag('citation', "'citation[$(this).attr(\"data-id\")].Title'", "'initiateCitationEditor(undefined,$(this).attr(\"data-i\"))'");
 }
 function citationHovertag2(recall) {
-	/*$('.citation').off('hover');
-	$('.citation').on('hover', function() {
-		alert(5);
-		displayHovertag(citation[$(this).attr('data-id')].title, {ypos: $(this).offset().top});
-	}, function() {
-		alert(4);
-		hideHovertag();
-	});*/
-	$('.citation').off('mouseenter');
+$('.citation').off('mouseenter');
 	$('.citation').off('mouseleave');
 	
 	$('.citation').on('mouseenter', function() {
 		displayHovertag(citation[$(this).attr('data-id')].Title, {ypos: $(this).offset().top}, "'initiateCitationEditor(undefined,"+$(this).attr('data-i')+")'");
 	});
 	$('.citation').on('mouseleave', function() {
-		//hideHovertag();
 	});
-//	console.log("CitationHovertag(Recall): "+recall+(recall == undefined));
 	if(recall == undefined)	{
 		hovertagRegistry('citationHovertag(true)');
 	}
 }
-//'
-//Using the new Tooltips 
+// Hovertag Class
+function Hovertag(classname, textcode, action) {
+    this.classname = classname;
+    this.textcode = textcode || classname;
+    this.action = action || function() { };
+    Hovertag.prototype.toString = function() {
+        var json = {classname: this.classname, textcode: this.textcode.toString(), action: this.action.toString()};
+        return JSON.stringify(json);
+    }
+}
+// HovertagManager Class
+function HovertagManager() {
+    this.registry = {
+        citation: new Hovertag('citation', function() {
+            return citation[$(this).attr('data-id')].Title;
+        }, function() {
+            initiateCitationEditor(undefined, $(this).attr('data-i'));
+        }),
+        context: new Hovertag('context', function() {
+            return window.context[parseInt($(this).attr('data-i'))].type;
+        }, function(element) {
+            contextPanel($(element).attr('data-i'));
+        }),
+        latex: new Hovertag('latex', function(element) {
+            console.log(element);
+            console.log($(element).attr('data-cmd'));
+            return $(element).attr('data-cmd');
+        }, function(element) {
+            console.log(element);
+            console.log($(element).attr('data-id'));
+            latexDetails($(element).attr('data-id'));
+        })
+    };
+    HovertagManager.prototype.implement = function(hovertag) {
+        this.registry[hovertag.classname] = hovertag;
+        this.refresh();
+    };
+    HovertagManager.prototype.refresh = function() {
+        for(var i in this.registry) {
+            var htag = this.registry[i];
+            var jtag = $('.'+htag.classname);
+            jtag.off();
+            jtag.attr('data-tooltip', 'true');
+            jtag.attr('data-title', htag.textcode.toString());
+            jtag.attr('data-class', htag.classname);
+            jtag.attr('data-options', 'disable_for_touch:true');
+            jtag.click(function() {
+                hovertagManager.registry[$(this).attr('data-class')].action(this);
+            });
+            
+            $('.tooltip[data-selector="'+htag.classname+'"]').remove();
+            $('body').append(Foundation.libs.tooltip.settings.tip_template(htag.classname, htag.textcode));
+            $('.'+htag.classname).hover(function() {
+                htag.classname = $(this).attr('class').split(' ')[0];
+                Foundation.libs.tooltip.showTip($('.tooltip[data-selector="'+htag.classname+'"]'));
+                if(typeof(htag.textcode) == "function") {
+                    txt = htag.textcode(this);
+                } else {
+                    txt = htag.textcode;
+                }
+                
+                $('.tooltip[data-selector="'+htag.classname+'"]').css('top', $(this).offset().top+30).css('left', $(this).offset().left+8).html( $(Foundation.libs.tooltip.settings.tip_template(htag.classname, txt)).html());
+            }, function() {
+                Foundation.libs.tooltip.hide($('.tooltip[data-selector="'+htag.classname+'"]'));
+            });
+        }
+        writeToFile('hovertags', this.toString());
+    };
+    HovertagManager.prototype.fromString = function(string) {
+        //Takes saved list and reads everything   
+        var json = JSON.parse(string);
+        for(var i in json) {
+            if(json[i].textcode.indexOf('function') > -1) {
+                json[i].textcode = "("+json[i].textcode+")()";
+                json[i].textcode = Function(json[i].textcode);
+            }
+            json[i].action = Function("("+json[i].action+")()");
+            if(this.registry[json[i].classname] !== undefined) 
+                 continue;
+            var htag = new Hovertag(json[i].classname, json[i].textcode, json[i].action);
+            this.implement(htag);
+        }
+    };
+    HovertagManager.prototype.toString = function() {
+        var a = "[";
+        for(i in this.registry) {
+            a += this.registry[i].toString()+",";   
+        }
+        a = a.substring(0,a.length-1) + "]";
+        return a;
+    };
+}
+hovertagManager = new HovertagManager();
+//FIXME
+
 function formatHovertag(classname, textcode, action, recall) {
+    return;
     $('.'+classname).off();
     $('.'+classname).removeClass("has-tip");
     $('.'+classname).attr('data-tooltip', 'true');
@@ -1479,33 +1561,21 @@ function refTextDetails(id) {
             });
 
             $('.PopupSave').on('click', function() {
-
                 closePopup(); 
-
                 markAsDirty();
-
             });
-
         }
-
         if($('.reftext'+id).attr('data-ref') != undefined) {
-
             populate($('.reftext'+id).attr('data-refid'));
-
         } else {
-
             populate(-1);
-
         }
-
     };
-
     initiatePopup({title: "Ref Text", bordercolor:"#09f", ht: ht, fnc: fnc});
-
 }
 
 function LatexDoc(id, keywords, script, parameters, description, title) {
-    return {id: id, keywords: keywords, cmd: script; param: parameters, des: description; title: title};   
+    return {id: id, keywords: keywords, cmd: script, param: parameters, des: description, title: title};   
 }
 function Parameter(id, description) {
     return {id: id, des: description};
@@ -1541,15 +1611,18 @@ window.LatexAPI = {
 function latexDetails(id) {
     console.log("LATEX " +id);
     console.log($('.latex'+id).attr('data-cmd'));
-    ht = "<table style='width:100%'><tr><td style='vertical-align:top;width:50%;'>LaTeX is a form of markup that, among other features, allows for rich math formatting. <br><br>Help:&nbsp;<input type='search' style='width:50%' id='latexSearch' placeholder='Search for something...'><br><span style='font-size:9pt'>**Mathematical formulas must be placed between \"$\"</span></td><td width:50%;>";
+    
+    ht = "<table style='width:100%'><tr><td style='vertical-align:top;width:50%;'>LaTeX is a form of markup that, among other features, allows for rich math formatting. <br><br><input id='latexSearch' placeholder='Search for help...' type='search' style='width:50%;display:inline-table;vertical-align:top;' ><div id='latexTable' style='width:calc(49% - 12px);display:inline-table;margin-left:8px;margin-bottom:8px;vertical-align:top;'></div><br><span style='font-size:9pt'>**Mathematical formulas must be placed between \"$\"</span></td><td width:50%;vertical-align:top>";
     ht += "<div id='latexRef' style='display:none;background-color: rgba(255,255,255,.1);padding:5px;'></div></td></tr></table>";
    // ht += "<button id='latexPrev'>Preview</button>";
     ht += "<table style='width:99%'><tr><td style='width:50%'><div id='latexCmd' style='height:4em;width:95%;border: solid 1px rgba(0,129,255,1);background-color:"+theme.normfsui+";margin-top:5px;margin-left:5px;margin-bottom:10px;' contenteditable='true'></div></td>";
     ht += "<td style='width:50%'><div id='latexView' style='height:4em;width:95%;border: solid 1px;background-color:"+theme.normfsui+";margin-top:5px;margin-left:5px;margin-bottom:10px;'></div></td></tr></table>";
     ht += "<div id='latexBuffer' style='visibility:hidden'></div>";
     ht += "<button id='latexSave' class='textbutton'>Save</button>";
+    
     $('.latex'+id).attr('data-id', id);
     ht += "<input type='hidden' id='PopupId' value='"+id+"'>";
+    
     fnc = function x(){
         id = $('#PopupId').val();
         Preview.Init();
@@ -1600,13 +1673,12 @@ function latexDetails(id) {
             populate(-1);
         }  
     };
-
-    initiatePopup({title: "Insert LaTeX", bordercolor: "#f1c40f", ht: ht, fnc: fnc, size: "large"});
+    var p = new Popup({title: "Add LaTeX", bordercolor: "#f1c40f", ht: ht, fnc: fnc, size: popupManager.LARGE}).show();
 }
 
 function showLatexReference(str) {
     function showReference(item) {
-        console.log(item);
+//        console.log(item.id, item);
         out = "<b>"+item.id+"</b><br>";
         out += "<span style='font-family:monospace'>"+item.cmd+"</span>";
         out += "<div style='margin-left:35px;font-size:10pt'><ul>";
@@ -1617,19 +1689,29 @@ function showLatexReference(str) {
         $('#latexRef').html(out);
         return out;
     }
-    var v = str;
+    var v = str.toLowerCase();
+    var results = [];
+    $('#latexTable').empty();
     if(v.length) {
         $('#latexRef').fadeIn(300);
         for(i in LatexAPI) {
-            if(v == LatexAPI[i].id) {
+            if(v == LatexAPI[i].id.toLowerCase()) {
                 showReference(LatexAPI[i]); 
                 return;
             } else if(LatexAPI[i].keywords.indexOf(v) > -1) {
-                showReference(LatexAPI[i]); 
-                return;
+                results.push(LatexAPI[i]);
+                if(results.length < 5) {
+                    $('#latexTable').append("<div class='latex_table_item' style='cursor:pointer;margin-bottom:8px;color:"+getAppropriateColor(theme.palette.blue.thick, theme.palette.blue.thin)+"' data-cmd='"+LatexAPI[i].id+"')'>-&nbsp;"+LatexAPI[i].title+"</div>");   
+                }
+                $('.latex_table_item').off().on('click', function() {
+                    showReference(LatexAPI[$(this).attr('data-cmd')]);
+                }); 
             }
         }
-        $('#latexRef').html("<span style='font-size:11pt'>&emsp;Sorry, that could not be found.</span>");
+        if(results.length === 1)
+            showReference(results[0]);
+        if(results.length === 0)
+            $('#latexRef').html("<span style='font-size:11pt'>&emsp;Sorry, that could not be found.</span>");
     } else {
         $('#latexRef').fadeOut(300);   
     }
@@ -1754,7 +1836,8 @@ function resetTheme() {
     $('button').css('text-transform', '').css('letter-spacing', '').css('color', '').css('border-radius', '').css('font-size','');
     $('.ribbonheader').css('color', '');
     $('.ribbonbody').css('height','78px');
-    writeCss("button.toolbutton { border:none; background-color:inherit; color:inherit; }");
+    writeCss("button.toolbutton { border:none; background-color:inherit; color:inherit; margin-bottom:0px; margin-top:-6px; padding:0px; font-size:11pt; }");
+    writeCss("button.ribbonbutton { margin-bottom:0px; }");
     
     loadThemeSettings = function() { return "" };
 }
@@ -1800,7 +1883,7 @@ function iterateTheme() {
     $('abbr').css('font-size', '100%');
     //TODO Erase css rules from foundation.min. css
     $('table').css('background-color', 'inherit').css('border', 'none');
-    $('kbd[data-theme!=false]').css('background-color', '').css('border-color','').css('color','').css('border-style','').css('border-width','').css('font-family','').css('padding','').css('border-radius','');
+    $('kbd[data-theme!=false]').css('background-color', theme.bodyColor).css('border-color','transparent').css('color',theme.fontColor).css('border-style','none').css('border-width','0px').css('font-family','inherit').css('padding','0px').css('border-radius','0px');
     
     if(loadThemeSettings() == "" || loadThemeSettings === undefined)
         $('#ThemeSettings').hide();

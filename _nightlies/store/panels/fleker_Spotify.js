@@ -1,33 +1,36 @@
-currentpanel = "fleker_Spotify";
-function GetPanelfleker_Spotify() {
-	return {title: "Spotify Player", bordercolor:"#81b71a", width:25};
-}
-function RunPanelfleker_Spotify() {
+var p = panelManager.getAvailablePanels().Fleker_Spotify;
+p.setManifest({
+    title: "Spotify Player",
+    name: "Music",
+    bordercolor: "#81b71a",
+    icon: "headphones",
+    width: 25
+});
+p.onRun = function() {
+    var playlists = {
+        Psyched: "https://play.spotify.com/user/12495681/playlist/1nCh78mkclE3034mGo03eT",
+        Jazz: "https://play.spotify.com/user/spotify/playlist/5O2ERf8kAYARVVdfCKZ9G7",
+        Coffee: "",
+        Deep-Focus: ""
+    }
 	function startPlaying(name) {
-		var playlist = "";
-		switch(name) {
-			case "Psyched":
-				playlist = "https://play.spotify.com/user/12495681/playlist/1nCh78mkclE3034mGo03eT";
-				break;
-			case "Jazz":
-				playlist = "https://play.spotify.com/user/spotify/playlist/5O2ERf8kAYARVVdfCKZ9G7";
-				break;
-		}
-		initService("fleker_Spotify", "Playing "+name, "<span class='fa fa-headphones'></span>");
-		out = "<button class='return'><span class='fa fa-angle-left'></span>&nbsp;Back</button><br>";
+		var playlist = playlists[name];
+		initService("Fleker_Spotify", "Playing "+name, "<span class='fa fa-headphones'></span>");
+		out = "<button class='textbutton return'><span class='fa fa-arrow-left'></span>&nbsp;Back</button><br>";
+        
 		out += '<iframe style="height:90%;width:95%;" src="https://embed.spotify.com/?uri='+playlist+'" width="300" height="380" frameborder="0" allowtransparency="true"></iframe>';
-		postPanelOutput(out);
+		
+        postPanelOutput(out);
 		writeToSettings('fleker_Spotify', name);
 		$('button.return').on('click', function() {
 			returnToMain();
 		});
 	}
 	function returnToMain(playlist) {
-		initService("fleker_Spotify", "", "");
+		initService("Fleker_Spotify", "", "");
 		out = "Some people enjoy listening to music while they work.<br>Choose a mood to begin a playlist.<br>";
-		var genres = ["Psyched", "Jazz"];
-		for(i in genres) {
-			out += "&emsp;<button class='playlist' data-id='"+genres[i]+"'>-"+genres[i]+"</button>";
+		for(i in playlists) {
+			out += "&emsp;<button class='textbutton playlist' data-id='"+playlists[i]+"'>-"+playlists[i]+"</button>";
 		}				
 
 		postPanelOutput(out);
@@ -47,3 +50,4 @@ function RunPanelfleker_Spotify() {
 	}
 	returnToMain(pl);
 }
+p.activate();

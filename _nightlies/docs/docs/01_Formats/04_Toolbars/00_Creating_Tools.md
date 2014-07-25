@@ -22,8 +22,19 @@ Tools may be added to the list of tools using a `ToolbarManager`, accessed with 
 
 This method also will update the toolbar if necessary.
 
-## Custom Actions
+### Downloading
+The best way to install one or more tools is to create a service. This service will, on initialization, install the tools and then do nothing else. The method provided below is recommended for tools that will be available in the Gltn Store.
+```Javascript
+    var s = new Service("myservice", "js/myservice.js");
+    s.onInit = function() {
+        var t = new Tool("mytool", "My Tool", function() {
+            alert("Hello");
+        });
+        toolbarManager.addTool(t);
+    };
+```
 
+## Custom Actions
 The toolbar contains actions for directly modifying content.
 
 ###`contentAddSpan(obj)`
