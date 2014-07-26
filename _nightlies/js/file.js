@@ -477,9 +477,6 @@ function restoreFile(full) {
 				window.saved[i] = decodeURIComponent(x.saved[i]);	
 			}
 		}
-        if(hasFileData("hovertags"))
-            hovertagManager.fromString(getFileData('hovertags'));
-        hovertagManager.refresh();
 		setTimeout("finishRestore(x,xc,"+full+");", 300);		
 	} else {
 		//New document - most things initialize at the top of this file
@@ -548,7 +545,7 @@ function finishRestore2(full) {
 		//may not be ready yet, so the function will be disabled
 		console.warn(e.message);	
 	}
-    console.log("Finishing... the registrar contains "+hovertagRegistrar.length+" items");
+    /*console.log("Finishing... the registrar contains "+hovertagRegistrar.length+" items");
     hovertagRegistrarTemp = [];
     for(i in hovertagRegistrar) {
         var include = true;
@@ -563,14 +560,17 @@ function finishRestore2(full) {
     //Prevent leak by cleaning up tags
     hovertagRegistrar = hovertagRegistrarTemp;
     console.log("The temp registrar contains "+hovertagRegistrarTemp.length+" items");
-	recallHovertags(hovertagRegistrar);
+	recallHovertags(hovertagRegistrar);*/
+    if(hasSetting("formats")) {
+        formatManager.fromString(getSettings("formats"));   
+    }
+    hovertagManager.refresh();
 //	window.hovertagregistrarinterval = setInterval("recallHovertags(hovertagRegistrar);",1000);
 	postWordCount();
 	initNiftyUI4Saving();
 	if(window.offline != true && !full)
 		initPanels();
 	
-	hideHovertag();
     if(!full)
         initMathjax();
     

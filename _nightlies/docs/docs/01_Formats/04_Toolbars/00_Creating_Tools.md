@@ -57,6 +57,35 @@ Enables a class to display hovertags when the item is hovered over.
 
 Make sure that you use this format, otherwise the system will break when trying to display that hovertag.
 
+## Examples
+### Citation
+```Javascript
+    var character = new Tool("character", "Character", function() {
+        panelManager.run("Main_Character");
+    })
+```
+It is easy to open a panel from a tool. The Character Panel contains the code to insert data into the content box using a larger user interface.
+
+### Heading
+```Javascript
+    var heading1 = new Tool("heading1", "H1", function() {
+        contentAddSpan({node:"span", class:"heading1 heading"});
+        hovertagManager.refresh();
+    })
+```
+Here, a heading is inserted directly into the content and then the `HovertagManager` is refreshed so that a hovertag will appear in that area. If a hovertag is not implemented yet, it should be done before refreshing. Ideally, it should be done when the page loads.
+
+### Image
+```Javascript
+    var image = new Tool("image", "Image", function() {
+        var imid = getObjectSize('img');
+        contentAddSpan({node:"div", class:"img inline img"+imid, ce: false});
+        imgDetails(imid);
+        hovertagManager.refresh();
+    })
+```
+This example is a little more complicated. A `div` is inserted into the content. It gets a specific id. Also a function is called, `imgDetails`, which opens an image picker. The image properties are tied to the `imid`. The function `getObjectSize` essentially gets the length of an array of that class. However, it does make sure that deleted images are also taken into consideration. 
+
 ##Reference
 ###*Class Tool*
 The class `Tool` is responsible for creating a tool and doing something when acted upon by user input.

@@ -1,4 +1,4 @@
-Gltn provides a simple way to create notifications and place them in a central notification repository. They are accessed under the content textarea, as a service.
+Gltn provides a simple way to create notifications and place them in a central notification repository. They are accessed in the services bar, as a service.
 
 ### Create Notification
 `postNotification(id, text, action)`

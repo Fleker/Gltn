@@ -37,7 +37,7 @@ function startBuild(el) {
             updateBuildProgress("<span style='color:#c00'>Error Building: "+e.message+"</span>");
             console.error(e.message);
         }
-    },500    );
+    },500);
     setTimeout('updateBuildProgress("Compiling...");',400);
     
    
@@ -116,8 +116,10 @@ function continueBuild(el) {
 	//el = '.content_textarea';
 	var cont = $(el).html();
 	//console.log(cont);
-	$('.draft').html(cont.replace(/&nbsp;/g, " ").trim());
+    window.predraft = cont;
+	$('.draft').html(cont/*.replace(/&nbsp;/g, " ").trim()*/);
 	$('.draft span').css('border','none');
+    window.predraft2 = $('.draft').html();
 	
 	//To {format}.js
 	if(cta) {
@@ -785,11 +787,12 @@ function post_content_formatting(object) {
 		$(this).html( $(this).html().replace(/ /g, '===').replace(/ /g,"~~~"));
 	});*/
     /*** PARAGRAPH DETECTION ***/
-    console.log($('.draft').html());
+//    console.log($('.draft').html());
     $('.draft span').css('color', 'inherit');
 	if(object.paragraph_indent == undefined)
 		object.paragraph_indent = "";
 //	window.cont = $('.draft').html().replace(/&nbsp;/g, " ");
+    window.predraft3 = $('.draft').html();
     window.cont = $('.draft').html().replace(/<div><\/div>/g, " ");
     window.cont = cont.replace(/<div>(.*)<\/div>/g, "$1");
     window.cont = cont.replace(/<div>(.*)<\/div>/g, "$1");
@@ -815,7 +818,7 @@ function post_content_formatting(object) {
 //    console.log( cont.match(/<br> &nbsp;<br>/g));
     
    
-	console.log(cont);
+//	console.log(cont);
 	updateBuildProgress("Generating HTML...");
 	//cont = cont.replace(/<span[^<]+?>/g, "");
 	//cont = cont.replace("</span>", "",'g');
@@ -824,7 +827,7 @@ function post_content_formatting(object) {
 	
 	/*** Replace output function so that it places every item into an array instead of just outputting ***/
 function c(s) {
-//	console.log(s);	 
+	//console.log(s);	 
 	//s = s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 //	$('body').append(s+"<br>");
 }
@@ -873,7 +876,7 @@ var ine = false;
 var parsingdiv = false;
 var out = "";
 var breakk = false;
-console.error(object.paragraph_indent);
+//console.error(object.paragraph_indent);
 //console.log(b);
 //a.unshift(object.paragraph_indent);
 //$('body').append("<hr>");
@@ -989,7 +992,7 @@ for(i in b) {
 			////'"	//'"
 		}
 		cout += "</tr></table>";
-		console.warn("getColumnOut("+p+")");
+//		console.warn("getColumnOut("+p+")");
 		return cout;
 	}
 	add_to_page(getColumnOut($('.page').length-1));
@@ -998,6 +1001,7 @@ for(i in b) {
 	else
 		col_count = 1;
 	d.unshift(object.paragraph_indent);
+    console.log(d);
 	for(j in d) {
 		//TODO - Find a way to grab the current page, not necessarily the last one. This will be handy for things that are added after content
 		p = $('.page').length-1;
@@ -1009,7 +1013,7 @@ for(i in b) {
             continue;
         }
         dspan = dspan.replace('</span>  ', '</span>');
-//        console.log(dspan);
+        console.log(dspan);
 		add_to_page("<span class='hideme'>"+dspan +" "+"</span>", undefined, undefined, col_count);
 		//console.warn($('.page'+p+'body').height(), maxh);
 		//console.warn(('.page'+p+'col'+(col_count-1)), $('.page'+p+'col'+(col_count-1)).height(), maxh, $('.page'+p+'col'+(col_count-1)).html().length);
@@ -1049,9 +1053,9 @@ for(i in b) {
 	$('.build').html($('.build').html().replace(/===/g,' ').replace(/~~~/g, ' ')/*.replace(/<span[^<]+?>/g, "")*/);
 	$('.pagebody').css('height', maxh+"px");
     
-    //Do some LaTeX corrections to display properly
+    //FIXME Do some LaTeX corrections to display properly
     window.fracArr = ($('.build .mfrac > span > span:last-child'));
-    console.log(fracArr);
+//    console.log(fracArr);
    for(j=0;j<fracArr.length;j++) {
         frac = fracArr[j];
         var num = $(frac).prev().prev().width();

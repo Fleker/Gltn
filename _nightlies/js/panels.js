@@ -598,27 +598,27 @@ panelManager.getAvailablePanels().Main_Character.onExport = function(isDocument,
 }
 
 function getChar(val, title, tag) {
-    return {val: val, title: title, tag: tag+" "+title};   
+    return {val: val, title: title.toLowerCase(), tag: (tag+" "+title).toLowerCase()};   
 }
 function getEmoji(val, title, tag) {
     tag = tag || "";
     return getChar(val, title, tag+" emoji emoticon "+title);   
 }
 function getCharAccent(char, accent, or) {
-    return getChar(char, or+" w/ "+accent, or+" "+char+" "+accent+" accent latin");  
+    return getChar(char, or+" w/ "+accent, or+" accent "+or+" "+char+" "+accent+" accent latin");  
 }
 // SPECIALCHARACTERS
 specialCharacters = {
-    Checkmark: {val: '✔', title: 'Checkmark', tag: 'checkmark check'},
+    Checkmark: getChar("✔", "Checkmark"),
 
     //  MUSIC
-    EighthNote: {val:'♪', title: 'Eighth Note', tag: 'music note eighth'},
-    QuarterNote: {val:'♩', title: 'Quarter Note', tag: 'music note quarter'},
-    TwoEighthNotes: {val:'♫', title:'Two Eigth Notes', tag:'music note eighth'},
-    TwoSixteenthNotes: {val:'♬', title: 'Two Sixteenth Notes', tag: 'music note sixteenth'},
-    FlatNote: {val:"♭", title:"Flat", tag:"music note flat"},
-    NeutralNote:{val:"♮", title:"Neutral", tag:"music note neutral"},
-    SharpNote:{val:"♯", title:"Sharp", tag:"music note sharp"},
+    EighthNote: getChar('♪', 'Eighth Note', 'music'),
+    QuarterNote: getChar('♩', 'Quarter Note', 'music'),
+    TwoEighthNotes: getChar('♫','Two Eighth Notes','music'),
+    TwoSixteenthNotes: getChar('♬', 'Two Sixteenth Notes', 'music'),
+    FlatNote: getChar("♭", "Flat", "music"),
+    NeutralNote:getChar("♮", "Neutral", "music note neutral"),
+    SharpNote:getChar("♯", "Sharp", "music"),
 
     // GENDER
     Female: {val:'♀', title: 'Female', tag: 'gender sex female'},
@@ -923,62 +923,62 @@ specialCharacters = {
     // Hazard
     Skull: {val:"☠", title:"Skull & Crossbones", tag:"skull crossbones pirate"},
     Radioactive: {val:"☢", title:"Radioactive", tag:"radioactive imagine dragons"},
-    Biohazard: {val:"☣", title:"Biohazard", tag:"biohazard"},
-    Caduceus: {val:"☤", title:"Caduceus", tag:"caduceus medicine snake pole"},
-    Recycling: getChar("♺", "Recycling", "recycling reuse recycle"), //Because I didn't know where else to put it :/
-    PermPaper: getChar("♾","Permanent Paper", "recycling paper permanent"),
-    ElectricArrow: getChar("⌁","Electric Arrow", "electric arrow"),
-    Warning: getChar("⚠","Warning","alert warning yellow"),
-    HighVoltage: getChar("⚡","High Voltage","electricity warning voltage high pikachu"),
+    Biohazard: {val:"☣", title:"Biohazard", tag:""},
+    Caduceus: {val:"☤", title:"Caduceus", tag:"medicine snake pole"},
+    Recycling: getChar("♺", "Recycling", "reuse recycle"), //Because I didn't know where else to put it :/
+    PermPaper: getChar("♾","Permanent Paper", "recycling"),
+    ElectricArrow: getChar("⌁","Electric Arrow"),
+    Warning: getChar("⚠","Warning","alert yellow"),
+    HighVoltage: getChar("⚡","High Voltage","electricity warning pikachu"),
 
     //Emoticons
-    WhiteSmiling: getChar("☺","White Smiling","white smiling face happy"),
-    BlackSmiling: getChar("☻", "Black Smiling", "black smiling face happy"),
-    WhiteFrown: getChar("☹", "White Frowning", "white frowning face sad"),
+    WhiteSmiling: getChar("☺","White Smiling","face happy"),
+    BlackSmiling: getChar("☻", "Black Smiling", "face happy"),
+    WhiteFrown: getChar("☹", "White Frowning", "face sad"),
 
     //Science
     Atom: getChar("⚛", "Atomic Model", "atom"),
-    Benzene: getChar("⌬","Benzene", "benzene molecule chemical"),
-    Alembic: getChar("⚗","Alembic","alchemy alembic"),
+    Benzene: getChar("⌬","Benzene", " molecule chemical"),
+    Alembic: getChar("⚗","Alembic","alchemy "),
     
     //Other Latin Characters
-    Eth: getChar("Ð", "Eth", "Latin Icelandic eth"),
-    eth: getChar("ð", "Eth", "Latin Icelandic eth"),
-    Thorn: getChar("Þ", "Thorn", "Thorn born latin norse"),
-    thorn: getChar("þ", "Thorn", "Thorn born latin norse"),
-    sharps: getChar("ß", "Sharp S", "German sharp s"),
+    Eth: getChar("Ð", "Eth", "Latin Icelandic "),
+    eth: getChar("ð", "Eth", "Latin Icelandic "),
+    Thorn: getChar("Þ", "Thorn", " born latin norse"),
+    thorn: getChar("þ", "Thorn", " born latin norse"),
+    sharps: getChar("ß", "Sharp S", "German"),
 
     //Symbols
-    Watch: getChar("⌚","Watch","watch clock time"),
-    Hourglass: getChar("⌛","Hourglass", "sand watch clock time hourglass"),
-    AlarmClock: getChar("⏰","Alarm Clock", "clock time alarm"),
+    Watch: getChar("⌚","Watch","clock time"),
+    Hourglass: getChar("⌛","Hourglass", "sand watch clock time"),
+    AlarmClock: getChar("⏰","Alarm Clock", "time"),
     
     // Automobiles
-    Collision: getChar("⛌","Traffic Collision", "traffic collision"),
-    Breakdown: getChar("⛍","Vehicle Breakdown", "vehicle breakdown"),
-    Road: getChar("⛑","Road", "road"),
-    RoadCondition: getChar("⛐","Road Conditions","road conditions"),
-    RoadBlock: getChar("⛒","Roadblock", "roadblock"),
-    Snowchains: getChar("⛓","Snow Chains", "snow icy black ice chains snowchains"),
-    HandTraffic: getChar("⛕","Right and Left Hand Traffic", "right left traffic road"),
-    NoEntry: getChar("⛔","No Entry", "no entry car"),
-    TwoWay: getChar("⛖","Two Way Traffic", "two way traffic highway"),
-    LaneEnds: getChar("⛙","Lane Ends","lane is ending"),
-    LaneCross: getChar("⛌","Lane Crossing", "crossing lane"),
-    BlackTruck: getChar("⛟","Black Truck", "black truck"),
-    Fuel: getChar("⛽","Fuel Pump","pump fuel"),
+    Collision: getChar("⛌","Traffic Collision"),
+    Breakdown: getChar("⛍","Vehicle Breakdown"),
+    Road: getChar("⛑","Road"),
+    RoadCondition: getChar("⛐","Road Conditions"),
+    RoadBlock: getChar("⛒","Roadblock"),
+    Snowchains: getChar("⛓","Snow Chains", "icy black ice snowchains"),
+    HandTraffic: getChar("⛕","Right and Left Hand Traffic", "road"),
+    NoEntry: getChar("⛔","No Entry", "car"),
+    TwoWay: getChar("⛖","Two Way Traffic", "highway"),
+    LaneEnds: getChar("⛙","Lane Ends"),
+    LaneCross: getChar("⛌","Lane Crossing"),
+    BlackTruck: getChar("⛟","Black Truck"),
+    Fuel: getChar("⛽","Fuel Pump"),
     
     //TODO Emoji
     // Emotions
     
     //http://en.wikipedia.org/wiki/Emoji
     // Regional Indicators
-    Cyclone: getEmoji("🌀","Cyclone","cyclone hurricane"),
-    Foggy: getEmoji("🌁","Foggy","fog foggy frog"),
-    ClosedUmbrella: getEmoji("🌂","Closed Umbrella", "closed umbrella"),
-    NightWithStars: getEmoji("🌃", "Night with Stars", "night stars city"),
-    SunriseOverMountains: getEmoji("🌄","Sunrise over Mountains", "sunrise mountains country"),
-    Sunrise: getEmoji("🌅","Sunrise","sunrise"),
+    Cyclone: getEmoji("🌀","Cyclone","hurricane"),
+    Foggy: getEmoji("🌁","Foggy","fog pea soup frog"),
+    ClosedUmbrella: getEmoji("🌂","Closed Umbrella"),
+    NightWithStars: getEmoji("🌃", "Night with Stars", "city"),
+    SunriseOverMountains: getEmoji("🌄","Sunrise over Mountains", "country"),
+    Sunrise: getEmoji("🌅","Sunrise"),
     CityscapeAtDusk: getEmoji("🌆", "Cityscape at Dusk", "cityscape dusk"),
     SunsetOverBuildings: getEmoji("🌇","Sunset over Buildings", "sunset buildings city"),
     Rainbow: getEmoji("🌈","Rainbow", "rainbow lucky charms"),
@@ -1082,6 +1082,20 @@ specialCharacters = {
     Lollipop: getEmoji("🍭", "Lollipop"),
     Custard: getEmoji("🍮", "Custard"),
     Honey: getEmoji("🍯", "Honey", "pooh bother"),
+    Shortcake: getEmoji("🍰", "Shortcake"),
+    BentoBox: getEmoji("🍱", "Bento Box"),
+    PotofFood: getEmoji("🍲", "Pot of Food"),
+    Cooking: getEmoji("🍳", "Cooking"),
+    ForkKnife: getEmoji("🍴", "Fork and Knife"),
+    TeacupSansHandle: getEmoji("🍵", "Teacup without Handle"),
+    SakeBottle: getEmoji("🍶", "Sake Bottle and Cup"),
+    WineGlass: getEmoji("🍷", "Wine Glass"),
+    CocktailGlass: getEmoji("🍸", "Cocktail Glass"),
+    TropicalDrink: getEmoji("🍸", "Tropical Drink"),
+    BeerMug: getEmoji("🍺", "Beer Mug"),
+    BeerMug2: getEmoji("🍻", "Clinking Beer Mugs", "bro"),
+    BabyBottle: getEmoji("🍼", "Baby Bottle"),
+    ForkKnifePlate: getEmoji("🍽", "Fork and Knife with Plate"),
     
     Wheelchair: getChar("♿","Wheelchair",'chair'),
     Fountain: getChar("⛲","Fountain","fountain water park"),
@@ -2095,6 +2109,7 @@ function startDictionarySearch(query) {
     }   
 }
 panelManager.getAvailablePanels().Main_Dictionary.onRun = function() {
+    //FIXME Saved searches keep starting with "undefined" on reload. Why is that?
 	var no_results = "<span style='font-size:16pt'>No Results</span><br>This does not appear in any of your dictionaries. Try to:<ul><li> Install a new dictionary</li>OR<li>Change your search.</li></ul>";
 	var no_connection = "<span style='font-size:16pt'>Sorry</span><br>The dictionary does not work offline.";
 	var connect_time = 0;
@@ -2360,8 +2375,7 @@ function InitPanelmain_PageCount() {
         }
      });
 }
-//TODO Use ColorAlt
-panelManager.getAvailablePanels().Main_Pagecount.setBordercolor('#fff').setWidth(20);
+panelManager.getAvailablePanels().Main_Pagecount.setBordercolor('#909').setWidth(20);
 panelManager.getAvailablePanels().Main_Pagecount.onInit = InitPanelmain_PageCount;
 function GetPanelmain_PageCount() {
     return {title:"Page Count", bordercolor: theme.coloralt, width:20};   

@@ -71,7 +71,6 @@ This is the source code for the Blackout Condensed theme to help developers see 
 ```
 
 ## *Breaking it Down*
-######Let's examine this theme piece by piece
 
 ### Define the Palette
 A good theme is colorful, using a variety of accents and shades to create a delightful experience. The default settings provide a full set of colors, but you may also want to define your own colors. 

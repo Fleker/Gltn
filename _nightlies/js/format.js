@@ -251,29 +251,29 @@ function ToolbarManager() {
         }), 
         heading1: new Tool("heading1", "H1", function() {
             contentAddSpan({node:"span", class:"heading1 heading"});
-            formatHovertag("heading1", "'Heading-1'", 'null');
+            hovertagManager.refresh();
         }),
         heading2: new Tool("heading2", "H2", function() {
             contentAddSpan({node:"span", class:"heading2 heading"});
-            formatHovertag("heading2", "'Heading-2'", 'null');
+            hovertagManager.refresh();
         }),
         heading3: new Tool("heading3", "H3", function() {
             contentAddSpan({node:"span", class:"heading3 heading"});
-            formatHovertag("heading3", "'Heading-3'", 'null');
+            hovertagManager.refresh();
         }),
         heading4: new Tool("heading4", "H4", function() {
             contentAddSpan({node:"span", class:"heading4 heading"});
-            formatHovertag("heading4", "'Heading-4'", 'null');
+            hovertagManager.refresh();
         }),
         heading5: new Tool("heading5", "H5", function() {
             contentAddSpan({node:"span", class:"heading5 heading"});
-            formatHovertag("heading5", "'Heading-5'", 'null');
+            hovertagManager.refresh();
         }),
         image: new Tool("image", "Image", function() {
             var imid = getObjectSize('img');
             contentAddSpan({node:"div", class:"img inline img"+imid, ce: false});
             imgDetails(imid);
-            formatHovertag("img", "'Image Details'", "'imgDetails('+$(this).attr('data-id')+');'");
+            hovertagManager.refresh();
         }),
         citation: new Tool("citation", "Citation", function() {
             initiateCitationEditor();
@@ -282,7 +282,7 @@ function ToolbarManager() {
             var tid = getObjectSize('table');
             contentAddSpan({node:"div", class:"table table"+tid+" inline", ce: false});
             tableDetails(tid);
-            formatHovertag("table", "$(this).attr('data-title')", "'tableDetails('+$(this).attr('data-id')+');'");
+            hovertagManager.refresh();
         }),
         bold: new Tool("bold", "<button class='fontawesome-bold'></button>", function() {
             console.warn("bold");
@@ -295,18 +295,17 @@ function ToolbarManager() {
             var rtid = getObjectSize('reftext');
             contentAddSpan({node:"span", class:"reftext reftext"+rtid, ce: false});
             refTextDetails(rtid);
-            formatHovertag("reftext", "'Ref: '+$(this).attr('data-ref')", "'refTextDetails('+$(this).attr('data-id')+');'");
+            hovertagManager.refresh();
         }),
         LaTeX: new Tool("LaTeX", "LaTeX", function() {
             var lid = getObjectSize('latex');
             console.log("LATEX "+lid);
             contentAddSpan({node:"kbd", class:"latex latex"+lid, ce: false});
             latexDetails(lid);
-            formatHovertag("latex", "$(this).attr('data-cmd')", "'latexDetails('+$(this).attr('data-id')+');'");
         }),
         pbreak: new Tool("pbreak", "Page Break", function() {
             contentAddSpan({node:"kbd", class:"pagebreak", ce: false});
-            formatHovertag("pagebreak", "'Page Break'", 'null');
+            hovertagManager.refresh();
             setTimeout("$('.pagebreak').empty();", 1000);
         }),
         fullscreen: new Tool("fullscreen", "<span class='fa fa-expand'></span>", function() {
@@ -322,8 +321,6 @@ function ToolbarManager() {
     };
     ToolbarManager.prototype.addTool = function(tool) {
         this.availableTools[tool.id] = tool;
-        
-        //TODO Allow tools to just appear w/ boolean
         post_toolbar(window.tools, window.tools_freeform);
     };
 }
@@ -397,7 +394,7 @@ function refreshBodyDesign1() {
             
 		$('.content_textarea').css('width', '100%').css('margin-left', '0px');
 	}
-    setTimeout(function() { onInitToolbar(); }, 100);
+//    setTimeout(function() { onInitToolbar(); }, 100);
 }
 $( window ).resize(function() {
   refreshBodyDesign();
@@ -405,3 +402,115 @@ $( window ).resize(function() {
     //TODO Fix readjust toolbar
 	//console.log(1);
 });
+
+// Hovertag Class
+function Hovertag(classname, textcode, action) {
+    this.classname = classname;
+    this.textcode = textcode || classname;
+    this.action = action || function() { };
+    Hovertag.prototype.toString = function() {
+        var json = {classname: this.classname, textcode: this.textcode.toString(), action: this.action.toString()};
+        return JSON.stringify(json);
+    }
+}
+// HovertagManager Class
+function HovertagManager() {
+    this.registry = {
+        citation: new Hovertag('citation', function(element) {
+            return citation[$(element).attr('data-id')].Title;
+        }, function(element) {
+            initiateCitationEditor(undefined, $(element).attr('data-i'));
+        }),
+        context: new Hovertag('context', function(element) {
+            return window.context[parseInt($(element).attr('data-i'))].type;
+        }, function(element) {
+            contextPanel($(element).attr('data-i'));
+        }),
+        latex: new Hovertag('latex', function(element) {
+            return $(element).attr('data-cmd');
+        }, function(element) {
+            latexDetails($(element).attr('data-id'));
+        }),
+        heading1: new Hovertag('heading1', 'Heading-1'),
+        heading2: new Hovertag('heading2', 'Heading-2'),
+        heading3: new Hovertag('heading3', 'Heading-3'),
+        heading4: new Hovertag('heading4', 'Heading-4'),
+        heading5: new Hovertag('heading5', 'Heading-5'),
+        image: new Hovertag("img", "Image Details", function(element) {
+            imgDetails($(element).attr('data-id'));
+        }),
+        table: new Hovertag("table", function(element) {
+            return $(element).attr('data-title');
+        }, function(element) {
+            tableDetails($(element).attr('data-id'));
+        }),    
+        reftext: new Hovertag("reftext", function(el) {
+            return "Ref: "+$(el).attr('data-ref')
+        }, function(el) {
+            refTextDetails($(el).attr('data-id'));
+        }),
+        pbreak: new Hovertag("pagebreak", "Page Break")
+    };
+    HovertagManager.prototype.implement = function(hovertag) {
+        this.registry[hovertag.classname] = hovertag;
+        this.refresh();
+    };
+    HovertagManager.prototype.refresh = function() {
+        for(var i in this.registry) {
+            var htag = this.registry[i];
+            var jtag = $('.'+htag.classname);
+            jtag.off();
+            jtag.attr('data-tooltip', 'true');
+            jtag.attr('data-title', htag.textcode.toString());
+            jtag.attr('data-class', htag.classname);
+            jtag.attr('data-options', 'disable_for_touch:true');
+            jtag.click(function() {
+                hovertagManager.registry[$(this).attr('data-class')].action(this);
+            });
+            
+            $('.tooltip[data-selector="'+htag.classname+'"]').remove();
+            $('body').append(Foundation.libs.tooltip.settings.tip_template(htag.classname, htag.textcode));
+            $('.'+htag.classname).hover(function() {
+//                htag.classname = $(this).attr('class').split(' ')[0];
+                Foundation.libs.tooltip.showTip($('.tooltip[data-selector="'+htag.classname+'"]'));
+                if(typeof(htag.textcode) == "function") {
+                    txt = htag.textcode(this);
+                } else {
+                    txt = htag.textcode;
+                }
+                
+                $('.tooltip[data-selector="'+htag.classname+'"]').css('top', $(this).offset().top+30).css('left', $(this).offset().left+8).html( $(Foundation.libs.tooltip.settings.tip_template(htag.classname, txt)).html());
+            }, function() {
+                Foundation.libs.tooltip.hide($('.tooltip[data-selector="'+htag.classname+'"]'));
+            });
+        }
+    };
+    HovertagManager.prototype.fromString = function(string) {
+        //Takes saved list and reads everything   
+        var json = JSON.parse(string);
+        for(var i in json) {
+            if(json[i].textcode.indexOf('function') > -1) {
+                json[i].textcode = "("+json[i].textcode+")()";
+                json[i].textcode = Function(json[i].textcode);
+            }
+            json[i].action = Function("("+json[i].action+")()");
+            if(this.registry[json[i].classname] !== undefined) 
+                 continue;
+            var htag = new Hovertag(json[i].classname, json[i].textcode, json[i].action);
+            this.implement(htag);
+        }
+    };
+    HovertagManager.prototype.toString = function() {
+        var a = "[";
+        for(i in this.registry) {
+            a += this.registry[i].toString()+",";   
+        }
+        a = a.substring(0,a.length-1) + "]";
+        return a;
+    };
+}
+hovertagManager = new HovertagManager();
+function hideHovertag() {
+    console.error("Remove me!");
+    $('.hovertag').hide();
+}

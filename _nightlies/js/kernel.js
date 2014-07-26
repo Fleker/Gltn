@@ -21,7 +21,7 @@ function FormatManager() {
         var a = this.getFormats();
         var out = "";
         for(i in a) {
-            this.addFormat(a[i]);
+//            this.addFormat(a[i]);
             if(a[i].hidden == false) {
                 out = out + "<option label='"+a[i].type+"'>"+a[i].name+"</option>";	   
             }
@@ -30,17 +30,30 @@ function FormatManager() {
 		$('#gluten_formats').html(out);
     };
     FormatManager.prototype.addFormat = function(format) {
-        //TODO No longer need this bulky code
         this.formats[format.id] = format;
-        if(getSettings('formats_name') == "undefined") {
+        this.postFormats();
+        writeToSettings('formats', this.toString());
+        
+        /*if(getSettings('formats_name') == "undefined") {
             writeToSettings('formats_name', "");
         }
         if(getSettings('formats_name').indexOf(format.name) == -1) {
             writeToSettings('formats_name', getSettings('formats_name') + ", " + format.name);
             writeToSettings('formats_type', getSettings('formats_type') + ", " + format.type);
             writeToSettings('formats_url', getSettings('formats_uri') + ", " + format.url);
-            this.postFormats();
-        }
+        }*/
+    };
+    FormatManager.prototype.fromString = function(string) {
+        var json = JSON.parse(string);
+        for(i in json) {
+            if(this.formats[i] !== undefined) {
+                var gltnf = new GltnFormat(json[i].id, json[i].name, json[i].type, json[i].url, json[i].hidden);
+                this.addFormat(gltnf);
+            }
+        }   
+    };
+    FormatManager.prototype.toString = function() {
+        return JSON.stringify(this.formats);  
     };
     //MLA is the default format
     this.currentFormat = this.getFormats().MLA;
@@ -89,9 +102,6 @@ function installGltnFormat(name, type, url) {
 function install_gluten_format(name, type, url) {
     installGltnFormat(name, type, url);
 }
-//TODO Documentation on FormatManager
-	
-	
 
 Date.prototype.toDateInputValue = (function() {
     var local = new Date(this);
@@ -499,239 +509,6 @@ function initiateCitationEditor(q, hovertag, h2) {
         initiatePopup({title: "Citations", bordercolor: "#09f", ht: ht, fnc: fnc, size: "large"});
 }
 
-function citationHovertag(recall) {
-    formatHovertag('citation', 'citation[$(this).attr("data-id")].Title', 'initiateCitationEditor(undefined,$(this).attr("data-i")) ');
-}
-function citationHovertag2(recall) {
-$('.citation').off('mouseenter');
-	$('.citation').off('mouseleave');
-	
-	$('.citation').on('mouseenter', function() {
-		displayHovertag(citation[$(this).attr('data-id')].Title, {ypos: $(this).offset().top}, "'initiateCitationEditor(undefined,"+$(this).attr('data-i')+")'");
-	});
-	$('.citation').on('mouseleave', function() {
-	});
-	if(recall == undefined)	{
-		hovertagRegistry('citationHovertag(true)');
-	}
-}
-// Hovertag Class
-function Hovertag(classname, textcode, action) {
-    this.classname = classname;
-    this.textcode = textcode || classname;
-    this.action = action || function() { };
-    Hovertag.prototype.toString = function() {
-        var json = {classname: this.classname, textcode: this.textcode.toString(), action: this.action.toString()};
-        return JSON.stringify(json);
-    }
-}
-// HovertagManager Class
-function HovertagManager() {
-    this.registry = {
-        citation: new Hovertag('citation', function() {
-            return citation[$(this).attr('data-id')].Title;
-        }, function() {
-            initiateCitationEditor(undefined, $(this).attr('data-i'));
-        }),
-        context: new Hovertag('context', function() {
-            return window.context[parseInt($(this).attr('data-i'))].type;
-        }, function(element) {
-            contextPanel($(element).attr('data-i'));
-        }),
-        latex: new Hovertag('latex', function(element) {
-            console.log(element);
-            console.log($(element).attr('data-cmd'));
-            return $(element).attr('data-cmd');
-        }, function(element) {
-            console.log(element);
-            console.log($(element).attr('data-id'));
-            latexDetails($(element).attr('data-id'));
-        })
-    };
-    HovertagManager.prototype.implement = function(hovertag) {
-        this.registry[hovertag.classname] = hovertag;
-        this.refresh();
-    };
-    HovertagManager.prototype.refresh = function() {
-        for(var i in this.registry) {
-            var htag = this.registry[i];
-            var jtag = $('.'+htag.classname);
-            jtag.off();
-            jtag.attr('data-tooltip', 'true');
-            jtag.attr('data-title', htag.textcode.toString());
-            jtag.attr('data-class', htag.classname);
-            jtag.attr('data-options', 'disable_for_touch:true');
-            jtag.click(function() {
-                hovertagManager.registry[$(this).attr('data-class')].action(this);
-            });
-            
-            $('.tooltip[data-selector="'+htag.classname+'"]').remove();
-            $('body').append(Foundation.libs.tooltip.settings.tip_template(htag.classname, htag.textcode));
-            $('.'+htag.classname).hover(function() {
-                htag.classname = $(this).attr('class').split(' ')[0];
-                Foundation.libs.tooltip.showTip($('.tooltip[data-selector="'+htag.classname+'"]'));
-                if(typeof(htag.textcode) == "function") {
-                    txt = htag.textcode(this);
-                } else {
-                    txt = htag.textcode;
-                }
-                
-                $('.tooltip[data-selector="'+htag.classname+'"]').css('top', $(this).offset().top+30).css('left', $(this).offset().left+8).html( $(Foundation.libs.tooltip.settings.tip_template(htag.classname, txt)).html());
-            }, function() {
-                Foundation.libs.tooltip.hide($('.tooltip[data-selector="'+htag.classname+'"]'));
-            });
-        }
-        writeToFile('hovertags', this.toString());
-    };
-    HovertagManager.prototype.fromString = function(string) {
-        //Takes saved list and reads everything   
-        var json = JSON.parse(string);
-        for(var i in json) {
-            if(json[i].textcode.indexOf('function') > -1) {
-                json[i].textcode = "("+json[i].textcode+")()";
-                json[i].textcode = Function(json[i].textcode);
-            }
-            json[i].action = Function("("+json[i].action+")()");
-            if(this.registry[json[i].classname] !== undefined) 
-                 continue;
-            var htag = new Hovertag(json[i].classname, json[i].textcode, json[i].action);
-            this.implement(htag);
-        }
-    };
-    HovertagManager.prototype.toString = function() {
-        var a = "[";
-        for(i in this.registry) {
-            a += this.registry[i].toString()+",";   
-        }
-        a = a.substring(0,a.length-1) + "]";
-        return a;
-    };
-}
-hovertagManager = new HovertagManager();
-//FIXME
-
-function formatHovertag(classname, textcode, action, recall) {
-    return;
-    $('.'+classname).off();
-    $('.'+classname).removeClass("has-tip");
-    $('.'+classname).attr('data-tooltip', 'true');
-    $('.'+classname).addClass('has-tip');
-   
-    $('.'+classname).attr('data-title', textcode);
-    $('.'+classname).attr('data-action', action);
-    $('.'+classname).attr('data-options', "disable_for_touch:true");
-    $('.'+classname).on('click', function() {
-        eval($(this).attr('data-action')); 
-    });
-    //TODO Remove such a tip beforehand to prevent overflow
-    $('.tooltip[data-selector="'+classname+'"]').remove();
-    $('body').append(Foundation.libs.tooltip.settings.tip_template(classname, textcode));
-//    console.log($('.'+classname));
-    $('.'+classname).hover(function() {
-//        console.log("H");
-        classname = $(this).attr('class').split(' ')[0];
-        Foundation.libs.tooltip.showTip($('.tooltip[data-selector="'+classname+'"]'));
-//        console.log($('.tooltip[data-selector="'+classname+'"]'));
-        console.log($(this).attr('data-title'));
-        txt = $(this).attr('data-title'); 
-     try {
-            txt = eval($(this).attr('data-title'));   
-     } catch(e) {
-            console.error(e.message);  
-     }
-        $('.tooltip[data-selector="'+classname+'"]').css('top', $(this).offset().top+30).css('left', $(this).offset().left+8).html( $(Foundation.libs.tooltip.settings.tip_template(classname, txt)).html());
-    }, function() {
-        classname = $(this).attr('class').split(' ')[0];
-        Foundation.libs.tooltip.hide($('.tooltip[data-selector="'+classname+'"]'));
-        recallHovertags();
-        citationHovertag();
-    });
-    
-    if(recall != true && recall != "true") { 
-        include = true;
-        for(i in hovertagRegistrar) {
-            console.log("!-!", hovertagRegistrar[i].classname, classname, hovertagRegistrar[i].classname == classname);
-            if(hovertagRegistrar[i].classname == classname) {
-                include = false;
-            }
-        }
-        if(include) {
-		  hovertagRegistry(classname, textcode, action);
-        }
-        console.log(classname, recall);
-    }
-}
-function formatHovertag2(classname, textcode, action, recall) {
-	/*for(i in hovertagRegistrar) {
-		if(hovertagRegistrar[i].classname == classname && recall != true)
-			return;	
-	}*/
-	$('.'+classname).off();
-	
-	$('.'+classname).each(function(index, element) {
-        $(this).on('mouseenter', function() {
-			try {
-			console.log(textcode, action);
-			console.log('"'+eval(textcode)+'"');
-			} catch(e) {
-				textcode = "'Item'";	
-				console.error(e);
-			}
-			try {
-			console.log('"'+eval(action)+'"');
-			} catch(e) {
-				console.error(e);
-				action = null;	
-			}
-			displayHovertag(eval(textcode), {ypos: $(this).offset().top}, '"'+eval(action)+'"');
-			//hovertagRegistry(\'displayHovertag(eval(textcode), {ypos: $(this).offset().top}, eval(action));\');
-		});
-    });
-	//'
-
-	if(recall != true && recall != "true") { 
-        include = true;
-        for(i in hovertagRegistrar) {
-            console.log("!-!", hovertagRegistrar[i].classname, classname, hovertagRegistrar[i].classname == classname);
-            if(hovertagRegistrar[i].classname == classname) {
-                include = false;
-            }
-        }
-        if(include) {
-		  hovertagRegistry(classname, textcode, action);
-        }
-        console.log(classname, recall);
-    } else {
-//        console.log("We should NOT be including "+classname);   
-    }
-}
-function hovertagRegistry(c, t, a) {
-    console.log("Adding to the Registry: "+c,t,a);
-	hovertagRegistrar.push({classname: c, textcode: t, action: a});
-	saveFile();
-}
-function recallHovertags(hovertagRegistryArray) {
-	//console.log('.');
-	for(i in hovertagRegistryArray) {
-//        console.log(hovertagRegistrar[i].classname);
-		if(hovertagRegistryArray[i].textcode != undefined)
-			try {
-			formatHovertag(hovertagRegistryArray[i].classname, hovertagRegistryArray[i].textcode, hovertagRegistryArray[i].action, true);
-//                eval('formatHovertag("'+hovertagRegistrar[i].classname+'", "'+hovertagRegistrar[i].textcode+'", "'+hovertagRegistrar[i].action+'", true)'); 
-			} catch(e) {
-                formatHovertag(hovertagRegistryArray[i].classname, 'Item', null, true);
-//			eval("formatHovertag('"+hovertagRegistrar[i].classname+"', 'Item', null, true)"); 	
-			}
-		else 
-			eval(hovertagRegistryArray[i].classname);
-	}
-}
-
-
-
-
-/*** HOVERTAG ***/
-//Get position of mouse with relation to scroll
 mousex = 0;
 mousey = 0;
 $( document ).on( "mousemove", function( event ) {
@@ -744,49 +521,7 @@ function mouseX() {
 function mouseY() {
 	return mousey-scrollY;
 }
-function displayHovertag(text, data, fnc) {
-	console.log(text, fnc);
-	ypos = data.ypos;
-	if(data.ypos == undefined) 
-		ypos = mouseY()-scrollY;
-	else
-		ypos = ypos - scrollY;
-	if(text == undefined)
-		text = "Object";
-		
-	if(mousex-($('.hovertag').width()/2) < 0)
-		xpos = 0;
-	else
-		xpos = mousex-($('.hovertag').width()/2);
-	$('.hovertag').css('left', xpos).css('top', ypos).css('opacity', 0).animate({
-		opacity: 1}, 100, function() {
-			$('.hovertag').html(text);	
-		});
-	$('.hovertag').off('click');
-	$('.hovertag').off('mouseleave');
-	$('.hovertag').on('mouseleave', function() {
-		hideHovertag();
-	});
-	$('.hovertag').on('click', function() {
-		if(fnc != undefined) {
-			console.log("Hovertag "+fnc);
-			eval(fnc.substring(1,fnc.length-1));
-			console.warn(fnc);
-		}
-	});
-	
-	if(fnc != undefined) {
-		$('.hovertag').css('cursor', 'pointer');
-	} else {
-		$('.hovertag').css('cursor', 'initial');
-	}	
-}
-function hideHovertag() {
-	$('.hovertag').animate({
-		opacity: 0}, 100, function(data) {
-		$('.hovertag').css('left', '110%').css('top', '110%');	
-	});
-}
+
 function launchFullscreen(element) {
   if(element.requestFullscreen) {
     element.requestFullscreen();
@@ -1834,7 +1569,7 @@ function resetTheme() {
     $('.ribbonheader').css('color', theme.fontColor);
     $('body').css('font-family', '');
     $('button').css('text-transform', '').css('letter-spacing', '').css('color', '').css('border-radius', '').css('font-size','');
-    $('.ribbonheader').css('color', '');
+    $('.ribbonheader').css('color', '').css('text-transform', 'uppercase').css('font-size', '10pt');
     $('.ribbonbody').css('height','78px');
     writeCss("button.toolbutton { border:none; background-color:inherit; color:inherit; margin-bottom:0px; margin-top:-6px; padding:0px; font-size:11pt; }");
     writeCss("button.ribbonbutton { margin-bottom:0px; }");
@@ -1881,9 +1616,9 @@ function iterateTheme() {
     $('input[data-theme!=false]').css('background-color', theme.bodyColor).css('color', theme.fontColor);
     $('h1, h2, h3, h4, h5').css('font-family', 'inherit').css('color', 'inherit');
     $('abbr').css('font-size', '100%');
-    //TODO Erase css rules from foundation.min. css
+    $('.ribbonheader').css('text-transform', 'uppercase').css('font-size', '10pt');
     $('table').css('background-color', 'inherit').css('border', 'none');
-    $('kbd[data-theme!=false]').css('background-color', theme.bodyColor).css('border-color','transparent').css('color',theme.fontColor).css('border-style','none').css('border-width','0px').css('font-family','inherit').css('padding','0px').css('border-radius','0px');
+    $('kbd[data-theme!=false]').css('background-color', 'inherit').css('border-color','transparent').css('color', 'inherit').css('border-style','none').css('border-width','0px').css('font-family','inherit').css('padding','0px').css('border-radius','0px');
     
     if(loadThemeSettings() == "" || loadThemeSettings === undefined)
         $('#ThemeSettings').hide();

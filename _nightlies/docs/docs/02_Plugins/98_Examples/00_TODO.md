@@ -68,7 +68,6 @@ This is a simple TODO app. By typing TODO or FUTURE, it will put that into a lis
 ```
 
 ## *Breaking it Down*
-######Let's examine this theme piece by piece
 
 ### Setting Attributes
 The first things that are done are that the panel is found in the panel manager and the manifest is set.
