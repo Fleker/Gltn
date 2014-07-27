@@ -1,4 +1,4 @@
-var GLTN_VERSION = "1.3.1.9";
+var GLTN_VERSION = "1.3.2.0";
 //For backwards compatibility, will return true 
 function greaterThanVersion(version) {
     var split = version.split(".");
@@ -521,7 +521,7 @@ function setHeader() {
             {text: "Explore Files", img: "<span class='fa fa-folder-open' style='font-size:18pt'></span>", action: "runPanel('Main_Filesys')", key: "Alt+O"} 
 		),
 		File: new Array(
-			{group: "", value:'<div class="row collapse" style="margin-top:9px"><div class="small-2 medium-5 columns"><input id="file_name" type="text" value="'+fileid+'" /></div><div class="small-4 medium-1 columns"><span class="postfix">.gltn</span></div><div class="small-6 medium-3 columns end"><input type="hidden" id="file_name_internal"><button id="file_name_con" class="textbutton" disabled="true">Rename</button></div></div>'},
+			{group: "", value:'<div class="row collapse" style="margin-top:9px"><div class="small-5 columns"><input id="file_name" type="text" value="'+fileid+'" /></div><div class="small-4 columns"><span class="postfix">.gltn</span></div><div class="small-3 medium-3 columns end"><input type="hidden" id="file_name_internal"><button id="file_name_con" class="textbutton" disabled="true">Rename</button></div></div>'},
 			{text: 'Compile & Export', img: '<span style="font-size:18pt" class="fa fa-file"></span>', action: "startBuild()", key: "Alt+B"},
 			{text: 'Share', img: '<span style="font-size:18pt" class="fa fa-code-fork"></span>', action: "getShare();"}
             //TODO File Info Popup
@@ -641,7 +641,7 @@ function openFeedback() {
 function openPersonalFavorites() {
     //Personalization Settings Popup
     
-    var colors = ["blue", "red", "green"];
+    var colors = ["blue", "red", "green", "brown", "orange", "purple", "yellow"];
     var output = "<span style='font-size:16pt;font-weight:200;'>"+getSettings("personal_name")+"</span><div class='row'><br><br>";
     
     //Avatar
@@ -650,7 +650,7 @@ function openPersonalFavorites() {
     //Colors
     output += "<div class='preference_card'><h1>FAVORITE COLOR</h1><br><div id='me_color_blob' style='background-color:"+getSettings("personal_color")+";width:60px;height:60px;text-align:center;border-radius:100%;'></div><br><select id='me_color'>";
     for(var i in colors) {
-        output += "<option value='"+colors[i]+"' selected='"+(colors[i]==getSettings("personal_color"))+"'>"+colors[i].substring(0,1).toUpperCase()+colors[i].substring(1)+"</option>";   
+        output += "<option value='"+colors[i] + "'" ((colors[i]==getSettings("personal_color"))?" selected='true' ":"")+ "'>" + colors[i].substring(0,1).toUpperCase()+colors[i].substring(1) + "</option>";   
     }   
     output += "</select><br></div>";
     
@@ -764,8 +764,8 @@ function openPersonalFavorites() {
         });
     }
     
-    var p = new Popup({title: "Personal Settings", ht: output, fnc: f, size: popupManager.XLARGE}).show();
-}
+    var p = new Popup({title: "Personal Settings", ht: output, fnc: f, size: popupManager.XLARGE, bordercolor: theme.palette[getSettings("personal_color")].normal}).show();
+};
 
 function postLegal() {
     var favorite = theme.palette[getSettings("personal_color")];
@@ -847,11 +847,14 @@ function appcache() {
 }
 
 //TODO New Panel Structre
-function GetPanelmain_Offline() {
-	return {title: "<span class='fa fa-plane'></span>&nbsp;Offline", bordercolor:"#ff9900", width: 15};	
-}
-
-function RunPanelmain_Offline() {
+var p = panelManager.getAvailablePanels().Main_Offline;
+p.setManifest({
+    title: "<span class='fa fa-plane'></span>&nbsp;Offline",
+    name: "Offline",
+    width: 15, 
+    bordercolor: "#ff9900"
+});
+p.onRun = function() {
 	out = "<span style='font-size:16pt'>This App is Available Offline</span><br>What Does this Mean?<br><br>If your device is not connected to the Internet, you can still open Gltn in your browser. Of course, not every feature will be available such as the Dictionary and the Gltn Store, but you will be able to edit and build documents like always.<br><br><span style='font-weight:bold;font-size:10pt;color:#ff9900'>"+window.appcachestatus+"</span>";
 	postPanelOutput(out);
 }

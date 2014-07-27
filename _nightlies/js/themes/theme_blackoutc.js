@@ -27,7 +27,7 @@ function initTheme() {
     $('button').css('font-family', '"Roboto Condensed", sans-serif');
 	$('.toolbar, .overflow').css('background-color', '#444');
 	$('.popuptop').css('color', 'white').css('background-color', theme.bodyColor);
-	$('.content_textarea').css('line-height','1.4em').css('padding-right', '5px');
+	$('.content_textarea[data-fullscreen!=true]').css('line-height','1.4em').css('padding-right', '5px');
 	$('.hovertag').css('font-size', '10pt');
 }	
 function loadThemeSettings() {

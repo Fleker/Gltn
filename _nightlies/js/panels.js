@@ -96,12 +96,14 @@ function PanelManager() {
     this.availablePanels = {
         Main_Character: new Panel("Main_Character"),
         Main_Citation: new Panel("Main_Citation", "Citation Editor"),
+        Main_Context: new Panel("Main_Context"),
         Main_Dictionary: new Panel("Main_Dictionary", "Dictionary"),
         Main_Filesys: new Panel("Main_Filesys", "My Documents"),
         Main_Find: new Panel("Main_Find", "Find & Replace"),
         Main_Guide: new Panel("Main_Guide", "Style Guide"),
         Main_Idea: new Panel("Main_Idea", "My Ideas"),
         Main_Notifications: new Panel("Main_Notifications", "Notifications"),
+        Main_Offline: new Panel("Main_Offline"),
         Main_Outline: new Panel("Main_Outline", "Outline Editor"),
         Main_Pagecount: new Panel("Main_Pagecount", "Page Count"),
         Main_Sync: new Panel("Main_Sync", "Synchronization Status"),
@@ -137,7 +139,14 @@ function PanelManager() {
         return this.activePanels;
     };
     PanelManager.prototype.getAvailableServices = function() {
-        //TODO Grab panels, filter only services   
+        //TODO Grab all, filter only services   
+        var list = {};
+        for(i in this.availablePanels) {
+            if(this.availablePanels[i] instanceof Service) {
+                list[i] = this.availablePanels[i];
+            }
+        }
+        return list;
     };  
     PanelManager.prototype.getPlugin = function(id) {
         return this.availablePanels[id];   
@@ -1096,6 +1105,22 @@ specialCharacters = {
     BeerMug2: getEmoji("🍻", "Clinking Beer Mugs", "bro"),
     BabyBottle: getEmoji("🍼", "Baby Bottle"),
     ForkKnifePlate: getEmoji("🍽", "Fork and Knife with Plate"),
+    Ribbon: getEmoji("🎀", "Ribbon"),
+    WrappedPresent: getEmoji("🎁", "Wrapped Present"),
+    BirthdayCake: getEmoji("🎂", "Birthday Cake"),
+    ScaryPumpkin: getEmoji("🎃", "Jack-O-Lanturn"),
+    PineTree: getEmoji("🎄", "Christmas Tree"),
+    Santa: getEmoji("🎅", "Father Christmas"),
+    Fireworks: getEmoji("🎆", "Fireworks"),
+    Sparker: getEmoji("🎇", "Sparkler"),
+    Balloon: getEmoji("🎈", "Balloon"),
+    Popper: getEmoji("🎉", "Party Popper", "pooper"),
+    Confetti: getEmoji("🎊", "Confetti Ball"),
+    Tanabata: getEmoji("🎊", "Tanabata Tree"),
+    CrossFlag: getEmoji("🎌", "Crossed Flags"),
+    PineDecor: getEmoji("🎍", "Pine Decoration"),
+    JapanDolls: getEmoji("🎎", "Japanese Dolls"),
+    CarpFlag: getEmoji("🎏", "Carp Streamer", "flag"),
     
     Wheelchair: getChar("♿","Wheelchair",'chair'),
     Fountain: getChar("⛲","Fountain","fountain water park"),
@@ -1485,12 +1510,13 @@ function createNewFile() {
             out = "<div class='row'>";
             if(v == undefined)
                 v = "";
-            for(i in window.formats) {
-                if(formats[i].type != "IN BETA") {
-                    if(formats[i].type.toLowerCase().indexOf(v.toLowerCase()) > -1 || formats[i].name.toLowerCase().indexOf(v.toLowerCase()) > -1) {
+            for(i in formatManager.getFormats()) {
+                var gf = formatManager.getFormats()[i];
+                if(gf.type != "IN BETA") {
+                    if(gf.type.toLowerCase().indexOf(v.toLowerCase()) > -1 || gf.name.toLowerCase().indexOf(v.toLowerCase()) > -1) {
                         //Add to the grid
-                        arr.push(formats[i]);
-                        out += "<div class='fileformat' data-name='"+formats[i].name+"' style='width:8em;height:4em;display:inline-table;text-align:center;' class='large-4 medium-6 small-12'><div style='width:8em;height:4em;display:inline-table;border:solid 2px "+theme.fontColorAlt+";background-color:"+theme.ribbon.highlight+";color:"+theme.palette.grey.accent400+";font-size:18pt;text-align:center;'>"+formats[i].name+"</div><div style='text-align:center;font-size:14pt;'>"+formats[i].name+"&nbsp;"+formats[i].type+"</div></div>";
+                        arr.push(gf);
+                        out += "<div class='fileformat' data-name='"+gf.name+"' style='width:8em;height:4em;display:inline-table;text-align:center;' class='large-4 medium-6 small-12'><div style='width:8em;height:4em;display:inline-table;border:solid 2px "+theme.fontColorAlt+";background-color:"+theme.ribbon.highlight+";color:"+theme.palette.grey.accent400+";font-size:18pt;text-align:center;'>"+gf.name+"</div><div style='text-align:center;font-size:14pt;'>"+gf.name+"&nbsp;"+gf.type+"</div></div>";
                         
                     }
                 }
@@ -1513,7 +1539,7 @@ function createNewFile() {
             window.location = "?file="+nFileid+"&format="+$('#FormatFinder').val();
         });
     }
-    initiatePopup({title: "Create New File", ht:ht, fnc:fnc,size:"large"});
+    initiatePopup({title: "Create New File", ht:ht, fnc:fnc,size:"large", bordercolor: "#7f8c8d"});
 }
 panelManager.getAvailablePanels().Main_Filesys.onRun = function () {
     //TODO SPinner
@@ -2405,3 +2431,72 @@ function onGetPageCount() {
     var a = getWords();
     return a.length*2/700;
 }   
+panelManager.getAvailablePanels().Main_Notifications;
+panelManager.getAvailablePanels().Main_Notifications.setManifest({
+    title: "Notifications",
+    bordercolor: "#6a6a6a",
+    width: 25
+});
+panelManager.getAvailablePanels().Main_Notifications.onRun = function() {
+	//get window.notifications
+	var nonotes = "You have no new notifications";
+	var out = "";
+	if(notifications.length) {
+		for(i in notifications) {
+			out += "<div class='notification' style='background-color: rgba(0,255,0,.3);cursor:pointer;padding-left: 5px;padding-top: 5px;border: solid 1px "+theme.coloralt+";' data-id='"+notifications[i].id+"' data-i='"+i+"'><div class='notification_delete fa fa-times' style='width:21px;text-align:center;' data-id='"+notifications[i].id+"'></div>&nbsp;&nbsp;<div style='display:inline-table' onclick='"+notifications[i].action+"' >"+notifications[i].text+"</div></div><br>";
+		}
+		postPanelOutput(out);
+        
+        $('.notification_delete').off().hover(function() {
+			$(this).css('color', theme.normbg).css('background-color', '#f44').css('border-radius', 100);
+		}, function() {
+			$(this).css('color', theme.normcolor).css('background-color', 'inherit');
+		}).on('click', function() {
+            for(i in notifications) {
+                if(notifications[i].id == $(this).attr('data-id')) {
+                    notifications.splice(i);
+                    $('.notification[data-i='+i+']').animate({
+                        width:'0%',
+                        opacity:0
+                    }, 300);
+                    postNotificationsIcon();
+                }   
+            }
+        });
+    } else {
+		postPanelOutput(nonotes);	
+	}
+}
+panelManager.getAvailablePanels().Main_Context.setManifest({
+    title: "Writing Tips",
+    name: "Context",
+    bordercolor: "#16a085",
+    width: 25
+});
+panelManager.getAvailablePanels().Main_Context.onRun = function() {
+	var d = grab_panel_data();	
+	var e = window.context[d.index];
+	out = '<br><span style="font-size:15pt;font-style:italics;">"'+d.html+'"</span>';
+	out += '<br>&emsp;(<b style="font-size:10pt">'+e.type+'</b>)<br><br>'+e.text+'<br>';
+
+	if(e.replacement != undefined) {
+		//Create option to replace all values (or just that one)
+		//$('span[data-i=0]')
+		out += '<br><br><br><b>What to Do</b><br>&emsp;<span style="font-size:11pt; cursor:pointer;border-bottom:solid 1px '+theme.normcolor+'" class="contextReplaceA">Replace all with "'+e.replacement+'"</span>';	
+		//<span style="font-size:11pt; cursor:pointer;border-bottom:solid 1px '+theme.normcolor+'" class="contextReplace">Replace this with "'+e.replacement+'"</span><br><br>&emsp;
+	}
+	postPanelOutput(out);
+	$('.contextReplace').on('click', function() {
+		//Global and singular
+		console.log($('.context[data-i='+d.index+']'));
+		$('.context[data-i='+d.index+']').html(e.replacement);
+		parseCT();
+	});
+	$('.contextReplaceA').on('click', function() {
+		//Global and singular
+		var re = new RegExp(d.html, 'gi');
+		console.log(re, e.replacement);
+		findTextReplaceText(re, e.replacement);
+		parseCT();
+	});
+}

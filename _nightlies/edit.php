@@ -57,18 +57,15 @@ ga('create', 'UA-24228980-2', 'felkerdigitalmedia.com');
 ga('send', 'pageview');
 </script>
 
-    
 <link rel="stylesheet" type="text/css" href="css/standard.css">
 </head>
+
 <body>
-
-<div class="header" id="header" style="text-align:center;max-width:auto;">
-
-</div>
+<div class="header" id="header" style="text-align:center;max-width:auto;"></div>
 
 <div class="main row" style="min-width:100%;width:100%;">
 	<div id="panel_content" class="small-12 columns">
-        <div class="row"><!--<fieldset><legend>Start Your Document</legend>-->
+        <div class="row">
             <div class="small-12 medium-6 large-3 column">
                 <label>Format:
                     <input type="text" id="file_format" list="gluten_formats" value="MLA">
@@ -88,7 +85,7 @@ ga('send', 'pageview');
             <div id="file_metadata" class='small-12 column'>
             
             </div>
-        <!--</fieldset>--></div>
+        </div>
       </div>
       
       <div id="panel_plugin" class="small-0 columns">  
@@ -102,9 +99,6 @@ ga('send', 'pageview');
 <div id="build_blob" style='display:none'>
        
 </div>
-<!--<div class="build_progress">
-
-</div>-->
 <div class="draft">
 <!--This section will be a place between the original content and the final build where HTML tags will still exist-->
 </div>
@@ -115,16 +109,8 @@ ga('send', 'pageview');
 <div class="popup reveal-model" id="popup" data-reveal></div>
     
     <div id="myModal" class="reveal-modal" data-reveal>
-<!--  <h2>Awesome. I have it.</h2>
-  <p class="lead">Your couch.  It is mine.</p>
-  <p>Im a cool paragraph that lives inside of an even cooler modal. Wins</p>
-  <button class="close-reveal-modal">&#215;</button>-->
 </div>
-
-<div class="hovertag">
-
-</div>
-<div class="fullscreenui" style="display:none; opacity:.1" onMouseOver="$('.fullscreenui').css('background-color', fsuo).css('opacity',1)" onMouseOut="$('.fullscreenui').css('background-color', fsuo).css('opacity', '.1');"><div class="fullscreenexit" onclick="normalscreen()"><br><span class="fa fa-times"/><br><br><br></div><div class="fullscreennight fa fa-adjust" onclick="nightscreen()"><br><br><br><br></div> <div class="fullscreencount" style="position:fixed;bottom:1%;left:0px;text-align:center;font-size:10pt;width:45px;"></div></div>
+<div class="fullscreenui" style="display:none;"><button class="fullscreenexit" onclick="normalscreen()"><span class="fa fa-times"/></button><br><br><br><br><button class="fullscreennight" onclick="nightscreen()"><span class='fa fa-adjust'></span></button> <div class="fullscreencount" style="position:fixed;bottom:1%;left:0px;text-align:center;font-size:10pt;width:45px;"></div></div>
 <span class='panelIntent'></span>
     
 <div class="footer"></div>

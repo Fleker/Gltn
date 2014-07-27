@@ -31,7 +31,6 @@ function Popup(data) {
     
     
     Popup.prototype.show = function() {
-        hideHovertag();
         popupManager.popups.push(this);
         $('#myModal').html('<div style="width:100%;text-align:right"><button class="close-reveal-modal close" style="color:inherit;font-size:1.5em">&#215;</button></div><table style="width:100%;vertical-align:top;" class="popupstatic"><tr><td style="vertical-align:top;width:100%;"><div style="padding-bottom:15px" class="popuptitle"></div><span class="popupsubtitle"></span><div class="popupbody"></div></td><td style="text-align:right"><img id="popupimg" src=""></img></td></tr></table><div class="popupcontent"></div>');
         if(this.title !== undefined)
@@ -49,7 +48,7 @@ function Popup(data) {
         if(this.bordercolor !== undefined) {
             $('#myModal').css('border', "solid 2px "+this.bordercolor);
         } else
-            $('#myModal').css('border-width', '1px');
+            $('#myModal').css('border-width', '1px').css('border-color', theme.fontColor);
         $('#myModal').css('background-color', theme.bodyColor).css('color', theme.fontColor);
         $('#myModal table').css('background-color', theme.bodyColor).css('color', theme.fontColor).css('border', 'none');
         $('#myModal div, #myModal .popupcontent').css('background-color', theme.bodyColor).css('color', theme.fontColor).css('border', 'none');

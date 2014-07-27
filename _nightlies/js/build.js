@@ -118,7 +118,8 @@ function continueBuild(el) {
 	//console.log(cont);
     window.predraft = cont;
 	$('.draft').html(cont/*.replace(/&nbsp;/g, " ").trim()*/);
-	$('.draft span').css('border','none');
+    //FIXME
+//	$('.draft span').css('border','none');
     window.predraft2 = $('.draft').html();
 	
 	//To {format}.js
@@ -607,7 +608,6 @@ function smallcapsX(inp) {
 }
 function numToLetter(capy, number) {
 	var cap = ["A", "B", "C","D","E","F","G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T","U","V","W","X","Y","Z"];
-	//TODO Complete Letter Set
 	if(capy == "A")
 		return cap[number-1];
 	else
@@ -1066,7 +1066,7 @@ for(i in b) {
         //.children()[0];
 //        console.log("! FRAC");
 //        console.log(frac);
-        $(frac).css('width', den).css('color', 'black').css('border', 'solid 2px').css('background-color', 'black').css('top', '-1.096em').css('height', '15px');
+//        $(frac).css('width', den).css('color', 'black').css('border', 'solid 2px').css('background-color', 'black').css('top', '-1.096em').css('height', '15px');
 //        .css('top', '-1.096em').css('height', '11px');
     
     }

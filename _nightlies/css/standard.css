@@ -658,3 +658,5 @@ text-decoration: none;
 /**
 @-webkit-keyframes loader10d{0%{background-color: rgba(255, 255, 0, .2);}25%{background-color: rgba(255, 255, 0, .2);}50%{background-color:rgba(255, 255, 0, .2);}75%{background-color: rgba(255, 255, 0, 1);}100%{background-color: rgba(255, 255, 0, .2);}}
 **/
+button.ribbonbutton { margin-bottom:0px; }
+button.toolbutton { border:none; background-color:inherit; color:inherit; margin-bottom:0px; margin-top:-6px; padding:0px; font-size:11pt; }

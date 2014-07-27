@@ -2,7 +2,7 @@
 function getBaseLog(y, x) {
     return Math.log(y) / Math.log(x);
 }
-//TODO Tools library and spreadsheets
+//TODO Tools library and spreadsheets, maybe export services
 //TODO uummm... oh yeah add a loader
 function getIcon(icon, size) {
     var font_size = "13pt";

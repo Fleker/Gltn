@@ -85,9 +85,6 @@ function post_format() {
 		out = out + "<br>";
 	}
 	$('#file_metadata').html(out);
-	$('.build, .toolbar').on('mouseleave', function() {
-		hideHovertag();
-	});
 	
 	for(i=0;i<=format_js_index;i++) {
 		if(window.metadata[i].min.length !== 0 || window.metadata[i].max.length !== 0) {
@@ -348,7 +345,6 @@ function post_toolbar(tools, freeform) {
     $('.toolbutton').on("click", function() {
         toolid = $(this).attr('data-tool');
         toolbarManager.getAvailableTools()[toolid].action();
-        recallHovertags();
 	});
 }
 function getObjectSize(classname) {
@@ -436,7 +432,7 @@ function HovertagManager() {
         heading3: new Hovertag('heading3', 'Heading-3'),
         heading4: new Hovertag('heading4', 'Heading-4'),
         heading5: new Hovertag('heading5', 'Heading-5'),
-        image: new Hovertag("img", "Image Details", function(element) {
+        img: new Hovertag("img", "Image Details", function(element) {
             imgDetails($(element).attr('data-id'));
         }),
         table: new Hovertag("table", function(element) {
@@ -449,7 +445,7 @@ function HovertagManager() {
         }, function(el) {
             refTextDetails($(el).attr('data-id'));
         }),
-        pbreak: new Hovertag("pagebreak", "Page Break")
+        pagebreak: new Hovertag("pagebreak", "Page Break")
     };
     HovertagManager.prototype.implement = function(hovertag) {
         this.registry[hovertag.classname] = hovertag;
@@ -471,17 +467,21 @@ function HovertagManager() {
             $('.tooltip[data-selector="'+htag.classname+'"]').remove();
             $('body').append(Foundation.libs.tooltip.settings.tip_template(htag.classname, htag.textcode));
             $('.'+htag.classname).hover(function() {
-//                htag.classname = $(this).attr('class').split(' ')[0];
-                Foundation.libs.tooltip.showTip($('.tooltip[data-selector="'+htag.classname+'"]'));
-                if(typeof(htag.textcode) == "function") {
-                    txt = htag.textcode(this);
+                var classname = $(this).attr('class').split(' ')[0];
+                console.log(classname);
+                var tag = hovertagManager.registry[classname];
+                //FIXME there must be a better system for local vars
+                Foundation.libs.tooltip.showTip($('.tooltip[data-selector="'+classname+'"]'));
+                if(typeof(tag.textcode) == "function") {
+                    txt = tag.textcode(this);
                 } else {
-                    txt = htag.textcode;
+                    txt = tag.textcode;
                 }
                 
-                $('.tooltip[data-selector="'+htag.classname+'"]').css('top', $(this).offset().top+30).css('left', $(this).offset().left+8).html( $(Foundation.libs.tooltip.settings.tip_template(htag.classname, txt)).html());
+                $('.tooltip[data-selector="'+classname+'"]').css('top', $(this).offset().top+30).css('left', $(this).offset().left+8).html( $(Foundation.libs.tooltip.settings.tip_template(tag.classname, txt)).html());
             }, function() {
-                Foundation.libs.tooltip.hide($('.tooltip[data-selector="'+htag.classname+'"]'));
+                var classname = $(this).attr('class').split(' ')[0];
+                Foundation.libs.tooltip.hide($('.tooltip[data-selector="'+classname+'"]'));
             });
         }
     };

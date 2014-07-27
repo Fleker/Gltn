@@ -494,7 +494,11 @@ function finishRestore(x, xc, full) {
 	} catch(e) {
 		console.warn(e.message);
         //TODO Readjust time
-        setTimeout("finishRestore('"+x+"','"+xc+"', '"+full+"');",5000);
+        //FIXME Unexpected Token ILLEGAL
+        setTimeout(function() {
+            finishRestore(x, xc, full);
+        },1000);
+//        setTimeout("finishRestore('"+x+"','"+xc+"', '"+full+"');",5000);
         return;
 	}
 	console.log(5);
