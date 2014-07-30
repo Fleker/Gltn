@@ -40,11 +40,13 @@ The class `Panel` is a self-contained plugin with functions and stored data abou
 | `.setName(String)`   | Panel | Sets the panel name to the `String` |
 | `.setOverride([int])`   | Panel | Sets the array of overriding panels to the provided array |
 | `.setWidth(int)`   | Panel | Sets the panel's width to the provided `int` |
+| `.setMenu(JSON)`   | void | Creates a new menu in the Holoribbon with the panel's name containing an `Array` of `JSON` objects. See the Holoribbon section for more details | 
 | `.activate()`   | void | Called when the panel is being created, this enables the system to identify when the panel is loaded and ready to install |
 | `.onInit()`   | void | Override this function to do something when the panel is first loaded |
 | `.onRun()`   | void | Override this function to do something when the panel is called by the user |
 | `.onContext()`   | void | Override this function to do something when the context service is called |
 | `.onExport()`   | void | Override this function to do something when the user wishes to export a file |
+| `.onRibbonRefresh()` | void | Override this function to do something when the Holoribbon is refreshed with new content | 
 | `.onUninstall()`   | void | Override this function to do something when panel is being uninstalled |
 
 #### Manifest Properties

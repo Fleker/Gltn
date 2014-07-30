@@ -1,4 +1,4 @@
-var GLTN_VERSION = "1.3.2.0";
+var GLTN_VERSION = "1.3.2.2";
 //For backwards compatibility, will return true 
 function greaterThanVersion(version) {
     var split = version.split(".");
@@ -37,9 +37,8 @@ window.onload = function() {
 	if(!doesThisWork()) {
 		alert("I'm sorry. I'm so, so sorry. You are not able to run this application. Please try an improved browser, like Google Chrome or Mozilla Firefox.");
 	}
-    //TODO Change initialization code
-	new_gluten_formats();
-	new_gluten_languages();
+    formatManager.postFormats();
+	languageManager.postLanguages();
             rangy.init();
 			range = rangy.createRange();
 			cssClassApplierModule = rangy.modules.CssClassApplier;
@@ -650,7 +649,7 @@ function openPersonalFavorites() {
     //Colors
     output += "<div class='preference_card'><h1>FAVORITE COLOR</h1><br><div id='me_color_blob' style='background-color:"+getSettings("personal_color")+";width:60px;height:60px;text-align:center;border-radius:100%;'></div><br><select id='me_color'>";
     for(var i in colors) {
-        output += "<option value='"+colors[i] + "'" ((colors[i]==getSettings("personal_color"))?" selected='true' ":"")+ "'>" + colors[i].substring(0,1).toUpperCase()+colors[i].substring(1) + "</option>";   
+        output += "<option value='"+colors[i] + "'" + ((colors[i]==getSettings("personal_color"))?" selected='true' ":"")+ "'>" + colors[i].substring(0,1).toUpperCase()+colors[i].substring(1) + "</option>";   
     }   
     output += "</select><br></div>";
     
@@ -769,7 +768,7 @@ function openPersonalFavorites() {
 
 function postLegal() {
     var favorite = theme.palette[getSettings("personal_color")];
-    out = "<span style='color:"+getAppropriateColor(favorite.accent700, favorite.accent100)+"'>Gltn version "+GLTN_VERSION+"</span><br><br>";
+    out = "<span style='color:"+getAppropriateColor(favorite.accent700, favorite.accent100)+"'>Version "+GLTN_VERSION+" Isidore</span><br><br>";
 	out += "2014 Made by Nick Felker&emsp;<a href='http://twitter.com/handnf'>@HandNF</a><br>";
     out += "Made using libraries from Mathjax, Font Awesome, jQuery, Rangy, InkFilepicker, and others<br>";
     out += "Shoutout to everyone who posted online about stuff like replacing text nodes and the ample amount of help from StackOverflow.<br>";
@@ -846,18 +845,6 @@ function appcache() {
 	return false;
 }
 
-//TODO New Panel Structre
-var p = panelManager.getAvailablePanels().Main_Offline;
-p.setManifest({
-    title: "<span class='fa fa-plane'></span>&nbsp;Offline",
-    name: "Offline",
-    width: 15, 
-    bordercolor: "#ff9900"
-});
-p.onRun = function() {
-	out = "<span style='font-size:16pt'>This App is Available Offline</span><br>What Does this Mean?<br><br>If your device is not connected to the Internet, you can still open Gltn in your browser. Of course, not every feature will be available such as the Dictionary and the Gltn Store, but you will be able to edit and build documents like always.<br><br><span style='font-weight:bold;font-size:10pt;color:#ff9900'>"+window.appcachestatus+"</span>";
-	postPanelOutput(out);
-}
 window.applicationCache.oncached = appcache();
 window.applicationCache.onupdateready = onUpdateReady();
 window.applicationCache.onprogress = function(e) {

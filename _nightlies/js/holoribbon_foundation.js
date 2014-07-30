@@ -1,5 +1,5 @@
 ribbonobj = {'index': 0};			
-ribbon_index = -1;				
+ribbon_index = -1;			
 ribbon_count = 0;	
 ribbonsave = {};
 function newRibbon(element, ribbon) {
@@ -13,7 +13,7 @@ function newRibbon(element, ribbon) {
 		ribbon_count++;
 	}
 	for(var k in ribbon) {
-        out = out + '<div class="ribbonheader small-'+columnCount(100/ribbon_count)+' column" style="text-align:center;" onclick="ribbonSwitch('+i+')"> '+k+' </div>';
+        out = out + '<div class="ribbonheader small-'+columnCount(100/ribbon_count, true)+' column" style="text-align:center;" onclick="ribbonSwitch('+i+')"> '+k+' </div>';
 		//'
         keys.push(k);
         i++;
@@ -52,7 +52,7 @@ function newRibbon(element, ribbon) {
         $($('.ribbongroupchild')[i]).addClass('small-'+columnSize[i]);   
         $($('.ribbongroupgrandchild')[i]).css('width', (1200/columnSize[i])+"%");
     }
-	ribbonGesture();
+//	ribbonGesture();
 	$('.ribbongroup').css('margin-left','102%').css('display', 'inline-table').css('opacity', 0);
 	ribbonobj.index = -1;
 	//ribbonSwitch(0,false);
@@ -113,20 +113,6 @@ function ribbonSwitch(index, bool) {
 			}, (2*animation_time));
             $(element).css('background-color', theme.ribbon.highlight);
 }
-function ribbonGesture() {			
-			var element = document.getElementsByClassName('header');
-			//var element = document.getElementsByClassName('ribbongroup')[ribbonobj.index];
-			/**/ 
-			/*var hammertime = Hammer(element).on("swipeleft swiperight", function(event) {
-				//console.log('H'+event.gesture.deltaX);
-				//alert(event.gesture.deltaX);
-				if(event.gesture.deltaX > 5) {
-					ribbonSwitch(ribbonobj.index -1);
-				} else if(event.gesture.deltaX < -5) {
-					ribbonSwitch(ribbonobj.index +1);
-				}
-			});*/
-}
 //The following is Gltn specific code, so you'll need to modify the colors
 function highlight(el) {
 	//console.log(jQuery(el).attr('class'));
@@ -140,4 +126,16 @@ function unlight(el) {
 		backgroundColor: theme.ribbon.plain,
         color: theme.fontColor
 	}, 25);
+}
+function holoribbonRefresh() {
+    newRibbon('.header', holoribbon_std);
+    ribbonSwitch(ribbon_index,false);
+    ribbonLoad();
+    
+    //Now update each panel
+    for(i in panelManager.getAvailablePanels()) {
+        if(panelManager.getAvailablePanels()[i].onRibbonRefresh !== undefined) {
+           panelManager.getAvailablePanels()[i].onRibbonRefresh();
+        }
+    }
 }

@@ -66,6 +66,7 @@ function getStoreCard(plugin, i) {
         return outt;
 }   
 //FIXME THis is wrong
+//FIXME Install dicctionaries, themes
 function isInstalled(datum) {
     return panelManager.getAvailablePanels()[datum] !== undefined;
     //TODO themes, dictionaries

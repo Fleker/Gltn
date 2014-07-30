@@ -19,13 +19,22 @@ function Panel(id, displayname, url) {
     };
     Panel.prototype.setManifest = function(json) {
         //TODO Or reassign it to the same variable if not assigned
-        this.setBordercolor(json.bordercolor);
-        this.setMaximize(json.canMaximize);
-        this.setName(json.name);
-        this.setOverride(json.override);
-        this.setWidth(json.width);
-        this.title = json.title;
-        this.icon = json.icon;
+        if(json.bordercolor !== undefined)
+            this.setBordercolor(json.bordercolor);
+        if(json.canMaximize !== undefined)
+            this.setMaximize(json.canMaximize);
+        if(json.name !== undefined)
+            this.setName(json.name);
+        if(json.override !== undefined)
+            this.setOverride(json.override);
+        if(json.width !== undefined)
+            this.setWidth(json.width);
+        if(json.title !== undefined)
+            this.title = json.title;
+        if(json.icon !== undefined)
+            this.icon = json.icon;
+        if(json.menu !== undefined)
+            this.setMenu(json.menu);
         
         if(typeof(holoribbon_std) == "undefined")
             return this;
@@ -79,12 +88,17 @@ function Panel(id, displayname, url) {
     Panel.prototype.activate = function() {
         downloadingpanel = this.id;  
     };
+    Panel.prototype.setMenu = function(JSON) {
+        holoribbon_std[this.name] = JSON;
+        holoribbonRefresh();
+    }
     
     //Panel events
     Panel.prototype.onInit = undefined;
     Panel.prototype.onRun = undefined;
     Panel.prototype.onContext = undefined;
     Panel.prototype.onExport = undefined;
+    Panel.prototype.onRibbonRefresh = undefined;
     Panel.prototype.onUninstall = undefined;
 }
 //PanaelManager Class 
@@ -223,6 +237,10 @@ function PanelManager() {
         $('#panel_content').show(200);
         window.paneltitle = undefined;
         paneloverride = [];    
+        for(i in this.activePanels) {
+            delete holoribbon_std[this.activePanels[i].name];   
+        }
+        holoribbonRefresh();
         //TODO Pop the stack based on the panel that is being closed.
         this.activePanels = [];
     };
@@ -1121,6 +1139,18 @@ specialCharacters = {
     PineDecor: getEmoji("🎍", "Pine Decoration"),
     JapanDolls: getEmoji("🎎", "Japanese Dolls"),
     CarpFlag: getEmoji("🎏", "Carp Streamer", "flag"),
+    WindChime: getEmoji("🎐", "Wind Chime"),
+    MoonViewing: getEmoji("🎑", "Moon Viewing Ceremony"),
+    Satchel: getEmoji("🎒", "School Satchel"),
+    Graduation: getEmoji("🎓", "Graduation Cap"),
+    HeartLeft: getEmoji("🎔", "Heart with Tip on the Left"),
+    Bouquet: getEmoji("🎕", "Bouquet of Flowers"),
+    MilitaryMedal: getEmoji("🎖", "Military Medal"),
+    Reminder: getEmoji("🎗", "Reminder Ribbon"),
+    MusicKeyboard: getEmoji("🎘", "Musical Keyboard with Jacks"),
+    StudioMike: getEmoji("🎙", "Studio Microphone"),
+    LevelSlider: getEmoji("🎚", "Level Slider"),
+    ControlKnobs: getEmoji("🎛", "Control Knobs"),
     
     Wheelchair: getChar("♿","Wheelchair",'chair'),
     Fountain: getChar("⛲","Fountain","fountain water park"),
@@ -1503,7 +1533,7 @@ panelManager.getAvailablePanels().Main_Filesys.onInit = function() {
 //TODO Shorten search width a little, color in tables
 function createNewFile() {
     ht = '<div class="row collapse"><div class="small-3 medium-3 columns"><input id="FileName" type="text" value="untitled" /></div><div class="small-3 medium-1 columns"><span class="postfix">.gltn</span></div>';
-    ht += "<div class='small-6 medium-8 columns end'>&emsp;<input type='search' id='FormatFinder' style='width:40%;display:inline-block' placeholder='Choose a Format'>&ensp;<button id='FormatOk' class='textbutton' style='margin-left:30px;font-size:16pt;'>Create</button></div></div><br><span style='font-size:14pt;'>&emsp;Search for a Format<br></span><br><div id='FormatSearch' style='text-align:center'><div>";
+    ht += "<div class='small-6 medium-8 columns end'>&emsp;<input type='search' id='FormatFinder' style='width:40%;display:inline-block' placeholder='Choose a Format'>&ensp;<button id='FormatOk' class='textbutton' style='margin-left:30px;'>Create</button></div></div><br><span style='font-size:14pt;'>&emsp;Search for a Format<br></span><br><div id='FormatSearch' style='text-align:center'><div>";
     fnc = function x() {
         function search(v) {
             arr = [];
@@ -1516,7 +1546,7 @@ function createNewFile() {
                     if(gf.type.toLowerCase().indexOf(v.toLowerCase()) > -1 || gf.name.toLowerCase().indexOf(v.toLowerCase()) > -1) {
                         //Add to the grid
                         arr.push(gf);
-                        out += "<div class='fileformat' data-name='"+gf.name+"' style='width:8em;height:4em;display:inline-table;text-align:center;' class='large-4 medium-6 small-12'><div style='width:8em;height:4em;display:inline-table;border:solid 2px "+theme.fontColorAlt+";background-color:"+theme.ribbon.highlight+";color:"+theme.palette.grey.accent400+";font-size:18pt;text-align:center;'>"+gf.name+"</div><div style='text-align:center;font-size:14pt;'>"+gf.name+"&nbsp;"+gf.type+"</div></div>";
+                        out += "<div class='fileformat' data-name='"+gf.name+"' style='width:8em;height:4em;display:inline-table;text-align:center;padding-top:16px;' class='large-4 medium-6 small-12'><div style='width:8em;height:4em;display:inline-table;border:solid 2px "+theme.fontColorAlt+";background-color:"+theme.ribbon.highlight+";color:"+theme.bodyColor+";font-size:18pt;text-align:center;'>"+gf.name+"</div><div style='text-align:center;font-size:14pt;'>"+gf.name+"&nbsp;"+gf.type+"</div></div>";
                         
                     }
                 }
@@ -2434,16 +2464,18 @@ function onGetPageCount() {
 panelManager.getAvailablePanels().Main_Notifications;
 panelManager.getAvailablePanels().Main_Notifications.setManifest({
     title: "Notifications",
+    name: "Notifications",
     bordercolor: "#6a6a6a",
     width: 25
 });
 panelManager.getAvailablePanels().Main_Notifications.onRun = function() {
-	//get window.notifications
+    panelManager.getAvailablePanels().Main_Notifications.setMenu([ {text:"Test Notification", img: '<span style="font-size:18pt" class="fa fa-book"></span>', action: "postNotification()"}])
+    
 	var nonotes = "You have no new notifications";
 	var out = "";
 	if(notifications.length) {
 		for(i in notifications) {
-			out += "<div class='notification' style='background-color: rgba(0,255,0,.3);cursor:pointer;padding-left: 5px;padding-top: 5px;border: solid 1px "+theme.coloralt+";' data-id='"+notifications[i].id+"' data-i='"+i+"'><div class='notification_delete fa fa-times' style='width:21px;text-align:center;' data-id='"+notifications[i].id+"'></div>&nbsp;&nbsp;<div style='display:inline-table' onclick='"+notifications[i].action+"' >"+notifications[i].text+"</div></div><br>";
+			out += "<div class='notification' style='background-color: rgba(0,255,0,.3);cursor:pointer;padding-left: 5px;padding-top: 5px;border: solid 1px "+theme.coloralt+";' data-id='"+notifications[i].id+"' data-i='"+i+"'><div class='notification_delete fa fa-times' style='width:21px;text-align:center;' data-id='"+notifications[i].id+"'></div>&nbsp;&nbsp;<div class='notification_main' style='display:inline-table' data-id='"+i+"' >"+notifications[i].text+"</div></div><br>";
 		}
 		postPanelOutput(out);
         
@@ -2463,6 +2495,12 @@ panelManager.getAvailablePanels().Main_Notifications.onRun = function() {
                 }   
             }
         });
+        
+        $('.notification_main').on('click', function() {
+            var id = $(this).attr('data-id');
+            notifications[id].action();
+        });
+        
     } else {
 		postPanelOutput(nonotes);	
 	}
@@ -2499,4 +2537,15 @@ panelManager.getAvailablePanels().Main_Context.onRun = function() {
 		findTextReplaceText(re, e.replacement);
 		parseCT();
 	});
+}
+var p = panelManager.getAvailablePanels().Main_Offline;
+p.setManifest({
+    title: "<span class='fa fa-plane'></span>&nbsp;Offline",
+    name: "Offline",
+    width: 15, 
+    bordercolor: "#ff9900"
+});
+p.onRun = function() {
+	out = "<span style='font-size:16pt'>This App is Available Offline</span><br>What Does this Mean?<br><br>If your device is not connected to the Internet, you can still open Gltn in your browser. Of course, not every feature will be available such as the Dictionary and the Gltn Store, but you will be able to edit and build documents like always.<br><br><span style='font-weight:bold;font-size:10pt;color:#ff9900'>"+window.appcachestatus+"</span>";
+	postPanelOutput(out);
 }

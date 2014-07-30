@@ -1859,8 +1859,8 @@ function selectTheme(id) {
 
 function initNotifications() {
 	//Notifications live, send out requests?	
-	if(window.notifications == undefined) {
-		window.notifications = new Array();		
+	if(window.notifications === undefined) {
+		window.notifications = [];		
 	}
     postNotificationsIcon();
 	//since appcache is too fast:
@@ -1876,22 +1876,61 @@ function postNotificationsIcon() {
     else
         initService("Main_Notifications", "Notifications ("+notifications.length+")", "<span class='fa fa-bell'></span>&nbsp;"+notifications.length);
 }
-
-function postNotification(id, text, action) {
-    if(notifications == undefined)
-            initNotifications();
+function Alert(id, title, body, icon, action) {
+    this.id = id || Math.round(100*Math.random());
+    this.title = title || "Gltn Notification";
+    this.body = body || "";
+    this.icon = icon || "https://secure.gravatar.com/blavatar/53d35b61b10f527e0315439fb4e26e99?s=32";
+    this.action = action || function() { console.warn("Empty Notiication Clicked") };
+}
+function postNotification(id, body, action, icon, title) {
+//alt constructor postNotification(Notification)
+    var note;
+    if(id === undefined) 
+        note = new Alert();
+    else if(body === undefined)
+        note = id;
+    else
+        note = new Alert(id, title, body, icon, action);
+    
+    
+    if(notifications === undefined)
+        initNotifications();
 	var npush = -1;
 	for(i in notifications) {
-		if(notifications[i].id == id)
+		if(notifications[i].id == note.id)
 			npush = i;
 	}
     if(npush == -1) {
-		notifications.push({id:id, text:text, action:action});
-		postNotificationsIcon();
+		notifications.push(note);
+        note.id = notifications.length - 1;
 	} else {
-		notifications[npush] = {id:id, text:text, action:action};
-		postNotificationsIcon();
+		notifications[npush] = note;
+        note.id = npush;
 	}
+    postNotificationsIcon();
+    
+    //Browser Notifications API
+    console.log(note);
+    var options = {
+        tag: note.id,
+        body: note.body,
+        icon: note.icon
+    };
+    var notificationEvents = ['onclick', 'onshow', 'onerror', 'onclose'];
+    Notification.requestPermission(function() {
+      var notification = new Notification(note.title, options);
+        
+      notificationEvents.forEach(function(eventName) {
+         notification[eventName] = function(event) {
+             console.log(notification.tag, notifications);
+             if(event.type == "click") {
+                notifications[notification.tag].action();
+                 console.log('Event "' + event.type + '" triggered for notification ' + notification.tag);
+             }
+         };
+      });
+   });
 }
 
 
@@ -2014,7 +2053,7 @@ function contextMarkup() {
 	apply_context("[Tt]he fact that", {type: "Consider Revising", replacement:"", text: getStrunkTips("Don't overcomplicate your sentence. Get rid of this phrase. You don't need it.")});
 	apply_context("[Nn]ot honest", {type: "Consider Revising", replacement:"Dishonest", text: getStrunkTips(simplify)});
 	apply_context("[Nn]ot important", {type: Context.REVISE, replacement: "trifling", text: getStrunkTips(simplify)});
-	apply_context("[Dd]id not remember", {type: Context.REVISE, replacContext.REVISEement: "forgot", text: getStrunkTips(simplify)});
+	apply_context("[Dd]id not remember", {type: Context.REVISE, replacement: "forgot", text: getStrunkTips(simplify)});
 	apply_context("[Dd]id not pay any attention to", {type: Context.REVISE, replacement: "ignored", text: getStrunkTips(simplify)});
 	apply_context("[Dd]id not have any confidence in", {type: Context.REVISE, replacement: "distrusted", text: getStrunkTips(simplify)});
 	apply_context("[Hh]e is a man who", {type: Context.REVISE, replacement: "he", text: getStrunkTips(simplify)});
