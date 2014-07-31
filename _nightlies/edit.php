@@ -2,7 +2,7 @@
 <html>
 <!--manifest="null.appcache" -->
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <title>Gltn Editor</title>
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="shortcut icon" sizes="196x196" href="gltn_f.png">
@@ -22,7 +22,6 @@
 <script src="js/build.js"></script>
 <script src="js/holoribbon_foundation.js"></script>
 <script src="store/secure/gltnstore.js"></script>
-
 
 <script src="js/rangy-1.3alpha.772\rangy-core.js"></script>
 <script src="js/rangy-1.3alpha.772\rangy-cssclassapplier.js"></script>
@@ -131,6 +130,6 @@ ga('send', 'pageview');
     <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.0/js/vendor/fastclick.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.0/js/vendor/modernizr.js"></script>
     <link rel="stylesheet" href="css/normalize.css">
-    <link rel="stylesheet" href="css/foundation.min.css">
+    <link rel="stylesheet" href="css/foundation.css">
 </body>
 </html>

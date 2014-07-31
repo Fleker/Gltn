@@ -1,4 +1,4 @@
-var GLTN_VERSION = "1.3.2.2";
+var GLTN_VERSION = "1.3.2.3";
 //For backwards compatibility, will return true 
 function greaterThanVersion(version) {
     var split = version.split(".");

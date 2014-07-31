@@ -126,7 +126,14 @@ function PanelManager() {
     };
     //FIXME service and override are the same
     PanelManager.prototype.fromString = function(j) {
-        var json = JSON.parse(j);
+        try {
+            var json = JSON.parse(j);
+        } catch(e) {
+            console.error(e.message);
+            writeToSettings("panels", this.toString());
+            markAsDirty();
+            return;
+        }
         for(var i in json) {
             if(this.availablePanels[i] !== undefined)
                 continue;
@@ -209,15 +216,15 @@ function PanelManager() {
         //We set a short timer so that if it doesn't exist, it doesn't ruin the flow of the function
         if(this.availablePanels[id].onUninstall !== undefined)
             this.availablePanels[id].onUninstall();
-        a = getSettings('panels').split(', ');
+//        a = getSettings('panels').split(', ');
         b = [];
         for(i in a) {
             if(a[i] != id) {
                 b.push(a[i]);
             }	
         }	
-        writeToSettings('panels', b.join(', '));
-        writeToSettings('panels_'+i, undefined);	
+//        writeToSettings('panels', b.join(', '));
+//        writeToSettings('panels_'+i, undefined);	
         if(localStorage['zpanels_'+id] !== undefined) 
             localStorage.removeItem('zpanels_'+id);  
     };
@@ -1151,6 +1158,21 @@ specialCharacters = {
     StudioMike: getEmoji("🎙", "Studio Microphone"),
     LevelSlider: getEmoji("🎚", "Level Slider"),
     ControlKnobs: getEmoji("🎛", "Control Knobs"),
+    MusicNotes: getEmoji("🎜", "Beamed Ascending Musical Notes"),
+    MusicNotes2: getEmoji("🎝", "Beamed Descending Musical Notes"),
+    Film: getEmoji("🎞", "Film Frames"),
+    Admission: getEmoji("🎟", "Admission Ticket"),
+    Carousel: getEmoji("🎠", "Carousel Horse"),
+    Ferris: getEmoji("🎡", "Ferris Wheel"),
+    Rollercoaster: getEmoji("🎢", "Rollercoaster"),
+    Fishing: getEmoji("🎣", "Fishing Pole and Fish"),
+    Microphone: getEmoji("🎤", "Microphone", "mike"),
+    MovieCamera: getEmoji("🎥", "Movie Camera"),
+    Cinema: getEmoji("🎦", "Cinema"),
+    Headphone: getEmoji("🎧", "Headphone"),
+    Artist: getEmoji("🎨", "Artist Palette"),
+    TopHat: getEmoji("🎩", "Top Hat"),
+    Circus: getEmoji("🎪", "Circus Tent"),
     
     Wheelchair: getChar("♿","Wheelchair",'chair'),
     Fountain: getChar("⛲","Fountain","fountain water park"),
@@ -2548,4 +2570,106 @@ p.setManifest({
 p.onRun = function() {
 	out = "<span style='font-size:16pt'>This App is Available Offline</span><br>What Does this Mean?<br><br>If your device is not connected to the Internet, you can still open Gltn in your browser. Of course, not every feature will be available such as the Dictionary and the Gltn Store, but you will be able to edit and build documents like always.<br><br><span style='font-weight:bold;font-size:10pt;color:#ff9900'>"+window.appcachestatus+"</span>";
 	postPanelOutput(out);
+}
+panelManager.getAvailablePanels().Main_Table.setManifest({
+    name: "",
+    title: "Grid",
+    bordercolor: "#2cc36b",
+    width: 50,
+    canMaximize: true
+});
+panelManager.getAvailablePanels().Main_Table.onInit = function() {
+    //Initiate the Spreadsheet framework
+    //TODO Documentation
+    window.Spreadsheet = {
+        IF: function(bool, tr, fl) {
+            if(bool) {
+                return tr;    
+            } else {
+                return fl;   
+            }
+        },
+        SUB: function(str) {
+            return "<sub>"+str.toString()+"</sub>";   
+        },
+        SUP: function(str) {
+            return "<sup>"+str.toString()+"</sup>";   
+        },
+        LATEX: function(str) {
+            console.log(str);
+            str = str.replace(/\\/g, "\\");
+            console.log(str);
+            postLatex(str);
+            return getLatex();
+        },
+        RANGE: function(c1, c2, r1, r2) {
+            //convert letters to numbers, run through two loops to grab all the data in an array, return it
+            var arr = [];
+            for(var index = r1; index<=r2; index++) {
+                console.log(Spreadsheet[c1+index]);
+                if(Spreadsheet[c1+index].substring(0,1) == "=")
+                    ans = Spreadsheet[c1+index].substring(1);
+                else
+                    ans = Spreadsheet[c1+index];
+                console.log(ans);
+                
+                try {
+                    ans = eval(ans);  
+                    console.log(ans);
+                    if(ans.toString().substring(0,1) == "=")
+                        ans = eval(ans.substring(1));
+                } catch(e) {
+                    console.error("RANGE: "+e.message);
+                }
+                console.log(ans);
+                arr.push(ans);
+            }
+            return arr;
+        },
+        SUM: function(arr) {
+            var sum = 0;
+            for(index in arr) {
+                sum += arr[index];
+            }
+            return sum;
+        }
+    };   
+}
+
+function generateSpreadsheetVars(array, row, column) {
+    for(i=1;i<=row;i++) {
+        for(j=0;j<column;j++) {
+            Spreadsheet[alpha[j]+i] = array[(i-1)*column+j];
+        }
+    }   
+}
+//TODO Remodel based on latex
+function showSpreadsheetFunction(str) {
+    function showFunction(i) {
+                out = "<b>"+i.id+"</b>";
+                out += "<br>&emsp;<span style='font-family:monospace'>"+i.cmd+"</span>";
+                out += "<br>&emsp;"+i.des;
+                out += "<ul>";
+                for(j in i.param) {
+                    out += "<li>"+i.param[j].id+" - "+i.param[j].des+"</li>";
+                }
+                out += "</ul>";
+                $('#spreadsheetDetails').html(out);
+                return out;
+            }
+    var t = str.toLowerCase();
+    if(t.length == 0)
+        return "";
+    for(i in SpreadsheetAPI) {
+        console.log(i);
+        if(SpreadsheetAPI[i].id.toLocaleLowerCase() == t) {
+            return showFunction(SpreadsheetAPI[i]);
+        
+        } else if(SpreadsheetAPI[i].tags.indexOf(t) > -1) {
+            return showFunction(SpreadsheetAPI[i]);
+            
+        }
+    }
+    $('#spreadsheetDetails').html("Sorry... we can't anything.");
+    return "Sorry... we can't anything.";
 }

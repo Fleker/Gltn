@@ -263,7 +263,7 @@ button[disabled] {
 }
 @media only screen and (max-width: 40em) {
     .holoribbon_title {
-        display:none;
+/*        display:none;*/
     }
     .holoribbon_icon {
         font-size:12pt;   
@@ -271,16 +271,22 @@ button[disabled] {
     .holoribbon_key {
         display:none;   
     }
+    .ribbonbutton {
+        padding: 0px;
+        margin-left: -8px;
+        margin-right: 8px;   
+    }
     .header {
         height: 90px;
         overflow-y: hidden;
         overflow-x: hidden;
     }
     .main {
-        padding-top:76px;   
+        padding-top:90px;   
     }
     #panel_plugin {
         top:70px;   
+        margin-top: 19px;
     }   
 }
 @media only screen and (max-width: 64em) { 

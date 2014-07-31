@@ -10,7 +10,7 @@ function GltnFormat(id, name, type, url, hidden) {
 function FormatManager() {
     this.formats = {
         APA: new GltnFormat("APA", "APA", "Essay", "js/formats/APA.js", true),
-        MLA: new GltnFormat("MLA", "MLA", "Essay", "js/formatts/MLA.js", false),
+        MLA: new GltnFormat("MLA", "MLA", "Essay", "js/formats/MLA.js", false),
         IEEE: new GltnFormat("IEEE", "IEEE", "Report", "js/formats/IEEE.js", false),
         Lab: new GltnFormat("Lab", "Lab", "Report", "js/formats/Lab.js", false)
     };
@@ -1584,6 +1584,7 @@ function resetTheme() {
     $('button').css('text-transform', '').css('letter-spacing', '').css('color', '').css('border-radius', '').css('font-size','');
     $('.ribbonheader').css('color', '').css('text-transform', 'uppercase').css('font-size', '10pt');
     $('.ribbonbody').css('height','78px');
+    $('button').css('background-color', theme.ribbon.plain).css('color', 'inherit').css('border-color', 'inherit').css('margin-top', '2px').css('padding', '3px');
     
     loadThemeSettings = function() { return "" };
 }
@@ -1604,7 +1605,7 @@ function initThemeDefault() {
 	$('.popuptop').css('color', 'white').css('background-color', theme.bodyColor);
 	$('.content_textarea').css('line-height','1.4em').css('padding-right', '5px');
 	$('.hovertag').css('font-size', '10pt');
-    $('.main').css('padding-top', '100px');
+//    $('.main').css('padding-top', '100px');
     themeCss('font-family', '"Lato", sans-serif');
     themeCss('font-size', '10pt');
     themeCss('background-color', '#ecf0f1');
@@ -1616,7 +1617,7 @@ function iterateTheme() {
 	themeCss('color', theme.fontColor);
     themeCss('font-size', '11pt');
     $('.timeago').css('color', theme.fontColor);
-    $('.popuptitle').css('color', theme.fontColorAlt);
+    $('.popuptitle').css('color', theme.fontColorAlt).css('background-color', "inherit");
     $('.content_textarea').css('background-color', theme.bodyColor).css('color', theme.fontColor);
     $('.toolbar, .overflow').css('background-color', theme.bodyColor);
     $('.toolbar').css('color', theme.fontColor);
@@ -1735,8 +1736,6 @@ function ThemeManager() {
 
         markAsDirty();
         startThemer();
-        //TODO Hot swap  
-        //TODO Change activetheme
     };
     ThemeManager.prototype.isDefault = function() {
         return this.getActiveTheme().id == this.DEFAULT || this.getActiveTheme().url === undefined;
@@ -1764,10 +1763,9 @@ function startThemer(oldtheme) {
 			setTimeout("localStorage['ztheme_"+id+"'] = $('#themeframe').contents().text();", 1000);
 		}
 	} else {
-        setLoaderColor('32,32,32');
         writeCss('@import url(http://fonts.googleapis.com/css?family=Lato:100,300,400);');
 //		writeCss('@import url(http://fonts.googleapis.com/css?family=Merriweather+Sans:400,300,700&subset=latin,latin-ext);');
-        writeCss("button { font-family:Lato,sans-serif;background-color:rgba(255,255,255,0.00);border-radius:3;text-indent:0;border:0px solid #888;display:inline-block;color:#333333;font-weight:bold;font-style:normal;text-decoration:none;text-align:center;padding:5px;min-width:30px;}");
+        writeCss("button, button.close { font-family:Lato,sans-serif;background-color:transparent;border-radius:3;text-indent:0;border:0px solid #888;display:inline-block;color:#333333;font-weight:bold;font-style:normal;text-decoration:none;text-align:center;padding:5px;min-width:30px;}");
         writeCss("button.ribbonbutton, button.toolbar_button { font-weight:400;color:#333; }");
         writeCss("button.textbutton { border: solid 1px #999;padding: 8px;background-color: #f9f9f9;font-weight: 400;color:#333;}");
         writeCss("button.close:hover { background-color:"+theme.palette.red.normal+"}");
@@ -1775,73 +1773,6 @@ function startThemer(oldtheme) {
 //        $('button').css('text-transform','initial').css('letter-spacing', '1px');
     }
 }
-
-function setLoaderColor(col) {
-
-    writeCss('@-webkit-keyframes loader10g{	0%{background-color: rgba('+col+', .2);} 25%{background-color: rgba('+col+', 1);} 50%{background-color: rgba('+col+', .2);} 75%{background-color: rgba('+col+', .2);} 100%{background-color: rgba('+col+', .2);} }');
-
-    writeCss('@keyframes loader10g{0%{background-color: rgba('+col+', .2);} 25%{background-color: rgba('+col+', 1);} 50%{background-color: rgba('+col+', .2);} 75%{background-color: rgba('+col+', .2);} 100%{background-color: rgba('+col+', .2);} }');
-
-    
-
-     writeCss('@-webkit-keyframes loader10m{	0%{background-color: rgba('+col+', .2);}	25%{background-color: rgba('+col+', .2);}	50%{background-color: rgba('+col+', 1);}	75%{background-color: rgba('+col+', .2);}	100%{background-color: rgba('+col+', .2);}}');
-
-    writeCss('@keyframes loader10m{	0%{background-color: rgba('+col+', .2);}	25%{background-color: rgba('+col+', .2);}	50%{background-color: rgba('+col+', 1);}	75%{background-color: rgba('+col+', .2);}	100%{background-color: rgba('+col+', .2);}}');
-
-    
-
-     writeCss('@-webkit-keyframes loader10d{	0%{background-color: rgba('+col+', .2);}	25%{background-color: rgba('+col+', .2);}	50%{background-color: rgba('+col+', .2);}	75%{background-color: rgba('+col+', 1);}	100%{background-color: rgba('+col+', .2);}}');
-
-    writeCss('@keyframes loader10d{	0%{background-color: rgba('+col+', .2);}	25%{background-color: rgba('+col+', .2);}	50%{background-color: rgba('+col+', .2);}	75%{background-color: rgba('+col+', 1);}	100%{background-color: rgba('+col+', .2);}}');
-
-    /*
-
-@keyframes loader10m{
-
-	0%{background-color: rgba(255, 255, 255, .2);}
-
-	25%{background-color: rgba(255, 255, 255, .2);}
-
-	50%{background-color: rgba(255, 255, 255, 1);}
-
-	75%{background-color: rgba(255, 255, 255, .2);}
-
-	100%{background-color: rgba(255, 255, 255, .2);}
-
-}
-
-
-
-@-webkit-keyframes loader10d{
-
-	0%{background-color: rgba(255, 255, 255, .2);}
-
-	25%{background-color: rgba(255, 255, 255, .2);}
-
-	50%{background-color: rgba(255, 255, 255, .2);}
-
-	75%{background-color: rgba(255, 255, 255, 1);}
-
-	100%{background-color: rgba(255, 255, 255, .2);}
-
-}
-
-@keyframes loader10d{
-
-	0%{background-color: rgba(255, 255, 255, .2);}
-
-	25%{background-color: rgba(255, 255, 255, .2);}
-
-	50%{background-color: rgba(255, 255, 255, .2);}
-
-	75%{background-color: rgba(255, 255, 255, 1);}
-
-	100%{background-color: rgba(255, 255, 255, .2);}
-
-}');   */
-
-}
-
 function install_theme(id, name, url, icon) {
     var t = new Theme(id, name, url, icon);
     themeManager.install(t);
