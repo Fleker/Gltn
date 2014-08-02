@@ -6,6 +6,7 @@
         <script src='angular.js' type='text/javascript'></script>
     </head>
     <body ng-app="500lines" ng-controller="Spreadsheet" ng-cloak>
+        GRID editor<br>
         <table><tr>
       <th><button type="button" ng-click="reset(); calc()">↻</button></th>
       <th ng-repeat="col in Cols">{{ col }}</th>
@@ -14,120 +15,180 @@
       <td ng-repeat="col in Cols" ng-class="{ formula: ( '=' === sheet[col+row][0] ) }">
         <input id="{{ col+row }}" ng-model="sheet[col+row]" ng-change="calc()"
          ng-model-options="{ debounce: 200 }" ng-keydown="keydown( $event, col, row )">
-        <div ng-class="{ error: errs[col+row], text: vals[col+row][0] }">
+        <div ng-class="{ error: errs[col+row], text: vals[col+row][0], formula: ( '=' === sheet[col+row][0] ) }">
           {{ errs[col+row] || vals[col+row] }}</div></td></tr></table>
     </body>
-    <script>
-        angular.module('500lines', []).controller('Spreadsheet', function ($scope, $timeout) {
-  // Begin of $scope properties; start with the column/row labels
-  $scope.Cols = [], $scope.Rows = [];
-  makeRange($scope.Cols, 'A', 'H');
-  makeRange($scope.Rows, 1, 20);
-  function makeRange(array, cur, end) { while (cur <= end) { array.push(cur);
-    // If it’s a number, increase it by one; otherwise move to next letter
-    cur = (isNaN( cur ) ? String.fromCharCode( cur.charCodeAt()+1 ) : cur+1);
-  } }
-
-  // UP(38) and DOWN(40)/ENTER(13) move focus to the row above (-1) and below (+1).
-  $scope.keydown = function(event, col, row) { switch (event.which) {
-    case 38: case 40: case 13: $timeout( function() {
-        console.log(event);
-      var direction = (event.which === 38) ? -1 : +1;
-      var cell = document.querySelector( '#' + col + (row + direction) );
-      if (cell) { cell.focus(); }
-    } );
-  } };
-
-  // Default sheet content, with some data cells and one formula cell.
-  $scope.reset = function() { $scope.sheet = { A1: 1874, B1: '+', C1: 2046, D1: '⇒', E1: '=A1+C1' }; };
-
-  // Define the initializer, and immediately call it
-  ($scope.init = function() {
-    // Restore the previous .sheet; reset to default if it’s the first run
-    $scope.sheet = angular.fromJson( localStorage.getItem( '' ) );
-    if (!$scope.sheet) { $scope.reset(); }
-      $scope.worker = new Worker("http://audreyt.github.io/500lines/spreadsheet/es5/worker.js");
-  }).call();
-
-  // Formula cells may produce errors in .errs; normal cell contents are in .vals
-  $scope.errs = {}, $scope.vals = {};
-
-  // Define the calculation handler; not calling it yet
-  $scope.calc = function() {
-    var json = angular.toJson( $scope.sheet );
-    var promise = $timeout( function() {
-      // If the worker has not returned in 499 milliseconds, terminate it
-      $scope.worker.terminate();
-      // Back up to the previous state and make a new worker
-      $scope.init();
-      // Redo the calculation using the last-known state
-      $scope.calc();
-    }, 99 );
-
-    // When the worker returns, apply its effect on the scope
-    $scope.worker.onmessage = function(message) {
-      $timeout.cancel( promise );
-      localStorage.setItem( '', json );
-      $timeout( function() { $scope.errs = message.data[0], $scope.vals = message.data[1]; } );
-    };
-
-    // Post the current sheet content for the worker to process
-    $scope.worker.postMessage( $scope.sheet );
-  };
-
-  // Start calculation when worker is ready
-  $scope.worker.onmessage = $scope.calc;
-  $scope.worker.postMessage( null );
-});
-
-// Worker.js
-function WorkerJS () {
-  var sheet, errs, vals;
-  self.onmessage = function(message) {
-    sheet = message.data, errs = {}, vals = {};
-
-    Object.getOwnPropertyNames(sheet || {}).forEach(function(coord) {
-      // Four variable names pointing to the same coordinate: A1, a1, $A1, $a1
-      [ '', '$' ].forEach(function(p) { [ coord, coord.toLowerCase() ].forEach(function(c){
-        var name = p+c;
-
-        // Worker is reused across computations, so only define each variable once
-        if ((Object.getOwnPropertyDescriptor( self, name ) || {}).get) { return; }
-
-        // Define self['A1'], which is the same thing as the global variable A1
-        Object.defineProperty( self, name, { get: function() {
-          if (coord in vals) { return vals[coord]; }
-          vals[coord] = NaN;
-
-          // Turn numeric strings into numbers, so =A1+C1 works when both are numbers
-          var x = +sheet[coord];
-          if (sheet[coord] !== x.toString()) { x = sheet[coord]; }
-
-          // Evaluate formula cells that begin with =
-          try { vals[coord] = (('=' === x[0]) ? eval.call( null, x.slice( 1 ) ) : x);
-          } catch (e) {
-            var match = /\$?[A-Za-z]+[1-9][0-9]*\b/.exec( e );
-            if (match && !( match[0] in self )) {
-              // The formula refers to a uninitialized cell; set it to 0 and retry
-              self[match[0]] = 0;
-              delete vals[coord];
-              return self[coord];
+    <script>    
+        Spreadsheet = {
+            IF: function(bool, tr, fl) {
+                if(bool) {
+                    return tr;    
+                } else {
+                    return fl;   
+                }
+            },
+            GRAV_EARTH: 9.81
+        }
+//        localStorage._Spreadsheet = JSON.stringify(Spreadsheet);
+        var myApp = angular.module('500lines',[]);
+        myApp.service('GridService', function() {
+            var data;
+            this.get = function() {
+                return Spreadsheet;   
             }
-            // Otherwise, stringify the caught exception in the errs object
-            errs[coord] = e.toString();
-          }
-          // Turn vals[coord] into a string if it's not a number or boolean
-          switch (typeof vals[coord]) { case 'function': case 'object': vals[coord]+=''; }
-          return vals[coord];
-        } } );
-      }); });
-    });
+        });
+        myApp.controller('Spreadsheet', function ($scope, $timeout, $rootScope, GridService) {
+            var pass = {};
+            for(i in GridService.get()) {
+                console.log(i);
+                pass[i] = GridService.get()[i].toString();
+            }
+            window.scope = $rootScope;
+            //Current plan - Maintain outside SS var, then on opening push over. Do same to worker
+            
+      // Begin of $scope properties; start with the column/row labels
+      $scope.Cols = [], $scope.Rows = [];
+      makeRange($scope.Cols, 'A', 'H');
+      makeRange($scope.Rows, 1, 20);
+      function makeRange(array, cur, end) { while (cur <= end) { array.push(cur);
+        // If it’s a number, increase it by one; otherwise move to next letter
+        cur = (isNaN( cur ) ? String.fromCharCode( cur.charCodeAt()+1 ) : cur+1);
+      } }
 
-    // For each coordinate in the sheet, call the property getter defined above
-    for (var coord in sheet) { self[coord]; }
-    postMessage([ errs, vals ]);
-  };
-}
+      // UP(38) and DOWN(40)/ENTER(13) move focus to the row above (-1) and below (+1).
+      $scope.keydown = function(event, col, row) { switch (event.which) {
+        case 38: case 40: case 13: $timeout( function() {
+            if((event.which === 13 && event.shiftKey === true) || event.which === 38)
+                direction = -1;
+            else
+                direction = 1;
+          var cell = document.querySelector( '#' + col + (row + direction) );
+          if (cell) { cell.focus(); }
+        } );
+      } };
+
+      // Default sheet content, with some data cells and one formula cell.
+      $scope.reset = function() { $scope.sheet = { A1: 1874, B1: '+', C1: 2046, D1: '⇒', E1: '=A1+C1' }; };
+
+      // Define the initializer, and immediately call it
+      ($scope.init = function() {
+        // Restore the previous .sheet; reset to default if it’s the first run
+          //FIMXME storage
+        $scope.sheet = angular.fromJson( localStorage.getItem( '' ) );
+        if (!$scope.sheet) { $scope.reset(); }
+          $scope.worker = new QueryableWorker("worker.js", function(message) {
+//              console.log(message);
+               $timeout.cancel( $scope.promise );
+              $timeout( function() { $scope.errs = message.data[0], $scope.vals = message.data[1]; } );
+          });
+          $scope.worker.sendQuery('setSS', JSON.stringify(pass));
+//          $scope.worker = new Worker('worker.js');
+          window.worker = $scope.worker;
+      }).call();
+
+      // Formula cells may produce errors in .errs; normal cell contents are in .vals
+      $scope.errs = {}, $scope.vals = {};
+
+      // Define the calculation handler; not calling it yet
+      $scope.calc = function() {
+        var json = angular.toJson( $scope.sheet );
+        $scope.promise = $timeout( function() {
+          // If the worker has not returned in 499 milliseconds, terminate it
+          $scope.worker.terminate();
+          // Back up to the previous state and make a new worker
+          $scope.init();
+          // Redo the calculation using the last-known state
+          $scope.calc();
+        }, 99 );
+
+        // When the worker returns, apply its effect on the scope
+        $scope.worker.onmessage = function(message) {
+            console.log(message);
+          $timeout.cancel( $scope.promise );
+          localStorage.setItem( '', json );
+          $timeout( function() { $scope.errs = message.data[0], $scope.vals = message.data[1]; } );
+        };
+
+        // Post the current sheet content for the worker to process
+        $scope.worker.postMessage( $scope.sheet );
+      };
+
+      // Start calculation when worker is ready
+      $scope.worker.onmessage = $scope.calc;
+      $scope.worker.postMessage( $scope.sheet );
+    });
+        
+        function clone(obj, kind) {
+            function OneShotConstructor(){}
+            OneShotConstructor.prototype = obj;
+            if(kind !== undefined)
+                OneShotConstructor.constructor = kind;
+            return new OneShotConstructor();
+        }
+    /* FROM MOZ
+    QueryableWorker instances methods:
+     * sendQuery(queryable function name, argument to pass 1, argument to pass 2, etc. etc): calls a Worker's queryable function
+     * postMessage(string or JSON Data): see Worker.prototype.postMessage()
+     * terminate(): terminates the Worker
+     * addListener(name, function): adds a listener
+     * removeListener(name): removes a listener
+    QueryableWorker instances properties:
+     * defaultListener: the default listener executed only when the Worker calls the postMessage() function directly
+  */
+      function QueryableWorker (sURL, fDefListener, fOnError) {
+        var oInstance = this, oWorker = new Worker(sURL), oListeners = {};
+        this.defaultListener = fDefListener || function () {};
+        /*oWorker.onmessage = function (oEvent) {
+          if (oEvent.data instanceof Object && oEvent.data.hasOwnProperty("vo42t30") && oEvent.data.hasOwnProperty("rnb93qh")) {
+            oListeners[oEvent.data.vo42t30].apply(oInstance, oEvent.data.rnb93qh);
+          } else {
+              console.log(oEvent.data[0]);
+            this.defaultListener.call(oInstance, oEvent.data);
+          }
+        };*/
+          oWorker.onmessage = fDefListener;
+        if (fOnError) { oWorker.onerror = fOnError; }
+        this.sendQuery = function (/* queryable function name, argument to pass 1, argument to pass 2, etc. etc */) {
+          if (arguments.length < 1) { throw new TypeError("QueryableWorker.sendQuery - not enough arguments"); return; }
+//            console.log(arguments[1]);
+          oWorker.postMessage({ "bk4e1h0": arguments[0], "ktp3fm1": arguments[1] });
+//          oWorker.postMessage({ "bk4e1h0": arguments[0], "ktp3fm1": Array.prototype.slice.call(arguments, 1) });
+        };
+        this.postMessage = function (vMsg) {
+          //I just think there is no need to use call() method
+          //how about just oWorker.postMessage(vMsg);
+          //the same situation with terminate
+          //well,just a little faster,no search up the prototye chain
+          Worker.prototype.postMessage.call(oWorker, vMsg);
+        };
+        this.terminate = function () {
+          Worker.prototype.terminate.call(oWorker);
+        };
+        this.addListener = function (sName, fListener) {
+          oListeners[sName] = fListener;
+        };
+        this.removeListener = function (sName) {
+          delete oListeners[sName];
+        };
+      };
 
     </script>
+    <style>
+        body { font-family: sans-serif; }
+        table { border-collapse: collapse; }
+th, td { border: 1px solid #ccc; }
+th { background: #ddd; }
+td.formula {  }
+td div { text-align: right; width: 120px; min-height: 1.2em;
+         overflow: hidden; text-overflow: ellipsis; }
+div.text { text-align: left;} 
+div.error { text-align: center; color: #800; font-size: 90%; border: solid 1px #800 }
+div.formula { background-color: #dfd}
+input { position: absolute; border: 0; padding: 0; width: 120px; height: 1.3em;
+        /*font-size: 26pt;*/ color: transparent; background: transparent; transition-duration:0.3s;margin-top:0em; padding-left:0px;}
+input + div { transition-duration:0.3s; padding-left:0px; padding-right:0px; background-color: #fff;  }
+input:focus { color: #111; background: #efe; font-size:70%; font-weight:bold; width: 360px; margin-left: -120px; margin-top:-1.4em; padding-left:8px;}
+input:focus + div { white-space: nowrap; font-weight:bold; background-color: #bfb; padding-left: 4px; padding-right: 4px; }
+
+    </style>
 </html>

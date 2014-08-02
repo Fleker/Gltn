@@ -2589,6 +2589,7 @@ panelManager.getAvailablePanels().Main_Table.onInit = function() {
                 return fl;   
             }
         },
+       IF-DOC: new LatexDoc("IF", "if conditional then else boolean", "IF(bool, true, false)", [new Parameter("bool", "A conditional statement"), new Parameter("true", "The value to return if true"), new Parameter("false", "The value to return if false")], "Changes the output depending on the conditional statement", "How to Create a Conditional");
         SUB: function(str) {
             return "<sub>"+str.toString()+"</sub>";   
         },
@@ -2635,7 +2636,11 @@ panelManager.getAvailablePanels().Main_Table.onInit = function() {
         }
     };   
 }
-
+panelManager.getAvailablePanels().Main_Table.onRun = function() {
+    
+};
+    
+    
 function generateSpreadsheetVars(array, row, column) {
     for(i=1;i<=row;i++) {
         for(j=0;j<column;j++) {

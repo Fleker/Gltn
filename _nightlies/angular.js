@@ -1107,7 +1107,7 @@ function toJson(obj, pretty) {
  * @returns {Object|Array|string|number} Deserialized thingy.
  */
 function fromJson(json) {
-    console.log(json);
+//    console.log(json);
   return isString(json)
       ? JSON.parse(json)
       : json;
