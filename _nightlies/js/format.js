@@ -435,7 +435,7 @@ function HovertagManager() {
         img: new Hovertag("img", "Image Details", function(element) {
             imgDetails($(element).attr('data-id'));
         }),
-        table: new Hovertag("table", function(element) {
+        table: new Hovertag('table', function(element) {
             return $(element).attr('data-title');
         }, function(element) {
             tableDetails($(element).attr('data-id'));
@@ -457,7 +457,7 @@ function HovertagManager() {
             var jtag = $('.'+htag.classname);
             jtag.off();
             jtag.attr('data-tooltip', 'true');
-            jtag.attr('data-title', htag.textcode.toString());
+//            jtag.attr('data-title', htag.textcode.toString());
             jtag.attr('data-class', htag.classname);
             jtag.attr('data-options', 'disable_for_touch:true');
             jtag.click(function() {
@@ -467,14 +467,17 @@ function HovertagManager() {
             $('.tooltip[data-selector="'+htag.classname+'"]').remove();
             $('body').append(Foundation.libs.tooltip.settings.tip_template(htag.classname, htag.textcode));
             $('.'+htag.classname).hover(function() {
-                var classname = $(this).attr('class').split(' ')[0];
+                var classname = $(this).attr('data-class')];
+//                var classname = $(this).attr('class').split(' ')[0];
                 console.log(classname);
                 var tag = hovertagManager.registry[classname];
                 //FIXME there must be a better system for local vars
                 Foundation.libs.tooltip.showTip($('.tooltip[data-selector="'+classname+'"]'));
                 if(typeof(tag.textcode) == "function") {
+                    console.warn("Eval tag");
                     txt = tag.textcode(this);
                 } else {
+                    console.warn("Text tag");
                     txt = tag.textcode;
                 }
                 

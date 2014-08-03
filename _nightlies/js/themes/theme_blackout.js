@@ -33,7 +33,6 @@ writeCss("@import url(http://fonts.googleapis.com/css?family=Roboto:400,100,100i
 
 	themeCss('font-family', '"Roboto", sans-serif');
 	
-setLoaderColor('255,255,255');
 writeCss("button { font-family:Roboto;background-color:rgba(255,255,255,0.01);border-radius:3;text-indent:0;border:1px solid #888;display:inline-block;color:#ccc;font-weight:bold;font-style:normal;text-decoration:none;text-align:center;padding:5px;min-width:30px;letter-spacing:0px;} button:hover { background-color: "+theme.ribbon.highlight+"; color: #222; } button:active {position:relative;top:1px;}");
 
 writeCss("button.textbutton {	background-color:"+theme.fontColor+";	border-radius:3;	text-indent:0;	border:1px solid #888;	display:inline-block;	color:"+theme.bodyColor+";	font-weight:bold;	font-style:normal;	text-decoration:none;	text-align:center;padding:3px;min-width:30px;}");

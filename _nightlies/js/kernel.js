@@ -722,7 +722,7 @@ function tableDetails(tableid) {
     $('.table'+tableid).attr('data-id', tableid);
     
     console.log(grab_panel_data());
-    runPanel('main_Table');
+    runPanel('Main_Table');
 }
 function InitPanelmain_Table() {
     //Initiate the Spreadsheet framework
@@ -791,7 +791,6 @@ function InitPanelmain_Table() {
         RANGE: {id: "Range", cmd: "RANGE(col1, col2, row1, row2)", param:[{id:"col1", des:"The first column"},{id:"col2", des:"The second column"},{id:"row1", des:"The first row"},{id:"row2", des:"The second row"}], des:"Returns an array of values for a given range", regin:"Spreadsheet.([A-Za-z]+)(\\d+):Spreadsheet.([A-Za-z]+)(\\d+)", regout:'eval(Spreadsheet.RANGE("$1","$3","$2","$4"))'}
     };
     
-    window.alpha = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA"];
 }
 function GetPanelmain_Table() {
     return {title: "Spreadsheets", bordercolor:"#2cc36b", width: 50, maximize:true};   
@@ -1325,6 +1324,9 @@ function refTextDetails(id) {
 function LatexDoc(id, keywords, script, parameters, description, title) {
     return {id: id, keywords: keywords, cmd: script, param: parameters, des: description, title: title};   
 }
+function SpreadsheetDoc(id, keywords, script, parameters, description, title, regexpIn, regexpOut) {
+    return {id: id, keywords: keywords, cmd: script, param: parameters, des: description, title: title, regexpIn: regexpIn, regexpOut: regexpOut};   
+}
 function Parameter(id, description) {
     return {id: id, des: description};
 }
@@ -1650,10 +1652,11 @@ function themeCss(rule, val) {
 	$('body').css(rule, val);	
 }
 
-function writeCss(rules) {
-    if($('#ThemeScriptCSS').length == 0)
-        $('body').append('<style id="ThemeScriptCSS"></style>');
-	$('#ThemeScriptCSS').append(rules);
+function writeCss(rules, element) {
+    element = element || "#ThemeScriptCSS";
+    if($(element).length == 0)
+        $('body').append('<style id="'+element.substring(1)+'"></style>');
+	$(element).append(rules);
 }
 // Theme Class
 function Theme(id, name, url, icon) {
@@ -1979,10 +1982,10 @@ function contextMarkup() {
 	var nouning = "A noun should not necessarily be turned into a verb.";
 	var overusetip = "Don't overuse this word in your writing.";
 
-	apply_context("[sS]tudent [bB]ody", {type:REVISE, replacement:"studentry", text: getStrunkTips("Use the word studentry instead of the two word phrase 'student body'. It is cleaner.")});
-	apply_context("[Tt]he question as to whether", {type: "Consider Revising", replacement:"whether", text: getStrunkTips(simplify)});
-	apply_context("[Tt]he fact that", {type: "Consider Revising", replacement:"", text: getStrunkTips("Don't overcomplicate your sentence. Get rid of this phrase. You don't need it.")});
-	apply_context("[Nn]ot honest", {type: "Consider Revising", replacement:"Dishonest", text: getStrunkTips(simplify)});
+	apply_context("[sS]tudent [bB]ody", {type:Context.REVISE, replacement:"studentry", text: getStrunkTips("Use the word studentry instead of the two word phrase 'student body'. It is cleaner.")});
+	apply_context("[Tt]he question as to whether", {type: Context.REVISE, replacement:"whether", text: getStrunkTips(simplify)});
+	apply_context("[Tt]he fact that", {type: Context.REVISE, replacement:"", text: getStrunkTips("Don't overcomplicate your sentence. Get rid of this phrase. You don't need it.")});
+	apply_context("[Nn]ot honest", {type: Context.REVISE, replacement:"Dishonest", text: getStrunkTips(simplify)});
 	apply_context("[Nn]ot important", {type: Context.REVISE, replacement: "trifling", text: getStrunkTips(simplify)});
 	apply_context("[Dd]id not remember", {type: Context.REVISE, replacement: "forgot", text: getStrunkTips(simplify)});
 	apply_context("[Dd]id not pay any attention to", {type: Context.REVISE, replacement: "ignored", text: getStrunkTips(simplify)});

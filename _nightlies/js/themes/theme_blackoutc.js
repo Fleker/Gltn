@@ -60,7 +60,6 @@ function executeSettings() {
 writeCss("@import url(http://fonts.googleapis.com/css?family=Roboto+Condensed:300italic,400italic,700italic,400,300,700);");
 writeCss("body { font-family: 'Roboto Condensed', sans-serif }");
 	
-setLoaderColor('255,255,255');
 writeCss("button.textbutton {text-indent:0;	border:1px solid white;	display:inline-block; color:"+theme.bodyColor+";	font-style:normal;	text-decoration:none;	text-align:center;padding:3px; text-transform:uppercase; min-width:80px; color:white; background-color: transparent; border-radius: 30px; font-weight:100; font-size:10pt; letter-spacing: 1px; margin-left: 3px; padding-left: 8px; padding-right: 7px;}");
 writeCss("button.ribbonbutton { padding-top:2px;height:77px;color:"+theme.fontColor+" }");
 writeCss("button { background-color:transparent; padding:6px; padding-left: 10px; padding-right:10px; color: "+theme.fontColor+"; }");

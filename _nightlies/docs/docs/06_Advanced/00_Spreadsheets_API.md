@@ -1,8 +1,23 @@
-Gltn provides a rudimentary spreadsheet software accessible in certain formats through formats with the "Table" tool. By default, users can supply raw data, numbers and strings, and equations (starting with the equals sign) that is a Javascript statement.
+Gltn provides basic spreadsheet software accessible in some formats with the "Table" tool. By default, users can supply raw data, numbers and strings, and equations (starting with the equals sign) that is a Javascript statement.
 
-Users can use any javascript command, plus access specific cells in the format `A1` where A is a row and 1 is a column.
+Users can use any javascript command or HTML tag, plus access specific cells in the format `A1` where A is a row and 1 is a column. Formulas may be nested (ie. `A1: 5` -- `A2: =A1+1` -- `A3: =A2+A1+5` as long as it isn't recursive.
 
-Additional spreadsheet commands can be added through a service that the user may install.
+Additional spreadsheet commands can be added through a service that the user may install. Some basic commands are included by default.
+
+## A Spreadsheet Function
+ID: function( ... )
+
+## Installing Library
+Create a service, add functions there
+
+## Documentation
+It's good to let users learn more
+FNC-DOC is the syntax for a LatexDoc
+
+## Naming Convention
+All caps because consistent and different
+
+//FIXME Remove bottom, extend top
 
 ### Custom Spreadsheet Commands
 To include a function, append an object to the variable Spreadsheet that dictates the function and an object dictating how it should be used for inclusion into the user manual. This should be done on your service's initialization.

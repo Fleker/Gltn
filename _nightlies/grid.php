@@ -4,9 +4,12 @@
         <title>Grid Sandbox</title>
         <meta charset="UTF-8">
         <script src='angular.js' type='text/javascript'></script>
+        <script src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.0-beta.13/angular-sanitize.min.js'></script>
     </head>
     <body ng-app="500lines" ng-controller="Spreadsheet" ng-cloak>
-        GRID editor<br>
+        {{ Locale.APPTITLE }}<br>
+        <input id='setCol' data-sp='true' placeholder="{{Locale.COLUMNS}}" oninput="scope.remodel()" value="H">&emsp;X&emsp;<input data-sp='true' id='setRow' placeholder="{{Locale.ROWS}}" oninput="scope.remodel()" value="20">
+        <br>
         <table><tr>
       <th><button type="button" ng-click="reset(); calc()">↻</button></th>
       <th ng-repeat="col in Cols">{{ col }}</th>
@@ -15,8 +18,10 @@
       <td ng-repeat="col in Cols" ng-class="{ formula: ( '=' === sheet[col+row][0] ) }">
         <input id="{{ col+row }}" ng-model="sheet[col+row]" ng-change="calc()"
          ng-model-options="{ debounce: 200 }" ng-keydown="keydown( $event, col, row )">
-        <div ng-class="{ error: errs[col+row], text: vals[col+row][0], formula: ( '=' === sheet[col+row][0] ) }">
-          {{ errs[col+row] || vals[col+row] }}</div></td></tr></table>
+        <div ng-class="{ error: errs[col+row], text: vals[col+row][0], formula: ( '=' === sheet[col+row][0] ) }" 
+             ng-bind-html="renderHtml(errs[col+row] || vals[col+row])" >
+            <!--{{ errs[col+row] || vals[col+row] }}-->
+          </div></td></tr></table>
     </body>
     <script>    
         Spreadsheet = {
@@ -27,33 +32,91 @@
                     return fl;   
                 }
             },
+            SUB: function(txt) {
+                return "<sub>"+txt+"</sub>";   
+            }, 
             GRAV_EARTH: 9.81
         }
 //        localStorage._Spreadsheet = JSON.stringify(Spreadsheet);
-        var myApp = angular.module('500lines',[]);
+        var myApp = angular.module('500lines',['ngSanitize']);
         myApp.service('GridService', function() {
             var data;
             this.get = function() {
                 return Spreadsheet;   
             }
         });
-        myApp.controller('Spreadsheet', function ($scope, $timeout, $rootScope, GridService) {
+        myApp.controller('Spreadsheet', function ($scope, $timeout, $rootScope, GridService, $sce) {
+            console.log("v3");
             var pass = {};
             for(i in GridService.get()) {
                 console.log(i);
                 pass[i] = GridService.get()[i].toString();
             }
-            window.scope = $rootScope;
-            //Current plan - Maintain outside SS var, then on opening push over. Do same to worker
-            
+            window.root = $rootScope;
+            window.scope = $scope;
+            $scope.strings = {
+                /*APPTITLE: {
+                    en_us: "GRID editor",
+                    es: "edetor GRIDE"
+                },*/
+                en_us: {
+                    APPTITLE: "GRID editor",
+                    COLUMNS: "Cols",
+                    ROWS: "Rows"
+                },
+                es: {
+                    APPTITLE: "edetor GRIDE",
+                    COLUMNS: "Clms",
+                    ROWS: "Rws"
+                }   
+            };
+            $scope.setLocale = function(loc_name) {
+                //Reset, get all possible items first
+                $scope.Locale = {};
+//                console.log($scope.strings);
+                for(loc in $scope.strings) {
+//                    console.log(loc, $scope.strings[loc]);
+                    for(i in $scope.strings[loc]) {
+//                        console.log(i, loc, $scope.strings[loc]);
+                        $scope.Locale[i] = i;   
+                    }
+                }
+//                console.log($scope.Locale);
+                //Now overwrite with local names
+                for(i in $scope.strings[loc_name]) {
+                    $scope.Locale[i] = $scope.strings[loc_name][i];
+                }
+//                console.log($scope.Locale);
+                $scope.$apply();
+            }
+            $scope.setLocale("en_us");
+            $scope.renderHtml = function(html_code) {
+                if(html_code === undefined)
+                    html_code = "";
+                return $sce.trustAsHtml(html_code+"");
+            };
       // Begin of $scope properties; start with the column/row labels
       $scope.Cols = [], $scope.Rows = [];
-      makeRange($scope.Cols, 'A', 'H');
-      makeRange($scope.Rows, 1, 20);
-      function makeRange(array, cur, end) { while (cur <= end) { array.push(cur);
-        // If it’s a number, increase it by one; otherwise move to next letter
-        cur = (isNaN( cur ) ? String.fromCharCode( cur.charCodeAt()+1 ) : cur+1);
-      } }
+
+      $scope.makeRange = function (array, cur, end) { 
+          array.length = 0;
+          while (cur <= end) { 
+              array.push(cur);
+            // If it’s a number, increase it by one; otherwise move to next letter
+            cur = (isNaN( cur ) ? String.fromCharCode( cur.charCodeAt()+1 ) : cur+1);
+          } 
+          $scope.$apply();
+      }
+      /*$scope.makeRange($scope.Cols, 'A', 'H');
+      $scope.makeRange($scope.Rows, 1, 20);*/
+      $scope.remodel = function() {
+        //Re-'makeRange'   
+          if(document.getElementById('setCol').value.length > 0)
+            $scope.makeRange($scope.Cols, 'A', document.getElementById('setCol').value);
+          if(document.getElementById('setRow').value.length > 0)
+            $scope.makeRange($scope.Rows, 1, document.getElementById('setRow').value);
+      }
+      $scope.remodel();
 
       // UP(38) and DOWN(40)/ENTER(13) move focus to the row above (-1) and below (+1).
       $scope.keydown = function(event, col, row) { switch (event.which) {
@@ -186,9 +249,13 @@ div.error { text-align: center; color: #800; font-size: 90%; border: solid 1px #
 div.formula { background-color: #dfd}
 input { position: absolute; border: 0; padding: 0; width: 120px; height: 1.3em;
         /*font-size: 26pt;*/ color: transparent; background: transparent; transition-duration:0.3s;margin-top:0em; padding-left:0px;}
-input + div { transition-duration:0.3s; padding-left:0px; padding-right:0px; background-color: #fff;  }
-input:focus { color: #111; background: #efe; font-size:70%; font-weight:bold; width: 360px; margin-left: -120px; margin-top:-1.4em; padding-left:8px;}
-input:focus + div { white-space: nowrap; font-weight:bold; background-color: #bfb; padding-left: 4px; padding-right: 4px; }
-
+input:not([data-sp=true]) + div { transition-duration:0.3s; padding-left:0px; padding-right:0px; background-color: #fff;  }
+input:not([data-sp=true]):focus { color: #111; background: #efe; font-size:70%; font-weight:bold; width: 360px; margin-left: -120px; margin-top:-1.4em; padding-left:8px;}
+input:not([data-sp=true]):focus + div { white-space: nowrap; font-weight:bold; background-color: #bfb; padding-left: 4px; padding-right: 4px; }
+input[data-sp=true] { 
+    color: black;
+    background-color: antiquewhite;
+    position: inherit;    
+}
     </style>
 </html>

@@ -12,6 +12,10 @@
 
 <script src="http://code.jquery.com/jquery-2.1.1.js"></script>
 <script src="http://code.jquery.com/color/jquery.color-2.1.2.min.js"></script>
+    
+<!-- TODO Minify and look at just what parts of angular are good v. Polymer or other libraries -->
+<script src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.0-beta.13/angular.min.js' type='text/javascript'></script>
+<script src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.0-beta.13/angular-sanitize.min.js'></script>
 
 <script src="js/kernel.js"></script>
 <script src="js/editor.js"></script>

@@ -27,7 +27,7 @@ self.onmessage = (function($__6) {
       oEvent = $__6;  
       if (oEvent.data instanceof Object && oEvent.data.hasOwnProperty("bk4e1h0") && oEvent.data.hasOwnProperty("ktp3fm1")) {
 //          console.log("@" + oEvent.data.bk4e1h0 + oEvent.data.ktp3fm1);
-          console.log("@");
+//          console.log("@");
           Spreadsheet =  JSON.parse(oEvent.data.ktp3fm1);
           for(var formula in Spreadsheet) {
 //              console.log(":"+formula);
@@ -35,7 +35,7 @@ self.onmessage = (function($__6) {
           }    
           return;
       }
-  console.log("~");
+//  console.log("~");
   var $__7;
   var data = $traceurRuntime.assertObject($__6).data;
   ($__7 = [data, {}, {}], sheet = $__7[0], errs = $__7[1], vals = $__7[2], $__7);
@@ -106,7 +106,7 @@ self.onmessage = (function($__6) {
                         }
 //                        vals[coord] = (('=' === x[0]) ?  : x);
                     } catch (e) {
-                        console.error(e.message);
+//                        console.error(e.message);
                         vals[coord] = x;
                       try {
                         throw undefined;
