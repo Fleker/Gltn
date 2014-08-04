@@ -16,6 +16,7 @@
 <!-- TODO Minify and look at just what parts of angular are good v. Polymer or other libraries -->
 <script src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.0-beta.13/angular.min.js' type='text/javascript'></script>
 <script src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.0-beta.13/angular-sanitize.min.js'></script>
+<script src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.20/angular-route.min.js'></script>
 
 <script src="js/kernel.js"></script>
 <script src="js/editor.js"></script>
@@ -45,6 +46,10 @@
     tex2jax: { inlineMath: [['$','$'],['\\(','\\)']] }
   });
 </script>
+    
+<script>
+
+</script>
 
 <link rel="icon" 
       type="image/png" 
@@ -63,24 +68,24 @@ ga('send', 'pageview');
 <link rel="stylesheet" type="text/css" href="css/standard.css">
 </head>
 
-<body>
+<body ng-app="Gltn" ng-controller="AppManager" ng-cloak>
 <div class="header" id="header" style="text-align:center;max-width:auto;"></div>
 
 <div class="main row" style="min-width:100%;width:100%;">
 	<div id="panel_content" class="small-12 columns">
         <div class="row">
             <div class="small-12 medium-6 large-3 column">
-                <label>Format:
+                <label><span id='meta_format'></span>:
                     <input type="text" id="file_format" list="gluten_formats" value="MLA">
                 </label>
             </div>
             <div class="small-12 medium-6 large-3 column">
-                <label>Language:
+                <label><span id='meta_lang'></span>:
                     <input type="text" id="file_language" list="gluten_languages" value="English (US)">
                 </label>
             </div>
             <div class='small-6 large-6 column'>
-                <label>Tags:
+                <label><span id='meta_tags'></span>:
                     <input type="text" id="file_tags" class="small-9 columns" placeholder="Comma Separated Tags">
                 </label>
             </div>

@@ -1,8 +1,13 @@
 // Formatting Engine
-
 file.clearMetadata();
 window.metadata = [];
 format_js_index = 0;
+
+$(document).ready(function() {
+    $('#meta_format').html("{{Locale.META_FORMAT}}");
+    $('#meta_lang').html("{{Locale.META_LANG}}");
+    $('#meta_tags').html("{{Locale.META_TAGS}}"); 
+});
 
 function new_format() {
 	format_js_index = -1;
@@ -13,6 +18,7 @@ function new_format() {
 	min_char = 0;
 	max_char = 0;
 }
+
 function new_format_item(type, ops) {
 	format_js_index++;
 	if(ops === undefined)
@@ -28,13 +34,17 @@ function new_format_item(type, ops) {
 		}
 	}
 }
+
 function new_format_block() {
 	new_format_item("block");	
 }
+
 function new_format_nl() {
 	new_format_item("nl");
 }
+
 window.annotated_bib = false;
+
 function set_up_format(name, property) {
 	switch(name) {
 		case 'word count':
@@ -467,23 +477,23 @@ function HovertagManager() {
             $('.tooltip[data-selector="'+htag.classname+'"]').remove();
             $('body').append(Foundation.libs.tooltip.settings.tip_template(htag.classname, htag.textcode));
             $('.'+htag.classname).hover(function() {
-                var classname = $(this).attr('data-class')];
+                var classname = $(this).attr('data-class');
 //                var classname = $(this).attr('class').split(' ')[0];
                 console.log(classname);
                 var tag = hovertagManager.registry[classname];
                 //FIXME there must be a better system for local vars
                 Foundation.libs.tooltip.showTip($('.tooltip[data-selector="'+classname+'"]'));
                 if(typeof(tag.textcode) == "function") {
-                    console.warn("Eval tag");
                     txt = tag.textcode(this);
+                    console.warn("Eval tag", txt);
                 } else {
-                    console.warn("Text tag");
                     txt = tag.textcode;
+                    console.warn("Text tag", txt);
                 }
                 
                 $('.tooltip[data-selector="'+classname+'"]').css('top', $(this).offset().top+30).css('left', $(this).offset().left+8).html( $(Foundation.libs.tooltip.settings.tip_template(tag.classname, txt)).html());
             }, function() {
-                var classname = $(this).attr('class').split(' ')[0];
+                var classname = $(this).attr('data-class');
                 Foundation.libs.tooltip.hide($('.tooltip[data-selector="'+classname+'"]'));
             });
         }

@@ -1,4 +1,5 @@
-var GLTN_VERSION = "1.3.2.4";
+var GLTN_VERSION = "1.3.2.5";
+var GLTN_VNAME = "Isidore";
 //For backwards compatibility, will return true 
 function greaterThanVersion(version) {
     var split = version.split(".");
@@ -26,6 +27,77 @@ function greaterThanVersion(version) {
     }
     return false;
 }
+Strings = {
+    de: {
+        WELCOME: "Willkommen auf GLTN!"   
+    },
+    en_us: {
+        WELCOME: "Welcome to Gltn!",
+        FILE_CREATE: "Create a File",
+        FILE_EXPLORE: "Explore Files",
+        META_FORMAT: "Format",
+        META_LANG: "Language",
+        META_TAGS: "Tags",        
+    }
+};
+
+// Angular.js SETUP
+window.ngApp = angular.module('Gltn',['ngSanitize']);
+window.ngGridService = ngApp.service('GridService', function() {
+    var data;
+    this.get = function() {
+        return Spreadsheet;
+    }
+});
+window.ngLocaleService = ngApp.service('LocaleService', function() {
+    this.setLocale = function(locale_name) {
+        var Locale = {};
+        // console.log($scope.strings);
+        for(loc in Strings) {
+    //                    console.log(loc, $scope.strings[loc]);
+            for(i in Strings[loc]) {
+    //                        console.log(i, loc, $scope.strings[loc]);
+                Locale[i] = i;   
+            }
+        }
+    //                console.log($scope.Locale);
+        //Now overwrite with local names
+        for(i in Strings[locale_name]) {
+            Locale[i] = Strings[locale_name][i];
+        }
+        console.log(locale_name);
+        console.log(Locale);
+        return Locale;
+    }
+});
+window.ngAppManager = ngApp.controller('AppManager', function($scope, $timeout, $compile, $injector, $rootScope, LocaleService, $sce) {
+    $scope.switchLocale = function(locale_name) {
+        $scope.Locale = LocaleService.setLocale(locale_name);  
+        try {
+            $scope.$apply();
+        } catch(e) {}
+    }
+    //TODO Preferred Language
+    $scope.switchLocale('en_us');
+//    console.log($scope.Locale);
+    window.ngAppManager = $scope;
+    $scope.applyDataBinding = function() {
+        //TODO Make dynamic, on page change
+        $("*").each(function () {
+            var content = $(this);
+            /*angular.element(document).injector().invoke(function($compile) {*/
+                var scope = angular.element(content).scope();
+                $compile(content)($scope);
+            /*});*/
+        });   
+    }
+});
+$(document).ready(function() {
+    
+    
+    
+});
+
 
 /*** RANGY ***/
 	//RANGY OBJECTS DO NOT UPDATE WHEN THE DOM CHANGES -> CREATE NEW OBJECT IF SOMETHING 
@@ -515,9 +587,9 @@ function setHeader() {
 	window.holoribbon_std =  {
 		Home: new Array(
 //            {text: "Start the Tour", img: "<span class='fa fa-home' style='font-size:18pt'></span>", action: "alert('TBD')", key:"Alt+T"}, 
-            {text: "Create a File", img: "<span class='fa fa-file' style='font-size:18pt'></span>", action: "createNewFile()", key:"Alt+N"},
-            {group: "", value:"<div style='font-size:22pt;padding-top:6px;text-align:center;'>Welcome to Gltn!</div>"},
-            {text: "Explore Files", img: "<span class='fa fa-folder-open' style='font-size:18pt'></span>", action: "runPanel('Main_Filesys')", key: "Alt+O"} 
+            {text: "{{ Locale.FILE_CREATE }}", img: "<span class='fa fa-file' style='font-size:18pt'></span>", action: "createNewFile()", key:"Alt+N"},
+            {group: "", value:"<div style='font-size:22pt;padding-top:6px;text-align:center;'>{{ Locale.WELCOME }}</div>"},
+            {text: "{{ Locale.FILE_EXPLORE }}", img: "<span class='fa fa-folder-open' style='font-size:18pt'></span>", action: "runPanel('Main_Filesys')", key: "Alt+O"} 
 		),
 		File: new Array(
 			{group: "", value:'<div class="row collapse" style="margin-top:9px"><div class="small-5 columns"><input id="file_name" type="text" value="'+fileid+'" /></div><div class="small-4 columns"><span class="postfix">.gltn</span></div><div class="small-3 medium-3 columns end"><input type="hidden" id="file_name_internal"><button id="file_name_con" class="textbutton" disabled="true">Rename</button></div></div>'},

@@ -252,7 +252,8 @@ function PanelManager() {
         this.activePanels = [];
     };
     PanelManager.prototype.onMaximize =  function() {
-        if($('.PanelMaximizeEvent').attr('data-status') === 0) {
+        console.log($('.PanelMaximizeEvent').attr('data-status') + "curr");
+        if($('.PanelMaximizeEvent').attr('data-status') == "0") {
             //Maximize
             $('#panel_content').hide(200);
             $('#panel_plugin').animate({
@@ -264,6 +265,11 @@ function PanelManager() {
             //Minimize
             $('#panel_content').show(200);
             sizePanel(panelwidth);
+            $('#panel_plugin').animate({
+                width: panelwidth+"%"    
+            }, 200, function() {
+                $('#panel_plugin').css('width', '');
+            });
             $('.PanelMaximizeEvent').attr('data-status', 0);
         }
         $('.PanelMaximizeEvent').click();
@@ -514,7 +520,7 @@ function animateContentPanel(p) {
 	);
 }
 function maximizePanel() {
-    panelManager.onPanelMaximize();
+    panelManager.onMaximize();
 }
 function hidePanelPlugin() {
 	panelManager.onClose();
@@ -1199,6 +1205,16 @@ specialCharacters = {
     Snowboard: getEmoji("🏂", "Snowboarder"),
     Runner: getEmoji("🏃", "Runner"),
     Surfer: getEmoji("🏄", "Surfer"),
+    SportsMedal: getEmoji("🏅", "Sports Medal"),
+    Trophy: getEmoji("🏆", "Trophy"),
+    Horses: getEmoji("🏇", "Horse Racing"),
+    AmericanFootball: getEmoji("🏈", "American Football"),
+    Rugby: getEmoji("🏉", "Rugby Football"),
+    Swimmer: getEmoji("🏊", "Swimmer"),
+    Weight: getEmoji("🏋", "Weight Lifter", "do you even lift?"),
+    Golfer: getEmoji("🏌", "Golfer"),
+    Motorcycle: getEmoji("🏍", "Racing Motorcycle"),
+    RaceCar: getEmoji("🏎", "Racing Car"),
     
     Wheelchair: getChar("♿","Wheelchair",'chair'),
     Fountain: getChar("⛲","Fountain","fountain water park"),
@@ -2663,8 +2679,9 @@ panelManager.getAvailablePanels().Main_Table.onInit = function() {
             return sum;
         }
     };   
+    
     var cssEl = "#SpreadsheetsCss";
-    writeCss('.Main_Table table { border-collapse: collapse; } .Main_Table th, td { border: 1px solid #ccc; } .Main_Table th { background: #ddd; }', cssEl);
+    writeCss('.Main_Table table { border-collapse: collapse; } .Main_Table th,  .Main_Table td { border: 1px solid #ccc; } .Main_Table th { background: #ddd; }', cssEl);
     writeCss('.Main_Table td div { text-align: right; width: 120px; min-height: 1.2em; overflow: hidden; text-overflow: ellipsis; }', cssEl);
     writeCss('.Main_Table div.text { text-align: left;} ', cssEl);
     writeCss('.Main_Table div.error { text-align: center; color: #800; font-size: 90%; border: solid 1px #800 }', cssEl);
@@ -2676,8 +2693,7 @@ panelManager.getAvailablePanels().Main_Table.onInit = function() {
     writeCss('.Main_Table input[data-sp=true] { color: black; background-color: antiquewhite; position: inherit; }', cssEl);
 }
 panelManager.getAvailablePanels().Main_Table.onRun = function() {
-    //TODO Change div to A) have that stuff in the main area, and B) work into Css rules above
-    var html = '<div class="Main_Table" ng-app="500lines" ng-controller="Spreadsheet" ng-cloak>{{ Locale.APPTITLE }}<br>';
+    var html = '<div class="Main_Table">{{ Locale.APPTITLE }}<br>';
     html += '<input id="setCol" data-sp="true" placeholder="{{Locale.COLUMNS}}" oninput="scope.remodel()" value="H">&emsp;X&emsp;<input data-sp="true" id="setRow" placeholder="{{Locale.ROWS}}" oninput="scope.remodel()" value="20"><br>';
     html += '<table><tr><th><button type="button" ng-click="reset(); calc()">↻</button></th>';
     html += '<th ng-repeat="col in Cols">{{ col }}</th></tr><tr ng-repeat="row in Rows">';
@@ -2691,14 +2707,8 @@ panelManager.getAvailablePanels().Main_Table.onRun = function() {
     html += '</div></td></tr></table></div>';
     postPanelOutput(html);
     
-     var myApp = angular.module('500lines',['ngSanitize']);
-        myApp.service('GridService', function() {
-            var data;
-            this.get = function() {
-                return Spreadsheet;   
-            }
-        });
-        myApp.controller('Spreadsheet', function ($scope, $timeout, $rootScope, GridService, $sce) {
+    console.log(ngApp);
+        ngApp.controller('Spreadsheetz', function ($scope, $timeout, $rootScope, GridService, $sce) {
             console.log("v3");
             var pass = {};
             for(i in GridService.get()) {
@@ -2707,6 +2717,7 @@ panelManager.getAvailablePanels().Main_Table.onRun = function() {
             }
             window.root = $rootScope;
             window.scope = $scope;
+            return;
             $scope.strings = {
                 /*APPTITLE: {
                     en_us: "GRID editor",
@@ -2834,13 +2845,6 @@ panelManager.getAvailablePanels().Main_Table.onRun = function() {
       $scope.worker.postMessage( $scope.sheet );
     });
         
-        function clone(obj, kind) {
-            function OneShotConstructor(){}
-            OneShotConstructor.prototype = obj;
-            if(kind !== undefined)
-                OneShotConstructor.constructor = kind;
-            return new OneShotConstructor();
-        }
     /* FROM MOZ
     QueryableWorker instances methods:
      * sendQuery(queryable function name, argument to pass 1, argument to pass 2, etc. etc): calls a Worker's queryable function
