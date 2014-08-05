@@ -17,6 +17,9 @@
 <script src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.0-beta.13/angular.min.js' type='text/javascript'></script>
 <script src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.0-beta.13/angular-sanitize.min.js'></script>
 <script src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.20/angular-route.min.js'></script>
+    
+<!--Polymer Data Bind-->
+<script src='js/platform/platform.js'></script>
 
 <script src="js/kernel.js"></script>
 <script src="js/editor.js"></script>
@@ -46,10 +49,6 @@
     tex2jax: { inlineMath: [['$','$'],['\\(','\\)']] }
   });
 </script>
-    
-<script>
-
-</script>
 
 <link rel="icon" 
       type="image/png" 
@@ -68,7 +67,7 @@ ga('send', 'pageview');
 <link rel="stylesheet" type="text/css" href="css/standard.css">
 </head>
 
-<body ng-app="Gltn" ng-controller="AppManager" ng-cloak>
+<body ng-app="Gltn" ng-cloak data-controller="AppManager"><template id='appDisplay' is='auto-binding'>
 <div class="header" id="header" style="text-align:center;max-width:auto;"></div>
 
 <div class="main row" style="min-width:100%;width:100%;">
@@ -101,6 +100,7 @@ ga('send', 'pageview');
         <div class="panel_plugin_content"></div>
       </div>
 </div>
+    
 <div class="build" id="build">
 
 </div>
@@ -140,5 +140,5 @@ ga('send', 'pageview');
     <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.0/js/vendor/modernizr.js"></script>
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/foundation.css">
-</body>
+</template></body>
 </html>

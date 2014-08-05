@@ -1,4 +1,4 @@
-var GLTN_VERSION = "1.3.2.5";
+var GLTN_VERSION = "1.3.2.6";
 var GLTN_VNAME = "Isidore";
 //For backwards compatibility, will return true 
 function greaterThanVersion(version) {
@@ -29,7 +29,12 @@ function greaterThanVersion(version) {
 }
 Strings = {
     de: {
-        WELCOME: "Willkommen auf GLTN!"   
+        WELCOME: "Willkommen auf GLTN!",
+        FILE_CREATE: "Erstellen Sie eine Datei",
+        FILE_EXPLORE: "Dateien durchsuchen",
+        META_FORMAT: "Format",
+        META_LANG: "Sprache",
+        META_TAGS: "Etikett"
     },
     en_us: {
         WELCOME: "Welcome to Gltn!",
@@ -38,6 +43,14 @@ Strings = {
         META_FORMAT: "Format",
         META_LANG: "Language",
         META_TAGS: "Tags",        
+    }, 
+    es: {
+        WELCOME: "Bienvenido a GLTN",
+        FILE_CREATE: "Crear un archivo",
+        FILE_EXPLORE: "explorar los archivos",
+        META_FORMAT: "formato",
+        META_LANG: "idioma",
+        META_TAGS: "etiquetas"
     }
 };
 
@@ -65,39 +78,59 @@ window.ngLocaleService = ngApp.service('LocaleService', function() {
         for(i in Strings[locale_name]) {
             Locale[i] = Strings[locale_name][i];
         }
-        console.log(locale_name);
+        console.error(locale_name);
         console.log(Locale);
         return Locale;
     }
 });
 window.ngAppManager = ngApp.controller('AppManager', function($scope, $timeout, $compile, $injector, $rootScope, LocaleService, $sce) {
-    $scope.switchLocale = function(locale_name) {
-        $scope.Locale = LocaleService.setLocale(locale_name);  
+    $scope.setLocale = function(locale_name) {
+        $scope.Locale = LocaleService.setLocale(locale_name);
         try {
             $scope.$apply();
         } catch(e) {}
+        $scope.applyDataBinding();
     }
-    //TODO Preferred Language
-    $scope.switchLocale('en_us');
-//    console.log($scope.Locale);
-    window.ngAppManager = $scope;
     $scope.applyDataBinding = function() {
         //TODO Make dynamic, on page change
         $("*").each(function () {
             var content = $(this);
-            /*angular.element(document).injector().invoke(function($compile) {*/
-                var scope = angular.element(content).scope();
-                $compile(content)($scope);
-            /*});*/
+            var scope = angular.element(content).scope();
+            $compile(content)(scope);
         });   
+        $scope.$apply();
     }
+    //TODO Preferred Language
+//    $scope.setLocale('en_us');
+    window.ngAppManager = $scope;
 });
-$(document).ready(function() {
-    
-    
-    
-});
-
+function setLocale(locale_name) {
+    var Locale = {};
+    // console.log($scope.strings);
+    for(loc in Strings) {
+//                    console.log(loc, $scope.strings[loc]);
+        for(i in Strings[loc]) {
+//                        console.log(i, loc, $scope.strings[loc]);
+            Locale[i] = i;   
+        }
+    }
+//                console.log($scope.Locale);
+    //Now overwrite with local names
+    for(i in Strings[locale_name]) {
+        Locale[i] = Strings[locale_name][i];
+    }
+    console.error(locale_name);
+    console.log(Locale);
+    return Locale;
+}
+function AppManager(root) {
+    window.pAppManager = this;
+    window.pAppManagerRoot = root;
+    this.model = {
+        Locale: setLocale('en_us')
+    }
+}
+$('#appDisplay').Locale = setLocale('en_us');
 
 /*** RANGY ***/
 	//RANGY OBJECTS DO NOT UPDATE WHEN THE DOM CHANGES -> CREATE NEW OBJECT IF SOMETHING 

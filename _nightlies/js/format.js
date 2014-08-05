@@ -479,16 +479,16 @@ function HovertagManager() {
             $('.'+htag.classname).hover(function() {
                 var classname = $(this).attr('data-class');
 //                var classname = $(this).attr('class').split(' ')[0];
-                console.log(classname);
+//                console.log(classname);
                 var tag = hovertagManager.registry[classname];
                 //FIXME there must be a better system for local vars
                 Foundation.libs.tooltip.showTip($('.tooltip[data-selector="'+classname+'"]'));
                 if(typeof(tag.textcode) == "function") {
                     txt = tag.textcode(this);
-                    console.warn("Eval tag", txt);
+//                    console.warn("Eval tag", txt);
                 } else {
                     txt = tag.textcode;
-                    console.warn("Text tag", txt);
+//                    console.warn("Text tag", txt);
                 }
                 
                 $('.tooltip[data-selector="'+classname+'"]').css('top', $(this).offset().top+30).css('left', $(this).offset().left+8).html( $(Foundation.libs.tooltip.settings.tip_template(tag.classname, txt)).html());

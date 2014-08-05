@@ -73,8 +73,9 @@ function Language(code, name) {
 //LANGUAGE MANAGER CLASS
 function LanguageManager() {
     this.languages = {
+        de: new Language("de", "Deutsch"),
         en_us: new Language("en_us", "English (US)"),
-        es: new Language("es", "Spanish")
+        es: new Language("es", "Español")
     };
     this.getLanguages = function() {
         return this.languages;   
@@ -86,6 +87,16 @@ function LanguageManager() {
 			out = out + "<option label='"+a[i].code+"'>"+a[i].name+"</option>";	
 		}	
 		$('#gluten_languages').html(out);
+        $("#file_language").on('input', function() {
+            console.log("Locale "+$(this).val());
+            var newlang = $(this).val();
+            for(var i in languageManager.languages) {
+                console.log(languageManager.languages[i]);
+                if(languageManager.languages[i].name == newlang) {
+                    setLocale(i);
+                }
+            }
+        });
     };
 }
 languageManager = new LanguageManager();
