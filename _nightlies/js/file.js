@@ -1186,7 +1186,7 @@ function initFormats() {
 **/
 function formatShift() {
     var f1 = formatManager.getCurrentFormat();
-    var f2txt = $('#file_format').val();
+    var f2txt = $('#file_format').val() || "MLA";
     var f2;
     console.log(f1.name, f2txt);
     for(i in formatManager.getFormats()) {

@@ -19,7 +19,11 @@
 <script src='//cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.20/angular-route.min.js'></script>
     
 <!--Polymer Data Bind-->
-<script src='js/platform/platform.js'></script>
+<script src='components/platform/platform.js'></script>
+<link rel="import" href="components/polymer/polymer.html">
+    
+<!--Filepicker-->
+<script type="text/javascript" src="https://api.filepicker.io/v1/filepicker.js"></script>
 
 <script src="js/kernel.js"></script>
 <script src="js/editor.js"></script>
@@ -37,7 +41,11 @@
 <script src="js/rangy-1.3alpha.772\uncompressed\rangy-selectionsaverestore.js"></script>
 <script src="js/json2xml.js"></script>
 <script src="js/xmlToJson.js"></script>
+    
+<!--Timeago.js-->
 <script src="http://timeago.yarp.com/jquery.timeago.js"></script>
+    
+<!--Spin.js-->
 <script src="http://fgnass.github.io/spin.js/spin.min.js"></script>
 <script src="http://fgnass.github.io/spin.js/jquery.spin.js"></script>
     
@@ -67,25 +75,25 @@ ga('send', 'pageview');
 <link rel="stylesheet" type="text/css" href="css/standard.css">
 </head>
 
-<body ng-app="Gltn" ng-cloak data-controller="AppManager"><template id='appDisplay' is='auto-binding'>
+<body ng-app="Gltn" ng-cloak data-controller="AppManager"><!--<template id='appDisplay' is='auto-binding'>-->
 <div class="header" id="header" style="text-align:center;max-width:auto;"></div>
 
 <div class="main row" style="min-width:100%;width:100%;">
 	<div id="panel_content" class="small-12 columns">
         <div class="row">
             <div class="small-12 medium-6 large-3 column">
-                <label><span id='meta_format'></span>:
+                <label><span id='meta_format'></span>{{HELLO}}:
                     <input type="text" id="file_format" list="gluten_formats" value="MLA">
                 </label>
             </div>
             <div class="small-12 medium-6 large-3 column">
-                <label><span id='meta_lang'></span>:
+                <label><span id='meta_lang'></span>{{NOLO}}:
                     <input type="text" id="file_language" list="gluten_languages" value="English (US)">
                 </label>
             </div>
             <div class='small-6 large-6 column'>
                 <label><span id='meta_tags'></span>:
-                    <input type="text" id="file_tags" class="small-9 columns" placeholder="Comma Separated Tags">
+                    <input type="text" id="file_tags" class="small-9 columns" placeholder="{{MATYPL}}">
                 </label>
             </div>
 
@@ -127,18 +135,18 @@ ga('send', 'pageview');
 <datalist id="gluten_languages"></datalist>
     
 <iframe id="themeframe" src="" style="visibility:collapse;width:1px;height:1px;"></iframe>
-<script>
-	
-</script>
-<script type="text/javascript" src="https://api.filepicker.io/v1/filepicker.js"></script>
+
+
         
+    
+<!--</template>-->
 <!--TODO Mark as Offline -->
-    <script src="js/foundation/foundation.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.0/js/foundation/foundation.reveal.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.0/js/foundation/foundation.tooltip.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.0/js/vendor/fastclick.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.0/js/vendor/modernizr.js"></script>
-    <link rel="stylesheet" href="css/normalize.css">
-    <link rel="stylesheet" href="css/foundation.css">
-</template></body>
+<script src="js/foundation/foundation.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.0/js/foundation/foundation.reveal.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.0/js/foundation/foundation.tooltip.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.0/js/vendor/fastclick.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.0/js/vendor/modernizr.js"></script>
+<link rel="stylesheet" href="css/normalize.css">
+<link rel="stylesheet" href="css/foundation.css">    
+</body>
 </html>

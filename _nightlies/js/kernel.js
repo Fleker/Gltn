@@ -97,6 +97,8 @@ function LanguageManager() {
                 }
             }
         });
+        localeApply();
+        setLocale( $("#file_language").val());
     };
 }
 languageManager = new LanguageManager();

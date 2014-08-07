@@ -1,4 +1,4 @@
-var GLTN_VERSION = "1.3.2.6";
+var GLTN_VERSION = "1.3.2.8";
 var GLTN_VNAME = "Isidore";
 //For backwards compatibility, will return true 
 function greaterThanVersion(version) {
@@ -47,10 +47,10 @@ Strings = {
     es: {
         WELCOME: "Bienvenido a GLTN",
         FILE_CREATE: "Crear un archivo",
-        FILE_EXPLORE: "explorar los archivos",
-        META_FORMAT: "formato",
-        META_LANG: "idioma",
-        META_TAGS: "etiquetas"
+        FILE_EXPLORE: "Explorar los archivos",
+        META_FORMAT: "Formato",
+        META_LANG: "Idioma",
+        META_TAGS: "Etiquetas"
     }
 };
 
@@ -121,6 +121,9 @@ function setLocale(locale_name) {
     }
     console.error(locale_name);
     console.log(Locale);
+    for(i in Locale) {
+        $('.Locale-'+i).html(Locale[i]);
+    }
     return Locale;
 }
 function AppManager(root) {
@@ -130,10 +133,53 @@ function AppManager(root) {
         Locale: setLocale('en_us')
     }
 }
-$('#appDisplay').Locale = setLocale('en_us');
+//$('#appDisplay').Locale = setLocale('en_us');
+$(document).ready(function() {
+    
+});
+function txtApply() {
+    var a = $('body').html().indexOf('<div class="header"');
+    var b = a+1+$('body').html().substr(a+1).indexOf('<div class="header"');
+    var c = b+$('body').html().substr(b).indexOf('<iframe id="themeframe"');
+//    $('#appDisplay').html();
+    var html = $('body').html().substring(b,c);
+    var frag = document.createDocumentFragment();
+    frag.appendChild($(html)[0]);
+    $('#appDisplay')[0].innerHTML = frag;
+}
+function localeApply() {
+    var a = $('body').html();  
+    $('body *:not(:has(*))').each(function(n, e) {
+        if($(e)[0].innerHTML.match(/{{Locale.([A-Za-z._]+)}}|{{\sLocale.([A-Za-z._]+)\s}}/gi)) {
+            //Go into nodes
+            console.log($(e)[0].childNodes);
+            nodesparent = $(e)[0];
+            nodesarray = $(e)[0].childNodes;
+            for(var nodes=0; nodes<$(e)[0].childNodes.length; nodes++) {
+                if(nodes == "length")
+                    continue;
+                textnode = $(e)[0].childNodes[nodes];
+                console.log(nodes, textnode);
+                if(textnode === null)
+                    continue;
+                if(textnode.data.match(/{{Locale.([A-Za-z._]+)}}|{{\sLocale.([A-Za-z._]+)\s}}/gi)) {
+                    textnode.data = textnode.data.replace(/{{Locale.([A-Za-z._]+)}}|{{\sLocale.([A-Za-z._]+)\s}}/gi, "Locale-$1 Locale-$2");
+                    console.log(textnode);
+                    
+                    var localenode = document.createElement('span');
+                    localenode.className = textnode.data;
+                    nodesparent.appendChild(localenode);
+                    textnode.remove();
+                }
+            }
+        }
+    }); 
+    var Locale = setLocale($("#file_language").val());
+}
 
-/*** RANGY ***/
-	//RANGY OBJECTS DO NOT UPDATE WHEN THE DOM CHANGES -> CREATE NEW OBJECT IF SOMETHING 
+/*** RANGY
+	* RANGY OBJECTS DO NOT UPDATE WHEN THE DOM CHANGES -> CREATE NEW OBJECT IF SOMETHING 
+***/
 range = null;
 function debug_buttons() {
 	$('.content_buttons').toggle(500);	

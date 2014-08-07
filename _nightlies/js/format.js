@@ -122,17 +122,17 @@ function post_format() {
 	onInitToolbar();
 	
 	//Set up selection parameters
-			 document.getElementsByClassName("content_textarea")[0].onmouseup = function() {
-				 	if($('.content_textarea').html().length > 1) {				 
+//			 document.getElementsByClassName("content_textarea")[0].onmouseup = function() {
+//				 	if($('.content_textarea').html().length > 1) {				 
 //						rangy.getSelection().expand("word", {
 //						wordOptions: {
 //							includeTrailingSpace: false,
 //							wordRegex: /[a-z0-9]+(['\-][a-z0-9]+)*/gi
 //						}
 //                		});
-					}
+//					}
 					//postRange('click and select');
-			}
+//			}
 			document.getElementsByClassName("content_textarea")[0].oninput = function() {
 				postRange('oninput');
 				//saveFile();

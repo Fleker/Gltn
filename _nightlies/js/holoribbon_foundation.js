@@ -48,6 +48,7 @@ function newRibbon(element, ribbon) {
     }
 //    console.log(out);   
     $('.ribbonbody').html(out);
+    localeApply();
     for(i in columnSize) {
         $($('.ribbongroupchild')[i]).addClass('small-'+columnSize[i]);   
         $($('.ribbongroupgrandchild')[i]).css('width', (1200/columnSize[i])+"%");
