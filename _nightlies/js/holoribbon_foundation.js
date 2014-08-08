@@ -13,7 +13,8 @@ function newRibbon(element, ribbon) {
 		ribbon_count++;
 	}
 	for(var k in ribbon) {
-        out = out + '<div class="ribbonheader small-'+columnCount(100/ribbon_count, true)+' column" style="text-align:center;" onclick="ribbonSwitch('+i+')"> '+k+' </div>';
+        var locale_key = "{{ Locale."+k.toUpperCase()+" }}";
+        out = out + '<div class="ribbonheader small-'+columnCount(100/ribbon_count, true)+' column" style="text-align:center;" onclick="ribbonSwitch('+i+')"> '+locale_key+' </div>';
 		//'
         keys.push(k);
         i++;

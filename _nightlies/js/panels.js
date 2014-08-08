@@ -2703,16 +2703,16 @@ panelManager.getAvailablePanels().Main_Table.onInit = function() {
     };   
     
     var cssEl = "#SpreadsheetsCss";
-    writeCss('.Main_Table table { border-collapse: collapse; } .Main_Table th,  .Main_Table td { border: 1px solid #ccc; } .Main_Table th { background: #ddd; }', cssEl);
-    writeCss('.Main_Table td div { text-align: right; width: 120px; min-height: 1.2em; overflow: hidden; text-overflow: ellipsis; }', cssEl);
-    writeCss('.Main_Table div.text { text-align: left;} ', cssEl);
-    writeCss('.Main_Table div.error { text-align: center; color: #800; font-size: 90%; border: solid 1px #800 }', cssEl);
-    writeCss('.Main_Table div.formula { background-color: #dfd}', cssEl);
-    writeCss('.Main_Table input { position: absolute; border: 0; padding: 0; width: 120px; height: 1.3em; color: transparent; background: transparent; transition-duration:0.3s;margin-top:0em; padding-left:0px;}', cssEl);
-    writeCss('.Main_Table input:not([data-sp=true]) + div { transition-duration:0.3s; padding-left:0px; padding-right:0px; background-color: #fff;  }', cssEl);
-    writeCss('.Main_Table input:not([data-sp=true]):focus { color: #111; background: #efe; font-size:70%; font-weight:bold; width: 360px; margin-left: -120px; margin-top:-1.4em; padding-left:8px;}', cssEl);
-    writeCss('.Main_Table input:not([data-sp=true]):focus + div { white-space: nowrap; font-weight:bold; background-color: #bfb; padding-left: 4px; padding-right: 4px; }', cssEl);
-    writeCss('.Main_Table input[data-sp=true] { color: black; background-color: antiquewhite; position: inherit; }', cssEl);
+    writeCss('gltn-grid::shadow table { border-collapse: collapse; } gltn-grid::shadow th,  gltn-grid::shadow td { border: 1px solid #ccc; } gltn-grid::shadow th { background: #ddd; }', cssEl);
+    writeCss('gltn-grid::shadow td div { text-align: right; width: 120px; min-height: 1.2em; overflow: hidden; text-overflow: ellipsis; }', cssEl);
+    writeCss('gltn-grid::shadow div.text { text-align: left;} ', cssEl);
+    writeCss('gltn-grid::shadow div.error { text-align: center; color: #800; font-size: 90%; border: solid 1px #800 }', cssEl);
+    writeCss('gltn-grid::shadow div.formula { background-color: #dfd}', cssEl);
+    writeCss('gltn-grid::shadow input { position: absolute; border: 0; padding: 0; width: 120px; height: 1.3em; color: transparent; background: transparent; transition-duration:0.3s;margin-top:0em; padding-left:0px;}', cssEl);
+    writeCss('gltn-grid::shadow input:not([data-sp=true]) + div { transition-duration:0.3s; padding-left:0px; padding-right:0px; background-color: #fff;  }', cssEl);
+    writeCss('gltn-grid::shadow input:not([data-sp=true]):focus { color: #111; background: #efe; font-size:70%; font-weight:bold; width: 360px; margin-left: -120px; margin-top:-1.4em; padding-left:8px;}', cssEl);
+    writeCss('gltn-grid::shadow input:not([data-sp=true]):focus + div { white-space: nowrap; font-weight:bold; background-color: #bfb; padding-left: 4px; padding-right: 4px; }', cssEl);
+    writeCss('gltn-grid::shadow input[data-sp=true] { color: black; background-color: antiquewhite; position: inherit; }', cssEl);
 }
 function SpreadsheetService() {
     console.log("Grid v4");
@@ -2815,19 +2815,21 @@ function SpreadsheetService() {
 }
 
 panelManager.getAvailablePanels().Main_Table.onRun = function() {
+    //Capture Intent
+    //NOTE INtents, l18n
     //Register Element
-    var html = '<polymer-element name="gltn-grid" attributes="title rows cols index"';
+    var html = '<polymer-element name="gltn-grid" attributes="title rows cols index">';
     html += '<template>';
-    html += '    <input id="setCol" data-sp="true" placeholder="{{Locale.COLUMNS}}" oninput="{{remodel}}" value="{{cols}}">&emsp; X &emsp;';
-    html += '    <input id="setRow" data-sp="true" placeholder="{{Locale.ROWS}}" oninput="{{remodel}}" value="{{rows}}">';
+    html += '    <input id="setCol" data-sp="true" placeholder="{{Locale.COLUMNS}}" value="{{cols}}">&emsp; X &emsp;';
+    html += '    <input id="setRow" data-sp="true" placeholder="{{Locale.ROWS}}" value="{{rows}}">';
     html += '    <table><tr><th><button type="button" onclick="{{reset}}">↻</button></th>';
-    html += '    <th repeat="{{col in Cols}}">{{col}}</th></tr><tr repeat="{{row in Rows}}">';
+    html += '    <template repeat="{{col in Cols}}"><th>{{col}}</th></template></tr><template repeat="{{row in Rows}}"><tr>';
     html += '    <th>{{row}}</th>';
-    html += '    <td repeat="{{col in Cols}}" data-formula="{{isFormula}}">';
-    html += '        <input id="{{col+row}}" oninput="{{calc}}"';
-    html += '            onkeydown="{{keydown}}">';
-    html += '        <div id="div{{col+row}}" data-error="{{isError}} data-text="{{isText}}" data-formula="{{isFormula}}">';
-    html += '        </div></td></tr></table></div>';
+    html += '    <template repeat="{{col in Cols}}"><td data-formula="{{isFormula}}">';
+    html += '        <input id="{{col+row}}" on-keyup="{{calc}}" on-input="{{calc}}" value="{{sheets[col+row]}}"'; 
+    html += '            on-keydown="{{keydown}}">';
+    html += '        <div id="div{{col+row}}" data-error="{{isError}}" data-text="{{isText}}" data-formula="{{isFormula}}">';
+    html += '        </div></td></template></tr></template></table>';
     html += '</template>';
     html += '<script>';
     html += '    Polymer("gltn-grid", {';
@@ -2835,14 +2837,41 @@ panelManager.getAvailablePanels().Main_Table.onRun = function() {
     html += '        rows: "10",';
     html += '        cols: "H",';
     html += '        index: 0,';
-    html += '        Locale: setLocale($("#file_language").val())';
+    html += '        sheets: {},';
+    html += '        sheetsCache: {},';
+    html += '        Locale: setLocale($("#file_language").val()),';
+    html += '        isFormula: true,';
+    html += '        isError: false,';
+    html += '        isText: false,';
+    html += '        calc: function() { console.log(this.sheets, this.$.A1); /* Calculations Here */ this.$.divA1.innerHTML = this.$.A1.textContent },';
+    html += '        colsChanged: function() { this.Cols = this.makeRange(this.cols); },';
+    html += '        rowsChanged: function() { this.Rows = this.makeRange(this.rows); },';
+    html += '     ready: function() { this.Rows = this.makeRange(this.rows); this.Cols = this.makeRange(this.cols); console.log(this.rows, this.Rows, this.Cols, this.title) },';
+    html += '        makeRange: function(v) { array=[]; if(v.match(/[A-Za-z]/)) { cur = "A"; end = v; } else { cur=1;end=v; }';
+    html += '           while (cur <= end) { array.push(cur); /* If it’s a number, increase it by one; otherwise move to next letter */';
+    html += '               cur = (isNaN( cur ) ? String.fromCharCode( cur.charCodeAt()+1 ) : cur+1);  }';            
+    html += '        return array; }';
+    //Keydown, calc, remodel, reset, NEED a title editor
     html += '    });';
     html += '</script>';
     html += '</polymer-element>';
+    //Now create shown tag
+    html += '<gltn-grid></gltn-grid>';
+//    console.log(html);
     postPanelOutput(html);
+    var hwidth = Math.floor(window.innerWidth / 2) - 30;
+    $('.panel_plugin_content').css('width', hwidth+"px");
+    //FIXME Fullscreen
 
     console.log("!");
-    //TODO Add a header menu
+    $('gltn-grid')[0].calc = function() {
+        console.log(this.sheets, this.$);
+        window.gltngrid = this;
+        /* Calculations Here */
+        $('gltn-grid /deep/ #divA1').html( $('gltn-grid /deep/ #A1').val() );
+    };  
+    //TODO Add a header menu: formula help, maybe insert cols/rows
+    //TODO Save data, cache it, recall, generate
         
     /* FROM MOZ
     QueryableWorker instances methods:

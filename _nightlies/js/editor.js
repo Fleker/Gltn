@@ -1,4 +1,4 @@
-var GLTN_VERSION = "1.3.2.8";
+var GLTN_VERSION = "1.3.2.9";
 var GLTN_VNAME = "Isidore";
 //For backwards compatibility, will return true 
 function greaterThanVersion(version) {
@@ -37,9 +37,32 @@ Strings = {
         META_TAGS: "Etikett"
     },
     en_us: {
+        HOME: "Home",
+        FILE: "File",
+        PANELS: "Panels",
+        TOOLS: "Tools",
+        ABOUT: "About",
+        ME: "Me",
         WELCOME: "Welcome to Gltn!",
         FILE_CREATE: "Create a File",
         FILE_EXPLORE: "Explore Files",
+        COMPILE_AND_EXPORT: "Compile & Export",
+        SHARE: "Share",
+        GLTN_STORE: "Gltn Store",
+        OUTLINE: "Outline",
+        CITATIONS: "Citations",
+        IDEAS: "Ideas",
+        STYLE_GUIDE: "Style Guide",
+        FIND: "Find",
+        DICTIONARY: "Dictionary",
+        THEMES: "Themes",
+        DOCUMENTATION: "Documentation",
+        SEND_FEEDBACK: "Send Feedback",
+        GLTN_BLOG: "Gltn Blog",
+        CREDITS: "Credits",
+        NAME: "Name",
+        EMAIL: "Email",
+        SETTINGS: "Settings",
         META_FORMAT: "Format",
         META_LANG: "Language",
         META_TAGS: "Tags",        
@@ -120,7 +143,7 @@ function setLocale(locale_name) {
         Locale[i] = Strings[locale_name][i];
     }
     console.error(locale_name);
-    console.log(Locale);
+//    console.log(Locale);
     for(i in Locale) {
         $('.Locale-'+i).html(Locale[i]);
     }
@@ -147,24 +170,25 @@ function txtApply() {
     frag.appendChild($(html)[0]);
     $('#appDisplay')[0].innerHTML = frag;
 }
+//TODO Input Placeholder values
 function localeApply() {
     var a = $('body').html();  
     $('body *:not(:has(*))').each(function(n, e) {
         if($(e)[0].innerHTML.match(/{{Locale.([A-Za-z._]+)}}|{{\sLocale.([A-Za-z._]+)\s}}/gi)) {
             //Go into nodes
-            console.log($(e)[0].childNodes);
+//            console.log($(e)[0].childNodes);
             nodesparent = $(e)[0];
             nodesarray = $(e)[0].childNodes;
             for(var nodes=0; nodes<$(e)[0].childNodes.length; nodes++) {
                 if(nodes == "length")
                     continue;
                 textnode = $(e)[0].childNodes[nodes];
-                console.log(nodes, textnode);
+//                console.log(nodes, textnode);
                 if(textnode === null)
                     continue;
                 if(textnode.data.match(/{{Locale.([A-Za-z._]+)}}|{{\sLocale.([A-Za-z._]+)\s}}/gi)) {
                     textnode.data = textnode.data.replace(/{{Locale.([A-Za-z._]+)}}|{{\sLocale.([A-Za-z._]+)\s}}/gi, "Locale-$1 Locale-$2");
-                    console.log(textnode);
+//                    console.log(textnode);
                     
                     var localenode = document.createElement('span');
                     localenode.className = textnode.data;
@@ -174,7 +198,7 @@ function localeApply() {
             }
         }
     }); 
-    var Locale = setLocale($("#file_language").val());
+    var Locale = languageManager.setLocale($("#file_language").val());
 }
 
 /*** RANGY
@@ -672,38 +696,38 @@ function setHeader() {
 		),
 		File: new Array(
 			{group: "", value:'<div class="row collapse" style="margin-top:9px"><div class="small-5 columns"><input id="file_name" type="text" value="'+fileid+'" /></div><div class="small-4 columns"><span class="postfix">.gltn</span></div><div class="small-3 medium-3 columns end"><input type="hidden" id="file_name_internal"><button id="file_name_con" class="textbutton" disabled="true">Rename</button></div></div>'},
-			{text: 'Compile & Export', img: '<span style="font-size:18pt" class="fa fa-file"></span>', action: "startBuild()", key: "Alt+B"},
-			{text: 'Share', img: '<span style="font-size:18pt" class="fa fa-code-fork"></span>', action: "getShare();"}
+			{text: '{{ Locale.COMPILE_AND_EXPORT }}', img: '<span style="font-size:18pt" class="fa fa-file"></span>', action: "startBuild()", key: "Alt+B"},
+			{text: '{{ Locale.SHARE }}', img: '<span style="font-size:18pt" class="fa fa-code-fork"></span>', action: "getShare();"}
             //TODO File Info Popup
 		),
 
 		Panels: new Array(
-			{text: 'Gltn Store', img: '<span style="font-size:18pt" class="fa fa-shopping-cart"/>', action: "launchStore()", key: "Alt+S"},
-			{text: 'Outline', img: '<span style="font-size:18pt" class="fa fa-list"></span>', action: "runPanel('Main_Outline');"},
-			{text: 'Citations', img: '<span style="font-size:18pt" class="fa fa-book"></span>', action: "runPanel('Main_Citation');"},
-			{text: 'Ideas', img: '<span style="font-size:18pt" class="fa fa-lightbulb-o"></span>', action: "runPanel('Main_Idea');"},
-			{text: 'Style Guide', img: '<span style="font-size:18pt" class="fa fa-info-circle"/>', action: "runPanel('Main_Guide');"}
+			{text: '{{ Locale.GLTN_STORE }}', img: '<span style="font-size:18pt" class="fa fa-shopping-cart"/>', action: "launchStore()", key: "Alt+S"},
+			{text: '{{ Locale.OUTLINE }}', img: '<span style="font-size:18pt" class="fa fa-list"></span>', action: "runPanel('Main_Outline');"},
+			{text: '{{ Locale.CITATIONS }}', img: '<span style="font-size:18pt" class="fa fa-book"></span>', action: "runPanel('Main_Citation');"},
+			{text: '{{ Locale.IDEAS }}', img: '<span style="font-size:18pt" class="fa fa-lightbulb-o"></span>', action: "runPanel('Main_Idea');"},
+			{text: '{{ Locale.STYLE_GUIDE }}', img: '<span style="font-size:18pt" class="fa fa-info-circle"/>', action: "runPanel('Main_Guide');"}
 		),
 
 		Tools: new Array(
-			{text: 'Find', img: '<span style="font-size:18pt" class="fa fa-search"></span>', action: "runPanel('Main_Find');", key: "Alt+F"},
-			{text: 'Dictionary', key:"Alt+D", img: '<span style="font-size:18pt" class="fa fa-quote-left"></span>', action: "runPanel('Main_Dictionary');"},
-			{text: 'Themes', img: '<span style="font-size:18pt" class="fa fa-picture-o"></span>', action: "runPanel('Main_Themes')"}
+			{text: '{{ Locale.FIND }}', img: '<span style="font-size:18pt" class="fa fa-search"></span>', action: "runPanel('Main_Find');", key: "Alt+F"},
+			{text: '{{ Locale.DICTIONARY }}', key:"Alt+D", img: '<span style="font-size:18pt" class="fa fa-quote-left"></span>', action: "runPanel('Main_Dictionary');"},
+			{text: '{{ Locale.THEMES }}', img: '<span style="font-size:18pt" class="fa fa-picture-o"></span>', action: "runPanel('Main_Themes')"}
 		),
 
 		About: new Array(
 			{text: 'GitHub', img: '<span style="font-size:18pt" class="fa fa-github-alt"></span>', action: "openTab('http://www.github.com/fleker/gltn')"},
-			{text: 'Documentation', img: '<span style="font-size:18pt" class="fa fa-book"></span>', action: "openTab('http://felkerdigitalmedia.com/gltn/docs')"},
-			{text: 'Send Feedback', img: '<span style="font-size:18pt" class="fa fa-envelope"></span>', action: "openFeedback()"},
-			{text: 'Gltn Blog', img: '<span style="font-size:18pt" class="fa fa-bullhorn"></span>', action:"openTab('http://gltndev.wordpress.com/')"},
-			{text: 'Credits', img: '<span style="font-size:18pt" class="fa fa-legal"></span>', action: 'postLegal()'}
+			{text: '{{ Locale.DOCUMENTATION }}', img: '<span style="font-size:18pt" class="fa fa-book"></span>', action: "openTab('http://felkerdigitalmedia.com/gltn/docs')"},
+			{text: '{{ Locale.SEND_FEEDBACK }}', img: '<span style="font-size:18pt" class="fa fa-envelope"></span>', action: "openFeedback()"},
+			{text: '{{ Locale.GLTN_BLOG }}', img: '<span style="font-size:18pt" class="fa fa-bullhorn"></span>', action:"openTab('http://gltndev.wordpress.com/')"},
+			{text: '{{ Locale.CREDITS }}', img: '<span style="font-size:18pt" class="fa fa-legal"></span>', action: 'postLegal()'}
 		),
 
 		Me: new Array(
             {group: '', value:"<img style='overflow:hidden;border-radius:50%;width:60px;height:60px;' class='me_avatar_img'>"},
-			{group: 'Name', value:'<div style="margin-top:2px"><input id="me_name" type="text" placeholder="Name"></div>'},
-			{group: 'Email', value:'<div style="margin-top:2px"><input id="me_email" type="email" placeholder="Email Address"></div>'},
-            {text: 'Settings...', img:'<span class="fa fa-cog" style="font-size:18pt"></span>', action:"openPersonalFavorites()", key: "F2"}
+			{group: '{{ Locale.NAME }}', value:'<div style="margin-top:2px"><input id="me_name" type="text" placeholder="{{ Locale.NAME }}"></div>'},
+			{group: '{{ Locale.NAME }}', value:'<div style="margin-top:2px"><input id="me_email" type="email" placeholder="Email Address"></div>'},
+            {text: '{{ Locale.SETTINGS }}...', img:'<span class="fa fa-cog" style="font-size:18pt"></span>', action:"openPersonalFavorites()", key: "F2"}
 		)
 	};
 	newRibbon('.header', holoribbon_std);
@@ -928,7 +952,7 @@ function postLegal() {
 	f = function() {
         $('#myModal a').css('color', theme.palette[getSettings("personal_color")].normal);
     };
-	initiatePopup({title:'About', value: out, fnc: f});
+	initiatePopup({title:'{{Locale.ABOUT}}', value: out, fnc: f});
 }
 
 
