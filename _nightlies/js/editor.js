@@ -1,4 +1,4 @@
-var GLTN_VERSION = "1.3.2.9";
+var GLTN_VERSION = "1.3.2.10";
 var GLTN_VNAME = "Isidore";
 //For backwards compatibility, will return true 
 function greaterThanVersion(version) {
@@ -142,7 +142,7 @@ function setLocale(locale_name) {
     for(i in Strings[locale_name]) {
         Locale[i] = Strings[locale_name][i];
     }
-    console.error(locale_name);
+//    console.error(locale_name);
 //    console.log(Locale);
     for(i in Locale) {
         $('.Locale-'+i).html(Locale[i]);

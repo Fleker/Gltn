@@ -2654,11 +2654,11 @@ panelManager.getAvailablePanels().Main_Table.onInit = function() {
             }
         },
         //TODO Documentation is of class SpreadsheetDoc to include regex
-       IF_DOC: new SpreadsheetDoc("IF", "if conditional then else boolean", "IF(bool, true, false)", [new Parameter("bool", "A conditional statement"), new Parameter("true", "The value to return if true"), new Parameter("false", "The value to return if false")], "Changes the output depending on the conditional statement", "How to Create a Conditional"),
+       /*IF_DOC: new SpreadsheetDoc("IF", "if conditional then else boolean", "IF(bool, true, false)", [new Parameter("bool", "A conditional statement"), new Parameter("true", "The value to return if true"), new Parameter("false", "The value to return if false")], "Changes the output depending on the conditional statement", "How to Create a Conditional"),*/
         SUB: function(str) {
             return "<sub>"+str.toString()+"</sub>";   
         },
-        SUB_DOC: new SpreadsheetDoc("SUB", "element sub subscript", "SUB(str)", [new Parameter("str", "The string to display in a subscript")], "Displays a subscript", "How to Create a Subscript"),
+       /* SUB_DOC: new SpreadsheetDoc("SUB", "element sub subscript", "SUB(str)", [new Parameter("str", "The string to display in a subscript")], "Displays a subscript", "How to Create a Subscript"),*/
         SUP: function(str) {
             return "<sup>"+str.toString()+"</sup>";   
         },
@@ -2669,8 +2669,11 @@ panelManager.getAvailablePanels().Main_Table.onInit = function() {
             postLatex(str);
             return getLatex();
         },
+        EXP: function(base, pow) {
+            return Math.pow(base, pow);   
+        },
         RANGE: function(c1, c2, r1, r2) {
-            //todo convert letters to numbers, run through two loops to grab all the data in an array, return it
+            //TODO convert letters to numbers, run through two loops to grab all the data in an array, return it
             var arr = [];
             for(var index = r1; index<=r2; index++) {
                 console.log(Spreadsheet[c1+index]);
@@ -2701,178 +2704,27 @@ panelManager.getAvailablePanels().Main_Table.onInit = function() {
             return sum;
         }
     };   
-    
-    var cssEl = "#SpreadsheetsCss";
-    writeCss('gltn-grid::shadow table { border-collapse: collapse; } gltn-grid::shadow th,  gltn-grid::shadow td { border: 1px solid #ccc; } gltn-grid::shadow th { background: #ddd; }', cssEl);
-    writeCss('gltn-grid::shadow td div { text-align: right; width: 120px; min-height: 1.2em; overflow: hidden; text-overflow: ellipsis; }', cssEl);
-    writeCss('gltn-grid::shadow div.text { text-align: left;} ', cssEl);
-    writeCss('gltn-grid::shadow div.error { text-align: center; color: #800; font-size: 90%; border: solid 1px #800 }', cssEl);
-    writeCss('gltn-grid::shadow div.formula { background-color: #dfd}', cssEl);
-    writeCss('gltn-grid::shadow input { position: absolute; border: 0; padding: 0; width: 120px; height: 1.3em; color: transparent; background: transparent; transition-duration:0.3s;margin-top:0em; padding-left:0px;}', cssEl);
-    writeCss('gltn-grid::shadow input:not([data-sp=true]) + div { transition-duration:0.3s; padding-left:0px; padding-right:0px; background-color: #fff;  }', cssEl);
-    writeCss('gltn-grid::shadow input:not([data-sp=true]):focus { color: #111; background: #efe; font-size:70%; font-weight:bold; width: 360px; margin-left: -120px; margin-top:-1.4em; padding-left:8px;}', cssEl);
-    writeCss('gltn-grid::shadow input:not([data-sp=true]):focus + div { white-space: nowrap; font-weight:bold; background-color: #bfb; padding-left: 4px; padding-right: 4px; }', cssEl);
-    writeCss('gltn-grid::shadow input[data-sp=true] { color: black; background-color: antiquewhite; position: inherit; }', cssEl);
-}
-function SpreadsheetService() {
-    console.log("Grid v4");
-    var pass = {};
-    for(i in Spreadsheet) {
-        console.log(i);
-        pass[i] = Spreadsheet[i].toString();
-    }
-    SpreadsheetService.prototype.renderHtml = function(html_code) {
-        if(html_code === undefined) 
-            html_code = "";
-        return html_code;
-    }
-    SpreadsheetService.prototype.apply = function() {
-        //HTML Rendering   
-    };
-    // Begin of $scope properties; start with the column/row labels
-    this.Cols = [], this.Rows = [];
-    SpreadsheetService.prototype.makeRange = function(array, cur, end) {
-        array.length = 0;
-        while (cur <= end) { 
-            array.push(cur);
-            // If it’s a number, increase it by one; otherwise move to next letter
-            cur = (isNaN( cur ) ? String.fromCharCode( cur.charCodeAt()+1 ) : cur+1);
-        } 
-        this.$apply();
-    };
-    SpreadsheetService.prototype.remake = function() {
-        //Re-'makeRange'
-        if(document.getElementById('setCol').value.length > 0)
-            this.makeRange(this.Cols, 'A', document.getElementById('setCol').value);
-        if(document.getElementById('setRow').value.length > 0)
-            this.makeRange(this.Rows, 1, document.getElementById('setRow').value);
-    };
-    this.remake();
-    
-    // UP(38) and DOWN(40)/ENTER(13) move focus to the row above (-1) and below (+1).
-    $(body).keyup(function(event) {
-        switch(event.which) {
-            case 38: case 40: case 13: 
-                if((event.which === 13 && event.shiftKey === true) || event.which === 38)
-                    direction = -1;
-                else
-                    direction = 1;
-                var cell = $('#'+col+(row + direction));
-                if(cell) { cell.focus(); }
-                break;
-        }
-    });
-    
-    // Default sheet content, with some data cells and one formula cell.
-    SpreadsheetService.prototype.reset = function() { this.sheet = { A1: 1874, B1: '+', C1: 2046, D1: '⇒', E1: '=A1+C1' }; };
-    
-    // Define the initializer, and immediately call it
-    (SpreadsheetService.prototype.init = function() {
-    // Restore the previous .sheet; reset to default if it’s the first run
-      //FIMXME storage
-    this.sheet = angular.fromJson( localStorage.getItem( '' ) );
-    if (!this.sheet) { this.reset(); }
-      this.worker = new QueryableWorker("worker.js", function(message) {
-    //              console.log(message);
-//           $timeout.cancel( $scope.promise );
-//          $timeout( function() { $scope.errs = message.data[0], $scope.vals = message.data[1]; } );
-          this.errs = message.data[0]; this.vals = message.data[1];
-      });
-      this.worker.sendQuery('setSS', JSON.stringify(pass));
-    //          $scope.worker = new Worker('worker.js');
-//      window.worker = $scope.worker;
-    }).call();
-    
-    // Formula cells may produce errors in .errs; normal cell contents are in .vals
-    this.errs = {}; this.vals = {};
-
-    // Define the calculation handler; not calling it yet
-    SpreadsheetService.prototype.calc = function() {
-        var json = angular.toJson( this.sheet );
-        /*$scope.promise = $timeout( function() {
-          // If the worker has not returned in 499 milliseconds, terminate it
-          $scope.worker.terminate();
-          // Back up to the previous state and make a new worker
-          $scope.init();
-          // Redo the calculation using the last-known state
-          $scope.calc();
-        }, 99 );*/
-
-    // When the worker returns, apply its effect on the scope
-    this.worker.onmessage = function(message) {
-        console.log(message);
-//      $timeout.cancel( $scope.promise );
-      localStorage.setItem( '', json );
-        this.errs = message.data[0]; this.vals = message.data[1];
-    };
-
-    // Post the current sheet content for the worker to process
-    this.worker.postMessage( $scope.sheet );
-    };
-    // Start calculation when worker is ready
-    this.worker.onmessage = $scope.calc;
-    this.worker.postMessage( $scope.sheet );
 }
 
 panelManager.getAvailablePanels().Main_Table.onRun = function() {
-    //Capture Intent
-    //NOTE INtents, l18n
-    //Register Element
-    var html = '<polymer-element name="gltn-grid" attributes="title rows cols index">';
-    html += '<template>';
-    html += '    <input id="setCol" data-sp="true" placeholder="{{Locale.COLUMNS}}" value="{{cols}}">&emsp; X &emsp;';
-    html += '    <input id="setRow" data-sp="true" placeholder="{{Locale.ROWS}}" value="{{rows}}">';
-    html += '    <table><tr><th><button type="button" onclick="{{reset}}">↻</button></th>';
-    html += '    <template repeat="{{col in Cols}}"><th>{{col}}</th></template></tr><template repeat="{{row in Rows}}"><tr>';
-    html += '    <th>{{row}}</th>';
-    html += '    <template repeat="{{col in Cols}}"><td data-formula="{{isFormula}}">';
-    html += '        <input id="{{col+row}}" on-keyup="{{calc}}" on-input="{{calc}}" value="{{sheets[col+row]}}"'; 
-    html += '            on-keydown="{{keydown}}">';
-    html += '        <div id="div{{col+row}}" data-error="{{isError}}" data-text="{{isText}}" data-formula="{{isFormula}}">';
-    html += '        </div></td></template></tr></template></table>';
-    html += '</template>';
-    html += '<script>';
-    html += '    Polymer("gltn-grid", {';
-    html += '        title: "New Table",';
-    html += '        rows: "10",';
-    html += '        cols: "H",';
-    html += '        index: 0,';
-    html += '        sheets: {},';
-    html += '        sheetsCache: {},';
-    html += '        Locale: setLocale($("#file_language").val()),';
-    html += '        isFormula: true,';
-    html += '        isError: false,';
-    html += '        isText: false,';
-    html += '        calc: function() { console.log(this.sheets, this.$.A1); /* Calculations Here */ this.$.divA1.innerHTML = this.$.A1.textContent },';
-    html += '        colsChanged: function() { this.Cols = this.makeRange(this.cols); },';
-    html += '        rowsChanged: function() { this.Rows = this.makeRange(this.rows); },';
-    html += '     ready: function() { this.Rows = this.makeRange(this.rows); this.Cols = this.makeRange(this.cols); console.log(this.rows, this.Rows, this.Cols, this.title) },';
-    html += '        makeRange: function(v) { array=[]; if(v.match(/[A-Za-z]/)) { cur = "A"; end = v; } else { cur=1;end=v; }';
-    html += '           while (cur <= end) { array.push(cur); /* If it’s a number, increase it by one; otherwise move to next letter */';
-    html += '               cur = (isNaN( cur ) ? String.fromCharCode( cur.charCodeAt()+1 ) : cur+1);  }';            
-    html += '        return array; }';
-    //Keydown, calc, remodel, reset, NEED a title editor
-    html += '    });';
-    html += '</script>';
-    html += '</polymer-element>';
-    //Now create shown tag
-    html += '<gltn-grid></gltn-grid>';
-//    console.log(html);
-    postPanelOutput(html);
-    var hwidth = Math.floor(window.innerWidth / 2) - 30;
-    $('.panel_plugin_content').css('width', hwidth+"px");
-    //FIXME Fullscreen
-
-    console.log("!");
-    $('gltn-grid')[0].calc = function() {
-        console.log(this.sheets, this.$);
-        window.gltngrid = this;
-        /* Calculations Here */
-        $('gltn-grid /deep/ #divA1').html( $('gltn-grid /deep/ #A1').val() );
-    };  
-    //TODO Add a header menu: formula help, maybe insert cols/rows
-    //TODO Save data, cache it, recall, generate
-        
+    var cssEl = "#SpreadsheetsCss";
+    var ccc = getAppropriateColor('#ccc', '#444');
+    var ddd = getAppropriateColor('#ddd', '#111');
+    var bfb = getAppropriateColor('#bfb', '#040');
+    var dfd = getAppropriateColor('#dfd', '#373');
+    var efe = getAppropriateColor('#efe', '#333');
+    $(cssEl).empty();
+    writeCss('gltn-grid::shadow table { border-collapse: collapse; } gltn-grid::shadow th,  gltn-grid::shadow td { border: 1px solid '+ccc+'; } gltn-grid::shadow th { background: '+ddd+'; }', cssEl);
+    writeCss('gltn-grid::shadow td div { text-align: right; width: 120px; min-height: 1.2em; overflow: hidden; text-overflow: ellipsis; }', cssEl);
+    writeCss('gltn-grid::shadow div.text { text-align: left;} ', cssEl);
+    writeCss('gltn-grid::shadow div.error { text-align: center; color: #800; font-size: 90%; border: solid 1px #800 }', cssEl);
+    writeCss('gltn-grid::shadow div.formula { background-color: '+dfd+'}', cssEl);
+    writeCss('gltn-grid::shadow input { position: absolute; border: 0; padding: 0; width: 120px; height: 1.3em;color: transparent; background: transparent; transition-duration:0.3s;margin-top:0em; padding-left:0px;}', cssEl);
+    writeCss('gltn-grid::shadow input:not([data-sp=true]) + div { transition-duration:0.3s; padding-left:0px; padding-right:0px; background-color: '+theme.bodyColor+';  }', cssEl);
+    writeCss('gltn-grid::shadow input:not([data-sp=true]):focus { color: '+theme.fontColorAlt+'; background: '+efe+'; font-size:70%; font-weight:bold; width: 360px; margin-left: -120px; margin-top:-1.4em; padding-left:8px;}', cssEl);
+    writeCss('gltn-grid::shadow input:not([data-sp=true]):focus + div { white-space: nowrap; font-weight:bold; background-color: '+bfb+'; padding-left: 4px; padding-right: 4px; }', cssEl);
+    writeCss('gltn-grid::shadow input[data-sp=true] { color: '+theme.fontColor+';background-color:'+theme.bodyColor+'; position: inherit; }', cssEl);
+    
     /* FROM MOZ
     QueryableWorker instances methods:
      * sendQuery(queryable function name, argument to pass 1, argument to pass 2, etc. etc): calls a Worker's queryable function
@@ -2919,6 +2771,174 @@ panelManager.getAvailablePanels().Main_Table.onRun = function() {
           delete oListeners[sName];
         };
       };
+    //Capture Intent
+    //NOTE INtents, l18n
+    //Register Element
+    Polymer('gltn-grid', {
+        nameColor: 'red',
+        title: "New Table",
+        rows: "10",
+        cols: "F",
+        index: 0,
+        sheet: {},
+        sheetCache: {},
+        Locale: setLocale($("#file_language").val()),
+        isFormula: true,
+       /* isError: function(col, row) {
+            return $('gltn-grid /deep/ #div'+col+row).hasClass('hasError');
+        },
+        isText: function(col, row) {
+            return $('gltn-grid /deep/ #div'+col+row).html().match(/[A-Za-z]/);   
+        },*/
+        isError: false,
+        isText: false,
+        errs: {},
+        vals: {},
+        calc: function() {
+            /* Calculations Here */
+            var json = angular.toJson( this.sheet );
+            this.worker.onmessage = function(message) {
+                console.log(message);
+        //      $timeout.cancel( $scope.promise );
+              localStorage.setItem( '', json );
+                this.errs = message.data[0]; this.vals = message.data[1];
+            };
+
+            // Post the current sheet content for the worker to process
+            var grid = this; 
+            window.setTimeout(function() {
+                grid.worker.postMessage( grid.sheet );
+            }, 100);
+        },
+        colsChanged: function() { this.Cols = this.makeRange(this.cols); },
+        rowsChanged: function() { this.Rows = this.makeRange(this.rows); },
+        display: function() {
+            for(var col in this.Cols) {
+                for(var row in this.Rows) {
+                    var c = this.Cols[col];
+                    var r = this.Rows[row];
+                    $('gltn-grid /deep/ #div'+c+r).removeClass('text').removeClass('error').removeClass('formula');
+                    if(this.errs[c+r] !== undefined) {
+                        $('gltn-grid /deep/ #div'+c+r).html(this.errs[c+r]).addClass('error');
+                    } else {
+                        $('gltn-grid /deep/ #div'+c+r).html(this.vals[c+r]);
+                        if($('gltn-grid /deep/ #div'+c+r).html().match(/[A-Za-z]/) !== null)
+                            $('gltn-grid /deep/ #div'+c+r).addClass('text');
+                        if($('gltn-grid /deep/ #'+c+r).html().substring(0,1) == "=")
+                            $('gltn-grid /deep/ #div'+c+r).addClass('formula');
+                    }
+                    //Update cache
+                    this.sheetCache[c+r] = $('gltn-grid /deep/ #div'+c+r).html();
+                } 
+            }
+        },
+        ready: function() { 
+            this.Rows = this.makeRange(this.rows); 
+            this.Cols = this.makeRange(this.cols); 
+//            console.log(this.rows, this.Rows, this.Cols, this.title);
+            //Set up worker data
+            var pass = {};
+            for(i in Spreadsheet) {
+                console.log(i);
+                pass[i] = Spreadsheet[i].toString();
+            }
+            //Create worker
+            var grid = this;
+            this.worker = new QueryableWorker("worker.js", function(message) {
+                 console.log(message.data);
+                grid.errs = message.data[0]; grid.vals = message.data[1];
+                window.setTimeout(function() {
+                    grid.display();
+                }, 10);
+            });
+            this.worker.sendQuery('setSS', JSON.stringify(pass));
+            // Start calculation when worker is ready
+            this.worker.onmessage = this.calc;
+            this.worker.postMessage( this.sheet );
+            window.gltngrid = this;
+        },
+        makeRange: function(v) { 
+            var ar = []; 
+            if(v.match(/[A-Za-z]/)) {
+                cur = "A";
+                end = v; 
+            } else { 
+                cur=1;
+                end=v; 
+            }
+            while (cur <= end) { 
+                ar.push(cur); 
+                /* If it’s a number, increase it by one; otherwise move to next letter */
+                cur = (isNaN( cur ) ? String.fromCharCode( cur.charCodeAt()+1 ) : cur+1);  
+            }
+            return ar;
+        },
+        keydown: function(event, detail, sender) {
+            /*
+                console.log(event, detail, sender);
+                    event - KeyboardEvent
+                    detail - 0
+                    sender - input Element
+            */
+//            console.log(sender.id); 
+            var col = sender.id.substring(0,1);
+            var row = parseInt(sender.id.substring(1));
+            switch(event.which) {
+                case 38: case 40: case 13: 
+                    if((event.which === 13 && event.shiftKey === true) || event.which === 38)
+                        direction = -1;
+                    else
+                        direction = 1;
+                    var cell = $('gltn-grid /deep/ #'+col+(row + direction));
+//                    console.log($('#'+col+(row + direction)));
+                    if(cell) { cell.focus(); }
+                    break;
+            }
+        }   
+    });
+    var el = document.createElement('div');
+    var html = '<polymer-element name="gltn-grid" attributes="title rows cols index">';
+    html += '    <template>';
+    html += '    <input id="setCol" data-sp="true" placeholder="{{Locale.COLUMNS}}" value="{{cols}}">&emsp; X &emsp;';
+    html += '    <input id="setRow" data-sp="true" placeholder="{{Locale.ROWS}}" value="{{rows}}">';
+    html += '    <table style="margin-top:8px"><tr><th><!--<button type="button" onclick="{{reset}}">↻</button>--></th>';
+    html += '    <template repeat="{{col in Cols}}"><th>{{col}}</th></template></tr><template repeat="{{row in Rows}}"><tr>';
+    html += '    <th>{{row}}</th>';
+    html += '    <template repeat="{{col in Cols}}"><td data-formula="{{isFormula}}">';
+    html += '        <input id="{{col+row}}" on-input="{{calc}}" value="{{sheet[col+row]}}"'; 
+    html += '            on-keydown="{{keydown}}">';
+    html += '        <div id="div{{col+row}}" data-error="{{isError}}" data-text="{{isText}}" data-formula="{{isFormula}}">';
+    html += '        </div></td></template></tr></template></table>';
+    html += '</template></polymer-element>';
+    // The custom elements polyfill can't see the <polymer-element>
+    // unless you put it in the DOM.
+    el.innerHTML = html;
+    document.body.appendChild(el);
+
+    //Now create shown tag
+    html = '<gltn-grid></gltn-grid>';
+//    console.log(html);
+    postPanelOutput(html);
+    
+    var hwidth = Math.floor(window.innerWidth / 2) - 30;
+    $('.panel_plugin_content').css('width', hwidth+"px");
+    $('.PanelMaximizeEvent').on('click', function() {
+        if($(this).attr('data-status') == 1) {
+            /** Code to execute when the panel is becoming maximized **/
+            var hwidth = Math.floor(window.innerWidth) - 60;
+            $('.panel_plugin_content').css('width', hwidth+"px");
+        } else {
+            /** Code to execute when the panel is becoming minimized **/
+            var hwidth = Math.floor(window.innerWidth / 2) - 30;
+            $('.panel_plugin_content').css('width', hwidth+"px");
+        }
+    });
+
+    console.log("!");
+    //TODO Add a header menu: formula help, maybe insert cols/rows, whatever else Excel does
+    //TODO Save data, cache it, recall, generate
+        
+    
 };
     
     

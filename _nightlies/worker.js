@@ -98,6 +98,7 @@ self.onmessage = (function($__6) {
                             for(var formula in Spreadsheet) {
                                 var regex = new RegExp("("+formula+")", 'gi');
                                 x = x.replace(regex, "Spreadsheet.$1");
+                                //TODO Apply various kinds of regex regout stuff
 //                                console.log(x);
                             }
                             vals[coord] = eval.call(null, x.slice(1))
