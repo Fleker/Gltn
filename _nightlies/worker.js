@@ -28,10 +28,17 @@ self.onmessage = (function($__6) {
       if (oEvent.data instanceof Object && oEvent.data.hasOwnProperty("bk4e1h0") && oEvent.data.hasOwnProperty("ktp3fm1")) {
 //          console.log("@" + oEvent.data.bk4e1h0 + oEvent.data.ktp3fm1);
 //          console.log("@");
-          Spreadsheet =  JSON.parse(oEvent.data.ktp3fm1);
+          //TODO DEcrypt JSON
+          console.log(decodeURIComponent(oEvent.data.ktp3fm1));
+          Spreadsheet =  JSON.parse(decodeURIComponent(oEvent.data.ktp3fm1));
           for(var formula in Spreadsheet) {
-//              console.log(":"+formula);
-              Spreadsheet[formula] = eval("("+Spreadsheet[formula]+")");
+              console.log(":"+formula);
+              console.log("::"+Spreadsheet[formula]);
+              if(formula.indexOf('_DOC') > -1)
+                  Spreadsheet[formula] = JSON.parse(Spreadsheet[formula]);
+              else
+                  Spreadsheet[formula] = eval("("+Spreadsheet[formula]+")");
+              console.log(Spreadsheet[formula]);
           }    
           return;
       }
@@ -95,19 +102,31 @@ self.onmessage = (function($__6) {
 //                        console.log(coord)
                         //var x is the formula. Here I will scan for new functions to implement if they exist in the main object
                         if(('=' === x[0])) {
+                            var regex;
+                            var regout;
                             for(var formula in Spreadsheet) {
-                                var regex = new RegExp("("+formula+")", 'gi');
-                                x = x.replace(regex, "Spreadsheet.$1");
-                                //TODO Apply various kinds of regex regout stuff
+                                if(formula.indexOf('_DOC') > -1) {
+                                    console.log(formula, Spreadsheet[formula], Spreadsheet[formula].regexpIn === undefined);
+                                    if(Spreadsheet[formula].regexpIn === undefined)
+                                        continue;
+                                    regex = new RegExp(Spreadsheet[formula].regexpIn, 'gi');
+                                    regout = Spreadsheet[formula].regexpOut;
+                                } else {
+                                    regex = new RegExp("("+formula+")", 'gi');
+                                    regout = "Spreadsheet.$1";
+                                }
+//                                console.log(x);
+//                                console.log(regex, regout);
+//                                console.log(x.match(regex));
+//                                console.log(x.replace(regex
+                                x = x.replace(regex, regout);
 //                                console.log(x);
                             }
-                            vals[coord] = eval.call(null, x.slice(1))
+                            vals[coord] = eval.call(null, x.slice(1));
                         } else {
                             vals[coord] = x;
                         }
-//                        vals[coord] = (('=' === x[0]) ?  : x);
                     } catch (e) {
-//                        console.error(e.message);
                         vals[coord] = x;
                       try {
                         throw undefined;
