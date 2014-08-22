@@ -5,40 +5,21 @@ var sheet,
     errs,
     vals; 
 
-/*var queryableFunctions = {
-  setSS: function(ss) {
-    Spreadsheet = ss;   
-       console.log("OK");
-      try {
-      console.log(Spreadsheet.IF);
-      } catch(E) {console.error("IF")}
-      try {
-          console.log(Spreadsheet[0]);
-      } catch(e) {console.error("0")}
-  for(var formula in Spreadsheet) {
-              console.log(":"+formula);
-              console.log(";"+Spreadsheet[formula]);
-              console.log(typeof Spreadsheet[formula]);
-          } 
-  }
-};*/
-
 self.onmessage = (function($__6) {
       oEvent = $__6;  
       if (oEvent.data instanceof Object && oEvent.data.hasOwnProperty("bk4e1h0") && oEvent.data.hasOwnProperty("ktp3fm1")) {
 //          console.log("@" + oEvent.data.bk4e1h0 + oEvent.data.ktp3fm1);
 //          console.log("@");
-          //TODO DEcrypt JSON
-          console.log(decodeURIComponent(oEvent.data.ktp3fm1));
+//          console.log(decodeURIComponent(oEvent.data.ktp3fm1));
           Spreadsheet =  JSON.parse(decodeURIComponent(oEvent.data.ktp3fm1));
           for(var formula in Spreadsheet) {
-              console.log(":"+formula);
-              console.log("::"+Spreadsheet[formula]);
+//              console.log(":"+formula);
+//              console.log("::"+Spreadsheet[formula]);
               if(formula.indexOf('_DOC') > -1)
                   Spreadsheet[formula] = JSON.parse(Spreadsheet[formula]);
               else
                   Spreadsheet[formula] = eval("("+Spreadsheet[formula]+")");
-              console.log(Spreadsheet[formula]);
+//              console.log(Spreadsheet[formula]);
           }    
           return;
       }
@@ -106,13 +87,13 @@ self.onmessage = (function($__6) {
                             var regout;
                             for(var formula in Spreadsheet) {
                                 if(formula.indexOf('_DOC') > -1) {
-                                    console.log(formula, Spreadsheet[formula], Spreadsheet[formula].regexpIn === undefined);
+//                                    console.log(formula, Spreadsheet[formula], Spreadsheet[formula].regexpIn === undefined);
                                     if(Spreadsheet[formula].regexpIn === undefined)
                                         continue;
-                                    regex = new RegExp(Spreadsheet[formula].regexpIn, 'gi');
+                                    regex = new RegExp(Spreadsheet[formula].regexpIn, 'g');
                                     regout = Spreadsheet[formula].regexpOut;
                                 } else {
-                                    regex = new RegExp("("+formula+")", 'gi');
+                                    regex = new RegExp("("+formula+")", 'g');
                                     regout = "Spreadsheet.$1";
                                 }
 //                                console.log(x);

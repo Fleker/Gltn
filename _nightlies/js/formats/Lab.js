@@ -51,7 +51,7 @@ function onGetFormats() {
 	obj.paragraph_indent = "&emsp;";
     obj.img = "IMG Fig. FIGN. TEXT";
 	obj.imgstyle = "width:80%;text-align:center;";
-    obj.figure = function x() {
+    obj.figure = function() {
 		var i = 1;
 		$('.draft .img').each(function() {
 			$(this).attr('data-figure-number', i);
@@ -68,23 +68,13 @@ function onGetFormats() {
 			i++;
 		});
 	};
-    obj.table = function x(table,row,col) {
-        console.log(table);
-        table = decodeURIComponent(table).split(";").join("").split(",");
-		out = "<br><span style='display:block;text-align:center'>Table FIGN. TEXT</span><table style='border-collapse:collapse;border:solid 1px black;width:100%;'>";
-		for(i=1;i<=row;i++) {
+    obj.table = function(table,row,col) {
+        out = "<br><span style='display:block;text-align:center'>Table FIGN. TEXT</span><table style='border-collapse:collapse;border:solid 1px black;width:100%;'>";
+        for(i="A".charCodeAt();i<col.charCodeAt();i++) {
             out += "<tr>";
-            for(j=0;j<col;j++) {
-                var v = table[(i-1)*c+j];
-                v = v.replace(/\\/g, "\\\\");
-                console.log(v);
-                try {
-                if(v.substr(0,1) == "=")
-                    v = tableEvaluate(v.substr(1));
-                } catch(e) {
-                    console.error("Table building error "+v+":    "+e.message);   
-                }
-                out += "<td style='border:solid 1px black'>"+v+"</td>";
+            for(j=1;j<=row;j++) {
+                var v = table[String.fromCharCode(i)+j];
+                out += "<td data-theme='false' style='border:solid 1px black'>"+v+"</td>";
             }
             out += "</tr>";
         }

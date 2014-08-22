@@ -49,6 +49,19 @@ function onGetFormats() {
 	obj.heading4 = "<div style='font-style:italics;text-align:center'>LIST1. TEXT</div>";
 	obj.heading5 = "<div style='text-decoration:underline'>LIST1. TEXT</div>";
 	obj.paragraph_indent = "&emsp;";
+    obj.table = function(table,row,col) {
+        out = "<br><span style='display:block;text-align:center'>Table FIGN. TEXT</span><table style='border-collapse:collapse;border:solid 1px black;width:100%;'>";
+        for(i="A".charCodeAt();i<col.charCodeAt();i++) {
+            out += "<tr>";
+            for(j=1;j<=row;j++) {
+                var v = table[String.fromCharCode(i)+j];
+                out += "<td data-theme='false' style='border:solid 1px black'>"+v+"</td>";
+            }
+            out += "</tr>";
+        }
+		out += "</table>";
+		return out;
+	};
 	
 	obj.citation = "(AUTHOR_LAST PAGE)";
 	obj.citation_main = "(PAGE)";

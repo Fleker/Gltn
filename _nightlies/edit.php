@@ -49,6 +49,7 @@
 <script src="http://fgnass.github.io/spin.js/spin.min.js"></script>
 <script src="http://fgnass.github.io/spin.js/jquery.spin.js"></script>
     
+<!--Mathjax-->
 <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
 <script type="text/x-mathjax-config">
@@ -57,6 +58,15 @@
     tex2jax: { inlineMath: [['$','$'],['\\(','\\)']] }
   });
 </script>
+    
+<!--Together.js-->
+<script src="js/togetherjs/togetherjs.js"></script>
+    <script>
+      TogetherJSConfig_findRoom = {prefix: "togetherjsmadlibs", max: 5};
+      TogetherJSConfig_autoStart = true;
+      TogetherJSConfig_suppressJoinConfirmation = true;
+      TogetherJSConfig_storagePrefix = "tjs_madlibs";
+    </script>
 
 <link rel="icon" 
       type="image/png" 

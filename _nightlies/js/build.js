@@ -730,7 +730,7 @@ function post_content_formatting(object) {
 	
 	//Figure numbers
 	if(object.figure !== undefined)	
-		eval(object.figure+";x();");
+		object.figure();
 	
 	//Images
 	var j = 0;
@@ -747,17 +747,14 @@ function post_content_formatting(object) {
 	$('.draft .table').each(function() {
 		$(this).css('background-color','white');
 		//var table = $.xml2json($(this).attr('data-xml'));
-		var table = $(this).attr('data-arr');
-		var r = $(this).attr('data-row');
-		var c = $(this).attr('data-col');
+		var table = JSON.parse($(this).attr('data-sheetcache'));
+		var r = $(this).attr('data-rows');
+		var c = $(this).attr('data-cols');
 		//use XML to encode table into rows and columns? Place into data-table and then decode in a preview in the div.
 		console.log("x('"+table+"',"+r+","+c+");");
-        generateSpreadsheetVars(table.split(';').join("").split(','), r, c);
-		$(this).html(eval(object.table+";x('"+table+"',"+r+","+c+");"));
-		$(this).attr('data-arr', "");
+       	$(this).html(object.table(table, r, c));
 		$(this).html(tableFormatted($(this).html(),$(this).attr('data-figure-number'),$(this).attr('data-title')));
         $('.reftext[data-ref=table'+$(this).attr('data-id')+']').html($(this).attr('data-figure-number'));
-        
 	});
     if(object.latex == undefined)
         object.latex = "EQN";

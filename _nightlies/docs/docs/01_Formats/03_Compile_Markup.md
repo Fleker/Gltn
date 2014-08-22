@@ -63,22 +63,22 @@ This is an array containing the property and its value
 ### Tables
 `obj.table` - A function that displays the table using the specified rules
 
-This function has three parameters. The first is an XML representation of the table which must be converted into a JSON object. The second and third are the number of rows and columns in the table.
+This function has three parameters. The first JSON object of the table. The second and third are the number of rows and columns in the table. The column parameter is a letter, so it must be converted between an integer and a character where necessary. The example below shows how to label the table as well as render the table in HTML. For your own purposes you may want to adjust some of the style options.
 
 ```JavaScript
-obj.table = function x(table,row,col) {
-    table = $.xml2json(table);
-    var out = "<br><span style='display:block;text-align:center'>" + smallcaps("Table") + " FIGN. TEXT%sc</span><table style='border-collapse:collapse;border:solid 1px black;width:100%;'>";
-    for(var i = 0; i < row; i++) {
-        out += "<tr>";
-        for(var j = 0; j < col; j++) {
-            out += "<td style='border:solid 1px black'>" + table['row'][i]['cell'][j] + "</td>";    
+    obj.table = function(table,row,col) {
+        out = "<br><span style='display:block;text-align:center'>Table FIGN. TEXT</span><table style='border-collapse:collapse;border:solid 1px black;width:100%;'>";
+        for(i="A".charCodeAt();i<col.charCodeAt();i++) {
+            out += "<tr>";
+            for(j=1;j<=row;j++) {
+                var v = table[String.fromCharCode(i)+j];
+                out += "<td style='border:solid 1px black'>"+v+"</td>";
+            }
+            out += "</tr>";
         }
-        out += "</tr>";
-    }
-    out += "</table>";
-    return out;
-};
+		out += "</table>";
+		return out;
+	};
 ```
 
 To refer to a specific table cell using the table object, you must call `table['row'][row #]['cell'][col #]`

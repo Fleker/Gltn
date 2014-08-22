@@ -1,4 +1,4 @@
-var GLTN_VERSION = "1.3.3.2";
+var GLTN_VERSION = "1.3.3.4";
 var GLTN_VNAME = "Isidore";
 //For backwards compatibility, will return true 
 function greaterThanVersion(version) {
@@ -945,7 +945,7 @@ function postLegal() {
     var favorite = theme.palette[getSettings("personal_color")];
     out = "<span style='color:"+getAppropriateColor(favorite.accent700, favorite.accent100)+"'>Version "+GLTN_VERSION+" Isidore</span><br><br>";
 	out += "2014 Made by Nick Felker&emsp;<a href='http://twitter.com/handnf'>@HandNF</a><br>";
-    out += "Made using libraries from Mathjax, Font Awesome, jQuery, Rangy, InkFilepicker, and others<br>";
+    out += "Made using libraries from Mathjax, Font Awesome, jQuery, Rangy, InkFilepicker, Spin.js, Timeago.js, and others<br>";
     out += "Shoutout to everyone who posted online about stuff like replacing text nodes and the ample amount of help from StackOverflow.<br>";
     out += '<br>Stock Images:<br>&emsp;"<a href="http://commons.wikimedia.org/wiki/File:Isidor_von_Sevilla.jpeg#mediaviewer/File:Isidor_von_Sevilla.jpeg">Isidor von Sevilla</a>" by <a href="//en.wikipedia.org/wiki/Bartolom%C3%A9_Esteban_Murillo" class="extiw" title="en:Bartolomé Esteban Murillo">Bartolomé Esteban Murillo</a> - <a rel="nofollow" class="external free" href="http://www.museumsyndicate.com/artist.php?artist=442">http://www.museumsyndicate.com/artist.php?artist=442</a>. Licensed under Public domain via <a href="//commons.wikimedia.org/wiki/">Wikimedia Commons</a>.'
 
