@@ -659,25 +659,36 @@ if(window.introdisabled != false && false)
 }
 function exitintro() {
 	window.introdisabled = false;
-//	introJs().exit();	
-	//alert("There you go, one perfectly formatted paper. Wasn't that easy? In fact, it was very simple to do, and it didn't require memorizing a computer language or formatting rules. There's a lot of things the human mind is good at; automation isn't one of them. Save you time for, you know, actually *writing* your paper.\n\nThis project is open source, so check it out on GitHub and contribute if you want. It is easy to develop a panel or add a small feature.\n\nI hope that this project is exciting, and that you'll use it once it is available.\n-Nick Felker");
 }
 
-//{element:'#CHARACTERPANEL', intro:'Another useful panel is the character palette.'},  {element:'#CHARACTERPANELCHARACTERS', intro:'This lists all the special characters that you can insert into your document. After clicking on the one you want, the keyboard switches focus so you can keep typing without having to reposition your mouse. Try it. It is really useful.' },  {element:'#popup_character_search', intro:"Can you find the character you want? You can easily find it using the searchbar."},  
-//{element:'#build', intro:"There you go, one perfectly formatted paper. Wasn't that easy? In fact, it was very simple to do, and it didn't require memorizing a computer language or formatting rules. There's a lot of things the human mind is good at; automation isn't one of them. Save you time for, you know, actually <i>writing</i> your paper.<br><br>This project is open source, so check it out on GitHub and contribute if you want. It is easy to develop a panel or add a small feature.<br><br>I hope that this project is exciting, and that you'll use it once it is available.<br>-Nick Felker", position:"top"}
-
-
-//Gets an array of words in the body
+//Gets an array of words in the body, can be used for a word count
 function getWords() {
     try {
-        var a = $('.content_textarea').html().toLowerCase().trim().replace(/<kbd class="latex.*<\/kbd>/g, "").replace(/></g, "> <").replace(/<[^>]*>/g, "").replace(/"/g, "").replace(/&nbsp;/g, " ").split(' ');
+        var a = $('.content_textarea').html().toLowerCase().trim().replace(/<kbd.*<\/kbd>|<div class="table.+?<\/div>/g, "").replace(/></g, "> <").replace(/<[^>]*>/g, "").replace(/"/g, "").replace(/&nbsp;/g, " ").split(' ');
+        for(i in a) {
+            if(a[i] = "") 
+                a.splice(i,1);
+        }
     } catch(e) {
         var a = "";
     }
     if(a.length == 0) 
         return [""];
     else
-        return a
+        return a;
+}
+function getParagraphs() {
+    try {
+        var a = $('.content_textarea').html().toLowerCase().trim().replace(/<kbd.*<\/kbd>|<div class="table.+?<\/div>/g, "");
+        b = a.match(/<\/div><div><br><\/div><div>|<div><br><\/div><div>|<\/div><div>|<\/div> <div>|<\/div><\/span><div>|<\/div><div><br><div>|<div><br><div>|<br><div>|<br>&emsp;<kbd|<br> &nbsp;<br>|<br>&emsp;<br>&emsp;|<br>&emsp;  <br>&emsp;|<div>/g);
+        if(b === null)
+            return [];
+        else
+            return b;
+    } catch(e) {
+        console.error(e.message);
+        return [""];   
+    }
 }
 
 function imgDetails(pid) {

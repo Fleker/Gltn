@@ -1,9 +1,25 @@
 /*** Store-Related Code ***/
+categories = {
+    panels: {s: "Panel", p: "Panels", icon: "columns", color: "brown"},
+    tools: {s: "Tool", p:"Tools", icon:"wrench", color: "green"},
+    services: {s: "Services", p: "Services", icon:"flask", color: "orange"}, 
+    dictionaries: {s: "Dictionary", p:"Dictionaries", icon:"book", color: "purple"},
+    themes: {s: "Theme", p:"Themes", icon:"photo", color: "red"},
+    plugins: {s: "Plugin", p:"Plugins", icon:"plus-square-o", color: "yellow"},
+    spreadsheets: {s: "Grid Library", p:"Grid Libraries", icon:"th", color: "grey"},
+    exports: {s: "Exporter", p:"Exporters", icon:"share", color:"blue"},
+}
+function getCategory(catname) {
+    for(i in categories) {
+        if(categories[i].s == catname || categories[i].p == catname) {
+            return categories[i];   
+        }
+    }
+    return undefined;
+}
 function getBaseLog(y, x) {
     return Math.log(y) / Math.log(x);
 }
-//TODO Tools library and spreadsheets, maybe export services
-//TODO uummm... oh yeah add a loader
 function getIcon(icon, size) {
     var font_size = "13pt";
     var img_size = "24px";
@@ -47,23 +63,40 @@ function getDownloadCount(number) {
         //Math.round(10*(n/Math.pow(10, Math.floor(getBaseLog(n,10)))))	
     }
 }
-function getStoreCard(plugin, i) {
+function getStoreCard(plugin, i, inHome) {
     var out = "";
     //console.log(d[i], d[i].parent);
-        out += "<div style='display:inline-block'>&emsp;"+getIcon(plugin.icon_fa, 50)+"</div>";
-        out += "<div style='display:inline-block;width: calc(100% - 85px);'><div style='font-weight:600;padding-top:10px;padding-left:20px;'>"+plugin.name+"</div>";
-        if(isInstalled(plugin)) {
-            out += "&emsp;<span style='color:"+theme.palette.green.normal+";font-size:8pt' class='fa fa-check'></span><span style='font-size:6pt;color:green'>ADDED</span>";	
-        }
+    out += "<div style='display:inline-block'>&emsp;"+getIcon(plugin.icon_fa, 50)+"</div>";
+    out += "<div style='display:inline-block;width: calc(100% - 85px);'><div style='font-weight:600;padding-top:10px;padding-left:20px;'>"+plugin.name+"</div>";
+    if(isInstalled(plugin)) {
+        out += "&emsp;<span style='color:"+theme.palette.green.normal+";font-size:8pt' class='fa fa-check'></span><span style='font-size:6pt;color:green'>ADDED</span>";	
+    }
 //        out += "<br>&emsp;&emsp;<i style='font-size:10pt'>"+plugin.credit+"</i>";
-        if(plugin.description.length > 140)
-            out += "<div style='font-size:8pt;padding-left:40px;padding-right:5px;padding-top:8px;'>"+plugin.description.substring(0,140)+"...</div>";	
-        else
-            out += "<div style='font-size:8pt;padding-left:40px;padding-right:5px;padding-top:8px;'>"+plugin.description+"</div>";
-        out += "</div>";
-
-        outt = "<div style='border:solid 1px "+getAppropriateColor(theme.palette.grey.accent700, theme.palette.grey.accent100)+";font-size:13pt;cursor:pointer;background-color:"+getAppropriateColor(theme.palette.grey.white, theme.palette.grey.thick)+";padding-top:5px;margin-top:-1px;color:"+getAppropriateColor(theme.palette.grey.thick, theme.palette.grey.light)+";min-height:100px;display: inline-table; width: 400px; margin-right: 24px; margin-bottom: 16px;' class='store_item' data-id='"+i+"'>"+out+"</div>";
-        return outt;
+    if(plugin.description.length > 140 && (plugin.featured == 0 && plugin.featured_c == 0))
+        out += "<div style='font-size:8pt;padding-left:40px;padding-right:5px;padding-top:8px;'>"+plugin.description.substring(0,140)+"...</div>";	
+    else
+        out += "<div style='font-size:8pt;padding-left:40px;padding-right:5px;padding-top:8px;'>"+plugin.description+"</div>";
+    if(plugin.featured == 1 || plugin.featured_c == 1)
+        out += "<div style='font-size:8pt;padding-left:40px;padding-right:5px;padding-top:8px;opacity:0.6;font-style:italic;'>This is a featured plugin</div>"
+    
+    out += "</div>";
+    var bordercolor = getAppropriateColor(theme.palette.grey.accent700, theme.palette.grey.accent100);
+    var cardback = getAppropriateColor(theme.palette.grey.white, theme.palette.grey.thick);
+    var cardwidth = "400px";
+    if(plugin.featured == 1 || plugin.featured_c == 1) {
+        bordercolor = getAppropriateColor(theme.palette.blue.thick, theme.palette.blue.accent400);
+        cardback = getAppropriateColor(theme.palette.blue.white, theme.palette.blue.thick);
+        cardwidth = "90%";
+    }
+    var cat = plugin.type;
+    var col = getCategory(cat).color;
+    if(plugin.featured_c == 1 && !inHome) {
+        cardback = getAppropriateColor(theme.palette[col].white, theme.palette[col].thick);
+        bordercolor = getAppropriateColor(theme.palette[col].thick, theme.palette[col].accent400);
+    }
+        
+    outt = "<div style='border:solid 1px "+bordercolor+";font-size:13pt;cursor:pointer;background-color:"+cardback+";padding-top:5px;margin-top:-1px;color:"+getAppropriateColor(theme.palette.grey.thick, theme.palette.grey.light)+";min-height:100px;display: inline-table; width: "+cardwidth+"; margin-right: 24px; margin-bottom: 16px;' class='store_item' data-id='"+i+"'>"+out+"</div>";
+    return outt;
 }   
 //FIXME THis is wrong
 //FIXME Install dicctionaries, themes
@@ -103,13 +136,22 @@ function launchStore2(storetype) {
         out = "<div id='storebody' class='row' style='max-width:100%'> <div id='store_categories' class='small-4 medium-3 large-2 columns'></div> <div id='store_display' class='small-8 medium-9 large-10 columns'></div> </div>";
         $('#build_inner').html(out);
         //TODO Maybe switch to Flatbuttons
-        $('#store_categories').html("<button id='store_c_home'>Home</button><br><button id='store_c_panels'>Panels</button><br><button id='store_c_services'>Services</button><br><button id='store_c_dictionaries'>Dictionaries</button><br><button id='store_c_themes'>Themes</button><br><button id='store_c_plugins'>Plugins</button><br><button id='store_c_submit'>Developers Portal</button>");
+        var out = "<button id='store_c_home' class='textbutton'><span class='fa fa-home' style='color:"+theme.palette.blue.normal+"'></span>&nbsp;Home</button><br>";
+        for(i in categories) {
+            out += "<button id='store_c_"+i+"' data-type='"+i+"' class='textbutton'><span class='fa fa-"+categories[i].icon+"' style='color:"+theme.palette[categories[i].color].accent400+"'></span>&nbsp;"+categories[i].p+"</button><br>";   
+        }
+        $('#store_categories').html(out+"<button class='textbutton' id='store_c_submit'><span class='fa fa-dashboard'></span>&nbsp;Dev Portal</button>");
+        for(i in categories) {
+            $('#store_c_'+i).click(function() {
+                loadStoreCategory(categories[$(this).attr('data-type')].s); 
+            });
+        }
         function loadHome() {
             $('#store_display').empty();
             $('#store_display').append("<div style='text-align:left;font-size:20pt;padding-bottom:16px;margin-left:-16px;'>home</div>");
             for(i in d) {
                 if(d[i].featured == 1) {
-                    $('#store_display').append(getStoreCard(d[i],i));   
+                    $('#store_display').append(getStoreCard(d[i],i, true));   
                 }
             }   
             loadStoreClickHandlers();
@@ -119,16 +161,17 @@ function launchStore2(storetype) {
                 loadHome(); 
                 return;
             }
+            var categoryitem = getCategory(catName);
             $('#store_display').empty();
-            $('#store_display').append("<div style='text-align:left;font-size:20pt;padding-bottom:16px;margin-left:-16px;text-transform:lowercase;'>"+catName+"</div>");
+            $('#store_display').append("<div style='text-align:left;font-size:20pt;padding-bottom:16px;margin-left:-16px;text-transform:lowercase;'>Browse "+categoryitem.p+"</div>");
             for(i in d) {
                 if(d[i].type == catName && d[i].featured_c == 1) {
-                    $('#store_display').append(getStoreCard(d[i],i));   
+                    $('#store_display').append(getStoreCard(d[i],i, false));   
                 }
             }
             for(i in d) {
                 if(d[i].type == catName && d[i].featured_c == 0) {
-                    $('#store_display').append(getStoreCard(d[i],i));   
+                    $('#store_display').append(getStoreCard(d[i],i, false));   
                 }
             }   
             loadStoreClickHandlers();
@@ -233,21 +276,7 @@ function launchStore2(storetype) {
         $('#store_c_home').click(function() {
             loadHome();
         });
-        $('#store_c_panels').click(function() {
-            loadStoreCategory("Panel");
-        });
-        $('#store_c_services').click(function() {
-            loadStoreCategory("Service");
-        });
-        $('#store_c_dictionaries').click(function() {
-            loadStoreCategory("Dictionary");
-        });
-        $('#store_c_themes').click(function() {
-            loadStoreCategory("Theme");
-        });
-        $('#store_c_plugins').click(function() {
-            loadStoreCategory("Plugin");
-        });
+        
         $('#store_c_submit').click(function() {
             //TODO Go to Developer Panel Link
             out = "<div style='margin-left:5%'>The plugin you submit must be uncondensed javascript so it may be reviewed. Your plugin must meet the following guidelines. Keep in mind that they may seem vague, and there is room to compromise.<br><ul><li><b>1. Integration</b> Your plugin may not secretly manipulate user data. This includes but isn't limited to deleting settings and files as well as adding settings and files without the user's consent or knowledge. Also, your plugin should use the APIs and procedures recommened.</li><li><b>2. Function</b> Your plugin must meet its specified function and not secretly run other code. This includes but isn't limited to attacking servers, running malicious code, or interfering with the user in a malicious way.</li><li><b>3. Classiness</b> Your plugin must be tastefully presented. This includes but isn't limited to showing pornography, insulting the user or any other individual, and presenting information in a tasteless manner.</li></ul></div><br>If your plugin meets these guidelines, <a href='mailto:handnf+gltn@gmail.com?subject=Gltn%20Store%20Submission&body=Please%20fill%20out%20the%20following%20information%20for%20appearing%20in%20the%20store%3A%0A%0AProject%20Name%3A%0AProject%20ID%3A%0ADeveloper%20Name%3A%0AIcon%20(Font-Awesome%2C%20IMG%2C%20or%20Text)%3A%0AGive%20a%20brief%20description%20of%20the%20project%3A'> Send an email</a> with the code attached for review.";

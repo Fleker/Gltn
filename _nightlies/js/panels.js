@@ -1656,6 +1656,13 @@ function createNewFile() {
     }
     initiatePopup({title: "Create New File", ht:ht, fnc:fnc,size:"large", bordercolor: "#7f8c8d"});
 }
+function createConvertButton(format, icon) {
+    ic = "";
+    if(icon !== undefined)
+        ic = getIcon(icon, 11);
+
+    return "<button class='convertButton textbutton' data-format='"+format+"' style='min-width:60px;text-align:center;'>"+ic+"&nbsp;" +format.substring(0,1).toUpperCase()+format.substring(1)+"</button>";
+}
 panelManager.getAvailablePanels().Main_Filesys.onRun = function () {
     //TODO SPinner
 	function c(i) {
@@ -1732,13 +1739,7 @@ panelManager.getAvailablePanels().Main_Filesys.onRun = function () {
                 $('.downloadFile').on('click', function() {
                     var id = $(this).attr('data-v');
                     var blob = localStorage[id]+localStorage[id+"_c"];
-                    function createConvertButton(format, icon) {
-                        ic = "";
-                        if(icon !== undefined)
-                            ic = getIcon(icon, 11);
-
-                        return "<button class='convertButton textbutton' data-format='"+format+"' style='min-width:60px;text-align:center;'>"+ic+"&nbsp;" +format.substring(0,1).toUpperCase()+format.substring(1)+"</button>";
-                    }
+                   
                     customFormats = {};
                     ht = "Export To: ";
                     for(i in panelManager.getAvailablePanels()) {
@@ -1788,14 +1789,39 @@ panelManager.getAvailablePanels().Main_Filesys.onRun = function () {
 		$('#filesys_new').on('click', function() {
 			createNewFile();
 		});
+        customImports = {};
 		$('#filesys_up').on('click', function() {
-            cloudImport("HFS");
+            ht = "";
+            for(i in panelManager.getAvailablePanels()) {
+                if(panelManager.getAvailablePanels()[i].onImport !== undefined) {
+                    var importOptions = panelManager.getAvailablePanels()[i].onImport();
+                    if(importOptions !== null) {
+                        if(!Array.isArray(importOptions)) {
+                            importOptions = [importOptions];   
+                        }
+                        for(var ii in importOptions) {
+                            ht += createConvertButton(importOptions[ii].name, importOptions[ii].icon);
+                            customImports[importOptions[ii].name] = importOptions[ii];
+                        }   
+                    }
+                }
+            }
+            fnc = function() {
+                $('.convertButton').click(function() {
+                    format = $(this).attr('data-format');
+                    cloudImport("HFS", customImports[format].extension);
+                    $('#filesys_file').attr('format', format); 
+                });
+            };
+            new Popup({title:"Choose an Filetype", ht:ht, fnc: fnc, bordercolor:"#", size: popupManager.LARGE}).show();
             //handleFileSelect(window.ink);
 			//$('#filesys_u').click();
 			//document.getElementById('filesys_u').addEventListener('change', handleFileSelect, false);
 		});
         $('#filesys_file').on('click', function() {
-           handleFileSelect(window.imported, window.ink2.filename); 
+            var rawFileData = window.imported;
+            var fileData = customImports[$(this).attr('format')].convert(rawFileData);
+           handleFileSelect(fileData, window.ink2.filename); 
         });
 		$('#filesys_s').on('input', function() {
 			resetFolder($('#filesys_s').val());
@@ -1972,6 +1998,13 @@ panelManager.getAvailablePanels().Main_Filesys.onExport = function(docView, blob
         } 
         return [{name: "html", icon: "file-code-o", callback: toHTML}, {name:"txt", icon:"file-text-o", callback: toTXT}];
     }
+}
+panelManager.getAvailablePanels().Main_Filesys.onImport = function() {
+    return [{
+        name: "gltn", icon: "file-code-o", extension: "gltn", convert: function(rawFileData) {
+            return rawFileData;
+        },
+    }]
 }
 
 function GetPanelmain_Guide() {
@@ -2507,7 +2540,12 @@ panelManager.getAvailablePanels().Main_Themes.setManifest({
 });
 
 /** Page Count **/
-function InitPanelmain_PageCount() {
+panelManager.getAvailablePanels().Main_Pagecount.setManifest({
+    bordercolor: '#909',
+    width: 20,
+    title: "Page Count"
+});
+panelManager.getAvailablePanels().Main_Pagecount.onInit = function() {
     postPageCount();
     $(document).on('keydown', function(e) {
         if(e.keyCode == 32) {
@@ -2516,13 +2554,8 @@ function InitPanelmain_PageCount() {
                 RunPanelmain_PageCount();
         }
      });
-}
-panelManager.getAvailablePanels().Main_Pagecount.setBordercolor('#909').setWidth(20);
-panelManager.getAvailablePanels().Main_Pagecount.onInit = InitPanelmain_PageCount;
-function GetPanelmain_PageCount() {
-    return {title:"Page Count", bordercolor: theme.coloralt, width:20};   
-}
-function RunPanelmain_PageCount() {
+};
+panelManager.getAvailablePanels().Main_Pagecount.onRun = function() {
     out = "<div style='text-align:center'>This document is</div><br><br>";
     out += "<div style='font-size:24pt;text-align:center;font-weight:100;'>~"+postPageCount()+" Page"+(postPageCount()==1?"":"s")+"</div>";
     out += "<br><div style='text-align:center;font-size:8pt;font-style:italic;'>Based on the number of words that can fit on a page.This does not factor additional formatting like bibliographies or cover pages.</div><br><br><br><br><br>"; 
@@ -2532,10 +2565,9 @@ function RunPanelmain_PageCount() {
     out += "<br><div style='text-align:center;font-size:8pt;font-style:italic;'>Based on an average of 130 words per minute.</div><br><br><br><br><br>";
     
     out += "<div style='text-align:center;'></div><br><br>";
-    out += "<div style='text-align:center;font-size:18pt;font-weight:100;'>"+getWords().length+" Words<br><br>"+getWords().join('').length+" Chars</div>";
+    out += "<div style='text-align:center;font-size:18pt;font-weight:100;'>"+getWords().length+" Words<br><br>"+getWords().join('').length+" Chars<br><br>"+(getParagraphs().length+1)+" Paragraphs</div>";
     postPanelOutput(out);
 }
-panelManager.getAvailablePanels().Main_Pagecount.onRun = RunPanelmain_PageCount;
 function postPageCount() {
     var i = Math.round(onGetPageCount()*10)/10;  
 //    initService("Main_PageCount", "Page Count", Math.ceil(i)+" Page"+(Math.ceil(i)==1?"":"s")); 
@@ -2857,7 +2889,9 @@ panelManager.getAvailablePanels().Main_Table.onRun = function() {
             // Start calculation when worker is ready
             this.worker.onmessage = this.calc;
             this.worker.postMessage( this.sheet );
-            this.sheet = JSON.parse(JSON.parse($('.table'+this.index).attr('data-sheet')));
+            this.sheet = JSON.parse($('.table'+this.index).attr('data-sheet'));
+            if($.isEmptyObject(this.sheet)) 
+                this.sheet = JSON.parse(this.sheet);
             console.log(this.sheet);
             this.calc();
             window.gltngrid = this;

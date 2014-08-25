@@ -237,7 +237,7 @@ function post_format_mltext(m) {
 }
 function post_format_content(m) {
 	var out = "<div class='small-12 column' style='margin-left: -11px;width: calc(100% + 27px);'><div class='content_wrapper row'><div class='content overflow small-12 column'></div>";
-	out += "<div class='content toolbar small-12 column'></div>";
+	out += "<div class='toolbar small-12 column'></div>";
 	out += "<div contenteditable='true' class='content content_textarea small-12 column'></div></div>";
 	out += "<div class='content_wordcount small-12 column' style='display:inline-flex'><div class='content_word'></div>&emsp;<div class='content_character'></div>&emsp;<div class='content_save'>&emsp;</div></div></div>";
 	return out;	

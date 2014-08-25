@@ -822,9 +822,10 @@ function cloudResave() {
     );   
 }
 //Now we PICK files
-function cloudImport(callback) {
+function cloudImport(callback, extension) {
+    extension = extension || ".gltn";
      filepicker.pick({
-        extension: '.gltn'
+        extension: extension;
       },
       function(InkBlob){
           window.ink2 = InkBlob;

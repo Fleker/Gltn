@@ -1,4 +1,4 @@
-var GLTN_VERSION = "1.3.3.4";
+var GLTN_VERSION = "1.3.3.6";
 var GLTN_VNAME = "Isidore";
 //For backwards compatibility, will return true 
 function greaterThanVersion(version) {
@@ -725,9 +725,9 @@ function setHeader() {
 
 		Me: new Array(
             {group: '', value:"<img style='overflow:hidden;border-radius:50%;width:60px;height:60px;' class='me_avatar_img'>"},
-			{group: '{{ Locale.NAME }}', value:'<div style="margin-top:2px"><input id="me_name" type="text" placeholder="{{ Locale.NAME }}"></div>'},
-			{group: '{{ Locale.NAME }}', value:'<div style="margin-top:2px"><input id="me_email" type="email" placeholder="Email Address"></div>'},
-            {text: '{{ Locale.SETTINGS }}...', img:'<span class="fa fa-cog" style="font-size:18pt"></span>', action:"openPersonalFavorites()", key: "F2"}
+			{group: '{{ Locale.NAME }}', value:'<div style="margin-top:2px"><input id="me_name" type="text" placeholder="Name" data-placeholder="{{ Locale.NAME }}"></div>'},
+			{group: '{{ Locale.EMAIL }}', value:'<div style="margin-top:2px"><input id="me_email" type="email" placeholder="Email Address"></div>'},
+            {text: '{{ Locale.SETTINGS }}', img:'<span class="fa fa-cog" style="font-size:18pt"></span>', action:"openPersonalFavorites()", key: "F2"}
 		)
 	};
 	newRibbon('.header', holoribbon_std);
@@ -945,8 +945,10 @@ function postLegal() {
     var favorite = theme.palette[getSettings("personal_color")];
     out = "<span style='color:"+getAppropriateColor(favorite.accent700, favorite.accent100)+"'>Version "+GLTN_VERSION+" Isidore</span><br><br>";
 	out += "2014 Made by Nick Felker&emsp;<a href='http://twitter.com/handnf'>@HandNF</a><br>";
-    out += "Made using libraries from Mathjax, Font Awesome, jQuery, Rangy, InkFilepicker, Spin.js, Timeago.js, and others<br>";
-    out += "Shoutout to everyone who posted online about stuff like replacing text nodes and the ample amount of help from StackOverflow.<br>";
+    out += "Iconography from Font Awesome";
+    out += "Made with Polymer, Mathjax, Foundation, jQuery, Rangy, Filepicker.io, CloudConvert, Spin.js, Timeago.js, and Together.js<br>";
+    out += "<br>I'd like to thank the others who posted online about stuff like replacing text nodes and the ample amount of help from assorted StackOverflow questions.<br>";
+    out += "Here's to making the web a better, more modular, place. :D<br>";
     out += '<br>Stock Images:<br>&emsp;"<a href="http://commons.wikimedia.org/wiki/File:Isidor_von_Sevilla.jpeg#mediaviewer/File:Isidor_von_Sevilla.jpeg">Isidor von Sevilla</a>" by <a href="//en.wikipedia.org/wiki/Bartolom%C3%A9_Esteban_Murillo" class="extiw" title="en:Bartolomé Esteban Murillo">Bartolomé Esteban Murillo</a> - <a rel="nofollow" class="external free" href="http://www.museumsyndicate.com/artist.php?artist=442">http://www.museumsyndicate.com/artist.php?artist=442</a>. Licensed under Public domain via <a href="//commons.wikimedia.org/wiki/">Wikimedia Commons</a>.'
 
 	f = function() {
