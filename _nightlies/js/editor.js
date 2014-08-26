@@ -1,5 +1,6 @@
-var GLTN_VERSION = "1.3.3.6";
+var GLTN_VERSION = "1.3.3.7";
 var GLTN_VNAME = "Isidore";
+var GLTN_BUILD = 0;
 //For backwards compatibility, will return true 
 function greaterThanVersion(version) {
     var split = version.split(".");
@@ -940,17 +941,30 @@ function openPersonalFavorites() {
     
     var p = new Popup({title: "Personal Settings", ht: output, fnc: f, size: popupManager.XLARGE, bordercolor: theme.palette[getSettings("personal_color")].normal}).show();
 };
+MITLICENSE = "(See MIT License)";
 
 function postLegal() {
     var favorite = theme.palette[getSettings("personal_color")];
     out = "<span style='color:"+getAppropriateColor(favorite.accent700, favorite.accent100)+"'>Version "+GLTN_VERSION+" Isidore</span><br><br>";
 	out += "2014 Made by Nick Felker&emsp;<a href='http://twitter.com/handnf'>@HandNF</a><br>";
     out += "Iconography from Font Awesome";
-    out += "Made with Polymer, Mathjax, Foundation, jQuery, Rangy, Filepicker.io, CloudConvert, Spin.js, Timeago.js, and Together.js<br>";
+    out += "Made with Polymer, Foundation, Rangy, CloudConvert, and Together.js<br>";
     out += "<br>I'd like to thank the others who posted online about stuff like replacing text nodes and the ample amount of help from assorted StackOverflow questions.<br>";
     out += "Here's to making the web a better, more modular, place. :D<br>";
     out += '<br>Stock Images:<br>&emsp;"<a href="http://commons.wikimedia.org/wiki/File:Isidor_von_Sevilla.jpeg#mediaviewer/File:Isidor_von_Sevilla.jpeg">Isidor von Sevilla</a>" by <a href="//en.wikipedia.org/wiki/Bartolom%C3%A9_Esteban_Murillo" class="extiw" title="en:Bartolomé Esteban Murillo">Bartolomé Esteban Murillo</a> - <a rel="nofollow" class="external free" href="http://www.museumsyndicate.com/artist.php?artist=442">http://www.museumsyndicate.com/artist.php?artist=442</a>. Licensed under Public domain via <a href="//commons.wikimedia.org/wiki/">Wikimedia Commons</a>.'
-
+    out += "<br><br><u>Timeago.js</u><br>Copyright (c) 2008-2013 Ryan McGeary<br>"+MITLICENSE+"<br>";
+    out += "<br><u>xml2json</u><br>Copyright 2014 BugLabs. All rights reserved.<br>"+MITLICENSE+"<br>";
+    out += "<br><u>json2xml</u><br>"+MITLICENSE+"<br>";
+    out += "<br><u><a href='http://filepicker.io'>Filepicker.io</a></u><br>";
+    out += '<br><a href="http://www.mathjax.org"><img title="Powered by MathJax" src="http://cdn.mathjax.org/mathjax/badge/badge.gif" border="0" alt="Powered by MathJax" /></a><br>';
+    out += "<br><u>jQuery</u><br>Copyright 2005, 2014 jQuery Foundation and other contributors, <a href='https://jquery.org/'>Website</a><br>"+MITLICENSE+"<br>";
+    out += "<br><u>jQuery Color</u><br>Copyright 2007, 2014 jQuery Foundation and other contributors, <a href='https://jquery.org/'>Website</a><br>"+MITLICENSE+"<br>";
+    out += "<br><u>Spin.js</u><br>Copyright (c) 2011-2014 Felix Gnass [fgnass at neteye dot de]<br>"+MITLICENSE+"<br>";
+    for(i in panelManager.getAvailablePanels()) {
+        if(panelManager.getAvailablePanels()[i].getCredits !== undefined) 
+            out += panelManager.getAvailablePanels()[i].getCredits();
+    }
+    out += "<br><br><u>MIT LICENSE</u><br>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the 'Software'), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:<br><br>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.<br><br>THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.";
 	f = function() {
         $('#myModal a').css('color', theme.palette[getSettings("personal_color")].normal);
     };

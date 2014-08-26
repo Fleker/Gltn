@@ -1,4 +1,3 @@
-//TODO Showcase new event access for panels
 ## Key Press Event
 Your panel is able to respond to global user key events with a simple integration much like responding to a popup close.
 

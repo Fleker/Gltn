@@ -2551,7 +2551,7 @@ panelManager.getAvailablePanels().Main_Pagecount.onInit = function() {
         if(e.keyCode == 32) {
             postPageCount();
             if(window.paneltitle == "main_PageCount")
-                RunPanelmain_PageCount();
+                panelManager.getAvailablePanels().Main_Pagecount.onRun();
         }
      });
 };
@@ -2565,7 +2565,7 @@ panelManager.getAvailablePanels().Main_Pagecount.onRun = function() {
     out += "<br><div style='text-align:center;font-size:8pt;font-style:italic;'>Based on an average of 130 words per minute.</div><br><br><br><br><br>";
     
     out += "<div style='text-align:center;'></div><br><br>";
-    out += "<div style='text-align:center;font-size:18pt;font-weight:100;'>"+getWords().length+" Words<br><br>"+getWords().join('').length+" Chars<br><br>"+(getParagraphs().length+1)+" Paragraphs</div>";
+    out += "<div style='text-align:center;font-size:18pt;font-weight:100;'>"+getWords().join('').length+" Chars<br><br>"+getWords().length+" Words<br><br>"+(getParagraphs().length+1)+" Paragraphs</div>";
     postPanelOutput(out);
 }
 function postPageCount() {

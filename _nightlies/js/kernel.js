@@ -666,14 +666,14 @@ function getWords() {
     try {
         var a = $('.content_textarea').html().toLowerCase().trim().replace(/<kbd.*<\/kbd>|<div class="table.+?<\/div>/g, "").replace(/></g, "> <").replace(/<[^>]*>/g, "").replace(/"/g, "").replace(/&nbsp;/g, " ").split(' ');
         for(i in a) {
-            if(a[i] = "") 
+            if(a[i] == "") 
                 a.splice(i,1);
         }
     } catch(e) {
         var a = "";
     }
     if(a.length == 0) 
-        return [""];
+        return [];
     else
         return a;
 }
