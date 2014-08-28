@@ -1663,6 +1663,114 @@ function createConvertButton(format, icon) {
 
     return "<button class='convertButton textbutton' data-format='"+format+"' style='min-width:60px;text-align:center;'>"+ic+"&nbsp;" +format.substring(0,1).toUpperCase()+format.substring(1)+"</button>";
 }
+function showFileInfo(id) {
+    var doc = $.xml2json(localStorage[id]);
+    out = "<div class='tinfo'>";
+    if(doc.metadata.Title !== undefined && doc.metadata.Title.length > 0)
+        out += "<h1>"+doc.metadata.Title+"</h1>";
+    if(doc.metadata.Author !== undefined && doc.metadata.Author.length > 0)
+        out += "<h2>By "+doc.metadata.Author+"</h2>";
+    out += "<h3><input id='renameFileVal' value='"+id+"'>.gltn&nbsp;&nbsp;"+truncateFloat(getLocalStorageOf(id)+getLocalStorageOf(id+"_c"))+"KB</h3>";
+    out += "<h4 class='filedata'>"+doc.file.format+"&emsp;"+doc.file.language+"&emsp;"
+    if(doc.file.gltn_version !== undefined)
+        out += "From Gltn v"+doc.file.gltn_version;
+    out += "</h4>";
+
+//            time = jQuery.timeago(new Date().setTime(doc.file.last_modified));
+    timeiso = new Date();
+    timeiso.setTime(decodeURIComponent(doc.file.last_modified));
+    timeiso = timeiso.toISOString();
+    out += "<h4 class='lastedit'>";
+    if(doc.saved != undefined) {
+        if(doc.saved.inkblob_url != undefined)
+            out += "<span class='fa fa-cloud' style='font-size:12pt' title='File is available on the cloud'></span>&nbsp;&nbsp;";
+    }
+    out += "Last edited <abbr class='timeago' title='"+timeiso+"'></abbr></h4>";
+    out += "<h5>"+doc.file.tags+"</h5>";
+
+    out += "<button class='textbutton openFile' data-v='"+id+"'><span class='fa fa-sign-in'></span>&nbsp;Open File</button>&emsp;&emsp;<button class='textbutton downloadFile' data-v='"+id+"'><span class='fa fa-download'></span>&nbsp;Download</button>&emsp;&emsp;<button class='textbutton deleteFile' data-v='"+id+"'><span class='fa fa-times' style='color:"+theme.palette.red.normal+"'></span>&nbsp;Delete</button>&emsp;&emsp;<button class='textbutton renameFile' style='opacity:0' data-v='"+id+"'><span class='fa fa-file-o'></span>&nbsp;Rename</button>";
+    out += "<div class='fileExportMenu'></div></div>";
+
+    var f = function() {
+        $('.tinfo > h1').css('color', theme.fontColor).css('font-size', '15pt').css('font-family','inherit').css('margin-top','-16px');
+        $('.tinfo > h2').css('color', theme.fontColor).css('font-size', '13pt').css('font-family','inherit').css('margin-left', '32px')/*.css('margin-top', '-8px')*/.css('margin-bottom', '24px');
+        $('.tinfo > h3').css('color', theme.fontColor).css('font-size', '13pt').css('font-family', 'inherit').css('opacity', '0.8');
+        $('.tinfo > .filedata').css('color', theme.fontColor).css('font-size', '11pt').css('text-align', 'right').css('margin-top','-24px').css('opacity', '0.8');
+        $('.tinfo > .lastedit').css('color', theme.fontColor).css('font-size', '11pt').css('font-family', 'inherit');
+        $('.tinfo > h5').css('color', theme.fontColor).css('opacity', '0.5').css('font-family', 'inherit').css('font-size','10pt').css('margin-bottom','32px').css('padding-top', '8px').css('margin-left', '32px');
+
+        jQuery("abbr.timeago").timeago();
+        $('.openFile').on('click', function() {
+            wl($(this).attr('data-v'));
+        });
+        $('.renameFile').on('click', function() {
+            renameFile(); 
+        });
+        $('#renameFileVal').on('input', function() {
+            $('.renameFile').animate({
+                opacity:1
+            },100);
+        });
+        $('.deleteFile').on('click', function() {
+            x = confirm('Delete '+$(this).attr('data-v')+'.gltn? This cannot be undone.');
+            if(x == true) {
+                y = confirm('Are you positive that you want this file to be completely erased?');
+                if(y == true) {
+                    deleteFile($(this).attr('data-v'));
+                    resetFolder($('#filesys_s').val());
+                }
+            }
+        });
+        $('.downloadFile').on('click', function() {
+            var id = $(this).attr('data-v');
+            var blob = localStorage[id]+localStorage[id+"_c"];
+
+            customFormats = {};
+            ht = "Export To: ";
+            for(i in panelManager.getAvailablePanels()) {
+                if(panelManager.getAvailablePanels()[i].onExport !== undefined) {
+                    var exportOptions = panelManager.getAvailablePanels()[i].onExport(false, blob);
+                    if(exportOptions !== null) {
+                        if(!Array.isArray(exportOptions)) {
+                           exportOptions = [exportOptions]
+                        }
+                        for(var ii in exportOptions) {
+                            ht += createConvertButton(exportOptions[ii].name, exportOptions[ii].icon);
+                            customFormats[exportOptions[ii].name] = exportOptions[ii];
+                        }
+                    }
+                }
+            }
+            $('.fileExportMenu').html(ht).fadeOut(1).fadeIn(300);
+            $('.convertButton').on('click', function() {
+                format = $(this).attr('data-format');
+//                        console.log(customFormats);
+                console.log("."+customFormats[format].extension, id);
+                blob = customFormats[format].callback();
+                filepicker.store(blob, function(InkBlob){
+                    filepicker.exportFile(
+                      InkBlob,
+                      {extension:"."+customFormats[format].extension,
+                       suggestedFilename: id,
+                       base64decode: false
+                      },
+                      function(InkBlob){
+
+                      });
+                    closePopup();
+                }, function(FPError) {
+                    closePopup();
+                    console.log(FPError.toString());
+                }, function(progress) {
+                    console.log("Loading: "+progress+"%");
+                }
+                )
+            });
+            });           
+
+    };
+    p = new Popup({title: "File Properties", ht: out, fnc: f, size: popupManager.LARGE}).show();    
+}
 panelManager.getAvailablePanels().Main_Filesys.onRun = function () {
     //TODO SPinner
 	function c(i) {
@@ -1686,105 +1794,7 @@ panelManager.getAvailablePanels().Main_Filesys.onRun = function () {
 				wl($(this).attr('data-v'));
 		});
         $('.tinfo').on('click', function() {
-            var id = $(this).attr('data-v');
-            var doc = $.xml2json(localStorage[id]);
-            out = "<div class='tinfo'>";
-            if(doc.metadata.Title !== undefined && doc.metadata.Title.length > 0)
-                out += "<h1>"+doc.metadata.Title+"</h1>";
-            if(doc.metadata.Author !== undefined && doc.metadata.Author.length > 0)
-                out += "<h2>By "+doc.metadata.Author+"</h2>";
-            out += "<h3>"+id+".gltn&nbsp;&nbsp;"+truncateFloat(getLocalStorageOf(id)+getLocalStorageOf(id+"_c"))+"KB</h3>";
-            out += "<h4 class='filedata'>"+doc.file.format+"&emsp;"+doc.file.language+"&emsp;"
-            if(doc.file.gltn_version !== undefined)
-                out += "From Gltn v"+doc.file.gltn_version;
-            out += "</h4>";
-            
-//            time = jQuery.timeago(new Date().setTime(doc.file.last_modified));
-            timeiso = new Date();
-            timeiso.setTime(decodeURIComponent(doc.file.last_modified));
-            timeiso = timeiso.toISOString();
-            out += "<h4 class='lastedit'>";
-            if(doc.saved != undefined) {
-                if(doc.saved.inkblob_url != undefined)
-                    out += "<span class='fa fa-cloud' style='font-size:12pt' title='File is available on the cloud'></span>&nbsp;&nbsp;";
-            }
-            out += "Last edited <abbr class='timeago' title='"+timeiso+"'></abbr></h4>";
-            out += "<h5>"+doc.file.tags+"</h5>";
-            
-            out += "<button class='textbutton openFile' data-v='"+id+"'><span class='fa fa-sign-in'></span>&nbsp;Open File</button>&emsp;&emsp;<button class='textbutton downloadFile' data-v='"+id+"'><span class='fa fa-download'></span>&nbsp;Download</button>&emsp;&emsp;<button class='textbutton deleteFile' data-v='"+id+"'><span class='fa fa-times' style='color:"+theme.palette.red.normal+"'></span>&nbsp;Delete</button>";
-            out += "<div class='fileExportMenu'></div></div>";
-            
-            var f = function() {
-                $('.tinfo > h1').css('color', theme.fontColor).css('font-size', '15pt').css('font-family','inherit').css('margin-top','-16px');
-                $('.tinfo > h2').css('color', theme.fontColor).css('font-size', '13pt').css('font-family','inherit').css('margin-left', '32px')/*.css('margin-top', '-8px')*/.css('margin-bottom', '24px');
-                $('.tinfo > h3').css('color', theme.fontColor).css('font-size', '13pt').css('font-family', 'inherit').css('opacity', '0.8');
-                $('.tinfo > .filedata').css('color', theme.fontColor).css('font-size', '11pt').css('text-align', 'right').css('margin-top','-24px').css('opacity', '0.8');
-                $('.tinfo > .lastedit').css('color', theme.fontColor).css('font-size', '11pt').css('font-family', 'inherit');
-                $('.tinfo > h5').css('color', theme.fontColor).css('opacity', '0.5').css('font-family', 'inherit').css('font-size','10pt').css('margin-bottom','32px').css('padding-top', '8px').css('margin-left', '32px');
-                
-                jQuery("abbr.timeago").timeago();
-                $('.openFile').on('click', function() {
-                    wl($(this).attr('data-v'));
-                });
-                $('.deleteFile').on('click', function() {
-                    x = confirm('Delete '+$(this).attr('data-v')+'.gltn? This cannot be undone.');
-                    if(x == true) {
-                        y = confirm('Are you positive that you want this file to be completely erased?');
-                        if(y == true) {
-                            deleteFile($(this).attr('data-v'));
-                            resetFolder($('#filesys_s').val());
-                        }
-                    }
-                });
-                $('.downloadFile').on('click', function() {
-                    var id = $(this).attr('data-v');
-                    var blob = localStorage[id]+localStorage[id+"_c"];
-                   
-                    customFormats = {};
-                    ht = "Export To: ";
-                    for(i in panelManager.getAvailablePanels()) {
-                        if(panelManager.getAvailablePanels()[i].onExport !== undefined) {
-                            var exportOptions = panelManager.getAvailablePanels()[i].onExport(false, blob);
-                            if(exportOptions !== null) {
-                                if(!Array.isArray(exportOptions)) {
-                                   exportOptions = [exportOptions]
-                                }
-                                for(var ii in exportOptions) {
-                                    ht += createConvertButton(exportOptions[ii].name, exportOptions[ii].icon);
-                                    customFormats[exportOptions[ii].name] = exportOptions[ii];
-                                }
-                            }
-                        }
-                    }
-                    $('.fileExportMenu').html(ht).fadeOut(1).fadeIn(300);
-                    $('.convertButton').on('click', function() {
-                        format = $(this).attr('data-format');
-//                        console.log(customFormats);
-                        console.log("."+customFormats[format].extension, id);
-                        blob = customFormats[format].callback();
-                        filepicker.store(blob, function(InkBlob){
-                            filepicker.exportFile(
-                              InkBlob,
-                              {extension:"."+customFormats[format].extension,
-                               suggestedFilename: id,
-                               base64decode: false
-                              },
-                              function(InkBlob){
-                                  
-                              });
-                            closePopup();
-                        }, function(FPError) {
-                            closePopup();
-                            console.log(FPError.toString());
-                        }, function(progress) {
-                            console.log("Loading: "+progress+"%");
-                        }
-                        )
-                    });
-                    });           
-                    
-            };
-            p = new Popup({title: "File Properties", ht: out, fnc: f, size: popupManager.LARGE}).show(); 
+            showFileInfo($(this).attr('data-v'));
         });
 		$('#filesys_new').on('click', function() {
 			createNewFile();
@@ -2694,6 +2704,7 @@ panelManager.getAvailablePanels().Main_Table.onInit = function() {
         SUP: function(str) {
             return "<sup>"+str.toString()+"</sup>";   
         },
+        SUP_DOC: new SpreadsheetDoc("SUP", "element sup superscript", "SUP(str)", [new Parameter("str", "The string to display in a superscript")], "Displays a superscript", "How to Create a Superscript"),
         LATEX: function(str) {
             console.log(str);
             str = str.replace(/\\/g, "\\");
@@ -2701,41 +2712,50 @@ panelManager.getAvailablePanels().Main_Table.onInit = function() {
             postLatex(str);
             return getLatex();
         },
-        EXP: function(base, pow) {
-            return Math.pow(base, pow);   
-        },
-        EXP_DOC: new SpreadsheetDoc("EXP", "exponent to square", "EXP(base, power)", [new Parameter("base", "The number to be given an exponent"), new Parameter("power", "The power of the exponent")], "Exponent of a number", "How to Create Exponents", "(\\d+)\\^(\\d+)", "Spreadsheet.EXP($1, $2)"), 
-        RANGE: function(c1, c2, r1, r2) {
-            //TODO convert letters to numbers, run through two loops to grab all the data in an array, return it
-            var arr = [];
-            for(var index = r1; index<=r2; index++) {
-                console.log(Spreadsheet[c1+index]);
-                if(Spreadsheet[c1+index].substring(0,1) == "=")
-                    ans = Spreadsheet[c1+index].substring(1);
-                else
-                    ans = Spreadsheet[c1+index];
-                console.log(ans);
-                
-                try {
-                    ans = eval(ans);  
-                    console.log(ans);
-                    if(ans.toString().substring(0,1) == "=")
-                        ans = eval(ans.substring(1));
-                } catch(e) {
-                    console.error("RANGE: "+e.message);
-                }
-                console.log(ans);
-                arr.push(ans);
-            }
-            return arr;
-        },
         SUM: function(arr) {
             var sum = 0;
             for(index in arr) {
-                sum += arr[index];
+                sum += parseFloat(arr[index]);
             }
             return sum;
-        }
+        },
+        SUM_DOC: new SpreadsheetDoc("SUM", "sum summation add", "SUM(range)", [new Parameter("range", "A range of numbers to add together")], "Computes the summation of all numbers in range", "How to Sum Values"),
+        RANGE: function(c1, c2, r1, r2) {
+            //TODO convert letters to numbers, run through two loops to grab all the data in an array, return it
+            var arr = [];
+            for(var c = c1.charCodeAt();c<=c2.charCodeAt();c++) {
+//                String.fromCharCode( cur.charCodeAt()+1 )
+                for(var r = r1;r<=r2;r++) {
+                    arr.push(gltngrid.sheetCache[String.fromCharCode(c)+r]);   
+//                    arr.push(String.fromCharCode(c)+r);   
+                }
+            }
+            return arr;
+        },
+        RANGE_DOC: new SpreadsheetDoc("RANGE", "range list group", "RANGE(col1, col2, row1, row2) OR col1row1:col2row2", [new Parameter("col1", "The column to start the range, inclusive"), new Parameter("col2", "The column to end that range, inclusive"), new Parameter("row1", "The row to start the range, inclusive"), new Parameter("row2", "The row to end the range, inclusive")], "Computes an inclusive range given two references. In lieu of long-form, the user may want to use the colon operator. Eg. RANGE('A', 'D', 2, 13) can be replaced by A2:D13", "How to Grab a Range of Values", "([A-Za-z])(\\d):([A-Za-z])(\\d)", "Spreadsheet.RANGE($1,$3,$2,$4)"),
+        
+        /* Based on the OpenFormula Standard 1.2
+            Available: http://docs.oasis-open.org/office/v1.2/os/OpenDocument-v1.2-os-part2.html
+        */
+        // 6.4 Standard Operators
+        /* 6.4.6 */ POWER: function(base, pow) {
+            return Math.pow(base, pow);   
+        },
+        POWER_DOC: new SpreadsheetDoc("POWER", "exponent to square", "POWER(base, power) OR base^power", [new Parameter("base", "The number to be given an exponent"), new Parameter("power", "The power of the exponent")], "Exponent of a number", "How to Create Exponents", "(\\d+)\\^(\\d+)", "Spreadsheet.POWER($1, $2)"), 
+        /* 6.4.7 */ ISEQUAL: function(left, right) {
+            return left === right;  
+        },
+        ISEQUAL_DOC: new SpreadsheetDoc("ISEQUAL", "equal equivalence", "ISEQUAL(left, right) OR left=right", [new Parameter("left", "First value"), new Parameter("right", "Second value")], "Takes two expressions and checks their equivalency", "How to Check Equivalence", "\\s*([\\w\\d\\(\\)]*)=([\\w\\d\\(\\)]*)", "Spreadsheet.ISEQUAL($1, $2)"),
+        /* 6.4.8  - This function reuses another function and is only needed for its regexp*/ 
+        NOTEQUAL_DOC: new SpreadsheetDoc("NOTEQUAL", "not equal", "!ISEQUAL(left, right) OR left<>right", [new Parameter("left", "First value"), new Parameter("right", "Second value")], "Takes two expressions and checks if they are not equivalent", "How to Check Inequality", "\\s*([\\w\\d\\(\\)]*)=([\\w\\d\\(\\)]*)", "!Spreadsheet.ISEQUAL($1, $2)"),
+        /* 6.4.10 */ CONCATENATE: function(left, right) {
+            return ""+left+right;  
+        },
+        CONCATENATE_DOC: new SpreadsheetDoc("CONCATENATE", "concat add strings", "CONCATENATE(left, right) OR left&right", [new Parameter("left", "The first string"), new Parameter("right", "The second string")], "Combines two strings", "How to Add Strings", "\\s*([\\w\\d\\(\\)]*)&([\\w\\d\\(\\)]*)", "Spreadsheet.CONCATENATE($1, $2)"),
+        /* 6.4.14 */ PERCENT: function(float) {
+            return float/100;
+        },
+        PERCENT_DOC: new Spreadsheet("PERCENT", "percentage", "float%", [new Parameter("float", "Any number")], "Divides a number by 100", "How to Show Percentage", "([\\d]+?)%", 'Spreadsheet.PERCENT($1)'),
     };   
 }
 

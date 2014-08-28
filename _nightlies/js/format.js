@@ -423,7 +423,9 @@ function Hovertag(classname, textcode, action) {
 function HovertagManager() {
     this.registry = {
         citation: new Hovertag('citation', function(element) {
-            return citation[$(element).attr('data-id')].Title;
+            if(citation[$(element).attr('data-id')] === undefined)
+                return "Delete this Citation";
+            return citation[$(element).attr('data-id')].Title || "Citation";
         }, function(element) {
             initiateCitationEditor(undefined, $(element).attr('data-i'));
         }),

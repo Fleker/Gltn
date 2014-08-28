@@ -7,10 +7,16 @@ max_char = 0;
 min_word = 0;
 max_word = 0;
 SYNC_STATUS = "";
+
 /** FILE CLASS **/
 function File() {
-    this.metadata = [];
-    
+    this.metadata = []; 
+    this.min_char = 0;
+    this.max_char = 0;
+    this.min_word = 0;
+    this.max_word = 0;
+    this.min_par = 0;
+    this.max_par = 0;
     File.prototype.clearMetadata = function() {
         this.metadata = [];
     };  
@@ -55,40 +61,38 @@ ideadefault = "";
 fileid = "scratchpad";
 shareid = "";
 formatid = "";
-
-//Handle GET parameters
-GET = window.location.search.substring(1);
-GETarr = GET.split("&");
-for(var i in GETarr) {
-    if(isNaN(parseInt(i)))
-        continue;
-//    console.log(GETarr, i, parseInt(i));
-    var GETparam = GETarr[i].split("=")[0]; 
-    var GETval = GETarr[i].split("=")[1];
-    
-    if(GETparam == "file")
-        fileid = GETval;
-    if(GETparam == "share")
-        shareid = GETval;
-    if(GETparam == "format") {
-        formatid = GETval;
-        $('#file_format').val(GETval);
-    }
-}
-
-
-
 hovertagRegistrar = [];
 obj = {};
 currentformat = "";
 
 $(document).ready(function() {
     console.log('Gltn has awakened: v '+GLTN_VERSION);
+    GET = window.location.search.substring(1);
+    GETarr = GET.split("&");
+    for(var i in GETarr) {
+        if(isNaN(parseInt(i)))
+            continue;
+    //    console.log(GETarr, i, parseInt(i));
+        var GETparam = GETarr[i].split("=")[0]; 
+        var GETval = GETarr[i].split("=")[1];
+        console.log(i, GETparam, GETval);
+
+        if(GETparam == "file")
+            fileid = GETval;
+        if(GETparam == "share")
+            shareid = GETval;
+        if(GETparam == "format") {
+            formatid = GETval;
+            $('#file_format').val(GETval);
+        }
+    }
+    console.log(fileid);
     //Setup Filepicker
-        filepicker.setKey("AePnevdApT62LvpkSSsiVz");
+    filepicker.setKey("AePnevdApT62LvpkSSsiVz");
     setUpGlobalSettings();    
     setUpFoundation();
     setUpFilepicker();
+    //Handle GET parameters
 });
 /**
     Initalizes Foundation Interface
@@ -308,9 +312,10 @@ function startSaveFile() {
     window.dirty = false;
 }
 function saveFile() {	
-	fileid = $('#file_name_internal').val();
-    if(fileid == undefined)
+    if(fileid === undefined) {
+        console.error('fileid had no value');
         fileid = "scratchpad";
+    }
 	$('.content_save').hide();
 	//console.log(o.gluten_doc, x, obj);
 	if(window.jsonsave == undefined) 
@@ -447,9 +452,13 @@ function restoreFile(full) {
 		$('#file_language').val(x.file.language);
 		$('#file_tags').val(x.file.tags);
 		min_char = x.file.min_char;
+        file.min_char = parseInt(x.file.min_char);
 		max_char = x.file.max_char;
+        file.max_char = parseInt(x.file.max_char);
 		min_word = x.file.min_word;
+		file.min_word = parseInt(x.file.min_word);
 		max_word = x.file.max_word;
+		file.max_word = parseInt(x.file.max_word);
 		//console.error(x.citation);
         citation = [];
 		if(x.citation == undefined) {
@@ -591,6 +600,10 @@ function finishRestore2(full) {
 	   setInterval("startSaveFile()", 4000);	
     }
     refreshBodyDesign();
+    $('#minchars').val(file.min_char);
+    $('#maxchars').val(file.max_char);
+    $('#minwords').val(file.min_word);
+    $('#maxwords').val(file.max_word);
 }
 function newFile(x,xc) {
 	console.log('No file found for this name.');
@@ -825,7 +838,7 @@ function cloudResave() {
 function cloudImport(callback, extension) {
     extension = extension || ".gltn";
      filepicker.pick({
-        extension: extension;
+        extension: extension
       },
       function(InkBlob){
           window.ink2 = InkBlob;
@@ -1248,4 +1261,21 @@ function formatShift2(d) {
 		}
 	}
 	console.log("The document's format has shifted.");
+}
+function renameFile() {
+    var v = $('#renameFileVal').val();
+    v = v.replace(/ /g, "");
+    ovr = true;
+    if(localStorage[v] !== undefined) {
+        ovr = confirm('This file already exists: '+v+'; Overwrite the contents of this file?');	
+    }
+    if(ovr) {
+        if(v.substr(-2) == "_c")
+            v = v.substr(0,v.length-2)+"c";
+        /*$('#file_name_con').attr('disabled', true);
+        $('#file_name_internal').val(v);*/
+        localStorage[v] = localStorage[fileid]
+        localStorage[v+"_c"] = localStorage[fileid+"_c"];
+        setTimeout('window.location = "?file='+v+'";', 250);
+    }   
 }

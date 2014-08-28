@@ -1,4 +1,4 @@
-var GLTN_VERSION = "1.3.3.7";
+var GLTN_VERSION = "1.3.3.8";
 var GLTN_VNAME = "Isidore";
 var GLTN_BUILD = 0;
 //For backwards compatibility, will return true 
@@ -47,6 +47,7 @@ Strings = {
         WELCOME: "Welcome to Gltn!",
         FILE_CREATE: "Create a File",
         FILE_EXPLORE: "Explore Files",
+        FILE_INFO: "File Info",
         COMPILE_AND_EXPORT: "Compile & Export",
         SHARE: "Share",
         GLTN_STORE: "Gltn Store",
@@ -632,55 +633,55 @@ function postWordCount() {
 	$('.content_character').css('width', '100px').html('<div style="height:3px;" class="content_character_bar"></div><span class="content_character_mark">'+char+'c</span>');
 	$('.content_word').css('width','100px').html('<div style="height:3px;" class="content_word_bar"></div><span class="content_word_mark">'+word+'w</span>');
 
-	if(min_char <= 0 && max_char <= 0) {
+	if(file.min_char <= 0 && file.max_char <= 0) {
 		$('.content_character_bar').css('background-color', '#00AC39').css('width', '100px');
-	} else if(min_char > 0 && max_char <= 0) {
-		if(char - min_char < -100) 
-			$('.content_character_bar').css('background-color','#f44').css('width', (100*(char/min_char))+"px");
-		else if(char - min_char < 0)
-			$('.content_character_bar').css('background-color','#D0B605').css('width', (100*(char/min_char))+"px");
+	} else if(file.min_char > 0 && file.max_char <= 0) {
+		if(char - file.min_char < -100) 
+			$('.content_character_bar').css('background-color','#f44').css('width', (100*(char/file.min_char))+"px");
+		else if(char - file.min_char < 0)
+			$('.content_character_bar').css('background-color','#D0B605').css('width', (100*(char/file.min_char))+"px");
 		else
-			$('.content_character_bar').css('background-color','#00AC39').css('width', (100*(min_char/char))+"px");
-	} else if(min_char <= 0 && max_char > 0) {
-		if(char - max_char > 100) 
-			$('.content_character_bar').css('background-color','#f44').css('width', (100*(max_char/char))+"px");
-		else if(char - max_char > 0)
-			$('.content_character_bar').css('background-color','#D0B605').css('width', (100*(max_char/char))+"px");
+			$('.content_character_bar').css('background-color','#00AC39').css('width', (100*(file.min_char/char))+"px");
+	} else if(file.min_char <= 0 && file.max_char > 0) {
+		if(char - file.max_char > 100) 
+			$('.content_character_bar').css('background-color','#f44').css('width', (100*(file.max_char/char))+"px");
+		else if(char - file.max_char > 0)
+			$('.content_character_bar').css('background-color','#D0B605').css('width', (100*(file.max_char/char))+"px");
 		else
-			$('.content_character_bar').css('background-color','#00AC39').css('width', (100*(char/max_char))+"px");
+			$('.content_character_bar').css('background-color','#00AC39').css('width', (100*(char/file.max_char))+"px");
 	} else {
-		if(char < min_char) {
-			$('.content_character_bar').css('background-color','#f44').css('width', (100*(char/min_char))+"px");
-		} else if(char > max_char) {
-			$('.content_character_bar').css('background-color','#f44').css('width', (100*(max_char/char))+"px");
+		if(char < file.min_char) {
+			$('.content_character_bar').css('background-color','#f44').css('width', (100*(char/file.min_char))+"px");
+		} else if(char > file.max_char) {
+			$('.content_character_bar').css('background-color','#f44').css('width', (100*(file.max_char/char))+"px");
 		} else {
-			$('.content_character_bar').css('background-color','#00AC39').css('width', (100*(char/max_char))+"px");
+			$('.content_character_bar').css('background-color','#00AC39').css('width', (100*(char/file.max_char))+"px");
 		}
 	}
 	
-	if(min_word <= 0 && max_word <= 0) {
+	if(file.min_word <= 0 && file.max_word <= 0) {
 		$('.content_word_bar').css('background-color', '#00AC39').css('width', '100px');
-	} else if(min_word > 0 && max_word <= 0) {
-		if(word - min_word < -100) 
-			$('.content_word_bar').css('background-color','#f44').css('width', (100*(word/min_word))+"px");
-		else if(word - min_word < 0)
-			$('.content_word_bar').css('background-color','#D0B605').css('width', (100*(word/min_word))+"px");
+	} else if(file.min_word > 0 && file.max_word <= 0) {
+		if(word - file.min_word < -100) 
+			$('.content_word_bar').css('background-color','#f44').css('width', (100*(word/file.min_word))+"px");
+		else if(word - file.min_word < 0)
+			$('.content_word_bar').css('background-color','#D0B605').css('width', (100*(word/file.min_word))+"px");
 		else
-			$('.content_word_bar').css('background-color','#00AC39').css('width', (100*(min_word/word))+"px");
-	} else if(min_word <= 0 && max_word > 0) {
-		if(word - max_word > 100) 
-			$('.content_word_bar').css('background-color','#f44').css('width', (100*(max_word/word))+"px");
-		else if(word - max_word > 0)
-			$('.content_word_bar').css('background-color','#D0B605').css('width', (100*(max_word/word))+"px");
+			$('.content_word_bar').css('background-color','#00AC39').css('width', (100*(file.min_word/word))+"px");
+	} else if(file.min_word <= 0 && file.max_word > 0) {
+		if(word - file.max_word > 100) 
+			$('.content_word_bar').css('background-color','#f44').css('width', (100*(file.max_word/word))+"px");
+		else if(word - file.max_word > 0)
+			$('.content_word_bar').css('background-color','#D0B605').css('width', (100*(file.max_word/word))+"px");
 		else
-			$('.content_word_bar').css('background-color','#00AC39').css('width', (100*(word/max_word))+"px");
+			$('.content_word_bar').css('background-color','#00AC39').css('width', (100*(word/file.max_word))+"px");
 	} else {
-		if(word < min_word) {
-			$('.content_word_bar').css('background-color','#f44').css('width', (100*(word/min_word))+"px");
-		} else if(word > max_word) {
-			$('.content_word_bar').css('background-color','#f44').css('width', (100*(max_word/word))+"px");
+		if(word < file.min_word) {
+			$('.content_word_bar').css('background-color','#f44').css('width', (100*(word/file.min_word))+"px");
+		} else if(word > file.max_word) {
+			$('.content_word_bar').css('background-color','#f44').css('width', (100*(file.max_word/word))+"px");
 		} else {
-			$('.content_word_bar').css('background-color','#00AC39').css('width', (100*(word/max_word))+"px");
+			$('.content_word_bar').css('background-color','#00AC39').css('width', (100*(word/file.max_word))+"px");
 		}
 	}
 }
@@ -690,16 +691,17 @@ function setHeader() {
 	console.log('Header set');
 	window.holoribbon_std =  {
 		Home: new Array(
-//            {text: "Start the Tour", img: "<span class='fa fa-home' style='font-size:18pt'></span>", action: "alert('TBD')", key:"Alt+T"}, 
             {text: "{{ Locale.FILE_CREATE }}", img: "<span class='fa fa-file' style='font-size:18pt'></span>", action: "createNewFile()", key:"Alt+N"},
             {group: "", value:"<div style='font-size:22pt;padding-top:6px;text-align:center;'>{{ Locale.WELCOME }}</div>"},
             {text: "{{ Locale.FILE_EXPLORE }}", img: "<span class='fa fa-folder-open' style='font-size:18pt'></span>", action: "runPanel('Main_Filesys')", key: "Alt+O"} 
 		),
 		File: new Array(
-			{group: "", value:'<div class="row collapse" style="margin-top:9px"><div class="small-5 columns"><input id="file_name" type="text" value="'+fileid+'" /></div><div class="small-4 columns"><span class="postfix">.gltn</span></div><div class="small-3 medium-3 columns end"><input type="hidden" id="file_name_internal"><button id="file_name_con" class="textbutton" disabled="true">Rename</button></div></div>'},
+			/*{group: "", value:'<div class="row collapse" style="margin-top:9px"><div class="small-5 columns"><input id="file_name" type="text" value="'+fileid+'" /></div><div class="small-4 columns"><span class="postfix">.gltn</span></div><div class="small-3 medium-3 columns end"><input type="hidden" id="file_name_internal"><button id="file_name_con" class="textbutton" disabled="true">Rename</button></div></div>'},*/
+            {text: '{{ Locale.FILE_INFO }}', img: '<span style="font-size:18pt" class="fa fa-info"></span>', action:'showFileInfo(fileid)'},
 			{text: '{{ Locale.COMPILE_AND_EXPORT }}', img: '<span style="font-size:18pt" class="fa fa-file"></span>', action: "startBuild()", key: "Alt+B"},
-			{text: '{{ Locale.SHARE }}', img: '<span style="font-size:18pt" class="fa fa-code-fork"></span>', action: "getShare();"}
-            //TODO File Info Popup
+			{text: '{{ Locale.SHARE }}', img: '<span style="font-size:18pt" class="fa fa-code-fork"></span>', action: "getShare();"},
+            {group: 'Characters', value:"<input id='minchars' type='number' placeholder='Min Chars' value='"+file.min_char+"' style='display:inline;width:4em;'>&nbsp;-&nbsp;<input id='maxchars' type='number' placeholder='Max Chars' value='"+file.max_char+"' style='display:inline;width:4em;'>"},
+            {group: 'Words', value:"<input id='minwords' type='number' placeholder='Min Words' value='"+file.min_word+"' style='display:inline;width:4em;'>&nbsp;-&nbsp;<input id='maxwords' type='number' placeholder='Max Words' value='"+file.max_word+"' style='display:inline;width:4em;'>"}
 		),
 
 		Panels: new Array(
@@ -737,7 +739,7 @@ function setHeader() {
 }
 
 function ribbonLoad() {
-    $('#file_name').attr('value', fileid);
+    /*$('#file_name').attr('value', fileid);
 	$('#file_name').attr('defaultValue', fileid);
 	$('#file_name_internal').val(fileid);
 	$('#file_name').on('input', function() {
@@ -745,22 +747,8 @@ function ribbonLoad() {
 		$('#file_name_con').attr('disabled', false);
 	});
 	$('#file_name_con').on('click', function() {
-		var v = $('#file_name').val();
-		v = v.replace(/ /g, "");
-		ovr = true;
-		if(localStorage[v] !== undefined) {
-			ovr = confirm('This file already exists: '+v+'; Overwrite the contents of this file?');	
-		}
-		if(ovr) {
-            if(v.substr(-2) == "_c")
-				v = v.substr(0,v.length-2)+"c";
-			$('#file_name_con').attr('disabled', true);
-			$('#file_name_internal').val(v);
-            localStorage[v] = localStorage[fileid]
-            localStorage[v+"_c"] = localStorage[fileid+"_c"];
-			setTimeout('window.location = "?file='+v+'";', 250);
-		}
-	});
+		renameFile();
+	});*/
     //Initialize Personalization
     if(!hasSetting("personal_name")) {
         writeToSettings("personal_name", "Me");   
@@ -777,6 +765,22 @@ function ribbonLoad() {
     if(!hasSetting("autoUpload")) {
         writeToSettings("autoUpload", "false");
     }   
+    $('#minchars').on('input', function() {
+        file.min_char = $(this).val();
+        postWordCount();
+    }); 
+    $('#maxchars').on('input', function() {
+        file.max_char = $(this).val(); 
+        postWordCount();
+    });   
+    $('#minwords').on('input', function() {
+        file.min_word = $(this).val();
+        postWordCount();
+    }); 
+    $('#maxwords').on('input', function() {
+        file.max_word = $(this).val(); 
+        postWordCount();
+    });
     
 	$('#me_name').attr('value', getSettings("personal_name"));
 	$('#me_name').attr('defaultValue', getSettings("personal_name"));
@@ -946,9 +950,9 @@ MITLICENSE = "(See MIT License)";
 function postLegal() {
     var favorite = theme.palette[getSettings("personal_color")];
     out = "<span style='color:"+getAppropriateColor(favorite.accent700, favorite.accent100)+"'>Version "+GLTN_VERSION+" Isidore</span><br><br>";
-	out += "2014 Made by Nick Felker&emsp;<a href='http://twitter.com/handnf'>@HandNF</a><br>";
+	out += "2014 Made by Nick Felker&ensp;<a href='http://twitter.com/handnf'>@HandNF</a><br>";
     out += "Iconography from Font Awesome";
-    out += "Made with Polymer, Foundation, Rangy, CloudConvert, and Together.js<br>";
+    out += "<br>Made with Polymer, Foundation, Rangy, CloudConvert, and Together.js<br>";
     out += "<br>I'd like to thank the others who posted online about stuff like replacing text nodes and the ample amount of help from assorted StackOverflow questions.<br>";
     out += "Here's to making the web a better, more modular, place. :D<br>";
     out += '<br>Stock Images:<br>&emsp;"<a href="http://commons.wikimedia.org/wiki/File:Isidor_von_Sevilla.jpeg#mediaviewer/File:Isidor_von_Sevilla.jpeg">Isidor von Sevilla</a>" by <a href="//en.wikipedia.org/wiki/Bartolom%C3%A9_Esteban_Murillo" class="extiw" title="en:Bartolomé Esteban Murillo">Bartolomé Esteban Murillo</a> - <a rel="nofollow" class="external free" href="http://www.museumsyndicate.com/artist.php?artist=442">http://www.museumsyndicate.com/artist.php?artist=442</a>. Licensed under Public domain via <a href="//commons.wikimedia.org/wiki/">Wikimedia Commons</a>.'

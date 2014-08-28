@@ -124,35 +124,114 @@ Date.prototype.toDateInputValue = (function() {
     local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
     return local.toJSON().slice(0,10);
 });
-function scrapeURL(url) {
+function scrapeURL(url, callback) {
+    if(callback === undefined) 
+        callback = function(data) { console.log(data); };
     window.SCRAPE_DONE = false;
     $.get('php/geturl.php', {url:url}, function(data) {
         window.scrapedata = data;
         var webpage = {};
-        var atts = [{o:"<title>", e:"</title>", n:"website_title"}];
-            atts.push({o:'rel="author">', e:'</a>', n:"author"});
-            atts.push({o:'class="author fn">', e:'</a>', n:"author"});
-            atts.push({o:'<author>', e:'<', n:"author"});
-            atts.push({o:'<h1 class="alpha tweet-title">', e:'</h1>', n:"title"});
-            atts.push({o:'og:title" content="', e:'"', n:"title"});
-            atts.push({o:'og:site_name" content="', e:'"', n:"publisher_title"});
-            atts.push({o:'Posted <time datetime="', e:'"', n:"pub_date"});
+        var atts = {
+            /* Titles */
+            a0: {o:"<title>", e:"</title>", n:"title"},
+            a2: {o:'<h1 class="alpha tweet-title">', e:'</h1>', n:"title"},
+            a3: {o:'og:title" content="', e:'"', n:"title"},
+            /* Authors */
+            b0: {o:'rel="author">', e:'</a>', n:"author"},
+            b1: {o:'class="author fn">', e:'</a>', n:"author"},
+            b2: {o:'<author>', e:'<', n:"author"},
+            /* Publisher Title */
+            c0: {o:'og:site_name" content="', e:'"', n:"publisher_title"},
+            c1: {ri: "<title>[\\s\\S]+?\[\|:-]([\\s\\S]+?)<\\/title>", start: "<title>", end:"</title>", ro: '$1', n: "publisher_title"},
+            /* Published Date */
+            d0: {o:'Posted <time datetime="', e:'"', n:"pub_date"},
+        };
         for(j in atts) {
             i = atts[j];
-            var a = data.indexOf(i.o);
-            var i_sub = data.substring(a+i.o.length);
-            var b = i_sub.indexOf(i.e);
-            if(a > -1) {
-                webpage[i.n] = i_sub.substring(0,b);   
-            }
+            if(i.o !== undefined) {
+                //Index Based
+                var a = data.indexOf(i.o);
+                var i_sub = data.substring(a+i.o.length);
+                var b = i_sub.indexOf(i.e);
+                if(a > -1 && b > -1) {
+                    webpage[i.n] = i_sub.substring(0,b).trim();   
+                }
+            } else {
+                var a = data.indexOf(i.start);
+                var i_sub = data.substring(a);
+                var b = i_sub.indexOf(i.end)+i.end.length;
+                if(a > -1 && b > -1) {
+                    var reg = new RegExp(i.ri, 'gi');
+                    webpage[i.n] = i_sub.substring(0,b).trim().replace(reg, i.ro).trim();   
+                }
+            } 
         }
-        console.log("SCRAPE_DONE");
-        if(webpage.title != undefined)
-            webpage.title = webpage.title.substring(window.title.indexOf("|"));
+        console.log("SCRAPE FINISHED");
+        if(webpage.title !== undefined)
+            webpage.title = webpage.title.substring(webpage.title.indexOf("|"));
         window.SCRAPE_WEBPAGE = webpage;
         window.SCRAPE_DONE = true;
+        callback(webpage);
     });
 }
+
+function CitationFormat(name, attributes, fnc) {
+    return {name:name, attributes: attributes, fnc: fnc || function() { }};   
+}
+citationFormats = {
+    bible: new CitationFormat("bible", "Title Bible", function() { selectedmedium = 'print' }),
+    digitalbook: new CitationFormat("digital book", 'Title Author Bookpub Publication Medium'),
+    dissertation: new CitationFormat("dissertation", 'Title Author Publication University', function() { selectedmedium = 'print' }),
+    ebook: new CitationFormat("ebook", 'Title Author Bookpub Publication Website Pubdate Accdate'),
+    eimage: new CitationFormat("eimage", 'Title Description Author Website Pubdate Accdate'),
+    government: new CitationFormat("government", 'Title Author Publication Government', function() { 
+        $('#citationEditorICity').val("Washington");
+        $('#citationEditorIPublisher').val("GPO");
+        selectedmedium = "print";
+    }),
+    journal: new CitationFormat("journal", 'Title Bookpub Author Publication', function() {
+        $('#citationEditorIEdition').attr('placeholder', "Issue #");
+        $('#citationEditorITitle').attr('placeholder', "Title of Journal");
+        $('#citationEditorIDescription').attr('placeholder', "Title of Article");
+        selectedmedium = "print";                       
+    }),
+    pamphlet: new CitationFormat("pamphlet", 'Title Publication', function() { selectedmedium = "print"; }),
+    periodical: new CitationFormat("periodical", 'Title Description Author Pubdate Publication', function() { 
+        selectedmedium = "print";
+        $('#citationEditorITitle').attr('placeholder', "Title of Periodical");
+        $('#citationEditorIDescription').attr('placeholder', "Title of Article");
+    }),
+    print: new CitationFormat("print", 'Title Author Bookpub Publication'),
+    rawdata: new CitationFormat("raw data", "Description"),
+    theater: new CitationFormat("theater", 'Title Play Author Publication'),
+    web: new CitationFormat("web", 'Title Author Website Pubdate Accdate'),
+};
+
+function CitationClass(name, format, medium) {
+    return {name:name, format: format, medium: medium || format.name};
+}
+citationObjects = {
+    //TODO Introduce Patents
+    ArticleJournal: new CitationClass('Journal Article', citationFormats.journal),
+    ArticlePrint: new CitationClass("Printed Article", citationFormats.periodical),
+    ArticleOnline: new CitationClass("Web Article", citationFormats.web),
+    Bible: new CitationClass('Bible', citationFormats.bible),
+    Blog: new CitationClass('Blog', citationFormats.web),
+    Book: new CitationClass("Book", citationFormats.print), 
+    Dissertation: new CitationClass("Dissertation", citationFormats.dissertation),
+    eBook: new CitationClass('eBook', citationFormats.ebook),	
+    Editorial: new CitationClass('Editorial', citationFormats.periodical),
+    Government: new CitationClass('Government', citationFormats.government),
+    ImageOnline: new CitationClass('Web Image', citationFormats.eimage),
+    LetterToEditor: new CitationClass('Letter to the Editor', citationFormats.periodical),
+    MagazineArticle: new CitationClass('Magazine Article', citationFormats.periodical),
+    MAThesis: new CitationClass('MA Thesis', citationFormats.dissertation),
+    MSThesis: new CitationClass('MS Thesis', citationFormats.dissertation),
+    Musical: new CitationClass('Play', citationFormats.theater),
+    Pamphlet: new CitationClass('Pamphlet', citationFormats.pamphlet),
+    PhotoOnline: new CitationClass('Web Photo', citationFormats.eimage),
+    Play: new CitationClass("Play", citationFormats.theater),
+};
 function initiateCitationEditor(q, hovertag, h2) {
 			//q = '"';
 			if(q == undefined)
@@ -220,24 +299,21 @@ function initiateCitationEditor(q, hovertag, h2) {
                         alert("Unexpected errror: " + ex);
                     }
                 }
-            }
-            console.log(citei, citationi);
-			
-			window.citetypes = new Array({val: 'Article - Online', format:'web'},{val:'Book', format:'print'}, {val:'Book - Online', format:'ebook'}, {val:'Play', format:'theater'}, {val:'Musical', format:'theater'}, /*{val:'eBook', format:'digital book'}, */{val:'Blog', format:'web'}, {val:'Image - Online', format:'eimage'},{val:'Photo - Online', format:'eimage'},{val:'Bible', format:'bible'},{val:'Government', format:'government'},{val:'Pamphlet',format:'pamphlet'},{val:'Dissertation',format:'dissertation'},{val:"MA Thesis", format:"dissertation"},{val:"MS Thesis", format:"dissertation"},{val: "Magazine Article", format:"periodical"},{val:"Article - Print", format:"periodical"},{val:"Editorial",format:"periodical"},{val:"Letter to the Editor", format:"periodical"},{val:"Article - Journal", format:'journal'});
+            }			
 			var today =  new Date();
 			today = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-			new Array('Article Online', 'Book - Print', 'Book - Online', 'Book - eBook Reader', 'Book - Database', 'Dictionary', 'eBook', 'Encyclopedia', 'Musical', 'Online Article', 'Newspaper', 'Play', 'Podcast', 'Website - Blog', 'Website - Book','Website - Image');
+
             try {
                 window.quoteout = $('#citation'+citei).html().replace(/"/g,'&quot;');
             } catch(e) {
 		          console.error(e.message);
                 window.quoteout = '""';   
             }
-		console.log("Q"+window.quoteout,citei,$('#citation'+citei).html());
+		    console.log("Q"+window.quoteout,citei,$('#citation'+citei).html());
 			out = 'Quote: <input id="citationQuote" style="width:74%;margin-left:13%;" value="'+window.quoteout+'"><br>What do you want to cite?<br><input class="citelist" type="text" list="citelist" id="citationEditorIType">';
 			out = out + '<datalist id="citelist">'
-			for(i in citetypes) {
-				out = out + '<option value="'+citetypes[i].val+'" label="'+citetypes[i].format+'">';
+			for(i in citationObjects) {
+				out = out + '<option value="'+citationObjects[i].name+'" label="'+citationObjects[i].format.name+'">';
 			}
 			var ht = out+"</datalist>";
     
@@ -284,8 +360,19 @@ function initiateCitationEditor(q, hovertag, h2) {
 				$('.citationEditorAuthor').append(out);
 			});
             $('#citationEditorIUrl').on('input', function() {
-//                var url_data = scrapeURL($(this).val()); 
                 spinloader(true);
+                var url_data = scrapeURL($(this).val(), function(data) {
+                    $('.spin').spin(false);
+                    $('#citationEditorITitle').val(data.title);
+                    $('#citationEditorIWebsite, #citationEditorIWebPublisher').val(data.publisher_title);
+                    var today =  new Date();
+                    var month = (today.getMonth()+1);
+                    if(month < 10)
+                        month = "0"+month;
+			        today = today.getFullYear()+'-'+month+'-'+today.getDate();
+                    $('#citationEditorIAccdate').val(today);
+                    $('#citationEditorIAuthorLast').val(data.author);
+                }); 
             });
 			$('#citationEditorITitle, #citationEditorIEdition, #citationEditorIAuthorLast').on('input', function() {
 				var t = $('#citationEditorITitle').val();
@@ -318,71 +405,18 @@ function initiateCitationEditor(q, hovertag, h2) {
 				ht = "";
 				for(i in citation) {
 					if(citation[i] != undefined && citation[i] != "undefined") {
-						if(citation[i].Type == $('#citationEditorIType').val())
+						/*if(citation[i].Type == $('#citationEditorIType').val())*/
 							ht += "<option>"+citation[i].Title+"</option>";
 					}
 				}
 				$('#citationAutoTitle').html(ht);
-				for(i=0;i<citetypes.length;i++) {
+				for(i in citationObjects) {
 					//console.log('-'+citetypes[i].val);
-					if(citetypes[i].val == $('#citationEditorIType').val()) {
+					if(citationObjects[i].name == $('#citationEditorIType').val()) {
 						//console.log('--'+citetypes[i].format);
-						window.selectedmedium = citetypes[i].format;
-						switch(citetypes[i].format) {
-							case 'web':
-								citationShow('Title Author Website Pubdate Accdate');
-							break;
-							case 'print':
-								citationShow('Title Author Bookpub Publication');
-							break;
-							case 'ebook':
-								citationShow('Title Author Bookpub Publication Website Pubdate Accdate');
-							break;	
-							case 'digital book':
-								citationShow('Title Author Bookpub Publication Medium');
-							break;
-							case 'theater':
-								citationShow('Title Play Author Publication');
-							break;
-							case 'eimage':
-								citationShow('Title Description Author Website Pubdate Accdate');
-                            break;
-							case 'raw data':
-								//IDK
-								citationShow('Description');
-							break;
-							case 'bible':
-								citationShow('Title Bible');
-								selectedmedium = "print";
-							break;
-							case 'government':
-								citationShow('Title Author Publication Government');
-								$('#citationEditorICity').val("Washington");
-								$('#citationEditorIPublisher').val("GPO");
-								selectedmedium = "print";
-							break;
-							case 'pamphlet':
-								citationShow('Title Publication');
-								selectedmedium = "print";
-							break;
-							case 'dissertation':
-								citationShow('Title Author Publication University');
-								selectedmedium = "print";
-							break;
-							case 'periodical':
-								citationShow('Title Description Author Pubdate Publication');
-								selectedmedium = "print";
-								$('#citationEditorITitle').attr('placeholder', "Title of Periodical");
-								$('#citationEditorIDescription').attr('placeholder', "Title of Article");
-							break;
-							case 'journal':
-								citationShow('Title Bookpub Author Publication');
-								$('#citationEditorIEdition').attr('placeholder', "Issue #");
-								$('#citationEditorITitle').attr('placeholder', "Title of Journal");
-								$('#citationEditorIDescription').attr('placeholder', "Title of Article");
-								selectedmedium = "print";
-						}
-						return;
+						window.selectedmedium = citationObjects[i].medium;
+						citationObjects[i].format.fnc();
+                        citationShow(citationObjects[i].format.attributes);
 					}
 				}
                 $('.citationEditorAccdate').val(new Date().toDateInputValue());
@@ -399,6 +433,8 @@ function initiateCitationEditor(q, hovertag, h2) {
 				//if abstracts for citations are turned on,
 				if(annotated_bib)
 					$('.citationEditorAbstract').css('display', 'block');
+                ///
+                hovertagManager.refresh();
 			}
 			var citeAttributes = new Array('Type', 'Title','Description','Page','Volume','Edition','Main','AuthorFirst','AuthorMiddle','AuthorLast','Publisher','City','Year','Website','WebPublisher','Url','Pubdate','Accdate','Database','DbUrl','Medium','Abstract','Biblebook','Biblechapter','Bibleverse', 'MediumFormat', 'Govnation', 'Govbranch', 'Govcomm', 'Govsess','University','Universityyear');	
 			function citationSave() {
@@ -457,9 +493,7 @@ function initiateCitationEditor(q, hovertag, h2) {
 				closePopup();
                 $('#citation'+citei).html($('#citationQuote').val());
                 window.quoteout = undefined;
-                recallHovertags();
-                citationHovertag();
-//				introJsStart(16);
+                hovertagManager.refresh();
 			}
 			function citationRestore() {
 				type = citation[citeid]['MediumFormat'];
