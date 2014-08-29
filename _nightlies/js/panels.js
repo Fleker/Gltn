@@ -89,8 +89,11 @@ function Panel(id, displayname, url) {
         downloadingpanel = this.id;  
     };
     Panel.prototype.setMenu = function(JSON) {
+        console.log(this.name, JSON);
         holoribbon_std[this.name] = JSON;
         holoribbonRefresh();
+        if(this.onRibbonRefresh !== undefined)
+            this.onRibbonRefresh();
     }
     
     //Panel events
@@ -101,12 +104,11 @@ function Panel(id, displayname, url) {
     Panel.prototype.onRibbonRefresh = undefined;
     Panel.prototype.onUninstall = undefined;
 }
-//PanaelManager Class 
+//PanelManager Class 
 function PanelManager() {
     //TODO If I can delay these initalizations until I load the page, then I can use theme attributes for constuctor. 
     //TODO Though for panels it should be done on Run because it will be based on a soft-picked theme. So, a beforeRun function should be called if applicable to set those parameters
     //  on both the developer side and the engine side
-    //TODO Move panel parameters to manifest, use id & url only
     this.availablePanels = {
         Main_Character: new Panel("Main_Character"),
         Main_Citation: new Panel("Main_Citation", "Citation Editor"),
@@ -2678,11 +2680,14 @@ p.onRun = function() {
 	postPanelOutput(out);
 }
 panelManager.getAvailablePanels().Main_Table.setManifest({
-    name: "",
+    name: "Grid",
     title: "Grid",
     bordercolor: "#2cc36b",
     width: 50,
     canMaximize: true
+});
+languageManager.addToDictionary("GRID", {
+    en_us: "Grid" 
 });
 panelManager.getAvailablePanels().Main_Table.onInit = function() {
     //Initiate the Spreadsheet framework
@@ -2755,7 +2760,109 @@ panelManager.getAvailablePanels().Main_Table.onInit = function() {
         /* 6.4.14 */ PERCENT: function(float) {
             return float/100;
         },
-        PERCENT_DOC: new Spreadsheet("PERCENT", "percentage", "float%", [new Parameter("float", "Any number")], "Divides a number by 100", "How to Show Percentage", "([\\d]+?)%", 'Spreadsheet.PERCENT($1)'),
+        PERCENT_DOC: new SpreadsheetDoc("PERCENT", "percentage", "float%", [new Parameter("float", "Any number")], "Divides a number by 100", "How to Show Percentage", "([\\d]+?)%", 'Spreadsheet.PERCENT($1)'),
+        /* 6.6.2 */ BITAND: function(left, right) {
+            var bin = "";
+            var indexOffset = 0;
+            if(left > right) {
+                var a = left.toString(2);
+                var b = right.toString(2);
+            } else {
+                var b = left.toString(2);
+                var a = right.toString(2);
+            }   
+            console.log(a, b);
+            for(i = a.length-1; i>=0; i--) {
+                console.log(i);
+                if(b[i] === undefined) {
+//                    bin = "0" + bin;
+                    indexOffset++;
+//                    continue;
+                }
+                console.log(a[i], b[i+indexOffset]);
+                if(a[i] == 1 && b[i+indexOffset] == 1)
+                    bin = "1" + bin;
+                else
+                    bin = "0" + bin;
+            }
+            return bin;
+        },
+        BITAND_DOC: new SpreadsheetDoc("BITAND", "bit and", "BITAND(int X, int Y)", [new Parameter("X", ""), new Parameter("Y", "")], "Returns bitwise 'and' of its parameters", "Perform a Bitwise And"),
+        /* 6.6.3 */ BITLSHIFT: function(x, n) {
+            if(n<0) {
+                return Spreadsheet.BITRSHIFT(x, -n);   
+            } else if(n==0) {
+                return x.toString(2);   
+            } else if(n>0) {
+                return x*Math.pow(2, n).toString(2);   
+            }
+        },
+        BITLSHIFT_DOC: new SpreadsheetDoc("BITLSHIFT", "bit shift left", "BITLSHIFT(int X, int N)", [new Parameter("X", "Integer to shift"), new Parameter("N", "Number of places to shift")], "Returns a left shift", "How to Shift Bits Left"),
+        /* 6.6.4 */ BITOR: function(left, right) {
+            var bin = "";
+            var indexOffset = 0;
+            if(left > right) {
+                var a = left.toString(2);
+                var b = right.toString(2);
+            } else {
+                var b = left.toString(2);
+                var a = right.toString(2);
+            }   
+            console.log(a, b);
+            for(i = a.length-1; i>=0; i--) {
+                console.log(i);
+                if(b[i] === undefined) {
+//                    bin = "0" + bin;
+                    indexOffset++;
+//                    continue;
+                }
+                console.log(a[i], b[i+indexOffset]);
+                if(a[i] == 1 || b[i+indexOffset] == 1)
+                    bin = "1" + bin;
+                else
+                    bin = "0" + bin;
+            }
+            return bin;
+        },
+        BITOR_DOC: new SpreadsheetDoc("BITOR", "bit or", "BITOR(int X, int Y)", [new Parameter("X", ""), new Parameter("Y", "")], "Returns bitwise 'or' of its parameters", "Perform a Bitwise Or"),
+        /* 6.6.5 */ BITRSHIFT: function(x, n) {
+            if(n<0) {
+                return Spreadsheet.BITLSHIFT(x, -n);   
+            } else if(n==0) {
+                return x.toString(2);   
+            } else {
+                return parseInt(x/Math.pow(2,n)).toString(2);    
+            }
+        },
+        BITRSHIFT: new SpreadsheetDoc("BITRSHIFT", "bit shift right", "BITRSHIFT(int X, int N)", [new Parameter("X", "Integer to shift"), new Parameter("N", "Number of places to shift")], "Returns a right shift", "How to Shift Bits Right"),
+        /* 6.6.6 */ BITXOR: function(left, right) {
+            var bin = "";
+            var indexOffset = 0;
+            if(left > right) {
+                var a = left.toString(2);
+                var b = right.toString(2);
+            } else {
+                var b = left.toString(2);
+                var a = right.toString(2);
+            }   
+            console.log(a, b);
+            for(i = a.length-1; i>=0; i--) {
+                console.log(i);
+                if(b[i] === undefined) {
+//                    bin = "0" + bin;
+                    indexOffset++;
+//                    continue;
+                }
+                console.log(a[i], b[i+indexOffset]);
+                if((a[i] == 1 && b[i+indexOffset] == 0) || (a[i] == 0 && b[i+indexOffset] == 1))
+                    bin = "1" + bin;
+                else
+                    bin = "0" + bin;
+            }
+            return bin;
+        },
+        BITXOR_DOC: new SpreadsheetDoc("BITXOR", "bit xor", "BITXOR(int X, int Y)", [new Parameter("X", ""), new Parameter("Y", "")], "Returns bitwise 'xor' of its parameters", "Perform a Bitwise Xor")
+        
     };   
 }
 
@@ -2797,7 +2904,7 @@ panelManager.getAvailablePanels().Main_Table.onRun = function() {
           } else {
               console.log(oEvent.data[0]);
             this.defaultListener.call(oInstance, oEvent.data);
-          }
+          } 
         };*/
           oWorker.onmessage = fDefListener;
         if (fOnError) { oWorker.onerror = fOnError; }
@@ -3012,10 +3119,36 @@ panelManager.getAvailablePanels().Main_Table.onRun = function() {
         clear_panel_data(); 
     });
     console.log("!");
-    //TODO Add a header menu: formula help, maybe insert cols/rows, whatever else Excel does
-    //TODO Save data, cache it, recall, generate
-        
     
+    //TODO Add a header menu: formula help, maybe insert cols/rows, whatever else Excel does
+    panelManager.getAvailablePanels().Main_Table.onRibbonRefresh = function() {
+        console.log("oRR");
+        $('#main_table_ref').on('input', function() {
+            var query = $(this).val();
+            console.log(query);
+            $('#main_table_hints').empty();
+            var count = 0;
+            for(i in Spreadsheet) {
+                if(i.indexOf("_DOC") === -1)
+                    continue;
+                if((Spreadsheet[i].id.indexOf(query) > -1 || Spreadsheet[i].keywords.indexOf(query) > -1 || Spreadsheet[i].title.indexOf(query) > -1) && count < 5) {
+                    $('#main_table_hints').append("<span class='main_table_hint' style='font-size:9pt' data-id='"+Spreadsheet[i].id+"'>-&nbsp;"+Spreadsheet[i].title+"</span><br>");
+                    count++;
+                }
+            }
+            $('.main_table_hint').on('click', function() {
+                var formula = $(this).attr('data-id');
+                console.log(formula);
+                var insert = $('#main_table_article');
+                insert.empty();
+                insert.append(Spreadsheet[formula].title);
+                insert.append(Spreadsheet[formula].cmd);
+                insert.append(Spreadsheet[formula].param);
+                insert.append(Spreadsheet[formula].des);
+            });
+        });
+    };
+    panelManager.getAvailablePanels().Main_Table.setMenu([{group:'Title', value: "TITLE"}, {group:'Formula Lookup', value:'<input id="main_table_ref" style="width:10em;display:inline;"><div id="main_table_hints" style="display:inline"></div><div id="main_table_article" style="display:inline"></div>'}]);    
 };
     
     

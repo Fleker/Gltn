@@ -95,6 +95,11 @@ function LanguageManager() {
         localeApply();
         languageManager.setLocale($("#file_language").val());
     };
+    LanguageManager.prototype.addToDictionary = function(word, JSON) {
+        for(i in JSON) {
+            Strings[i][word] = JSON[i];   
+        }
+    }
     LanguageManager.prototype.setLocale = function(locale_name) {
         var newlang = locale_name;
         for(var i in languageManager.languages) {

@@ -11,11 +11,16 @@ function RunPanelfleker_TTS() {
     postPanelOutput("It helps a writer when one's writing is spoken. This allows a better understanding of flow and perspective to one's audience. If you want, your computer can speak your essay. Just sit back and listen.<br><br><button id='startTTS' class='textbutton'>Start Speaking</button><br><button id='stopTTS' class='textbutton'>Stop Speaking</button>");
     $('#startTTS').on('click', function() {
         speechSynthesis.cancel();
-        var output = $('.content_textarea').html().toLowerCase().trim().replace(/<kbd class="latex.*<\/kbd>/g, "").replace(/></g, "> <").replace(/<[^>]*>/g, "").replace(/"/g, "").replace(/&nbsp;/g, " ");
+        var output = getWords();
         var outarr = [];
         
-        for(i=0;i<output.length;i+=200) {
-            outarr.push(output.substring(i,i+200));
+        var counter = 0;
+        for(i=0;i<output.length;i++) {
+            counter++;
+            if(output[i] == " " && counter >= 200) {
+                outarr.push(output.substring(i,i+counter));
+                counter = 0;
+            }
         }
         readMessage(outarr, 0);
     });
