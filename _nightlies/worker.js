@@ -11,6 +11,7 @@ self.onmessage = (function($__6) {
 //          console.log("@" + oEvent.data.bk4e1h0 + oEvent.data.ktp3fm1);
 //          console.log("@");
 //          console.log(decodeURIComponent(oEvent.data.ktp3fm1));
+          console.log((oEvent.data.ktp3fm1));
           console.log(decodeURIComponent(oEvent.data.ktp3fm1));
           Spreadsheet =  JSON.parse(decodeURIComponent(oEvent.data.ktp3fm1));
           for(var formula in Spreadsheet) {

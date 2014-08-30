@@ -1703,7 +1703,7 @@ function showFileInfo(id) {
 
         jQuery("abbr.timeago").timeago();
         $('.openFile').on('click', function() {
-            wl($(this).attr('data-v'));
+            window.location = '?file='+$(this).attr('data-v');
         });
         $('.renameFile').on('click', function() {
             renameFile(); 
@@ -2331,7 +2331,7 @@ panelManager.getAvailablePanels().Main_Dictionary.onRun = function() {
                 width: "100%",
                 marginRight: "-160px"
             }, 200, function() {
-                 $('.dictionaryNav').html("<button id='dicNavB'><span class='fa fa-arrow-left'></span></button>&nbsp;<button id='dicNavF'><span class='fa fa-arrow-right'></span></button>&nbsp;<button id='dicNavC'><span class='fa fa-file-code-o'></span></button>");
+                 $('.dictionaryNav').html("<button id='dicNavB'><span class='fa fa-arrow-left'></span></button>&nbsp;<button id='dicNavF'><span class='fa fa-arrow-right'></span></button>&nbsp;<button id='dicNavC' style='display:none'><span class='fa fa-file-code-o'></span></button>");
             });
             
             if($('#DictionaryOut .spin').length === 0) {
@@ -3122,33 +3122,50 @@ panelManager.getAvailablePanels().Main_Table.onRun = function() {
     
     //TODO Add a header menu: formula help, maybe insert cols/rows, whatever else Excel does
     panelManager.getAvailablePanels().Main_Table.onRibbonRefresh = function() {
-        console.log("oRR");
+//        console.log("oRR");
+        $('#main_table_title').val($('.table'+tid).attr('data-title'));
         $('#main_table_ref').on('input', function() {
-            var query = $(this).val();
+            var query = $(this).val().toLowerCase();
             console.log(query);
             $('#main_table_hints').empty();
             var count = 0;
             for(i in Spreadsheet) {
                 if(i.indexOf("_DOC") === -1)
                     continue;
-                if((Spreadsheet[i].id.indexOf(query) > -1 || Spreadsheet[i].keywords.indexOf(query) > -1 || Spreadsheet[i].title.indexOf(query) > -1) && count < 5) {
-                    $('#main_table_hints').append("<span class='main_table_hint' style='font-size:9pt' data-id='"+Spreadsheet[i].id+"'>-&nbsp;"+Spreadsheet[i].title+"</span><br>");
+                if((Spreadsheet[i].id.toLowerCase().indexOf(query) > -1 || Spreadsheet[i].keywords.indexOf(query) > -1 || Spreadsheet[i].title.toLowerCase().indexOf(query) > -1) && count < 10) {
+                    $('#main_table_hints').append("<span class='main_table_hint' style='font-size:9pt;cursor:pointer;' data-id='"+Spreadsheet[i].id+"'>-&nbsp;"+Spreadsheet[i].title+"</span><br>");
                     count++;
                 }
             }
             $('.main_table_hint').on('click', function() {
-                var formula = $(this).attr('data-id');
+                var formula = $(this).attr('data-id')+"_DOC";
                 console.log(formula);
-                var insert = $('#main_table_article');
-                insert.empty();
-                insert.append(Spreadsheet[formula].title);
-                insert.append(Spreadsheet[formula].cmd);
-                insert.append(Spreadsheet[formula].param);
-                insert.append(Spreadsheet[formula].des);
-            });
+                out = "<span style='font-weight:bold;font-size:10pt;'>"+Spreadsheet[formula].title+"</span><br>";
+                out += "<span style='font-family:monospace;font-size:9pt;margin-left:4em;'>"+Spreadsheet[formula].cmd+"</span><br>";
+                for(i in  Spreadsheet[formula].param) {
+                    out += "<span style='font-size:9pt;margin-left:5em;'>"+Spreadsheet[formula].param[i].id+": "+Spreadsheet[formula].param[i].des+"</span><br>";
+                }
+                out += "<span style='font-size:9pt;'>"+Spreadsheet[formula].des+"</span>";
+                $('#main_table_article').html(out);
+                
+//                out = "<span style='font-weight:bold;font-size:10pt;'>"+Spreadsheet[formula].title+"</span><br>";
+                out = "<span style='font-family:monospace;font-size:12pt;margin-left:0.5em;'>"+Spreadsheet[formula].cmd+"</span><br><br>";
+                for(i in  Spreadsheet[formula].param) {
+                    out += "<span style='font-size:11pt;margin-left:2em;'>-"+Spreadsheet[formula].param[i].id+": "+Spreadsheet[formula].param[i].des+"</span><br>";
+                }
+                out += "<br><br><span style='font-size:11pt;'>"+Spreadsheet[formula].des+"</span>";    
+                var p = new Popup({title:Spreadsheet[formula].title, ht: out, size: popupManager.TINY});
+                $('#main_table_article').click(function() {
+                    p.show();
+                }); 
+            }); 
+        });
+        $('#main_table_title').on('input', function() {
+//            console.log("Alerting table"+tid);    
+            $('.table'+tid).attr('data-title', $(this).val());
         });
     };
-    panelManager.getAvailablePanels().Main_Table.setMenu([{group:'Title', value: "TITLE"}, {group:'Formula Lookup', value:'<input id="main_table_ref" style="width:10em;display:inline;"><div id="main_table_hints" style="display:inline"></div><div id="main_table_article" style="display:inline"></div>'}]);    
+    panelManager.getAvailablePanels().Main_Table.setMenu([{group:'Title', value: "<input type='text' placeholder='Title of Table' id='main_table_title'>"}, {group:'Formula Search', value:'<input type="search" placeholder="Search for Formulas" id="main_table_ref" style="width:10em;display:inline;">'}, {group:'', value:'<div id="main_table_hints" style="height:67px;overflow-y:auto;"></div>'}, {group: '', value:'<div id="main_table_article" style="height:67px;overflow-y:auto;text-align:left;"></div>'}]);    
 };
     
     
