@@ -34,13 +34,13 @@ You may use any of the following markup to dynamically modify the output.
 In many cases, you will want to label images and other figures with a numerical representation. You can give elements a figure number using this function and you can recall it later when marking up the object.
 
 ```JavaScript
-obj.figure = function x() {
-    var i = 1;
-    $('.draft .table, .draft .img').each(function() {
-        $(this).attr('data-figure-number', i);
-        i++;
-    });
-};
+    obj.figure = function x() {
+        var i = 1;
+        $('.draft .table, .draft .img').each(function() {
+            $(this).attr('data-figure-number', i);
+            i++;
+        });
+    };
 ```
 
 ### Images

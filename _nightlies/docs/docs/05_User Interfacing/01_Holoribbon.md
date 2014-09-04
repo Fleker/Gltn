@@ -22,9 +22,10 @@ A Button has several predetermined attributes that display and run a button, whi
         //Nothing to do here since I'm just using buttons
     };
 ```
-This code will create and display a new menu in the Holoribbon for the duration of the panel's lifetime. When the panel is closed, the menu will disappear as well.
+<img src="http://felkerdigitalmedia.com/gltn/images\blog\grid_search.png">
+This code will create and display a new menu in the Holoribbon for the duration of the panel's lifetime. When the <a href='?Plugins/Panels_API'>panel</a> is closed, the menu will disappear as well.
 
-If you use a group, you may want to have some Javascript execute after the ribbon refreshes. A panel may override the method `.onRibbonRefresh` to provide event listeners for the elements you create. 
+If you use a group, you may want to have some Javascript execute after the ribbon refreshes. A <a href='?Plugins/Panels_API'>panel</a> may override the method `.onRibbonRefresh` to provide event listeners for the elements you create. 
 
 ## *Reference*
 * `holoribbonRefresh()` - Updates the HTML ribbon with new properties in the variable (this is not necessary for `Panel.setMenu(...)`)

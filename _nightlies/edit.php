@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <title>Gltn Editor</title>
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="shortcut icon" sizes="196x196" href="gltn_f.png">
+<link rel="shortcut icon" sizes="196x196" href="logo2.png">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 
 <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
@@ -70,7 +70,7 @@
 
 <link rel="icon" 
       type="image/png" 
-      href="images/gltn_f.png">
+      href="images/logo2.png">
      
  <script>
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

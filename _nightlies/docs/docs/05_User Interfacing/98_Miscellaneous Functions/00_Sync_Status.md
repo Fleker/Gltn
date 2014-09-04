@@ -1,5 +1,5 @@
 ### Syncing
-If you want to look into the file's sync history, there are a few calls for getting and setting the status. This is viewed mainly using the main_Sync panel, but other applicaitons can be developed.
+If you want to look into the file's sync history, there are a few calls for getting and setting the status. This is viewed mainly using the main_Sync <a href='?Plugins/Panels_API'>panel</a>, but other applicaitons can be developed.
 
 ### Getting
 

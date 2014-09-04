@@ -1,8 +1,7 @@
-### Style Guide
 Templates are terrible, but one thing they do is break down the user how to write certain sections and what they should include. This can be done side-by-side in the Style Guide panel.
 
-#### `onStyleGuide()`
-When this panel is selected by the user, this function will be called in your script. If it exists, the function will run. At the end of running, whatever is returned will be displayed inside the guide.
+### `onStyleGuide()`
+When this <a href='?Plugins/Panels_API'>panel</a> is selected by the user, this function will be called in your script. If it exists, the function will run. At the end of running, whatever is returned will be displayed inside the guide.
 
 ```JavaScript
     function onStyleGuide() {

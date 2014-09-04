@@ -1,4 +1,3 @@
-##Reference
 ###*Class Dictionary*
 The class `Dictionary` stores information about a single dictionary.
 

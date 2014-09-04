@@ -6,12 +6,12 @@ A format is the premier class in Gltn. With it, one can shape the editor to incl
 
 A format exists as an object of class `GltnFormat` which is stored in a `FormatManager`. You can use the variable `formatManager` to access available formats and install new ones.
 
-A format script is written using JavaScript and can be added into the Gltn Editor using the FormatManager.
+A format script is written using JavaScript and can be added into the Gltn Editor using the <a href="99_Reference.md">FormatManager</a>.
 
 ## Creating a new Format
 To create a new format, use the constructor for a GltnFormat:
 
-    new GltnFormat("MLA", "MLA", "Essay", "js/formatts/MLA.js", false)
+`new GltnFormat("MLA", "MLA", "Essay", "js/formatts/MLA.js", false);`
     
 `GltnFormat(id, name, type, url, hidden)`
 
@@ -22,8 +22,9 @@ To create a new format, use the constructor for a GltnFormat:
 * hidden - To hide this format from the format dropdown
 
 ## Installing
-
+```Javascript
     var f = new GltnFormat(...);
     formatManager.addFormat(f);
+```
     
 Using the method `addFormat`, the format is installed in the editor and can be used offline.

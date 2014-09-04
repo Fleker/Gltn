@@ -4,3 +4,5 @@
 * personal_color - User's favorite color
 * personal_avatar - URL to the image of the user's choice
 * personal_email - The user's email
+
+<img src="http://felkerdigitalmedia.com/gltn\images\blog\preferences.png">

@@ -6,8 +6,8 @@ categories = {
     dictionaries: {s: "Dictionary", p:"Dictionaries", icon:"book", color: "purple"},
     themes: {s: "Theme", p:"Themes", icon:"photo", color: "red"},
     plugins: {s: "Plugin", p:"Plugins", icon:"plus-square-o", color: "yellow"},
-    spreadsheets: {s: "Grid Library", p:"Grid Libraries", icon:"th", color: "grey"},
-    exports: {s: "Exporter", p:"Exporters", icon:"share", color:"blue"},
+    spreadsheets: {s: "Grid Library", p:"Grid Libs", icon:"th", color: "grey"},
+    exports: {s: "File Op", p:"File Ops", icon:"share", color:"blue"},
 }
 function getCategory(catname) {
     for(i in categories) {

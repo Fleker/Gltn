@@ -2,7 +2,7 @@
 	"title": "Gltn API",
 	"tagline": "The Easiest Way To Format Your Paper",
 	"docs_path": "docs",
-	"image": "img/flat_design_stage1.png",
+	"image": "../images/blog/gltn_store_aug14.png", 
 	"theme": "navy",
 	"template":"default",
 	"toggle_code": true,

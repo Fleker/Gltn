@@ -14,6 +14,8 @@ Not every user will have previous searches, as not all of them may use the dicti
 
 Which returns true if there is an item at that index.
 
+<img src="http://felkerdigitalmedia.com/gltn\images\blog\dictionary_recents.png">
+
 ### Create a Search
 If a user doesn't understand a particular word, they will consult the dictionary. The dictionary in Gltn is much like Google's Knowledge Graph, able to encompass a variety of data sources. This makes it an ideal tool for a lot of occasions. To help developers integrate the dictionary into their plugin, the following function can be used to launch the dictionary and perform the search:
 

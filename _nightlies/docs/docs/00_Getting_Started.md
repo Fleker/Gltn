@@ -1,4 +1,3 @@
-## *Getting Started*
 It's really easy to start using Gltn. Everything happens in the browser. 
 
 ### Setting Up the Environment

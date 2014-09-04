@@ -1,4 +1,3 @@
-##Using Popups
 Popups are used to draw attention away from the main UI and show the user ephemeral information that this pressing.
 
 ##Initiating Popup

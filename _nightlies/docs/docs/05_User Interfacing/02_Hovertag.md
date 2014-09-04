@@ -1,4 +1,3 @@
-###Hovertagging
 Hovertags are a simple way to display hints to the user about the kind of content they are selecting without having to force them into bulky menus and spending time in navigation. It keeps a writer in the same mindset, without messing up their concentration.
 
 When you don't know what something is, a simple hover over that item will create a small textbox giving the user some extra information about the rich data.

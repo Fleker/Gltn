@@ -79,15 +79,15 @@ This function sets up all of the in-text formatting commands in a JSON object, t
 Use divs for objects that are meant to exist as a block.
 
 ```JavaScript
-function onGetFormats() {
-    obj = {};
-    obj.citation = "(AUTHOR_LAST PAGE)";
-    obj.heading1 = "<div style='font-style:italic'>LISTI:  TEXT</div>";
-    obj.heading2 = "<div style='font-size:10pt'>TEXT (LIST1)</div>";
-    obj.heading3 = "<div style='margin-left:0.5in'>LISTa. TEXT</div>";
-    obj.paragraph_indent = "&emsp;"; //The paragraph indent is placed at the beginning of each paragraph, determined by the system 
-    post_content_formatting(obj);
-}
+    function onGetFormats() {
+        obj = {};
+        obj.citation = "(AUTHOR_LAST PAGE)";
+        obj.heading1 = "<div style='font-style:italic'>LISTI:  TEXT</div>";
+        obj.heading2 = "<div style='font-size:10pt'>TEXT (LIST1)</div>";
+        obj.heading3 = "<div style='margin-left:0.5in'>LISTa. TEXT</div>";
+        obj.paragraph_indent = "&emsp;"; //The paragraph indent is placed at the beginning of each paragraph, determined by the system 
+        post_content_formatting(obj);
+    }
 ```
 
 ### Full list of format Options
@@ -140,16 +140,16 @@ This function is used to customize the bibliography. It creates a bibliography s
 Example:
 
 ```JavaScript
-function onBuildBibliography() {
-    add_new_section('bibliography');
-    add_to_page(centerText('Works Cited'));
+    function onBuildBibliography() {
+        add_new_section('bibliography');
+        add_to_page(centerText('Works Cited'));
 
-    obj = {};
-    cob = {};
-    obj.def = "AUTHOR_LAST, AUTHOR_FIRST_I. (YEAR). TITLE. (Ed EDITION., Vol. VOLUME, p. PAGE). PUBCITY: PUBCOMP. DOI: URL";
-    obj.style = "text-indent:-.5in;margin-left:.5in";
-    post_bibliography(obj, cob);        
-}
+        obj = {};
+        cob = {};
+        obj.def = "AUTHOR_LAST, AUTHOR_FIRST_I. (YEAR). TITLE. (Ed EDITION., Vol. VOLUME, p. PAGE). PUBCITY: PUBCOMP. DOI: URL";
+        obj.style = "text-indent:-.5in;margin-left:.5in";
+        post_bibliography(obj, cob);        
+    }
 ```
 
 These bibliography formats use the same markup as for citation formatting.
@@ -180,7 +180,8 @@ All author modifications. The system chooses the optimal value for author
 * manyauthors
 * sameauthor
 * firstonlyauthor
-Other properties
+
+#####Other properties
 
 * medium
 * pubcity
@@ -203,7 +204,7 @@ Other properties
 * webpub
 
 #### Citations
-Below are a list of things that can be included in the citation. Note that as time goes on, the list will grow.
+Below are a list of `CitationFormat` objects.
 As of 20 Dec 2013:
 
 * def - Whenever a different citation appears that doesn't meet any other criteria, or you don't have the every citation included, this is used as the default.

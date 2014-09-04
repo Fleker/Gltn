@@ -4,12 +4,12 @@ Your format script should contain the following functions to take full advantage
 * `onInitFormat()` - Sets up format UI
 * `onInitToolbar()` - Adds items to the toolbar
 * `onStylePaper()` - Adds global rules for a paper build
-* `onStyleGuide()` - Returns an HTML formatted guide to how a paper can be written; for details, [See Documentation](http://felkerdigitalmedia.com/gltn/docs/index.php?Formats/Style_Guide)
+* `onStyleGuide()` - Returns an HTML formatted <a href='?Formats/Style_Guide'>Style Guide</a> to how a paper can be written
 * `onBuildFormat()` - Sets up the paper design before the content
 * `onSetHeader()` - Sets the header rules
 * `onGetFormats()` - Rules for formatting the content
 * `onBuildBibliogaphy()` - Sets up the bibliography (if applicable)
-* `onStyleMarkup()` - Integrate with the Context API
+* `onStyleMarkup()` - Integrate with the <a href='?User%20Interfacing/Context_API'>Context API</a>
 
 ##Reference
 ###*Class GltnFormat*

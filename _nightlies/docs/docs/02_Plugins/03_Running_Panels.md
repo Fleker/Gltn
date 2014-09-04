@@ -54,27 +54,8 @@ When using HTML and text, using a standard string.replace tool can be difficult.
 * RegIn - A regular expression to find
 * RegOut - A regular expression for replacing
 
-
-
-#### LaTeX
-Panels can integrate with LaTeX by translating a command into the formatted output.
-
-##### Text to LaTeX
-These two functions will translate a command into formatted output.
-
-```Javascript
-    postLatex("$x^2$");
-    var x = getLatex();
-```
-* postLatex(cmd, callback) - Receives a command as a string and translates it into formatted output. The MathJax library may take some time to process the input, so the output shouldn't be retrieved directly. Rather, you must call a separate function to access the output.
-* getLatex() - Retrieves the formatted output as HTML
-
-##### LatexAPI
-You can access pieces of the LaTeX reference much like the Spreadsheet reference. They're also formatted the same
-`window.LatexAPI`
-
 ### Saving
-For simple applications like a dictionary you may use a generic set of code. However, for advanced operations, or even for simple settings, you'll need to save data. 
+For simple applications like a <a href='?Dictionaries/Intro_to_Dictionaries'>dictionary</a> you may use a generic set of code. However, for advanced operations, or even for simple settings, you'll need to save data. 
 #### Saving to File
 `writeToFile(att, val)`
 * att - The name of the attribute

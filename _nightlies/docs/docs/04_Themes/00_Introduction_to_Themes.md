@@ -2,6 +2,8 @@ Themes alter the look and feel of the editor, but they should not alter the actu
 
 What is a theme? It is a collection of attributes that alter the look of the editor without altering the actual content on-screen. This gives the Gltn Editor a fresh look that may be modern while at the same time giving users a consistent user experience. How is a theme written? It is a collection of colors, standardized, that developers can use in their plugins for a consistent color palette across all plugins and devices. A theme developer can make up their own set of colors and the user's editor should accurately refect that theme. In addition to colors, developers may also give general CSS commands and run Javascript. If a developer may also create a settings menu for users to have even more customization.
 
+<img src="http://felkerdigitalmedia.com/gltn\images\blog\theme_hot_swap.png">
+
 ## Installing
 Themes may be installed manually from a console. 
 `new Theme(id, name, url, icon)`
@@ -11,11 +13,11 @@ Themes may be installed manually from a console.
 * url - The location of this theme
 * icon - The icon of the theme
 
-After being installed, the theme is available in window.settings.theme but it is not immediately turned chosen. To select your theme, either choose it from the Themes Panel, or give the command:
+After being installed, the theme is added to installed themes, but it is not immediately turned chosen. To select your theme, either choose it from the Themes Panel, or give the command:
 `themeManager.pickTheme(id)` 
 Where id is the internal id for the theme.
 
-Themes can be submitted and placed in the Gltn Store for anyone to install.
+Themes can be submitted and placed in the <a href='?Gltn%20Store/Welcome'>Gltn Store</a> for anyone to install.
 
 ##*Getting Started*
 ###Server

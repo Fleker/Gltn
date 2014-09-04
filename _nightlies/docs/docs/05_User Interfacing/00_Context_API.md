@@ -2,11 +2,12 @@ In the IEEE format, for example, one should not use any personal pronouns. The u
 
 More abstract, it is a way for a developer to markup any type of text and give users any type of note. Moreover, developers can use regular expressions to make marking up much easier.
 
-Marked text will be underlined in a green-blue color. When hovered over, it will show a hovertag. Clicking the hovertag opens the Context Panel which includes more details about the issue and provides actions.
+Marked text will be underlined in a green-blue color. When hovered over, it will show a <a href='?User%20Interfacing/Hovertag'>hovertag</a>. Clicking the <a href='?User%20Interfacing/Hovertag'>hovertag</a> opens the Context Panel which includes more details about the issue and provides actions.
 
 ## How to Implement
 ### Format Script
 The Context API is tied to the format using the function `onStyleMarkup()`. From this function, we can create various types of text markups that are placed in `window.context`
+
 *Note:* Do not directly modify the `window.context` variable. The functions below will do that.
 
 ### Panel or Service
@@ -28,7 +29,7 @@ NOT: `/[Ss]tudent [Bb]ody/gi`
 
 Please include these properties. Other properties are optional and can modify the behavior in the "suggestions" section of the Context Panel
 
-* type - This is the reason why text was marked. Also, this text appears in the hovertag.
+* type - This is the reason why text was marked. Also, this text appears in the <a href='?User%20Interfacing/Hovertag'>hovertag</a>.
     * If type is "Don't Overuse", then you can use the limit parameter
 * text - This is HTML containing full details about why the text was marked
 

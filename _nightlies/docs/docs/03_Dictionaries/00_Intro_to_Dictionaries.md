@@ -2,6 +2,8 @@ This will document how to create a dictionary and implement it in Gltn. A dictio
 
 All the user's dictionaries are stored in a `DictionaryManager` which also includes methods for installing dictionaries and storing previous searches.
 
+<img src="http://felkerdigitalmedia.com/gltn\images\blog\dictionary_navigation.png">
+
 ### Installation
 ```Javascript
     var dictionary = new Dictionary(format, url, name, id, icon)

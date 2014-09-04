@@ -3012,6 +3012,7 @@ panelManager.getAvailablePanels().Main_Table.onRun = function() {
                     grid.display();
                 }, 10);
             });
+            console.log(JSON.stringify(pass));
             this.worker.sendQuery('setSS', JSON.stringify(pass));
             // Start calculation when worker is ready
             this.worker.onmessage = this.calc;

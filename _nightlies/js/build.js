@@ -518,14 +518,15 @@ function citationFormatted(string, i, id, page, cob) {
         build_volume.push(citation[id].Title);
         
 	}
+        
 	if(typeof(citation[id]['ContributorsFirst']) == "string")
-					citation[id]['ContributorsFirst'] = [citation[id]['ContributorsFirst']];
-				
-				if(typeof(citation[id]['ContributorsMiddle']) == "string")
-					citation[id]['ContributorsMiddle'] = [citation[id]['ContributorsMiddle']];
-				
-				if(typeof(citation[id]['ContributorsLast']) == "string")
-                        citation[id]['ContributorsLast'] = [citation[id]['ContributorsLast']];
+	   citation[id]['ContributorsFirst'] = [citation[id]['ContributorsFirst']];
+    if(typeof(citation[id]['ContributorsMiddle']) == "string")
+        citation[id]['ContributorsMiddle'] = [citation[id]['ContributorsMiddle']];
+
+    if(typeof(citation[id]['ContributorsLast']) == "string")
+            citation[id]['ContributorsLast'] = [citation[id]['ContributorsLast']];
+        
 	for(i=0;i<citation[id].Contributors.length;i++) {
 		if(i == 0) {
 			string = string.replace(/AUTHOR_FIRST_I/, citation[id].AuthorFirst.substr(0,1));

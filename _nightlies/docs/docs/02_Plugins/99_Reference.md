@@ -1,4 +1,3 @@
-## Reference
 The APIs for plugins and related classes
 
 ###*Class Panel*

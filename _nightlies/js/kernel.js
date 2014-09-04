@@ -232,7 +232,7 @@ citationObjects = {
     MagazineArticle: new CitationClass('Magazine Article', citationFormats.periodical),
     MAThesis: new CitationClass('MA Thesis', citationFormats.dissertation),
     MSThesis: new CitationClass('MS Thesis', citationFormats.dissertation),
-    Musical: new CitationClass('Play', citationFormats.theater),
+    Musical: new CitationClass('Musical', citationFormats.theater),
     Pamphlet: new CitationClass('Pamphlet', citationFormats.pamphlet),
     PhotoOnline: new CitationClass('Web Photo', citationFormats.eimage),
     Play: new CitationClass("Play", citationFormats.theater),

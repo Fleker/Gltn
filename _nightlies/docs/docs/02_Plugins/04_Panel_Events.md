@@ -12,13 +12,10 @@ Your panel is able to respond to global user key events with a simple integratio
 
 Possible attributes from the element:
 
-`data-keycode` - The Javascript keycode of the key being pressed
-
-`data-alt` - The alt key is being pressed
-
-`data-ctrl` - The ctrl key is being pressed
-
-`data-shift` - The shift key is being pressed
+* `data-keycode` - The Javascript keycode of the key being pressed
+* `data-alt` - The alt key is being pressed
+* `data-ctrl` - The ctrl key is being pressed
+* `data-shift` - The shift key is being pressed
 
 *Notes*:
 You cannot prevent default actions at this time, nor for the foreseeable future, so do not try to override default actions.

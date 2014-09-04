@@ -1,5 +1,4 @@
-## Theme Script
-A javascript file is all that is required for a theme. It is easy to set up, and it can be organized into several different components
+A Javascript file is all that is required for a theme. It is easy to set up, and it can be organized into several different components
 
 ## Function
 Your script must have a `function initTheme()` which is called frequently in order for all elements on screen, new and old, to follow the theme's rules.
@@ -8,7 +7,6 @@ Your script must have a `function initTheme()` which is called frequently in ord
 The first part of the function should be created the theme object and setting up variables.
 
 ```JavaScript
-    window.theme = {};
     theme.bodyColor = 'black'
 ```   
 
@@ -41,11 +39,6 @@ The following code should be separate, not in any function.
     themeCss('color', theme.normcolor);
     setLoaderColor('255,255,255');
 ```
-
-### Loader Color
-//TODO Make sure this is still true
-The new loading icon is developed entirely in CSS. This means the color can be decided by the theme. Write the RGB color for the loader, comma separated.
-`setLoaderColor('220, 119, 240');`
 
 ### Write CSS
 `writeCss(text)` literally inputs CSS and places it in a `<style>` tag. In the Blackout example above, I use this to quickly import a web font.
