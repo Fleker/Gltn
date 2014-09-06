@@ -59,15 +59,6 @@
   });
 </script>
     
-<!--Together.js-->
-<script src="js/togetherjs/togetherjs.js"></script>
-    <script>
-      TogetherJSConfig_findRoom = {prefix: "togetherjsmadlibs", max: 5};
-      TogetherJSConfig_autoStart = true;
-      TogetherJSConfig_suppressJoinConfirmation = true;
-      TogetherJSConfig_storagePrefix = "tjs_madlibs";
-    </script>
-
 <link rel="icon" 
       type="image/png" 
       href="images/logo2.png">
@@ -146,17 +137,22 @@ ga('send', 'pageview');
     
 <iframe id="themeframe" src="" style="visibility:collapse;width:1px;height:1px;"></iframe>
 
+    <!--TODO Mark as Offline -->
+    <script src="js/foundation/foundation.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.0/js/foundation/foundation.reveal.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.0/js/foundation/foundation.tooltip.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.0/js/vendor/fastclick.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.0/js/vendor/modernizr.js"></script>
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/foundation.css">   
 
-        
-    
-<!--</template>-->
-<!--TODO Mark as Offline -->
-<script src="js/foundation/foundation.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.0/js/foundation/foundation.reveal.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.0/js/foundation/foundation.tooltip.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.0/js/vendor/fastclick.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/foundation/5.3.0/js/vendor/modernizr.js"></script>
-<link rel="stylesheet" href="css/normalize.css">
-<link rel="stylesheet" href="css/foundation.css">    
+    <!--Together.js-->
+    <script>
+      TogetherJSConfig_findRoom = {prefix: "gltn", max: 12};
+      TogetherJSConfig_autoStart = true;
+      TogetherJSConfig_suppressJoinConfirmation = true;
+      TogetherJSConfig_storagePrefix = "gltn_togetherjs_";
+    </script>
+    <script src="js/togetherjs/togetherjs/togetherjs.js"></script>
 </body>
 </html>

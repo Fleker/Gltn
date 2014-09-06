@@ -9,3 +9,8 @@ To resolve this, a simple function has been created that lets you compare the cu
 `greaterThanVersion(version_Name)`
 
 Here, `version_Name` is a version code in the form W.X.Y.Z (containing three periods). The function returns true if the current version of Gltn is newer or equal to the version passed in the argument.
+
+## Version Variables
+* `GLTN_VERSION` - The 4-part version code
+* `GLTN_VNAME` - The codename for this release, ie. Isidore
+* `GLTN_BUILD` - The build code, which doesn't mean much

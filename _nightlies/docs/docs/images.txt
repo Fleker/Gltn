@@ -1,0 +1,28 @@
+[x]Creating Tools: Toolbar 
+[x]Style Guide: Example
+[x]Gltn Store/Welcome: Main
+[x]LaTeX: Show some before/after popups
+[x]Panels that r services: Code, image example
+[x]Spreadsheet-Documentation: Holoribbon API, images
+[x]Themes-buttons: image examples of each type
+[x]Themes-Developing: Favorite color, file browser
+[x]File--Stuff
+[x]Store/Dev API: "More Stuff"
+[x]Preferences pic should be edited
+[x]Theme Settings
+[x]Panel maximize pics
+Quicks
+<img src='http://felkerdigitalmedia.com/gltn/images\blog\grid_search.png'>
+
+<a href='?Plugins/Panels_API'>panel</a>
+<a href='?User%20Interfacing/Popups'>popup</a>
+<a href='?User%20Interfacing/Hovertag'>hovertag</a>
+<a href='?Gltn%20Store/Welcome'>Gltn Store</a>
+<a href='?User%20Interfacing/Miscellaneous%20Functions/Latex'>LaTeX</a>
+<a href='?User%20Interfacing/Context_API'>Context API</a>
+<a href='?Formats/Style_Guide'>Style Guide</a>
+<a href='?Dictionaries/Intro_to_Dictionaries'>dictionary</a>
+<a href='?Formats/Compile_Markup'>Compile Markup</a>
+<a href='?Themes/Buttons'>buttons</a>
+<a href='?User%20Interfacing/Holoribbon'>Holoribbon API</a>
+<img src="http://felkerdigitalmedia.com/gltn\images\blog\file_info.png">

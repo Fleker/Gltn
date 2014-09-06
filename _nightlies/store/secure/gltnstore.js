@@ -2,7 +2,7 @@
 categories = {
     panels: {s: "Panel", p: "Panels", icon: "columns", color: "brown"},
     tools: {s: "Tool", p:"Tools", icon:"wrench", color: "green"},
-    services: {s: "Services", p: "Services", icon:"flask", color: "orange"}, 
+    services: {s: "Service", p: "Services", icon:"flask", color: "orange"}, 
     dictionaries: {s: "Dictionary", p:"Dictionaries", icon:"book", color: "purple"},
     themes: {s: "Theme", p:"Themes", icon:"photo", color: "red"},
     plugins: {s: "Plugin", p:"Plugins", icon:"plus-square-o", color: "yellow"},

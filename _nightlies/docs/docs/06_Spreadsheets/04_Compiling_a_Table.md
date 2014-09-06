@@ -1,0 +1,3 @@
+Once you develop the formulas and the documentation, your work on a library is complete. For other developers, however, there is still a lot of work to accomplish. Showing tables when compiling a document is something that a format must include. Otherwise, the table will probably remain a small purple box. 
+
+To learn more about how to render a table using Gltn, read <a href='?Formats/Compile_Markup'>Compile Markup</a>.

@@ -1,0 +1,13 @@
+{% extends "base.tmpl" %}
+{# set enableMarkdown true #}
+{% block body %}
+
+<div class="container">
+  <section class="row" id="markdownpages">
+    <div class="col-md-9">
+      <h1>{{ title }}</h1>
+      {{ markdownBody }}
+    </div>
+  </section>
+
+{% endblock %}

@@ -39,6 +39,8 @@ Now, your plugin is more versatile and adapts better to a myriad of user customi
 ## Favorite Color
 Users can select their favorite color from among the top-level color types. This makes it easy to integrate with your plugins to give the user a nice flair and a little more customization.
 
+<img src="http://felkerdigitalmedia.com/gltn/images\blog\favorite_color.png">
+
 `getSettings('personal_color')`
 
 It'll return values such as red, blue, etc. So, if you want a light blue accent, or a light accent in any color, you can use

@@ -13,6 +13,12 @@ Note that this icon is tied to the id of the panel. You may update this service 
 `initService("Main_PageCount", "Page Count", Math.ceil(i)+" Page"+(Math.ceil(i)==1?"":"s"));`
 
 
-Take, for example, the unofficial Spotify panel. 
+Take, for example, the Spotify panel. 
 
-//TODO Paste section code
+`initService("Fleker_Spotify", "Playing "+name, "<span class='fa fa-headphones'></span>");`
+This code runs when the user starts playing a playlist.
+
+When the user stops playing, the icon goes away.
+`initService("Fleker_Spotify", "", "");`
+
+<img src='http://felkerdigitalmedia.com/gltn/images\blog\services.png'>

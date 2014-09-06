@@ -53,3 +53,6 @@ If the attribute is properly set in the Get function, the panel can hide the con
         }
     });
 ```
+
+<img src='http://felkerdigitalmedia.com/gltn/images\blog\maximize_no.png'>
+<img src='http://felkerdigitalmedia.com/gltn/images\blog\maximize_yes.png'>

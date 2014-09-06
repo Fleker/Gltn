@@ -38,11 +38,11 @@ function Panel(id, displayname, url) {
         
         if(typeof(holoribbon_std) == "undefined")
             return this;
-        for(i in holoribbon_std['Panels']) {
-            if(holoribbon_std['Panels'][i].plugin_id !== undefined) {
-                if(holoribbon_std['Panels'][i].plugin_id == this.id) {
-                    holoribbon_std['Panels'][i].text = this.name;   
-                    holoribbon_std['Panels'][i].img = getIcon(this.icon, 18);   
+        for(var ii in holoribbon_std.Panels) {
+            if(holoribbon_std.Panels[i].plugin_id !== undefined) {
+                if(holoribbon_std.Panels[i].plugin_id == this.id) {
+                    holoribbon_std.Panels[i].text = this.name;   
+                    holoribbon_std.Panels[i].img = getIcon(this.icon, 18);   
                 }
             }
         }
@@ -51,18 +51,18 @@ function Panel(id, displayname, url) {
         ribbonLoad();
         markAsDirty();
         return this;
-    }
+    };
     Panel.prototype.hasBordercolor = function() {
         return this.bordercolor !== undefined && this.bordercolor.length > 0;   
-    }
+    };
     Panel.prototype.setBordercolor = function(border) {
         this.bordercolor = border;
         return this;
-    }
+    };
     Panel.prototype.enableMaximize = function() {
         this._canMaximize = true;
         return this;
-    }
+    };
     Panel.prototype.setMaximize = function(max) {
         this._canMaximize = max;
         return this;
@@ -74,17 +74,17 @@ function Panel(id, displayname, url) {
     Panel.prototype.setOverride = function(ovr) {
         this.override = ovr;
         return this;
-    }
+    };
     Panel.prototype.setWidth = function(width) {
         this.width = width;
         return this;
     };
     Panel.prototype.canMaximize = function() {
         return this._canMaximize;   
-    }
+    };
     Panel.prototype.isMaximized = function() {
         return this._isMaximized;   
-    }
+    };
     Panel.prototype.activate = function() {
         downloadingpanel = this.id;  
     };
@@ -94,7 +94,7 @@ function Panel(id, displayname, url) {
         holoribbonRefresh();
         if(this.onRibbonRefresh !== undefined)
             this.onRibbonRefresh();
-    }
+    };
     
     //Panel events
     Panel.prototype.onInit = undefined;
@@ -124,12 +124,14 @@ function PanelManager() {
         Main_Pagecount: new Panel("Main_Pagecount", "Page Count"),
         Main_Sync: new Panel("Main_Sync", "Synchronization Status"),
         Main_Table: new Panel("Main_Table", "Spreadsheets"),
-        Main_Themes: new Panel("Main_Themes")
+        Main_Themes: new Panel("Main_Themes"),
+        Main_Together: new Panel("Main_Together")
     };
     //FIXME service and override are the same
     PanelManager.prototype.fromString = function(j) {
+        var json = {};
         try {
-            var json = JSON.parse(j);
+            json = JSON.parse(j);
         } catch(e) {
             console.error(e.message);
             writeToSettings("panels", this.toString());
@@ -3207,3 +3209,24 @@ function showSpreadsheetFunction(str) {
     $('#spreadsheetDetails').html("Sorry... we can't anything.");
     return "Sorry... we can't anything.";
 }
+
+p = panelManager.getAvailablePanels().Main_Together;
+p.setManifest({
+    bordercolor: '#0195DD',
+    title: "Chat",
+    name: "Chat",
+    width: 25
+});
+p.onInit = function() {
+    //Um nothing -- later, remove automatic ui injection, save for panel
+    //Any init stuff or handling of things will occur here
+};
+p.onRun = function() {
+    //Inflate interface.html, inject into panel
+    postPanelOutput('');
+    $('.panel_plugin_content').load('js/togetherjs/togetherjs/interface.html', function() {
+        uiz.activateUI();   
+        //Do setup stuff here
+        //Later, design panel better to better account for space
+    });
+};

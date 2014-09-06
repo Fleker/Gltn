@@ -604,6 +604,14 @@ function finishRestore2(full) {
     $('#maxchars').val(file.max_char);
     $('#minwords').val(file.min_word);
     $('#maxwords').val(file.max_word);
+    
+    //TOGETHERJS
+    if(isCloudSaved() && !TogetherJsStarted())
+        TogetherJS(this);
+}
+//TODO Make this a thing, File class data
+function TogetherJsStarted() {
+    return true;
 }
 function newFile(x,xc) {
 	console.log('No file found for this name.');
