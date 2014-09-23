@@ -39,10 +39,10 @@ function Panel(id, displayname, url) {
         if(typeof(holoribbon_std) == "undefined")
             return this;
         for(var ii in holoribbon_std.Panels) {
-            if(holoribbon_std.Panels[i].plugin_id !== undefined) {
-                if(holoribbon_std.Panels[i].plugin_id == this.id) {
-                    holoribbon_std.Panels[i].text = this.name;   
-                    holoribbon_std.Panels[i].img = getIcon(this.icon, 18);   
+            if(holoribbon_std.Panels[ii].plugin_id !== undefined) {
+                if(holoribbon_std.Panels[ii].plugin_id == this.id) {
+                    holoribbon_std.Panels[ii].text = this.name;   
+                    holoribbon_std.Panels[ii].img = getIcon(this.icon, 18);   
                 }
             }
         }
@@ -100,6 +100,7 @@ function Panel(id, displayname, url) {
     Panel.prototype.onInit = undefined;
     Panel.prototype.onRun = undefined;
     Panel.prototype.onContext = undefined;
+    Panel.prototype.onImport = undefined;
     Panel.prototype.onExport = undefined;
     Panel.prototype.onRibbonRefresh = undefined;
     Panel.prototype.onUninstall = undefined;
@@ -133,19 +134,21 @@ function PanelManager() {
         try {
             json = JSON.parse(j);
         } catch(e) {
+            alert(e.message+"\nSomething serious went wrong");
             console.error(e.message);
             writeToSettings("panels", this.toString());
             markAsDirty();
             return;
         }
         for(var i in json) {
-            if(this.availablePanels[i] !== undefined)
+            if(this.availablePanels[i] !== undefined) {
+//                console.error("Panel "+i+" is not undefined"); 
                 continue;
-            //TODO Revise constuctors
+            }
             if(json[i].service === true)
-                var p = new Service(json[i].id, json[i].name, json[i].url, json[i].override, json[i].service);            
+                var p = new Service(json[i].id, json[i].url);            
             else
-                var p = new Panel(json[i].id, json[i].name, /*json[i].icon, */json[i].url, json[i].override, json[i].service);  
+                var p = new Panel(json[i].id, json[i].url);  
             this.availablePanels[i] = p;
         }
     };
@@ -358,8 +361,8 @@ function install_panel(id, name, url) {
 
 function download_panel(id,num) {
     if(downloadingpanel !== id) {
-//        console.log(id+", "+downloadingpanel);
-        if(!downloadingpanel.length || id.length)
+        console.log("Panel download: "+id+", "+downloadingpanel);
+        if(!downloadingpanel.length || !id.length)
             return;
         window.setTimeout(function() {download_panel(id,num);}, 100);
     } else {
@@ -371,6 +374,7 @@ function download_panel(id,num) {
         if(panelManager.availablePanels[id].onInit !== undefined)
             panelManager.availablePanels[id].onInit();
         num++;
+        console.log("Panel "+id+" download complete");
         initPanels(num);
     }
 }
@@ -388,6 +392,7 @@ function getPanelIndex(index) {
 }
 //TODO I know this is being called twice somehow. I just can't figure out how
 function initPanels(num) {
+//    console.warn(panelManager.getAvailablePanels());
     if(!hasSetting("panels")) {
         writeToSettings("panels", panelManager.toString());   
     }
@@ -399,12 +404,15 @@ function initPanels(num) {
     }   
     if(isNaN(num))
         return null;
-    if(num >= a_nm - 1)
+    if(num >= a_nm)
         return null;
     
     plugin = panelManager.getAvailablePanels()[getPanelIndex(num)];
+    if(plugin === undefined)
+        return;
+//    console.warn(plugin.url);
     if(getPanelIndex(num).indexOf('Main') !== 0) {
-//        console.log("Must install panel "+getPanelIndex(num), num);
+        console.log("Must install panel "+getPanelIndex(num), num);
         panelManager.install(plugin, num);
     } else {
 //        console.log("Panel "+getPanelIndex(num)+".onInit is "+(plugin.onInit !== undefined));
@@ -416,7 +424,7 @@ function initPanels(num) {
     }
 }
 
-//Panel GUI
+/** PANEL GUI **/
 function runPanel(panel_id_name) {
     //TODO Optimize height, title size
 	//Get Properties of the Panel First
@@ -538,7 +546,8 @@ function panelWrite(text) {
 	//Any other panel stuff can be here too (if I want to add a footer)
 }
 function populatePanelPlugin(panel_id_name) {
-	panelManager.getAvailablePanels()[panel_id_name].onRun();
+	if(panelManager.getAvailablePanels()[panel_id_name].onRun !== undefined)
+        panelManager.getAvailablePanels()[panel_id_name].onRun();
 	$('.panel_plugin_content').css('height', (window.innerHeight-187)+"px").css('overflow-y', 'auto');
 }
 
@@ -1775,6 +1784,68 @@ function showFileInfo(id) {
     };
     p = new Popup({title: "File Properties", ht: out, fnc: f, size: popupManager.LARGE}).show();    
 }
+/**
+    evt - GltnData
+    filename - Name for this file
+**/
+function handleFileSelect(evt, filename) {	
+    
+/*	var files = evt.target.files;
+    var file = files[0];
+    var start = 0;
+    var stop = file.size - 1;
+    if(file.name.split('.')[file.name.split('.').length-1] != "gltn") {
+        //Popup false
+        $('.progress').html('<span style="color:red">Error: Not a proper Gltn file</span>');
+        //set timeout close
+        setTimeout('closePopup()', 4000);
+        return null;
+    }*/
+
+//			var reader = new FileReader();
+    // If we use onloadend, we need to check the readyState.
+//			reader.onloadend = function(evt) {
+//			  if (evt.target.readyState == FileReader.DONE) { // DONE == 2
+        //console.log(evt.target.result);
+        //Save to localStorage
+        var xmli = evt.indexOf('</gluten_doc>')+13;
+        var xml = evt.substring(0,xmli);
+        try {
+            var i = $.xml2json(xml);                
+        } catch(e) {
+            console.error(e.message);
+            $('.import_progress').html('<span style="color:red">Error: Not a proper Gltn file</span>');
+            setTimeout('closePopup();', 4000);
+            return null;
+        }
+        var ht = evt.substring(xmli);
+        //Need to insert something before I'm completely finished
+        if(xml.indexOf("inkblob_url") == -1) {
+            var j = xml.indexOf("<saved>");
+            if(j > -1)
+                xml = xml.substring(0,j+7) + "<inkblob_url>"+ink2.url+"</inkblob_url>" + xml.substring(j+7,xmli);
+            else
+                xml = xml.substring(0,12) + "<saved><inkblob_url>"+ink2.url+"</inkblob_url></saved>" + xml.substring(12,xmli);
+        }
+        console.log(xml+";;;;"+ht);
+        //evt.target.result;
+        save = filename.split(' ')[0];
+        save = save.split('.')[0];
+        ovr = true;
+        if(localStorage[save] != undefined) {
+            ovr = confirm('This filename already exists: '+save+'; Overwrite the contents of this file?');
+        }
+        if(ovr) {
+            localStorage[save] = xml;
+            localStorage[save+"_c"] = ht;
+            console.log(filename, save);
+            $('.import_progress').html('<span style="color:green">The file '+save+'.gltn was successfully imported.<br><span style="font-size:10pt">The file will now be accessible on this computer. To use it on another computer you must export the file after editing.</span></span>');
+            setTimeout('closePopup()', 4000);
+            resetFolder(term);
+        }
+//			  }
+    }
+
 panelManager.getAvailablePanels().Main_Filesys.onRun = function () {
     //TODO SPinner
 	function c(i) {
@@ -1827,84 +1898,25 @@ panelManager.getAvailablePanels().Main_Filesys.onRun = function () {
                     $('#filesys_file').attr('format', format); 
                 });
             };
-            new Popup({title:"Choose an Filetype", ht:ht, fnc: fnc, bordercolor:"#", size: popupManager.LARGE}).show();
+            new Popup({title:"Choose a Filetype", ht:ht, fnc: fnc, /*bordercolor:"#", */size: popupManager.LARGE}).show();
             //handleFileSelect(window.ink);
 			//$('#filesys_u').click();
 			//document.getElementById('filesys_u').addEventListener('change', handleFileSelect, false);
 		});
         $('#filesys_file').on('click', function() {
             var rawFileData = window.imported;
-            var fileData = customImports[$(this).attr('format')].convert(rawFileData);
-           handleFileSelect(fileData, window.ink2.filename); 
+            /*var fileData = */customImports[$(this).attr('format')].convert(rawFileData);
+            initiatePopup({title:'Importing File',ht:'<div class="import_progress" style="font-size:14pt;text-align:center;width:100%;"></div>',bordercolor:'#7f8c8d'});
         });
 		$('#filesys_s').on('input', function() {
 			resetFolder($('#filesys_s').val());
 		});
 		$('#filesys_s').focus();
 		$('#filesys_s').val(term);	
-		function handleFileSelect(evt, filename) {
-			//Popup
-			initiatePopup({title:'Importing File',ht:'<div class="progress" style="font-size:14pt;text-align:center;width:100%;"></div>',bordercolor:'#7f8c8d'});
-            
-    	/*	var files = evt.target.files;
-			var file = files[0];
-			var start = 0;
-			var stop = file.size - 1;
-			if(file.name.split('.')[file.name.split('.').length-1] != "gltn") {
-				//Popup false
-				$('.progress').html('<span style="color:red">Error: Not a proper Gltn file</span>');
-				//set timeout close
-				setTimeout('closePopup()', 4000);
-				return null;
-			}*/
 		
-//			var reader = new FileReader();
-			// If we use onloadend, we need to check the readyState.
-//			reader.onloadend = function(evt) {
-//			  if (evt.target.readyState == FileReader.DONE) { // DONE == 2
-				//console.log(evt.target.result);
-				//Save to localStorage
-				var xmli = evt.indexOf('</gluten_doc>')+13;
-				var xml = evt.substring(0,xmli);
-				try {
-					var i = $.xml2json(xml);                
-				} catch(e) {
-                    console.error(e.message);
-					$('.progress').html('<span style="color:red">Error: Not a proper Gltn file</span>');
-					setTimeout('closePopup();', 4000);
-					return null;
-				}
-				var ht = evt.substring(xmli);
-                //Need to insert something before I'm completely finished
-                if(xml.indexOf("inkblob_url") == -1) {
-                    var j = xml.indexOf("<saved>");
-                    if(j > -1)
-                        xml = xml.substring(0,j+7) + "<inkblob_url>"+ink2.url+"</inkblob_url>" + xml.substring(j+7,xmli);
-                    else
-                        xml = xml.substring(0,12) + "<saved><inkblob_url>"+ink2.url+"</inkblob_url></saved>" + xml.substring(12,xmli);
-                }
-				console.log(xml+";;;;"+ht);
-				//evt.target.result;
-				save = filename.split(' ')[0];
-				save = save.split('.')[0];
-                ovr = true;
-				if(localStorage[save] != undefined) {
-					ovr = confirm('This filename already exists: '+save+'; Overwrite the contents of this file?');
-				}
-				if(ovr) {
-					localStorage[save] = xml;
-					localStorage[save+"_c"] = ht;
-					console.log(filename, save);
-					$('.progress').html('<span style="color:green">The file '+save+'.gltn was successfully imported.<br><span style="font-size:10pt">The file will now be accessible on this computer. To use it on another computer you must export the file after editing.</span></span>');
-					setTimeout('closePopup()', 4000);
-					resetFolder(term);
-				}
-//			  }
-			}
-		
-			//var blob = file.slice(start, stop + 1);
-			//reader.readAsText(blob);
-	}
+        //var blob = file.slice(start, stop + 1);
+        //reader.readAsText(blob);
+    }
     function resetFolder(term) {
 		//postPanelOutput("<div id='spin' style='margin-left:25%'></div>");
 		$('.panel_plugin_content').html(getloader());
@@ -2013,10 +2025,11 @@ panelManager.getAvailablePanels().Main_Filesys.onExport = function(docView, blob
         return [{name: "html", icon: "file-code-o", callback: toHTML}, {name:"txt", icon:"file-text-o", callback: toTXT}];
     }
 }
+//NOTE
 panelManager.getAvailablePanels().Main_Filesys.onImport = function() {
     return [{
         name: "gltn", icon: "file-code-o", extension: "gltn", convert: function(rawFileData) {
-            return rawFileData;
+            handleFileSelect(rawFileData, window.ink2.filename);
         },
     }]
 }

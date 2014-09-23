@@ -1,4 +1,3 @@
-## Spotify
 Here is the code used to make the Spotify Player.
 
 ```Javascript

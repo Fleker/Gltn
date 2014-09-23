@@ -1,7 +1,63 @@
 // Formatting Engine
 file.clearMetadata();
+// FUTURE Deprecated
 window.metadata = [];
 format_js_index = 0;
+
+//NOTE
+function Metadata(type, ops) {
+    this.type = type || "";
+    this.label = ops.label || "";
+    this.max = ops.max || 0;
+    this.min = ops.min || 0;
+    this.mtype = ops.mtype || "c";
+    this.placeholder = ops.placeholder || "";
+    this.description = ops.description || "";
+    this.id = ops.id || "";
+    this.index = format_js_index;
+    this.default = ops.default || "";
+    Metadata.prototype.hasLabel = function() {
+        return this.label.length > 0;   
+    };
+    Metadata.prototype.hasPlaceholder = function() {
+        return this.placeholder.length;   
+    };
+    Metadata.prototype.hasDescription = function() {
+        return this.description.length;  
+    };
+    Metadata.prototype.isCounterEnabled = function() {
+        return this.max !== 0 || this.min !== 0;  
+    };
+}
+//NOTE
+function MetadataHtml(type, outputdata) {
+    this.type = type || "text";
+    this.outputdata = outputdata;
+}
+//NOTE
+MetadataTypes = {
+    content: new MetadataHtml("content", function(i) {
+        return post_format_content(file.metadata[i]);
+    }),
+    block: new MetadataHtml("block", function(i) {
+        return "<br><br>";
+    }),
+    nl: new MetadataHtml("nl", function(i) {
+        return "<br>";
+    }),
+    mltext: new MetadataHtml("mltext", function(i) {
+        return post_format_mltext(file.metadata[i]);
+    }),
+    label: new MetadataHtml("label", function(i) {
+        return "<div style='font-weight:bold;border-bottom:solid 1px #888;width:90%;margin-left:5%;'>"+file.metadata[i].label+"</div>";
+    }),
+    date: new MetadataHtml("date", function(i) {
+        return post_format_date(file.metadata[i]);
+    }),
+    text: new MetadataHtml("text", function(i) {
+        return post_format_text(file.metadata[i]);  
+    })
+};
 
 $(document).ready(function() {
     $('#meta_format').html("{{Locale.META_FORMAT}}");
@@ -11,7 +67,7 @@ $(document).ready(function() {
 
 function new_format() {
 	format_js_index = -1;
-	window.metadata = [{blank: 0}];	
+	file.metadata = [{blank: 0}];	
 	$('#file_metadata').empty();
 	min_word = 0;
 	max_word = 0;
@@ -23,16 +79,7 @@ function new_format_item(type, ops) {
 	format_js_index++;
 	if(ops === undefined)
 		ops = {};
-	window.metadata[format_js_index] = {type: type, index: format_js_index, min: 0, max: 0};
-	var option_choices = ["label", "max", "min", "mtype", "placeholder", "description", "id"];
-	//FUTURE - Default Text
-	for(i=0;i<option_choices.length;i++) {
-		if(ops[option_choices[i]] !== undefined) {
-			window.metadata[format_js_index][option_choices[i]] = ops[option_choices[i]];
-		} else {
-			window.metadata[format_js_index][option_choices[i]] = "";
-		}
-	}
+    file.metadata[format_js_index] = new Metadata(type, ops);
 }
 
 function new_format_block() {
@@ -43,7 +90,7 @@ function new_format_nl() {
 	new_format_item("nl");
 }
 
-window.annotated_bib = false;
+file.annotated_bib = false;
 
 function set_up_format(name, property) {
 	switch(name) {
@@ -70,54 +117,20 @@ function setFormatItemWidth(index) {
 	else
 		$('#format_item_'+index).css('width', 0.5*$('#format_item_'+index).val().length+"em");
 }
+
 function post_format() {
 	var out = "";
-	for(i=0;i<=format_js_index;i++) {
-		type = window.metadata[i].type;
-		
-		if(type == "content") {
-			out = out + post_format_content(window.metadata[i]);
-		} else if(type == "name") {
-			out = out + post_format_text(window.metadata[i]) + "&nbsp;&nbsp;" + post_format_text(window.metadata[i], -1);
-		} else if(type == "block") {
-			out = out + "<br><br>";
-		} else if(type == "nl") {
-			out = out + "<br>";
-		} else if(type == "mltext") { 
-			out += post_format_mltext(window.metadata[i]);
-		} else if(type == "label") {
-			out += "<div style='font-weight:bold;border-bottom:solid 1px #888;width:90%;margin-left:5%;'>"+window.metadata[i].label+"</div>";
-		} else if(type == "date") {
-			out += post_format_date(window.metadata[i]);
-		} else {
-			out = out + post_format_text(window.metadata[i]);
-		}		
-		out = out + "<br>";
+	for(i in file.metadata) {
+		type = file.metadata[i].type;
+        out = out + MetadataTypes[type].outputdata(i) + "<br>";
 	}
 	$('#file_metadata').html(out);
 	
-	for(i=0;i<=format_js_index;i++) {
-		if(window.metadata[i].min.length !== 0 || window.metadata[i].max.length !== 0) {
-			/*var e = '#format_item_'+i;
-			$(e).on('input', function() {
-				format_check_count(i);
-			});*/
+	for(i in file.metadata) {
+		if(file.metadata[i].min.length !== 0 || file.metadata[i].max.length !== 0) {
 			setInterval("format_check_count("+i+")", 100);
 		} else
-		  setInterval("setFormatItemWidth("+i+")", 100);
-		/*if($('#format_item_'+i).val() != undefined) {
-			if($('#format_item_'+i).val().length < 20)
-				$('#format_item_'+i).css('width', '10em');
-			else if($('#format_item_'+i).val().length > 80)
-				$('#format_item_'+i).css('width', '40em');
-			else
-				$('#format_item_'+i).css('width', 0.5*$('#format_item_'+i).val().length+"em");
-		}*/
-
-       /* setTimeout("setFormatItemWidth("+i+");", 1000);
-       		$('#format_item_'+i).on('input', function() {
-			     setFormatItemWidth(i);
-        	});*/
+            setInterval("setFormatItemWidth("+i+")", 100);
 	}
 	onInitToolbar();
 	
@@ -133,45 +146,46 @@ function post_format() {
 //					}
 					//postRange('click and select');
 //			}
-			document.getElementsByClassName("content_textarea")[0].oninput = function() {
-				postRange('oninput');
-				//saveFile();
-			}	
-			document.getElementsByClassName("content_textarea")[0].onkeyup = function() {
-				postRange('onkeyup');
-			}	
+    $('.content_textarea').on('input', function() {
+        postRange('oninput'); 
+    }); 
+    $('.content_textarea').on('input', function() {
+        postRange('onkeyup'); 
+    });
+
 	//Theme parameters for content_textarea
 	$('.content_textarea').css('background-color', theme.bodyColor).css('color', theme.fontColor);
 	console.log('CT colors set');
     
     //Preload data that already exists
-    for(j in window.metadata) {
+   /* for(j in file.metadata) {
 		try {
-            if(i == window.metadata[j].id.replace(/ /g, '_') && $('#format_item_'+j).val().length == 0) {
-//			   onsole.log("Insert "+d[i]+" for "+window.metadata[j].id);
-                //console.log($('#format_item_'+j).val(), i);
+            if(i == file.metadata[j].id.replace(/ /g, '_') && $('#format_item_'+j).val().length == 0) {
 			     $('#format_item_'+j).val(decodeURIComponent(d[i]));
 			     $('#format_item_'+j).html(decodeURIComponent(d[i]));
             }
         } catch(e) {}
-    }
+    }*/
+//    $('.content_textarea').html(localStorage[file.getFileid()+"_c"]);
 }
 function format_check_count(i) {
 	content = $('#format_item_'+i).val();
+    if(content === undefined)
+        return;
 	if(content.length === 0)
 		content = $('#format_item_'+i).html();
-	if(window.metadata[i] === undefined)
+	if(file.metadata[i] === undefined)
 		console.log("md"+i);
-	mtype = window.metadata[i].mtype;
-	min = window.metadata[i].min;
-	max = window.metadata[i].max;
+	mtype = file.metadata[i].mtype;
+	min = file.metadata[i].min;
+	max = file.metadata[i].max;
 	if(mtype == "c") {
 		characters = content.length;
 		var e = '#format_count_'+i;
 		if(min > characters) {
 			$(e).html('<span style="color:'+theme.fontColorAlt+'">'+min+'</span>&emsp;<span class="gluten_red">'+characters+'&nbsp;'+mtype+'</span>&emsp;<span style="color:'+theme.coloralt+'">'+max+'</span>');
 		} else if(max < characters) {
-			$(e).html('<spanstyle="color:'+theme.fontColorAlt+'">'+min+'</span>&emsp;<span class="gluten_red">'+characters+'&nbsp;'+mtype+'</span>&emsp;<span style="color:'+theme.coloralt+'">'+max+'</span>');
+			$(e).html('<span style="color:'+theme.fontColorAlt+'">'+min+'</span>&emsp;<span class="gluten_red">'+characters+'&nbsp;'+mtype+'</span>&emsp;<span style="color:'+theme.coloralt+'">'+max+'</span>');
 		} else {
 			$(e).html('<span class="gluten_gray">'+characters+'&nbsp;'+mtype+'</span>');
 		}	
@@ -201,8 +215,8 @@ function post_format_text(m, inv) {
 		if(m.description.length)
 			out = out + "<br><span class='format_description'>"+m.description+"</span><br>";
 	}
-	out = out + "<input type='text' id='format_item_"+m.index+"' placeholder='"+m.placeholder+"' style='width:55%' onmouseenter='hideHovertag()'>";
-	if(m.min.length !== 0 || m.max.length !== 0) {
+	out = out + "<input type='text' id='format_item_"+m.index+"' placeholder='"+m.placeholder+"' style='width:55%'>";
+	if(m.isCounterEnabled()) {
 		out = out + "<div class='format_count' id='format_count_"+m.index+"'></div>";	
 	}
 	return out;
@@ -215,11 +229,11 @@ function post_format_date(m, inv) {
 		ind = (m.index-inv)+"_2";
 	else {
 		out = out + m.label+":&nbsp;";
-		if(m.description.length)
+		if(m.hasDescription())
 			out = out + "<br><span class='format_description'>"+m.description+"</span><br>";
 	}
-	out = out + "<input type='date' id='format_item_"+m.index+"' placeholder='"+m.placeholder+"' onmouseenter='hideHovertag()'>";
-	if(m.min.length !== 0 || m.max.length !== 0) {
+	out = out + "<input type='date' id='format_item_"+m.index+"' placeholder='"+m.placeholder+"'>";
+	if(m.isCounterEnabled()) {
 		out = out + "<br><div class='format_count' id='format_count_"+m.index+"'></div>";	
 	}
 	return out;
@@ -229,7 +243,7 @@ function post_format_mltext(m) {
 	out = out + m.label + "<br>";
 	if(m.description.length)
 		out = out + "<span class='format_description'>"+m.description+"</span><br>";	
-	out = out + "<div class='post_format_mltext' contenteditable id='format_item_"+m.index+"' onmouseenter='hideHovertag()'></div>";
+	out = out + "<div class='post_format_mltext' contenteditable id='format_item_"+m.index+"'></div>";
 	if(m.min.length !==0 || m.max.length !== 0) {
 		out = out + "<div class='format_count' id='format_count_"+m.index+"'></div>";	
 	}

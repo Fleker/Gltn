@@ -153,6 +153,6 @@ ga('send', 'pageview');
       TogetherJSConfig_suppressJoinConfirmation = true;
       TogetherJSConfig_storagePrefix = "gltn_togetherjs_";
     </script>
-    <script src="js/togetherjs/togetherjs/togetherjs.js"></script>
+    <!--<script src="js/togetherjs/togetherjs/togetherjs.js"></script>-->
 </body>
 </html>

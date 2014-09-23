@@ -41,16 +41,14 @@ function getIcon(icon, size) {
         default:
             //this is a number
             font_size = size+"pt";
-            img_size = font_size;
+            img_size = (size+4)+"px";
     }
     //This is an image url
     if(icon.indexOf(".") > -1) {
-        return "<img src='"+icon+"' style='"+img_size+"'>";
+        return "<img src='"+icon+"' style='height:"+img_size+"'>";
     }
-//        else {
-        //Icon Font -- Probably Font Awesome
-        return "<span class='fa fa-"+icon+"' style='font-size:"+font_size+"'></span>";
-//    }
+    //Icon Font -- Probably Font Awesome
+    return "<span class='fa fa-"+icon+"' style='font-size:"+font_size+"'></span>";
 }
 //Estimates a download count to the nearest integer on an order of ten
 function getDownloadCount(number) {

@@ -1652,7 +1652,7 @@ function resetTheme() {
     $('button').css('text-transform', '').css('letter-spacing', '').css('color', '').css('border-radius', '').css('font-size','');
     $('.ribbonheader').css('color', '').css('text-transform', 'uppercase').css('font-size', '10pt');
     $('.ribbonbody').css('height','78px');
-    $('button').css('background-color', theme.ribbon.plain).css('color', 'inherit').css('border-color', 'inherit').css('margin-top', '2px').css('padding', '3px');
+    $('button').css('background-color', '').css('color', '').css('border-color', '').css('margin-top', '2px').css('padding', '3px');
     
     loadThemeSettings = function() { return "" };
 }

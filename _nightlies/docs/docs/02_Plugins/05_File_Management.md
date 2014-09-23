@@ -52,3 +52,56 @@ This function must return a valid JSON object containing a few attributes.
 If docView is `false`, you should also supply an additional parameter
 
 * extension - The file extension that will be used for the converted file
+
+## Using CloudConvert
+CloudConvert is a service that allows different file types to be converted into other formats. This is useful for Gltn, as `docx` and `pdf` files do not render very well. You can convert them into HTML before continuing to import or export the file.
+
+### API
+`cloudConvert(inputformat, outputformat, inputdata, callback)`
+
+* inputformat - The file extension you have (default is "HTML")
+* outputformat - The file extension you want (default is "PDF", but you may want "HTML")
+* inputdata - The data you want to be converted. This can be the raw file data you get from the import/export callback
+* callback - A function with a parameter of `outputdata`. This parameter is the converted file that you can use to further process
+
+## Examples
+### Import Example - Gltn
+*This is the default function for importing a Gltn file*
+```Javascript
+    panelManager.getAvailablePanels().Main_Filesys.onImport = function() {
+        return [{
+            name: "gltn", icon: "file-code-o", extension: "gltn", convert: function(rawFileData) {
+                return rawFileData;
+            },
+        }]
+    }
+```
+
+### Export Example - File to Gltn
+*This is the default function for exporting a file to Gltn, not as a formatted document*
+```Javascript
+    panelManager.getAvailablePanels().Main_Filesys.onExport = function(docView, blob) {
+        if(docView === false) {
+            var callback = function() {
+                return blob;   
+            }
+            return [{name: "gltn", icon: "file-code-o",  callback: callback, extension:"gltn"}, {name:"txt", icon: "file-text-o", callback:callback, extesion:"txt"}];
+        }
+    }
+```
+
+### Export Example - Doc to TXT, HTML 
+*This is the default function for exporting a formatted document to an array of formats*
+```Javascript
+    panelManager.getAvailablePanels().Main_Filesys.onExport = function(docView, blob) {
+        if(docView === true) {
+            var toHTML = function() {
+                startExportHTML();
+            }
+            var toTXT = function() {
+                startConversion("txt");
+            } 
+            return [{name: "html", icon: "file-code-o", callback: toHTML}, {name:"txt", icon:"file-text-o", callback: toTXT}];
+        }
+    }
+```

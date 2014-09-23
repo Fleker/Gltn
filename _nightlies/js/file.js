@@ -1,7 +1,6 @@
 // File.js handles the saves and restores, changing the formatting, and other file-related functions (convert to PDF? LaTeX, .doc)
 
 //Since the file initiates when it loads, you can do some initization 
-//TODO Push everything to File
 min_char = 0;
 max_char = 0;
 min_word = 0;
@@ -17,20 +16,16 @@ function File() {
     this.max_word = 0;
     this.min_par = 0;
     this.max_par = 0;
+    this.language = "";
     File.prototype.clearMetadata = function() {
         this.metadata = [];
     };  
-    File.prototype.getCitations = function() {
-        return citation;  
-    };
-    File.prototype.getIdeas = function() {
-        return idea;
-    };  
-    File.prototype.getIdeaDefault = function() {
-        return ideadefault;  
-    };
     File.prototype.getFileid = function() {
         return fileid;     
+    };
+    File.prototype.setFileid = function(file) {
+        fileid = file;
+        return this;
     };
     File.prototype.getShareid = function() {
         return shareid;  
@@ -49,6 +44,47 @@ function File() {
     };
     File.prototype.getHovertagRegistrar = function() {
         return hovertagRegistrar;  
+    };
+    //NOTE New APIs
+    File.prototype.getLanguage = function() {
+        if(this.lang == "") {
+            this.lang = $('#file_language').val();
+        } 
+        return this.lang;
+    };
+    File.prototype.setLanguage = function(lang) {
+        this.language = lang;
+        return this;
+    };
+    File.prototype.getTags = function() {
+        return $('#file_tags').val();  
+    };
+    File.prototype.sync = {
+        getHistory: function() {
+            return SYNC_HISTORY;   
+        }, 
+        getStatus: function() {
+            return SYNC_STATUS;   
+        }
+    };
+    File.prototype.citations = {
+        getArray: function() {
+            return citation;
+        },
+        getIndex: function() {
+            return citationi;   
+        }
+    };
+    File.prototype.ideas = {
+        getArray: function() {
+            return idea;   
+        },
+        getDefault: function() {
+            return ideadefault;
+        }
+    };
+    File.prototype.getFormat = function() {
+        return currentformat;     
     };
 }
 file = new File();
@@ -278,7 +314,7 @@ function startSaveFile() {
     //If not a cloud doc, saves as usual
     if(isCloudSaved() && window.dirty) {
         try {
-            saveFile();
+            saveFile(file);
         } catch(e) {
             console.error(e.message);
             cloudResave();
@@ -287,7 +323,7 @@ function startSaveFile() {
     else if(isCloudSaved()) {
         cloudRead(getFileData("inkblob_url"), "RF2", jsonsave.gluten_doc.file.last_modified);
     } else if(window.dirty) {
-        saveFile();   
+        saveFile(file);   
     }
     
     if(window.dirty) {
@@ -295,7 +331,7 @@ function startSaveFile() {
             filepicker.write(getSettings("inkblob_url"),
                          localStorage.settings,
                         function(InkBlob){
-                            saveFile();
+                            saveFile(file);
                             console.log("Settings synced for now");
                         }, function(FPError) {
                             console.log("Settings sync Error: "+FPError.toString());
@@ -311,42 +347,60 @@ function startSaveFile() {
 	}    
     window.dirty = false;
 }
-function saveFile() {	
-    if(fileid === undefined) {
-        console.error('fileid had no value');
-        fileid = "scratchpad";
+//NOTE - Parameter features
+function saveFile(fileObj) {	
+    fileObj = fileObj || file;
+    var isSameFile = false; //If this is true, then you are saving current file. If false, then you're saving a different, perhaps new, file. The function returns the Gltn file that you can use for custom stuff
+    if(fileObj.getFileid() === file.getFileid()) {
+        isSameFile = true;
     }
-	$('.content_save').hide();
-	//console.log(o.gluten_doc, x, obj);
-	if(window.jsonsave == undefined) 
-		obj = x;
-	else 
-		obj = jsonsave.gluten_doc;
+//    alert(isSameFile);
+    if(fileObj.getFileid() === undefined) {
+        console.error('fileid had no value');
+        fileObj.setFileid("scratchpad");
+    }
+    if(isSameFile) {
+        $('.content_save').hide();
+        if(window.jsonsave === undefined) 
+            obj = x;
+        else 
+            obj = jsonsave.gluten_doc;
+    } else {
+        obj = {};   
+    }
 	//console.log(window.jsonsave, x, obj);
-	for(i=0;i<citation.length;i++) {
-		if(citation[i] == undefined)
-			citation[i] = "undefined";
+	for(i=0;i<fileObj.citations.getArray().length;i++) {
+		if(fileObj.citations.getArray()[i] === undefined)
+			fileObj.citations.getArray()[i] = "undefined";
 	}
-	obj.citation = citation;
-	obj.citationi = citationi;
-	obj.idea = idea;
-	obj.ideadefault = ideadefault;
-	obj.hovertagRegistrar = hovertagRegistrar;
+	obj.citation = fileObj.citations.getArray();
+	obj.citationi = fileObj.citations.getIndex();
+	obj.idea = fileObj.ideas.getArray();
+	obj.ideadefault = fileObj.ideas.getDefault();
+	obj.hovertagRegistrar = fileObj.getHovertagRegistrar();
     if(obj.file == undefined)
 	   obj.file = {};
-	obj['file']['format'] = $('#file_format').val();
-	obj['file']['language'] = $('#file_language').val();
-	obj['file']['tags'] = $('#file_tags').val();
-    obj['file']['fileid'] = fileid;
-    obj['file']['last_modified'] = new Date().getTime();
-    obj['file']['gltn_version'] = GLTN_VERSION;
-	obj['file']['min_char'] = 0;
-	obj['file']['max_char'] = 0;
-	obj['file']['min_word'] = 0;
-	obj['file']['max_word'] = 0;
+    //FIXME These three things
+    if(isSameFile) {
+        obj['file']['format'] = $('#file_format').val();
+        obj['file']['language'] = $('#file_language').val();
+        obj['file']['tags'] = $('#file_tags').val();
+    } else {
+        //FIXME Not complete
+        obj.file.format = fileObj.getFormat();
+        obj.file.language = fileObj.getLanguage();
+        obj.file.tags = fileObj.getTags();
+    }
+    obj.file.fileid = fileObj.getFileid();
+    obj.file.last_modified = new Date().getTime();
+    obj.file.gltn_version = GLTN_VERSION;
+	obj.file.min_char = fileObj.getMinChar();
+	obj.file.max_char = fileObj.getMaxChar();
+	obj.file.min_word = fileObj.getMinWord();
+	obj.file.max_word = fileObj.getMaxWord();
 	
 	//Integrated saves
-	if(window.saved != undefined) {	
+	if(window.saved != undefined && isSameFile) {	
 		obj.saved = {};
 		for(i in window.saved) {
 			if(window.saved[i] != undefined) {
@@ -355,52 +409,53 @@ function saveFile() {
 			}
 		}
 	}
-	//console.log(obj);
-	if(obj.metadata == undefined) 
+    if(obj.metadata === undefined) 
 		obj.metadata = {};
-	for(i in window.metadata) {
-//		console.log(obj.metadata,i,window.metadata[i].id,obj['metadata'][window.metadata[i].id]);
-		var att = window.metadata[i].id.replace(/ /g, '_');
-		//console.warn(i);
-        if(att.length > 0)
-		  obj['metadata'][att] = encodeURIComponent(grabMetadata(i).value);
-//        console.log(att, i, grabMetadata(i).value);
-		//console.log(obj.metadata);
-		//console.warn(i);
-	}
-	content = $('.content_textarea').html();
-	o = {};
-	o.gluten_doc = obj;
-	window.jsonsave = o;
-	//console.log(o);
+    if(isSameFile) {
+        for(i in window.metadata) {
+            var att = window.metadata[i].id.replace(/ /g, '_');
+            if(att.length > 0)
+                obj['metadata'][att] = encodeURIComponent(grabMetadata(i).value);
+        }
+        content = $('.content_textarea').html();
+        o = {};
+        o.gluten_doc = obj;
+        window.jsonsave = o;
+    } else {
+        content = "";   
+    }
+
 	xo = json2xml(o, "");
-	localStorage[fileid] = xo;
-	localStorage[fileid+"_c"] = content;
+    if(isSameFile) {
+        localStorage[fileid] = xo;
+        localStorage[fileid+"_c"] = content;
+    }
 	 
 	//Save global settings - Integrated saves
 	op = {};
 	opbj = {};
 	if(window.settings !== undefined) {	
 		for(i in window.settings) {
-//			console.warn("WS "+i);
-//            console.warn(getSettings(i));
 			writeToSettings(i, getSettings(i));
 			opbj[i] = window.settings[i];
 		}
 	}
 	op.gluten_prefs = opbj;
-	xo = json2xml(op, "");
-	localStorage['settings'] = xo;
+	xo2 = json2xml(op, "");
+	localStorage['settings'] = xo2;
 	
-	if(window.dirty == true) {
-        if(isCloudSaved())
-            cloudResave();
-//        window.dirty = false;
+    if(isSameFile) {
+        if(window.dirty === true) {
+            if(isCloudSaved())
+                cloudResave();
+    //        window.dirty = false;
+        }
+        $('.content_save').show();
+        $('.content_save').html("<span class='fa fa-file-text' style='color:"+theme.fontColorAlt+"'></span>&nbsp;<span class='fa fa-check' style='color:"+theme.fontColorAlt+"'></span>");
     }
-	$('.content_save').show();
-	$('.content_save').html("<span class='fa fa-file-text' style='color:"+theme.fontColorAlt+"'></span>&nbsp;<span class='fa fa-check' style='color:"+theme.fontColorAlt+"'></span>");
+    return xo+content;
 }
-
+//NOTE Clodconvert
 
 
 docformat = '';
@@ -497,11 +552,12 @@ function restoreFile(full) {
     
 }
 function finishRestore(x, xc, full) {
+    window.jsonsave = {gluten_doc: x};
 	try {
         console.log("onInitFormat");
         onInitFormat();
 	} catch(e) {
-		console.warn(e.message);
+		console.error(e.message);
         //TODO Readjust time
         //FIXME Unexpected Token ILLEGAL
         setTimeout(function() {
@@ -1004,7 +1060,78 @@ function startExportHTML(src, suggestedFile) {
         }
    );   
 }
-
+function cloudConvert(inputformat, outputformat, inputdata, callback) {
+    inputformat = inputformat || "html";
+    outputformat = outputformat || "pdf";
+    process = new FormData();
+    process.append('apikey', "7Y4JLPi-k-TWCMDuqs3YMD388TdVvJEAsyNzFvlNEEc7CM8g-CXDHJ7rekArn0Xj3aZuEmPL3TxTh6D402w6BQ");
+    process.append('inputformat', inputformat);
+    process.append('outputformat', outputformat);
+    $.ajax({
+        url: "https://api.cloudconvert.org/process",
+        type: "POST",
+        data: process,
+        contentType: false,
+        processData: false,
+        success: function(data){
+            console.log(data);
+            $('#build_blob').html('<form enctype="multipart/form-data" method="post" name="fileinfo" id="build_blob_form"></form><button id="build_blob_submit">S</button>');
+            $('#build_blob').css('display','none');
+            //Do the actual POST
+            if($('#build_print').length == 0) {
+                $('body').append("<div id='build_print'></div>");   
+            }
+//            $('#build_print').html(inputdata);
+            
+            var formdata = new FormData($("#build_blob_form"));
+            formdata.append('input', 'upload');
+            var aFileParts = [inputdata];
+            var oMyBlob = new Blob(aFileParts, {type : 'text/'+inputformat}); // the blob
+            console.log(oMyBlob);
+            formdata.append('file', oMyBlob);
+            formdata.append('outputformat', outputformat);
+            formdata.append('filename', "converted_doc."+inputformat);
+            console.log(formdata);
+            $('#build_print').css('display', 'none');
+    
+            $.ajax({
+                url: "https:"+data.url,
+                type: "POST",
+                data: formdata,
+                contentType: false,
+                processData: false,
+                success: function(d){
+                    console.log(d);
+                    var downloadr = setInterval(function() {
+                        $.ajax({
+                           url:"https:"+data.url,
+                            success: function(di) {
+                                console.log(di); 
+//                                console.log(di.output);
+                                if(di.output !== undefined) {
+                                    if(di.percent == 100) {
+                                        //TODO AJAX to get data
+                                        console.log("Now use AJAX to get DATA");
+                                        /*$('#build_print').load("http:"+di.output.url, function(outputdata, statusTxt, xhr) {
+//                                                console.log(outputdata);
+                                                callback(outputdata);
+//                                                alert(di.output.url);
+                                        });*/
+//                                        var w = window.open(di.output.url, "_blank");
+                                        clearInterval(downloadr);
+//                                        closePopup();          
+//                                        callback(outputdata);
+                                    }
+                                }
+                            }
+                        });
+                    }, 100);
+                    
+                }
+            });
+        }
+    }); 
+}
 function startConversion(output) {
     if(output == undefined)
         output = "pdf";
@@ -1207,6 +1334,7 @@ function initFormats() {
     -Repopulates metadata fields and content area
 **/
 function formatShift() {
+    window.dirty = false;
     var f1 = formatManager.getCurrentFormat();
     var f2txt = $('#file_format').val() || "MLA";
     var f2;
@@ -1216,8 +1344,10 @@ function formatShift() {
             f2 = formatManager.getFormats()[i];   
         } 
     }   
-    if(f2 === undefined)
+    if(f2 === undefined) {
+        window.dirty = true;
         return;
+    }
     console.log("Format Shifting...");
     
     replacejscssfile(f1.url, f2.url, "js");
@@ -1249,13 +1379,13 @@ function download_format2(y) {
 function formatShift2(d) {
 	//Set up parameters	
 	if(d == undefined)
-		d = x.metadata;
+		d = jsonsave.gluten_doc.metadata;
 	else
 		d = JSON.parse(d);
 	for(i in d) {
-        for(j in window.metadata) {
+        for(j in file.metadata) {
 			try {
-				if(i == window.metadata[j].id.replace(/ /g, '_') && $('#format_item_'+j).val().length == 0) {
+				if(i == file.metadata[j].id.replace(/ /g, '_') && $('#format_item_'+j).val().length == 0) {
 					$('#format_item_'+j).val(decodeURIComponent(d[i]));
 					$('#format_item_'+j).html(decodeURIComponent(d[i]));
 				} else {
@@ -1269,6 +1399,7 @@ function formatShift2(d) {
 		}
 	}
 	console.log("The document's format has shifted.");
+    window.dirty = true;
 }
 function renameFile() {
     var v = $('#renameFileVal').val();

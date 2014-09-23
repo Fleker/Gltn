@@ -1,4 +1,3 @@
-## TODO
 This is a simple TODO app. By typing TODO or FUTURE, it will put that into a list where you are able to see all your tasks. You can also assign tasks to other people.
 
 ```Javascript
