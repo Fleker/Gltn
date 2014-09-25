@@ -921,6 +921,7 @@ function cloudRead(ink, callback, localMod) {
         //Asynchronously handle callback
         if(callback == "HFS") {
             window.imported = data;
+            window.importedink = ink;
             $('#filesys_file').click();
         }
         else if(callback == "RF" || callback == "RF2") {
@@ -1060,6 +1061,7 @@ function startExportHTML(src, suggestedFile) {
         }
    );   
 }
+//TODO inputdata can also be a url -- parse that out and use, "download" if entered that way. Filepicker will do better this way.
 function cloudConvert(inputformat, outputformat, inputdata, callback) {
     inputformat = inputformat || "html";
     outputformat = outputformat || "pdf";
@@ -1081,14 +1083,19 @@ function cloudConvert(inputformat, outputformat, inputdata, callback) {
             if($('#build_print').length == 0) {
                 $('body').append("<div id='build_print'></div>");   
             }
-//            $('#build_print').html(inputdata);
-            
-            var formdata = new FormData($("#build_blob_form"));
-            formdata.append('input', 'upload');
-            var aFileParts = [inputdata];
-            var oMyBlob = new Blob(aFileParts, {type : 'text/'+inputformat}); // the blob
-            console.log(oMyBlob);
-            formdata.append('file', oMyBlob);
+            if(inputdata.indexOf("http") === 0) {
+                //URL - CC will download from that URL
+                var formdata = new FormData($("#build_blob_form"));
+                formdata.append('file', inputdata);
+                formdata.append('input', 'download');
+            } else {
+                var formdata = new FormData($("#build_blob_form"));
+                formdata.append('input', 'upload');
+                var aFileParts = [inputdata];
+                var oMyBlob = new Blob(aFileParts, {type : 'text/'+inputformat}); // the blob
+                console.log(oMyBlob);
+                formdata.append('file', oMyBlob);
+            }
             formdata.append('outputformat', outputformat);
             formdata.append('filename', "converted_doc."+inputformat);
             console.log(formdata);
@@ -1112,11 +1119,12 @@ function cloudConvert(inputformat, outputformat, inputdata, callback) {
                                     if(di.percent == 100) {
                                         //TODO AJAX to get data
                                         console.log("Now use AJAX to get DATA");
-                                        /*$('#build_print').load("http:"+di.output.url, function(outputdata, statusTxt, xhr) {
+                                        $('#build_print').load("http:"+di.output.url, function(outputdata, statusTxt, xhr) {
 //                                                console.log(outputdata);
                                                 callback(outputdata);
+                                                console.log("Exit Importer");
 //                                                alert(di.output.url);
-                                        });*/
+                                        });
 //                                        var w = window.open(di.output.url, "_blank");
                                         clearInterval(downloadr);
 //                                        closePopup();          
@@ -1125,7 +1133,7 @@ function cloudConvert(inputformat, outputformat, inputdata, callback) {
                                 }
                             }
                         });
-                    }, 100);
+                    }, 300);
                     
                 }
             });

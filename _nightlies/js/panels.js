@@ -1905,7 +1905,7 @@ panelManager.getAvailablePanels().Main_Filesys.onRun = function () {
 		});
         $('#filesys_file').on('click', function() {
             var rawFileData = window.imported;
-            /*var fileData = */customImports[$(this).attr('format')].convert(rawFileData);
+            /*var fileData = */customImports[$(this).attr('format')].convert(rawFileData, window.importedink);
             initiatePopup({title:'Importing File',ht:'<div class="import_progress" style="font-size:14pt;text-align:center;width:100%;"></div>',bordercolor:'#7f8c8d'});
         });
 		$('#filesys_s').on('input', function() {
