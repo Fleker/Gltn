@@ -1533,6 +1533,39 @@ function showLatexReference(str) {
     }
 }
 
+function footnoteDetails(id) {
+    console.log("Footnote " +id);
+    console.log($('.footnote'+id).attr('data-cmd'));
+    
+    ht = "<b>You may add a footnote for the given text.</b>";
+    ht += "<input type='text' id='footnoteText' placeholder='Footnote Text' style='width:80%' value='"+$('.latex'+id).attr('data-note')+"'><br><br>";
+    ht += "<button id='footnoteSave' class='textbutton'>Save</button>";
+    
+    $('.footnote'+id).attr('data-id', id);
+    ht += "<input type='hidden' id='PopupId' value='"+id+"'>";
+    
+    fnc = function x(){
+        id = $('#PopupId').val();
+        function populate(cmd) {
+            $('#footnoteSave').on('click', function() {
+                setTimeout(function() {
+                    $('.footnote'+id).attr('data-note', $('#footnoteText').val());
+                    markAsDirty();
+                    closePopup();
+                }, 250);
+            });
+        }
+        
+        if($('.footnote'+id).attr('data-cmd') != undefined) {
+            populate($('.footnote'+id).attr('data-cmd'));
+        } else {
+            populate(-1);
+        }  
+    };
+    var p = new Popup({title: "Edit This Footnote", bordercolor: "#f0901f", ht: ht, fnc: fnc, size: popupManager.LARGE}).show();
+}
+
+
 
 /*** Custom Theming -- THEMES -- Theme Class -- Theme Enum***/
 function resetTheme() {

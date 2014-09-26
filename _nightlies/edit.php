@@ -33,7 +33,7 @@
 <script src="js/popup.js"></script>
 <script src="js/build.js"></script>
 <script src="js/holoribbon_foundation.js"></script>
-<script src="store/secure/gltnstore.js"></script>
+<script src="js/gltnstore.js"></script>
 
 <script src="js/rangy-1.3alpha.772\rangy-core.js"></script>
 <script src="js/rangy-1.3alpha.772\rangy-cssclassapplier.js"></script>

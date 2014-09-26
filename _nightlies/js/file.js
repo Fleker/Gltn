@@ -17,14 +17,15 @@ function File() {
     this.min_par = 0;
     this.max_par = 0;
     this.language = "";
+    this.fileid = "untitled";
     File.prototype.clearMetadata = function() {
         this.metadata = [];
     };  
     File.prototype.getFileid = function() {
-        return fileid;     
+        return this.fileid;     
     };
-    File.prototype.setFileid = function(file) {
-        fileid = file;
+    File.prototype.setFileid = function(newfile) {
+        fileid = newfile;
         return this;
     };
     File.prototype.getShareid = function() {
@@ -113,8 +114,10 @@ $(document).ready(function() {
         var GETval = GETarr[i].split("=")[1];
         console.log(i, GETparam, GETval);
 
-        if(GETparam == "file")
+        if(GETparam == "file") {
             fileid = GETval;
+            file.fileid = GETval;
+        }
         if(GETparam == "share")
             shareid = GETval;
         if(GETparam == "format") {
@@ -377,7 +380,7 @@ function saveFile(fileObj) {
 	obj.citationi = fileObj.citations.getIndex();
 	obj.idea = fileObj.ideas.getArray();
 	obj.ideadefault = fileObj.ideas.getDefault();
-	obj.hovertagRegistrar = fileObj.getHovertagRegistrar();
+//	obj.hovertagRegistrar = fileObj.getHovertagRegistrar();
     if(obj.file == undefined)
 	   obj.file = {};
     //FIXME These three things
@@ -453,7 +456,7 @@ function saveFile(fileObj) {
         $('.content_save').show();
         $('.content_save').html("<span class='fa fa-file-text' style='color:"+theme.fontColorAlt+"'></span>&nbsp;<span class='fa fa-check' style='color:"+theme.fontColorAlt+"'></span>");
     }
-    return xo+content;
+    return [xo+content,o];
 }
 //NOTE Clodconvert
 

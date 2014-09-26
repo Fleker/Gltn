@@ -226,6 +226,10 @@ button[disabled]:hover {
     display:inline;
     font-size:100%;
 }	
+.footnote {
+    text-decoration: none;
+    border-bottom: solid 1px #f0901f;`
+}   
 .table {
     text-decoration:none;
     border: solid 1px #f0f;
@@ -235,6 +239,9 @@ button[disabled]:hover {
 }
 .build .latex {
     border-bottom: solid 0px;   
+}
+.build .footnote {
+    border:none 0px;   
 }
 .context {
 	text-decoration: none;

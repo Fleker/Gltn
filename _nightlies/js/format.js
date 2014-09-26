@@ -324,6 +324,12 @@ function ToolbarManager() {
             contentAddSpan({node:"kbd", class:"latex latex"+lid, ce: false});
             latexDetails(lid);
         }),
+        footnote: new Tool("footnote", "Footnote", function() {
+            var findex = getObjectSize('footnote');
+            console.log("Footnote "+findex);
+            contentAddSpan({node:"span", class:"footnote footnote"+findex});
+            footnoteDetails(findex);
+        }),
         pbreak: new Tool("pbreak", "Page Break", function() {
             contentAddSpan({node:"kbd", class:"pagebreak", ce: false});
             hovertagManager.refresh();
@@ -471,7 +477,12 @@ function HovertagManager() {
         }, function(el) {
             refTextDetails($(el).attr('data-id'));
         }),
-        pagebreak: new Hovertag("pagebreak", "Page Break")
+        pagebreak: new Hovertag("pagebreak", "Page Break"),
+        footnote: new Hovertag('footnote', function(el) {
+            return $(el).attr('data-note');
+        }, function(el) {
+            footnoteDetails($(el).attr('data-id'));
+        })
     };
     HovertagManager.prototype.implement = function(hovertag) {
         this.registry[hovertag.classname] = hovertag;
