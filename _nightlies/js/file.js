@@ -6,6 +6,7 @@ max_char = 0;
 min_word = 0;
 max_word = 0;
 SYNC_STATUS = "";
+window.dirty = false;
 
 /** FILE CLASS **/
 function File() {
@@ -18,6 +19,7 @@ function File() {
     this.max_par = 0;
     this.language = "";
     this.fileid = "untitled";
+    this.jsonsave = {};
     File.prototype.clearMetadata = function() {
         this.metadata = [];
     };  
@@ -32,16 +34,16 @@ function File() {
         return shareid;  
     };
     File.prototype.getMinChar = function() {
-        return min_char;
+        return this.min_char;
     };
     File.prototype.getMaxChar = function() {
-        return max_char;
+        return this.max_char;
     };
     File.prototype.getMinWord = function() {
-        return min_word;
+        return this.min_word;
     };
     File.prototype.getMaxWord = function() {
-        return max_word;
+        return this.max_word;
     };
     File.prototype.getHovertagRegistrar = function() {
         return hovertagRegistrar;  
@@ -60,28 +62,34 @@ function File() {
     File.prototype.getTags = function() {
         return $('#file_tags').val();  
     };
-    File.prototype.sync = {
-        getHistory: function() {
-            return SYNC_HISTORY;   
-        }, 
-        getStatus: function() {
-            return SYNC_STATUS;   
+    File.prototype.sync = function() {
+        return {
+            getHistory: function() {
+                return SYNC_HISTORY;   
+            }, 
+            getStatus: function() {
+                return SYNC_STATUS;   
+            }
         }
     };
-    File.prototype.citations = {
-        getArray: function() {
-            return citation;
-        },
-        getIndex: function() {
-            return citationi;   
+    File.prototype.citations = function() { 
+        return {
+            getArray: function() {
+                return citation;
+            },
+            getIndex: function() {
+                return citationi; 
+            }
         }
     };
-    File.prototype.ideas = {
-        getArray: function() {
-            return idea;   
-        },
-        getDefault: function() {
-            return ideadefault;
+    File.prototype.ideas = function() {
+        return {
+            getArray: function() {
+                return idea;   
+            },
+            getDefault: function() {
+                return ideadefault;
+            }
         }
     };
     File.prototype.getFormat = function() {
@@ -317,6 +325,7 @@ function startSaveFile() {
     //If not a cloud doc, saves as usual
     if(isCloudSaved() && window.dirty) {
         try {
+            console.warn("Cloud saved and dirty file");
             saveFile(file);
         } catch(e) {
             console.error(e.message);
@@ -326,6 +335,7 @@ function startSaveFile() {
     else if(isCloudSaved()) {
         cloudRead(getFileData("inkblob_url"), "RF2", jsonsave.gluten_doc.file.last_modified);
     } else if(window.dirty) {
+        console.warn("Dirty file");
         saveFile(file);   
     }
     
@@ -334,6 +344,7 @@ function startSaveFile() {
             filepicker.write(getSettings("inkblob_url"),
                          localStorage.settings,
                         function(InkBlob){
+                            console.warn("File is dirty again");
                             saveFile(file);
                             console.log("Settings synced for now");
                         }, function(FPError) {
@@ -357,29 +368,36 @@ function saveFile(fileObj) {
     if(fileObj.getFileid() === file.getFileid()) {
         isSameFile = true;
     }
-//    alert(isSameFile);
+    console.error("File builder is not "+isSameFile);
     if(fileObj.getFileid() === undefined) {
         console.error('fileid had no value');
         fileObj.setFileid("scratchpad");
     }
+    var obj = {};
     if(isSameFile) {
         $('.content_save').hide();
-        if(window.jsonsave === undefined) 
-            obj = x;
-        else 
-            obj = jsonsave.gluten_doc;
+        console.warn((fileObj.jsonsave === undefined) + " isf");
+        console.warn(fileObj);
+        if(fileObj.jsonsave === undefined) 
+            obj = {};
+        else if(fileObj.jsonsave.gluten_doc !== undefined)
+            obj = fileObj.jsonsave.gluten_doc;
     } else {
-        obj = {};   
+        console.warn(fileObj.jsonsave !== undefined + " insf");
+        if(fileObj.jsonsave !== undefined) 
+            obj = fileObj.jsonsave;    
     }
 	//console.log(window.jsonsave, x, obj);
-	for(i=0;i<fileObj.citations.getArray().length;i++) {
-		if(fileObj.citations.getArray()[i] === undefined)
-			fileObj.citations.getArray()[i] = "undefined";
+    //Better citation handler in file
+	for(i=0;i<fileObj.citations().getArray().length;i++) {
+		if(fileObj.citations().getArray()[i] === undefined)
+			fileObj.citations().getArray()[i] = "undefined";
 	}
-	obj.citation = fileObj.citations.getArray();
-	obj.citationi = fileObj.citations.getIndex();
-	obj.idea = fileObj.ideas.getArray();
-	obj.ideadefault = fileObj.ideas.getDefault();
+    console.log(obj);
+	obj.citation = fileObj.citations().getArray();
+	obj.citationi = fileObj.citations().getIndex();
+	obj.idea = fileObj.ideas().getArray();
+	obj.ideadefault = fileObj.ideas().getDefault();
 //	obj.hovertagRegistrar = fileObj.getHovertagRegistrar();
     if(obj.file == undefined)
 	   obj.file = {};
@@ -403,6 +421,7 @@ function saveFile(fileObj) {
 	obj.file.max_word = fileObj.getMaxWord();
 	
 	//Integrated saves
+    //TODO Fix to fileObj
 	if(window.saved != undefined && isSameFile) {	
 		obj.saved = {};
 		for(i in window.saved) {
@@ -414,6 +433,7 @@ function saveFile(fileObj) {
 	}
     if(obj.metadata === undefined) 
 		obj.metadata = {};
+    
     if(isSameFile) {
         for(i in window.metadata) {
             var att = window.metadata[i].id.replace(/ /g, '_');
@@ -421,12 +441,13 @@ function saveFile(fileObj) {
                 obj['metadata'][att] = encodeURIComponent(grabMetadata(i).value);
         }
         content = $('.content_textarea').html();
-        o = {};
-        o.gluten_doc = obj;
-        window.jsonsave = o;
+        
     } else {
         content = "";   
     }
+    o = {};
+    o.gluten_doc = obj;
+    fileObj.jsonsave = o;
 
 	xo = json2xml(o, "");
     if(isSameFile) {
@@ -555,7 +576,7 @@ function restoreFile(full) {
     
 }
 function finishRestore(x, xc, full) {
-    window.jsonsave = {gluten_doc: x};
+    file.jsonsave = {gluten_doc: x};
 	try {
         console.log("onInitFormat");
         onInitFormat();
@@ -770,9 +791,10 @@ function initNiftyUI4Saving() {
 	});	
 }
 function markAsDirty() {
+    console.error("File marked as dirty right now");
     $('.content_save').html("<span class='fa fa-file-text' style='color:"+window.theme.coloralt+"'></span>&nbsp;<span class='fa fa-pencil' style='color:"+window.theme.coloralt+"'></span>");
     try {
-        jsonsave.gluten_doc.file.last_modified = new Date().getTime();
+        file.jsonsave.gluten_doc.file.last_modified = new Date().getTime();
     } catch(e) {
         
     }
@@ -1390,7 +1412,7 @@ function download_format2(y) {
 function formatShift2(d) {
 	//Set up parameters	
 	if(d == undefined)
-		d = jsonsave.gluten_doc.metadata;
+		d = file.jsonsave.gluten_doc.metadata;
 	else
 		d = JSON.parse(d);
 	for(i in d) {
@@ -1410,7 +1432,7 @@ function formatShift2(d) {
 		}
 	}
 	console.log("The document's format has shifted.");
-    window.dirty = true;
+    markAsDirty();
 }
 function renameFile() {
     var v = $('#renameFileVal').val();
