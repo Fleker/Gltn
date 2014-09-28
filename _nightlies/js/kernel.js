@@ -12,7 +12,7 @@ function FormatManager() {
         APA: new GltnFormat("APA", "APA", "Essay", "js/formats/APA.js", true),
         MLA: new GltnFormat("MLA", "MLA", "Essay", "js/formats/MLA.js", false),
         IEEE: new GltnFormat("IEEE", "IEEE", "Report", "js/formats/IEEE.js", false),
-        Lab: new GltnFormat("Lab", "Lab", "Report", "js/formats/Lab.js", false)
+        Lab: new GltnFormat("Lab", "IMRAD", "Report", "js/formats/Lab.js", false)
     };
     FormatManager.prototype.getFormats = function() {
         return this.formats;
@@ -1537,8 +1537,8 @@ function footnoteDetails(id) {
     console.log("Footnote " +id);
     console.log($('.footnote'+id).attr('data-cmd'));
     
-    ht = "<b>You may add a footnote for the given text.</b>";
-    ht += "<input type='text' id='footnoteText' placeholder='Footnote Text' style='width:80%' value='"+$('.latex'+id).attr('data-note')+"'><br><br>";
+    ht = "You may add a footnote for the given text.<br>";
+    ht += "<input type='text' id='footnoteText' placeholder='Footnote Text' style='width:80%' value='"+decodeURIComponent($('.footnote'+id).attr('data-note'))+"'><br><br>";
     ht += "<button id='footnoteSave' class='textbutton'>Save</button>";
     
     $('.footnote'+id).attr('data-id', id);
@@ -1549,7 +1549,7 @@ function footnoteDetails(id) {
         function populate(cmd) {
             $('#footnoteSave').on('click', function() {
                 setTimeout(function() {
-                    $('.footnote'+id).attr('data-note', $('#footnoteText').val());
+                    $('.footnote'+id).attr('data-note', encodeURIComponent($('#footnoteText').val()));
                     markAsDirty();
                     closePopup();
                 }, 250);
@@ -2125,7 +2125,7 @@ function contextMarkup() {
 	apply_context("[Rr]eally", {type: Context.OVERUSE, text: getStrunkTips(overusetip), limit: Context.P_RARE});
 	apply_context("[Ii]ncredibly", {type: Context.OVERUSE, text: getStrunkTips(overusetip), limit: Context.P_RARE});
 }
-
+//FIXME
 /*** Sync Service - Not directly related to files ***/
 function InitPanelmain_Sync() {
     window.SYNC_HISTORY = ["File Downloading..."];
@@ -2153,8 +2153,8 @@ function RunPanelmain_Sync() {
     },1000)
 }
 function setSyncStatus(txt) {
-    if(SYNC_HISTORY == undefined) {
-        InitPanelmain_Sync();   
+    if(SYNC_HISTORY === undefined) {
+        panelManager.getAvailablePanels().Main_Sync.onInit();
     }
     SYNC_STATUS = txt;   
     SYNC_HISTORY.unshift(txt);

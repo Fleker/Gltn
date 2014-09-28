@@ -6,6 +6,7 @@ max_char = 0;
 min_word = 0;
 max_word = 0;
 SYNC_STATUS = "";
+SYNC_HISTORY = [];
 window.dirty = false;
 
 /** FILE CLASS **/
@@ -53,6 +54,8 @@ function File() {
         if(this.lang == "") {
             this.lang = $('#file_language').val();
         } 
+        if(this.lang == "" || this.lang === undefined)
+            this.lang = languageManager.getLanguages().en_us.name;
         return this.lang;
     };
     File.prototype.setLanguage = function(lang) {
@@ -325,7 +328,7 @@ function startSaveFile() {
     //If not a cloud doc, saves as usual
     if(isCloudSaved() && window.dirty) {
         try {
-            console.warn("Cloud saved and dirty file");
+//            console.warn("Cloud saved and dirty file");
             saveFile(file);
         } catch(e) {
             console.error(e.message);
@@ -333,9 +336,9 @@ function startSaveFile() {
         }
     }
     else if(isCloudSaved()) {
-        cloudRead(getFileData("inkblob_url"), "RF2", jsonsave.gluten_doc.file.last_modified);
+//        cloudRead(getFileData("inkblob_url"), "RF2", jsonsave.gluten_doc.file.last_modified);
     } else if(window.dirty) {
-        console.warn("Dirty file");
+//        console.warn("Dirty file");
         saveFile(file);   
     }
     
@@ -344,7 +347,7 @@ function startSaveFile() {
             filepicker.write(getSettings("inkblob_url"),
                          localStorage.settings,
                         function(InkBlob){
-                            console.warn("File is dirty again");
+//                            console.warn("File is dirty again");
                             saveFile(file);
                             console.log("Settings synced for now");
                         }, function(FPError) {
@@ -368,7 +371,7 @@ function saveFile(fileObj) {
     if(fileObj.getFileid() === file.getFileid()) {
         isSameFile = true;
     }
-    console.error("File builder is not "+isSameFile);
+//    console.error("File builder is not "+isSameFile);
     if(fileObj.getFileid() === undefined) {
         console.error('fileid had no value');
         fileObj.setFileid("scratchpad");
@@ -376,16 +379,20 @@ function saveFile(fileObj) {
     var obj = {};
     if(isSameFile) {
         $('.content_save').hide();
-        console.warn((fileObj.jsonsave === undefined) + " isf");
+//        console.warn((fileObj.jsonsave === undefined) + " isf");
         console.warn(fileObj);
         if(fileObj.jsonsave === undefined) 
             obj = {};
         else if(fileObj.jsonsave.gluten_doc !== undefined)
             obj = fileObj.jsonsave.gluten_doc;
     } else {
-        console.warn(fileObj.jsonsave !== undefined + " insf");
-        if(fileObj.jsonsave !== undefined) 
-            obj = fileObj.jsonsave;    
+//        console.warn(fileObj.jsonsave !== undefined + " insf");
+        if(fileObj.jsonsave !== undefined) {
+            if(fileObj.jsonsave.gluten_doc !== undefined)
+                obj = fileObj.jsonsave.gluten_doc;   
+            else
+                obj = fileObj.jsonsave;
+        }
     }
 	//console.log(window.jsonsave, x, obj);
     //Better citation handler in file
@@ -583,7 +590,6 @@ function finishRestore(x, xc, full) {
 	} catch(e) {
 		console.error(e.message);
         //TODO Readjust time
-        //FIXME Unexpected Token ILLEGAL
         setTimeout(function() {
             finishRestore(x, xc, full);
         },1000);
@@ -791,7 +797,7 @@ function initNiftyUI4Saving() {
 	});	
 }
 function markAsDirty() {
-    console.error("File marked as dirty right now");
+//    console.error("File marked as dirty right now");
     $('.content_save').html("<span class='fa fa-file-text' style='color:"+window.theme.coloralt+"'></span>&nbsp;<span class='fa fa-pencil' style='color:"+window.theme.coloralt+"'></span>");
     try {
         file.jsonsave.gluten_doc.file.last_modified = new Date().getTime();
@@ -1134,7 +1140,7 @@ function cloudConvert(inputformat, outputformat, inputdata, callback) {
                 processData: false,
                 success: function(d){
                     console.log(d);
-                    var downloadr = setInterval(function() {
+                    var downloadr = (function() {
                         $.ajax({
                            url:"https:"+data.url,
                             success: function(di) {
@@ -1146,20 +1152,26 @@ function cloudConvert(inputformat, outputformat, inputdata, callback) {
                                         console.log("Now use AJAX to get DATA");
                                         $('#build_print').load("http:"+di.output.url, function(outputdata, statusTxt, xhr) {
 //                                                console.log(outputdata);
+                                            try {
                                                 callback(outputdata);
-                                                console.log("Exit Importer");
+                                            } catch(e) {
+                                                $('.import_progress').html("<span style='color:red'>ERROR: "+e.message+"</span>");
+                                                console.error(e.message);
+                                            }
 //                                                alert(di.output.url);
                                         });
 //                                        var w = window.open(di.output.url, "_blank");
-                                        clearInterval(downloadr);
+//                                        clearInterval(downloadr);
 //                                        closePopup();          
 //                                        callback(outputdata);
-                                    }
-                                }
+                                    } else
+                                        downloadr();
+                                } else
+                                    downloadr();
                             }
                         });
-                    }, 300);
-                    
+                    });
+                    downloadr();
                 }
             });
         }

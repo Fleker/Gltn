@@ -479,7 +479,7 @@ function HovertagManager() {
         }),
         pagebreak: new Hovertag("pagebreak", "Page Break"),
         footnote: new Hovertag('footnote', function(el) {
-            return $(el).attr('data-note');
+            return decodeURIComponent(decodeURIComponent($(el).attr('data-note')));
         }, function(el) {
             footnoteDetails($(el).attr('data-id'));
         })

@@ -1,4 +1,4 @@
-var GLTN_VERSION = "1.4.0.5";
+var GLTN_VERSION = "1.4.0.6";
 var GLTN_VNAME = "Isidore";
 var GLTN_BUILD = 2;
 //For backwards compatibility, will return true 
@@ -1096,8 +1096,10 @@ function columnCount(p, trunc) {
     else
         return Math.round(b);
 }
- 
 function getloader() {
+    return '<div class="spinner"><div class="dot1"></div><div class="dot2"></div></div>';
+}
+function getloader2() {
     return "<div style='text-align:center; width:100%;' class='spin'></div>";  
 }
 function spinloader(inline) {

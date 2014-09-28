@@ -1,4 +1,3 @@
-//TODO Fix build system. A - Use Promises
 //TODO B - Change %sc and its effect to improve speed
 //FIXME C - This NEEDS to display correctly. Make a demo if necessary. It cannot be imperfect
 builddate = 0;
@@ -27,9 +26,10 @@ function startBuild(el) {
 	$('.build').html('<span class="buildRow"><button onclick="exitBuild()" class="textbutton"><span class="fa fa-angle-left"></span>&nbsp;Editor</button>'+buildPrint+'</span><span class="buildtime noprint" style="font-size:9pt"></span>');
         
 		//$('.build_progress').css('display', 'block').css('position', 'fixed').css('width', '50%').css('height', '50%').css('top','25%').css('left','25%').css('background-color', 'rgba(0,0,0,0.3)').css('font-size','16pt').css('margin-top','10%');
-	initiatePopup({title:"Compilation Progress",bordercolor:"rgb(44, 145, 16)",ht:"<div id='build_progress' class='build_progress' style=''></div>"});
+	initiatePopup({title:"Compilation Progress",bordercolor:"rgb(44, 145, 16)",ht:"<div id='build_progress' class='build_progress' style=''></div>"+getloader()});
 	updateBuildProgress('Beginning to Compile...');
-	setTimeout(function() {
+    
+	/*setTimeout(function() {
         try {
               
             continueBuild(el);  
@@ -37,11 +37,18 @@ function startBuild(el) {
             updateBuildProgress("<span style='color:#c00'>Error Building: "+e.message+"</span>");
             console.error(e.message);
         }
-    },500);
-    setTimeout('updateBuildProgress("Compiling...");',400);
-    
-   
-   
+    },500);*/
+    $.when(continueBuild()).then(
+        function(status) {
+            console.log("Build: "+status);   
+        }, function(status) {
+            updateBuildProgress("<span style='color:#c00'>Error Building: "+status+"</span>");
+            console.log("Build2: "+status);   
+        }, function(status) {
+            console.log("Build3: "+status);   
+        }
+    );
+    setTimeout('updateBuildProgress("Compiling...");',40);
 }
 function add_export_button(title, icon, fnc) {
     $('.buildRow').append('<button class="export_'+title+'" style="width:60px">'+icon+"&nbsp;"+title+"</button>"); 
@@ -102,6 +109,8 @@ function convertDoc() {
 }
 
 function continueBuild(el) {
+    var dfd = new jQuery.Deferred();
+        
     window.build_ln = new Array();
     window.build_fn = new Array();
     window.build_volume = new Array();
@@ -127,11 +136,15 @@ function continueBuild(el) {
 		try {
 			onStylePaper();	
 		} catch(e) {
-			
+			dfd.reject("on style paper");
 		}
 		updateBuildProgress('Building Text...');
-		onBuildFormat();
+        try {
+            onBuildFormat();
 			updateBuildProgress('Setting Headers...');	
+        } catch(e) {
+            dfd.reject("on build format");   
+        }
 				
 		onGetFormats();
 			updateBuildProgress('Formatting Content...');
@@ -142,6 +155,7 @@ function continueBuild(el) {
 		try {
 			onSetHeader();
 		} catch(e) {
+			dfd.reject("on set header");
 			
 		}
 	} else {
@@ -152,7 +166,7 @@ function continueBuild(el) {
 		
 	//To stuff
 		//$('.body').css('display', 'none');
-		$('.main').fadeOut(500);
+    $('.main').fadeOut(500);
 	finishBuild();
 	scrollTo(0,0);
 	console.warn('finish');
@@ -166,13 +180,14 @@ function continueBuild(el) {
     }
     $('.buildtime').append('&emsp;Stats: '+i+' words, '+$('.pagebody').text().length+' chars');
     $("#PanelBuildEvent").click();
+    dfd.resolve("yay");
+    return dfd.promise();
 	//$('.build').css('display', 'block');
 }
 function updateBuildProgress(text) {
     setTimeout(function() {
 //	   $('.build_progress').empty();
-        $('.build_progress').html(text+"<br>"+getloader());
-        spinloader();
+        $('.build_progress').html(text+"<br>");
 //        $('#progress_buddy').html();
     }, 10);
 }
@@ -192,16 +207,16 @@ function exitBuild() {
 }
 //Integration into format.js files
 function grabMetadata(i) {
-	var o = window.metadata[i];
-//	console.log(i);
+	var o = file.metadata;
+	console.log(i);
 	o.value = $('#format_item_'+i).val();
 	if(o.value == undefined)
 		o.value = $('#format_item_'+i).html();
 	return o;	
 }
 function searchMetadata(request) {
-	for(i=0;i<window.metadata.length;i++) {
-		if(window.metadata[i].id == request || window.metadata[i].label == request)
+	for(i=0;i<file.metadata.length;i++) {
+		if(file.metadata[i].id == request || file.metadata[i].label == request)
 			return i;	
 	}
 }

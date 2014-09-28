@@ -1680,10 +1680,10 @@ function showFileInfo(id) {
     var doc = $.xml2json(localStorage[id]);
     out = "<div class='tinfo'>";
     if(doc.metadata.Title !== undefined && doc.metadata.Title.length > 0)
-        out += "<h1>"+doc.metadata.Title+"</h1>";
+        out += "<h1>"+decodeURIComponent(doc.metadata.Title)+"</h1>";
     if(doc.metadata.Author !== undefined && doc.metadata.Author.length > 0)
         out += "<h2>By "+doc.metadata.Author+"</h2>";
-    out += "<h3><input id='renameFileVal' value='"+id+"'>.gltn&nbsp;&nbsp;"+truncateFloat(getLocalStorageOf(id)+getLocalStorageOf(id+"_c"))+"KB</h3>";
+    out += "<h3><input type='text' id='renameFileVal' style='display:inline; width:16em;' value='"+id+"'>.gltn &nbsp;&nbsp;"+truncateFloat(getLocalStorageOf(id)+getLocalStorageOf(id+"_c"))+"KB</h3>";
     out += "<h4 class='filedata'>"+doc.file.format+"&emsp;"+doc.file.language+"&emsp;"
     if(doc.file.gltn_version !== undefined)
         out += "From Gltn v"+doc.file.gltn_version;
@@ -1788,6 +1788,10 @@ function showFileInfo(id) {
     evt - GltnData
     filename - Name for this file
 **/
+function importGltnBlob(blob, filename) {
+    filename = filename || "untitled";
+    handleFileSelect(blob, filename);
+}
 function handleFileSelect(evt, filename) {	
     
 /*	var files = evt.target.files;
@@ -1841,11 +1845,101 @@ function handleFileSelect(evt, filename) {
             console.log(filename, save);
             $('.import_progress').html('<span style="color:green">The file '+save+'.gltn was successfully imported.<br><span style="font-size:10pt">The file will now be accessible on this computer. To use it on another computer you must export the file after editing.</span></span>');
             setTimeout('closePopup()', 4000);
-            resetFolder(term);
+            resetFolder();
         }
 //			  }
     }
+function resetFolder(sterm) {
+    if(sterm !== undefined)
+        sterm = sterm.toLowerCase();
+    fstotal = 0;
+    out="";
+    for(i in localStorage){
+//        c(i);
+        if(localStorage[i] != undefined && localStorage[i+"_c"] != undefined) {
+            //We've got something!
+            try {
+                var xx = $.xml2json(localStorage[i]);
+            } catch(e) {
+//                c(e.message);
+                continue;
+            }
+            title = decodeURIComponent(xx.metadata.Title);
+            if(title == undefined)
+                title = "";
 
+            bgc = theme.bodyColor;
+            if(i == fileid)
+                bgc = theme.palette.blue.normal;
+
+            var fsi = localStorage[i].length;
+            var fsci = localStorage[i+"_c"].length;
+            fstotal += fsi;
+            fstotal += fsci;
+            var fsout = truncateFloat(getLocalStorageOf(i)+getLocalStorageOf(i+"_c"))+"KB";
+            //console.log(xx.file.tags.split(','),sterm)
+            if(sterm == undefined || (sterm != undefined  && (title.toLowerCase().indexOf(sterm) > -1) || i.toLowerCase().indexOf(sterm) > -1 || xx.file.tags.indexOf(sterm) > -1)) {
+                try {
+                    var y = decodeURIComponent(xx.file.format);
+                } catch(e) {
+                    console.error(e.message);
+                    continue;
+                }
+                var time = "";
+                timeiso = undefined;
+                try {
+                     //console.log(xx.file.last_modified, time);
+                    time = jQuery.timeago(new Date().setTime(xx.file.last_modified));
+                    timeiso = new Date();
+                    timeiso.setTime(decodeURIComponent(xx.file.last_modified));
+                    //console.log(xx.file.last_modified,timeiso, timeiso.getTime());
+                    timeiso = timeiso.toISOString();
+                    //console.log(xx.file.last_modified, time, timeiso);
+                } catch(e) {
+                    time = undefined;   
+                    timeiso = undefined;
+                    //console.error(e.message);
+                } 
+
+                /*out += "<div class='tfile "+((i==fileid)?"selected":"")+"' style='background-color:"+bgc+";border:solid 0px "+bgc+";padding-bottom:8px;width:98%;cursor:pointer;' data-v='"+i+"'><table style='font-size:7pt;font-family:sans-serif;width:100%;'><tr><td style='text-align:left'><span style='font-size:8pt' class='fa fa-file-text'></span>&nbsp;"+i+".gltn</td><td style='text-align:center;width:36px' class='Filesys_delete' data-f='"+i+"'>X</td></tr></table>";*/
+//                    out += "<div style='background-color:"+bgc+"; border-bottom: solid 1px "+theme.palette.grey.accent400+";padding-bottom:8px;margin-bottom: 8px; width: 98%;'><span style='font-size:8pt;'>"+i+".gltn</span>";
+                out += "<div style='background-color:"+bgc+"; padding-bottom:8px;margin-bottom: 8px;'>";
+                out += "<div style='margin-left:3px;padding:8px;'><b>"+((title !== undefined && title.length > 2)?title:i+".gltn")+"</b></div>";
+                out += "<span style='font-size:8pt'>&emsp;"+xx.file.format+/*"&nbsp;&nbsp;"+xx.file.language+*/"&nbsp;&nbsp;"+fsout+"</span>";
+                time = "";
+                out += "&emsp;";
+                if(xx.saved != undefined) {
+                    if(xx.saved.inkblob_url != undefined)
+                        out += "<span class='fa fa-cloud' style='font-size:8pt' title='File is available on the cloud'></span>&nbsp;";
+                }
+
+                if(timeiso != undefined)
+                    out += "<span style='font-size:8pt'>Last edited <abbr class='timeago' title='"+timeiso+"'></abbr>"+time+"</span>";
+                var actioncolor = getAppropriateColor(theme.palette[getSettings("personal_color")].accent700, theme.palette[getSettings("personal_color")].accent100);
+                out += "<br><div class='tfile fa fa-sign-in' data-v='"+i+"' style='color:"+actioncolor+"; display:inline-block; width:24px; padding-top:8px; padding-left: 8px; cursor:pointer;'></div>&emsp;<div class='tinfo fa fa-info' data-v='"+i+"' style='color:"+actioncolor+";display:inline-block; width:24px; cursor:pointer;'></div>";
+                out += "</div>";	
+            }
+        }	
+    }
+    fstotal += localStorage['settings'].length;
+    $('.resetFolder').html(out);
+    jQuery("abbr.timeago").timeago();
+    $('.exportall').on('click', function() {
+        startExportHTML(getGltp(), "My Gltn Data");   
+    });
+    $('.tfile').on('click', function() {
+        /*if($('.Filesys_delete').attr('data-end') != "true")*/
+            wl($(this).attr('data-v'));
+    });
+    $('.tinfo').on('click', function() {
+        showFileInfo($(this).attr('data-v'));
+    });
+    return out;
+}
+function wl(i) {
+//		c('?file='+i);
+		window.location = '?file='+i;	
+	}
 panelManager.getAvailablePanels().Main_Filesys.onRun = function () {
     //TODO SPinner
 	function c(i) {
@@ -1905,8 +1999,9 @@ panelManager.getAvailablePanels().Main_Filesys.onRun = function () {
 		});
         $('#filesys_file').on('click', function() {
             var rawFileData = window.imported;
+            //NOTE Spinner, Spinner CSS, and Spinner API
             /*var fileData = */customImports[$(this).attr('format')].convert(rawFileData, window.importedink);
-            initiatePopup({title:'Importing File',ht:'<div class="import_progress" style="font-size:14pt;text-align:center;width:100%;"></div>',bordercolor:'#7f8c8d'});
+            initiatePopup({title:'Importing File',ht:'<div class="import_progress" style="font-size:14pt;text-align:center;width:100%;"></div><div class="spinner"><div class="dot1"></div><div class="dot2"></div></div>',bordercolor:'#7f8c8d'});
         });
 		$('#filesys_s').on('input', function() {
 			resetFolder($('#filesys_s').val());
@@ -1917,7 +2012,7 @@ panelManager.getAvailablePanels().Main_Filesys.onRun = function () {
         //var blob = file.slice(start, stop + 1);
         //reader.readAsText(blob);
     }
-    function resetFolder(term) {
+    function initFolder(term) {
 		//postPanelOutput("<div id='spin' style='margin-left:25%'></div>");
 		$('.panel_plugin_content').html(getloader());
         spinloader();
@@ -1927,86 +2022,15 @@ panelManager.getAvailablePanels().Main_Filesys.onRun = function () {
 		else
 			sterm = term.toLowerCase();
 		out = "<button class='textbutton' id='filesys_new'><span class='fa fa-plus'></span>&nbsp;New</button><input type='file' id='filesys_u' style='display:none' name='file[]'>&ensp;<button class='textbutton' id='filesys_up'><span class='fa fa-cloud-upload'>&nbsp;</span>Upload</button><br><span class='fa fa-search' style='font-size:16pt'></span>&nbsp;&nbsp;&nbsp;<input type='search' id='filesys_s' style='width:calc(100% - 64px);display:inline' value='"+sterm+"'><input type='hidden' id='filesys_file'>";
-		fstotal = 0;
-		for(i in localStorage){
-			c(i);
-			if(localStorage[i] != undefined && localStorage[i+"_c"] != undefined) {
-				//We've got something!
-				try {
-					var xx = $.xml2json(localStorage[i]);
-				} catch(e) {
-					c(e.message);
-					continue;
-				}
-				title = decodeURIComponent(xx.metadata.Title);
-				if(title == undefined)
-					title = "";
-                
-                bgc = theme.bodyColor;
-				if(i == fileid)
-					bgc = theme.palette.blue.normal;
-					
-				var fsi = localStorage[i].length;
-				var fsci = localStorage[i+"_c"].length;
-				fstotal += fsi;
-				fstotal += fsci;
-				var fsout = truncateFloat(getLocalStorageOf(i)+getLocalStorageOf(i+"_c"))+"KB";
-				//console.log(xx.file.tags.split(','),sterm)
-				if(sterm == undefined || (sterm != undefined  && (title.toLowerCase().indexOf(sterm) > -1) || i.toLowerCase().indexOf(sterm) > -1 || xx.file.tags.indexOf(sterm) > -1)) {
-					try {
-						var y = decodeURIComponent(xx.file.format);
-					} catch(e) {
-						console.error(e.message);
-						continue;
-					}
-                    var time = "";
-                    timeiso = undefined;
-                    try {
-                         //console.log(xx.file.last_modified, time);
-                        time = jQuery.timeago(new Date().setTime(xx.file.last_modified));
-                        timeiso = new Date();
-                        timeiso.setTime(decodeURIComponent(xx.file.last_modified));
-                        //console.log(xx.file.last_modified,timeiso, timeiso.getTime());
-                        timeiso = timeiso.toISOString();
-                        //console.log(xx.file.last_modified, time, timeiso);
-                    } catch(e) {
-                        time = undefined;   
-                        timeiso = undefined;
-                        //console.error(e.message);
-                    } 
-                    
-					/*out += "<div class='tfile "+((i==fileid)?"selected":"")+"' style='background-color:"+bgc+";border:solid 0px "+bgc+";padding-bottom:8px;width:98%;cursor:pointer;' data-v='"+i+"'><table style='font-size:7pt;font-family:sans-serif;width:100%;'><tr><td style='text-align:left'><span style='font-size:8pt' class='fa fa-file-text'></span>&nbsp;"+i+".gltn</td><td style='text-align:center;width:36px' class='Filesys_delete' data-f='"+i+"'>X</td></tr></table>";*/
-//                    out += "<div style='background-color:"+bgc+"; border-bottom: solid 1px "+theme.palette.grey.accent400+";padding-bottom:8px;margin-bottom: 8px; width: 98%;'><span style='font-size:8pt;'>"+i+".gltn</span>";
-                    out += "<div style='background-color:"+bgc+"; padding-bottom:8px;margin-bottom: 8px;'>";
-                    out += "<div style='margin-left:3px;padding:8px;'><b>"+((title !== undefined && title.length > 2)?title:i+".gltn")+"</b></div>";
-                    out += "<span style='font-size:8pt'>&emsp;"+xx.file.format+/*"&nbsp;&nbsp;"+xx.file.language+*/"&nbsp;&nbsp;"+fsout+"</span>";
-                    time = "";
-                    out += "&emsp;";
-                    if(xx.saved != undefined) {
-                        if(xx.saved.inkblob_url != undefined)
-                            out += "<span class='fa fa-cloud' style='font-size:8pt' title='File is available on the cloud'></span>&nbsp;";
-                    }
-                        
-                    if(timeiso != undefined)
-                        out += "<span style='font-size:8pt'>Last edited <abbr class='timeago' title='"+timeiso+"'></abbr>"+time+"</span>";
-                    var actioncolor = getAppropriateColor(theme.palette[getSettings("personal_color")].accent700, theme.palette[getSettings("personal_color")].accent100);
-                    out += "<br><div class='tfile fa fa-sign-in' data-v='"+i+"' style='color:"+actioncolor+"; display:inline-block; width:24px; padding-top:8px; padding-left: 8px; cursor:pointer;'></div>&emsp;<div class='tinfo fa fa-info' data-v='"+i+"' style='color:"+actioncolor+";display:inline-block; width:24px; cursor:pointer;'></div>";
-					out += "</div>";	
-				}
-			}	
-		}
+		
 //		out += "</table>";
-		fstotal += localStorage['settings'].length;
+		out += "<div class='resetFolder'>"+resetFolder(sterm)+"</div>";
 		fstotalout = "<br><span style='font-size:10pt'>&emsp;"+getLocalStorageLength()+"KB stored</span><br><button class='textbutton exportall'>Export All Data</button>"
 		out += fstotalout;
 		post(out,term);
-        jQuery("abbr.timeago").timeago();
-        $('.exportall').on('click', function() {
-            startExportHTML(getGltp(), "My Gltn Data");   
-        });
 		//setTimeout("post(out);", 50);
 	}	
-	resetFolder();
+	initFolder();
 }
 //TODO Allow the ability to return multiple types of formats. Add in XML. Also, use this panel to implement docView versions of files to be more native
 panelManager.getAvailablePanels().Main_Filesys.onExport = function(docView, blob) {
@@ -2592,7 +2616,7 @@ panelManager.getAvailablePanels().Main_Pagecount.onRun = function() {
     out += "<br><div style='text-align:center;font-size:8pt;font-style:italic;'>Based on an average of 130 words per minute.</div><br><br><br><br><br>";
     
     out += "<div style='text-align:center;'></div><br><br>";
-    out += "<div style='text-align:center;font-size:18pt;font-weight:100;'>"+getWords().join('').length+" Chars<br><br>"+getWords().length+" Words<br><br>"+(getParagraphs().length+1)+" Paragraphs</div>";
+    out += "<div style='text-align:center;font-size:18pt;font-weight:100;'>"+getWords().join('').length+" Chars<br><br>"+getWords().length+" Words<br><br>"+(getParagraphs().length+1)+" Paragraph"+(getParagraphs()+1==1?"s":"")+"</div>";
     postPanelOutput(out);
 }
 function postPageCount() {
