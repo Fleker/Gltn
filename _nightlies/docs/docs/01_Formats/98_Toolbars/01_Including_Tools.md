@@ -19,7 +19,7 @@ You state which tools should be displayed in the toolbar, then you commit these 
 
 **Note**: The character palette and fullscreen will always be available in the toolbar.
 
-### Default Tools
+### Stock Tools
 * `citation` - Creates a citation
 * `heading1` - Adds a top-level heading
 * `heading2`
@@ -31,6 +31,7 @@ You state which tools should be displayed in the toolbar, then you commit these 
 * `reftext` - Copies text from elsewhere in a programmable way
 * `LaTeX` - Allows users to insert custom <a href='?User%20Interfacing/Miscellaneous%20Functions/Latex'>LaTeX</a> markup and have it render in HTML utilizing MathJax
 * `pbreak` - A page break in the paper. A new page is started at this point.
+* `footnote` - Lets the user insert a footnote into text, which can be supplied with text or HTML.
 
 ### Else
 The following tools can't be chosen as they appear anyway; they are here for reference.

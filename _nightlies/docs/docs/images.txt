@@ -25,4 +25,5 @@ Quicks
 <a href='?Formats/Compile_Markup'>Compile Markup</a>
 <a href='?Themes/Buttons'>buttons</a>
 <a href='?User%20Interfacing/Holoribbon'>Holoribbon API</a>
+<a href='?File/Reference'>File object</a>
 <img src="http://felkerdigitalmedia.com/gltn\images\blog\file_info.png">

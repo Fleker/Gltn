@@ -216,7 +216,7 @@ function CitationClass(name, format, medium) {
     return {name:name, format: format, medium: medium || format.name};
 }
 citationObjects = {
-    //TODO Introduce Patents
+    //TODO Introduce Patents, use medium attribute for builder
     ArticleJournal: new CitationClass('Journal Article', citationFormats.journal),
     ArticlePrint: new CitationClass("Printed Article", citationFormats.periodical),
     ArticleOnline: new CitationClass("Web Article", citationFormats.web),
@@ -1707,7 +1707,7 @@ function initThemeDefault() {
 	$('.content_textarea').css('line-height','1.4em').css('padding-right', '5px');
 	$('.hovertag').css('font-size', '10pt');
 //    $('.main').css('padding-top', '100px');
-    themeCss('font-family', '"Lato", sans-serif');
+    themeCss('font-family', '"Roboto", sans-serif');
     themeCss('font-size', '10pt');
     themeCss('background-color', '#ecf0f1');
 }
@@ -1865,8 +1865,9 @@ function startThemer(oldtheme) {
 			setTimeout("localStorage['ztheme_"+id+"'] = $('#themeframe').contents().text();", 1000);
 		}
 	} else {
-        writeCss('@import url(http://fonts.googleapis.com/css?family=Lato:100,300,400);');
+//        writeCss('@import url(http://fonts.googleapis.com/css?family=Lato:100,300,400);');
 //		writeCss('@import url(http://fonts.googleapis.com/css?family=Merriweather+Sans:400,300,700&subset=latin,latin-ext);');
+        writeCss("@import url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900,900italic);");
         writeCss("button, button.close { font-family:Lato,sans-serif;background-color:transparent;border-radius:3;text-indent:0;border:0px solid #888;display:inline-block;color:#333333;font-weight:bold;font-style:normal;text-decoration:none;text-align:center;padding:5px;min-width:30px;}");
         writeCss("button.ribbonbutton, button.toolbar_button { font-weight:400;color:#333; }");
         writeCss("button.textbutton { border: solid 1px #999;padding: 8px;background-color: #f9f9f9;font-weight: 400;color:#333;}");

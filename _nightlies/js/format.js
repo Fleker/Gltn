@@ -4,7 +4,6 @@ file.clearMetadata();
 window.metadata = [];
 format_js_index = 0;
 
-//NOTE
 function Metadata(type, ops) {
     this.type = type || "";
     this.label = ops.label || "";
@@ -29,12 +28,12 @@ function Metadata(type, ops) {
         return this.max !== 0 || this.min !== 0;  
     };
 }
-//NOTE
+
 function MetadataHtml(type, outputdata) {
     this.type = type || "text";
     this.outputdata = outputdata;
 }
-//NOTE
+
 MetadataTypes = {
     content: new MetadataHtml("content", function(i) {
         return post_format_content(file.metadata[i]);
@@ -49,7 +48,7 @@ MetadataTypes = {
         return post_format_mltext(file.metadata[i]);
     }),
     label: new MetadataHtml("label", function(i) {
-        return "<div style='font-weight:bold;border-bottom:solid 1px #888;width:90%;margin-left:5%;'>"+file.metadata[i].label+"</div>";
+        return "<div style='font-weight:bold;border-bottom:solid 1px #888;width:90%;margin-left:5%;'>"+file.metadata[i].label+"</div><br><span style='margin-left:4em;font-size:9pt;opacity:0.8;'>"+file.metadata[i].description+"</span>";
     }),
     date: new MetadataHtml("date", function(i) {
         return post_format_date(file.metadata[i]);

@@ -8,7 +8,7 @@
 <link rel="shortcut icon" sizes="196x196" href="logo2.png">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 
-<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 
 <script src="http://code.jquery.com/jquery-2.1.1.js"></script>
 <script src="http://code.jquery.com/color/jquery.color-2.1.2.min.js"></script>
@@ -34,6 +34,7 @@
 <script src="js/build.js"></script>
 <script src="js/holoribbon_foundation.js"></script>
 <script src="js/gltnstore.js"></script>
+<script src="js/formats/MLA.js"></script>
 
 <script src="js/rangy-1.3alpha.772\rangy-core.js"></script>
 <script src="js/rangy-1.3alpha.772\rangy-cssclassapplier.js"></script>

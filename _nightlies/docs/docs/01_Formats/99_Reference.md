@@ -38,24 +38,43 @@ The class `FormatManager` handles formats and controlling which one is currently
 | `.addFormat(GltnFormat)`   | void    | Adds a new `GltnFormat` to the list of formats, in escence installing it |
 | `.getCurrentFormat()`   | GltnFormat    | Returns the format that is currently being used in the document |
 
-###*Class Language*
-The class `Language` stores information about a single language which is used in the writing of a document
-
+###*Class Metadata*
+The class `Metadata` holds information relating to a specific piece of metadata
 | Properties   | Return  | Description                                 |
 | ----------   | :-----: | ------------------------------------------: |  
-| `code`     | String | The unique language code   |
-| `name`        | String     | The name of the language or dialect           | 
-
-###*Class LanguageManager*
-The class `LanguageManager` handles languages and controlling which one is currently active for the document. It can be accessed using the variable `languageManager`.
-
-| Properties   | Return  | Description                                 |
-| ----------   | :-----: | ------------------------------------------: |  
-| `languages`     | [Language]  | An array of all existing languages       |
+| `type`     | String  | A String pointing to a `MetadataHtml` object      |
+| `label`        | String     | A title for the datum           | 
+| `max`        | int     | A maximum number of items      | 
+| `min`        | int     | A minimum number of items      | 
+| `mtype`        | String     | "W" or "C" depending on the count you wish to constrain      | 
+| `placeholder`        | String     | Placeholder text for the field      | 
+| `description`        | String     | A more detailed description for the datum      | 
+| `id`        | String     | A name that can be used to identify the datum, it should be designed to persist across many formats      | 
+| `index`        | int     | The position of this datum     | 
+| `default`        | String     | Default text (IN PROGRESS)     | 
 
 | Methods    | Return  | Description                                                       |
 | ---------- | :-----: | ----------------------------------------------------------------: |
-| `.getLanguages()` | [Language]    | Returns an array of all languages stored in the object                    |
-| `.postFormats()` | void   | Refreshes the language input field with all contained language                    |
+| `.hasLabel()` | boolean    | States whether a label is set for the datum                    |
+| `.hasPlaceholder()` | boolean   | States whether a placeholder is set for the datum                   |
+| `.hasDescription()`   | boolean    | States whether a description is set for the datum |
+| `.isCounterEnabled()`   | boolean    | States whether the datum is actively measuring min and max values and displaying them to the user |
 
+###*Class MetadataHtml*
+The class `MetadataHtml` is used to manage different types of `Metadata` and is represented by the `type` attribute of a `Metadata` object
+| Properties   | Return  | Description                                 |
+| ----------   | :-----: | ------------------------------------------: |  
+| `type`     | String  | The name of the `MetadataHtml`      |
+| `outputdata`        | function     | A function with a parameter `i` (being the index of that metadata) which returns HTML to be displayed on the webpage  | 
 
+###*Enum MetadataTypes*
+The enum `MetadataTypes` contains all available `MetadataHtml`, and can be easily extended to support more types
+| Properties | Description                                 |
+| ----------| ------------------------------------------: |  
+| `content`    | Main content area    |
+| `block`    | Two empty lines   |
+| `nl`    | A single blank line  |
+| `mltext`    | Multi-line text  |
+| `text`    | Single line text  |
+| `date`    | Date field |
+| `label`    | Description with no input type |

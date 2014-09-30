@@ -3,11 +3,11 @@ The compile APIs are explained here, showing you how to create the perfect paper
 ## `onStylePaper()`
 This function is the first one called. This sets up all of the preliminary settings that apply to the entire paper.
 
-Any code can technically be run here, but this is the spot where `enableFormat("")` is called. This function can be used to set up a variety of global attributes.
+Any code can technically be run here, but this is the spot where `enableFormat(String)` is called. This function can be used to set up a variety of global attributes.
 
 When the name of the setting is passed, this turns it on. There is no off.
-* "double space" - Turns on double spacing. [Default is single space]
-* "[n] columns" - Sets the body to be equal to n columns (currently only works for 2 and 3) [Default is one column]
+* `double space` - Turns on double spacing. [Default is single space]
+* `[n] columns` - Sets the body to be equal to n columns (currently only works for 2 and 3) [Default is one column]
 
 ## `onBuildFormat()`
 This is the second function that is called. This is where the bulk of the work is done in actually designing and implementing the paper.

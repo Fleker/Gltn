@@ -208,7 +208,7 @@ function exitBuild() {
 //Integration into format.js files
 function grabMetadata(i) {
 	var o = file.metadata;
-	console.log(i);
+//	console.log(i);
 	o.value = $('#format_item_'+i).val();
 	if(o.value == undefined)
 		o.value = $('#format_item_'+i).html();
@@ -1109,6 +1109,9 @@ function post_bibliography(object, cob) {
 	for(i in citationSorted) {
 		var str = "";
 		var f = findCitation(citationSorted[i]);
+       /* for(i in citationObjects) {
+            if(citation[f.id].Type == citationObjects[f.id].name && object[f.id].Type)   
+        }*/
 		if(citation[f.id].Type == "Bible" && object.bible != undefined) {
 			str = citationFormatted(object.bible, f.i, f.id, f.page, cob); 
 		} else if((citation[f.id].Type == "Book" || citation[f.id].Type == "Book - Online") && object.book != undefined) {

@@ -30,8 +30,7 @@ function initTheme() {
 }	
 initTheme();
 writeCss("@import url(http://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900,900italic);");
-
-	themeCss('font-family', '"Roboto", sans-serif');
+themeCss('font-family', '"Roboto", sans-serif');
 	
 writeCss("button { font-family:Roboto;background-color:rgba(255,255,255,0.01);border-radius:3;text-indent:0;border:1px solid #888;display:inline-block;color:#ccc;font-weight:bold;font-style:normal;text-decoration:none;text-align:center;padding:5px;min-width:30px;letter-spacing:0px;} button:hover { background-color: "+theme.ribbon.highlight+"; color: #222; } button:active {position:relative;top:1px;}");
 

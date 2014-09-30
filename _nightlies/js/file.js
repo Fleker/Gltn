@@ -10,6 +10,8 @@ SYNC_HISTORY = [];
 window.dirty = false;
 
 /** FILE CLASS **/
+
+//TODO Make language the code instead
 function File() {
     this.metadata = []; 
     this.min_char = 0;
@@ -49,7 +51,6 @@ function File() {
     File.prototype.getHovertagRegistrar = function() {
         return hovertagRegistrar;  
     };
-    //NOTE New APIs
     File.prototype.getLanguage = function() {
         if(this.lang == "") {
             this.lang = $('#file_language').val();
@@ -364,7 +365,7 @@ function startSaveFile() {
 	}    
     window.dirty = false;
 }
-//NOTE - Parameter features
+
 function saveFile(fileObj) {	
     fileObj = fileObj || file;
     var isSameFile = false; //If this is true, then you are saving current file. If false, then you're saving a different, perhaps new, file. The function returns the Gltn file that you can use for custom stuff
@@ -486,8 +487,6 @@ function saveFile(fileObj) {
     }
     return [xo+content,o];
 }
-//NOTE Clodconvert
-
 
 docformat = '';
 function restoreFile(full) {
@@ -523,6 +522,9 @@ function restoreFile(full) {
     }
 	//$.xml2json(xml);
 	xc = localStorage[fileid+"_c"];
+    if(hasSetting("formats")) {
+        formatManager.fromString(getSettings("formats"));   
+    }
     if(x == undefined)
          x = {file: undefined};
 	if(x.file != undefined) {
@@ -660,9 +662,7 @@ function finishRestore2(full) {
     hovertagRegistrar = hovertagRegistrarTemp;
     console.log("The temp registrar contains "+hovertagRegistrarTemp.length+" items");
 	recallHovertags(hovertagRegistrar);*/
-    if(hasSetting("formats")) {
-        formatManager.fromString(getSettings("formats"));   
-    }
+    
     hovertagManager.refresh();
 //	window.hovertagregistrarinterval = setInterval("recallHovertags(hovertagRegistrar);",1000);
 	postWordCount();
@@ -786,8 +786,8 @@ function writeToSettings(att, val) {
 	}
 	if(window.settings === undefined)
 		window.settings = {};	
-//    console.warn(att);
-//    console.log(val);
+/*    console.warn(att);
+    console.log(val);*/
 	window.settings[att] = val;
 }
 //Nifty UI for saving
@@ -1092,7 +1092,6 @@ function startExportHTML(src, suggestedFile) {
         }
    );   
 }
-//TODO inputdata can also be a url -- parse that out and use, "download" if entered that way. Filepicker will do better this way.
 function cloudConvert(inputformat, outputformat, inputdata, callback) {
     inputformat = inputformat || "html";
     outputformat = outputformat || "pdf";
@@ -1394,9 +1393,13 @@ function formatShift() {
         return;
     }
     console.log("Format Shifting...");
-    
+    console.log(f1.url, f2.url, "js");
     replacejscssfile(f1.url, f2.url, "js");
     console.log("Wait for script to load");
+    setTimeout(function() {
+        onInitFormat();
+        formatShift2();
+    }, 1000);
     //TODO Maybe offline support
 }
 
@@ -1422,7 +1425,8 @@ function download_format2(y) {
     } 
 }
 function formatShift2(d) {
-	//Set up parameters	
+	//Set up parameters
+    //TODO Insert Content
 	if(d == undefined)
 		d = file.jsonsave.gluten_doc.metadata;
 	else

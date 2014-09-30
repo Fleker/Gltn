@@ -23,14 +23,15 @@ The type is what kind of item you want this to be. There are a few choices.
 
 The data parameter contains plenty of powerful attributes which can be arranged to increase the functionality of your input.
 
+* `id` - The id of the specified input. This is important because it allows multiple formats to load the same data. Keep your ids consistent and make the first letter capitalized. For example, common ids such as `Author` and `Title` are used to persist metadata between formats.
 * `label` - This is what is displayed next to the input box, to indicate what value it should contain
 * `placeholder` - Placeholder for the input box
 * `description` - A lengthier description that can be placed near the input box. Using small font, it details what is expected inside of that input
-* `id` - The id of the specified input
-* min/max - You are able to customize the minimum and maximum lengths for an input box. This alerts the user when their input doesn't fit in the specified conditions. It suggests to the user to adjust their input but does not forcibly prevent the user from typing nor cut off their text at the specified length.
-    * `mtype` - What unit do you want min/max to be in? "w"ords or "c"haracters? (Use the first letter)
-    * `min` - The minimum value (can be left blank)
-    * `max` - The maximum value (can be left blank)
+#### Min/Max
+You are able to customize the minimum and maximum lengths for an input box. This alerts the user when their input doesn't fit in the specified conditions. It suggests to the user to adjust their input but does not forcibly prevent the user from typing nor cut off their text at the specified length.
+* `mtype` - What unit do you want min/max to be in? "w"ords or "c"haracters? (Use the first letter)
+* `min` - The minimum value (can be left blank)
+* `max` - The maximum value (can be left blank)
 
 ### Date
 Currently, the date parameter only exists as a direct date string. You must convert it to a date object in Javascript.

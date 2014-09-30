@@ -1999,7 +1999,6 @@ panelManager.getAvailablePanels().Main_Filesys.onRun = function () {
 		});
         $('#filesys_file').on('click', function() {
             var rawFileData = window.imported;
-            //NOTE Spinner, Spinner CSS, and Spinner API
             /*var fileData = */customImports[$(this).attr('format')].convert(rawFileData, window.importedink);
             initiatePopup({title:'Importing File',ht:'<div class="import_progress" style="font-size:14pt;text-align:center;width:100%;"></div><div class="spinner"><div class="dot1"></div><div class="dot2"></div></div>',bordercolor:'#7f8c8d'});
         });
@@ -2049,11 +2048,10 @@ panelManager.getAvailablePanels().Main_Filesys.onExport = function(docView, blob
         return [{name: "html", icon: "file-code-o", callback: toHTML}, {name:"txt", icon:"file-text-o", callback: toTXT}];
     }
 }
-//NOTE
 panelManager.getAvailablePanels().Main_Filesys.onImport = function() {
     return [{
         name: "gltn", icon: "file-code-o", extension: "gltn", convert: function(rawFileData) {
-            handleFileSelect(rawFileData, window.ink2.filename);
+            importGltnBlob(rawFileData, window.ink2.filename);
         },
     }]
 }
@@ -2247,9 +2245,11 @@ function DictionaryManager() {
         if(this.previousSearches.length > 5)
             this.previousSearches.length = 5;
         
-        var settings;
+        var settings = "";
         for(i in this.previousSearches) {
+            console.log(settings);
             settings += this.previousSearches[i]+",";
+            console.log(settings);
         }
         writeToSettings("dictionarySearches", settings);
         //TODO Make this optional, have it opt-out through a checkbox in dictionary settings
@@ -3198,7 +3198,7 @@ panelManager.getAvailablePanels().Main_Table.onRun = function() {
                 $('#main_table_article').click(function() {
                     p.show();
                 }); 
-            }); 
+            });
         });
         $('#main_table_title').on('input', function() {
 //            console.log("Alerting table"+tid);    
