@@ -78,3 +78,10 @@ The enum `MetadataTypes` contains all available `MetadataHtml`, and can be easil
 | `text`    | Single line text  |
 | `date`    | Date field |
 | `label`    | Description with no input type |
+
+###*Metadata ID Constants*
+It is useful to have consistent ids, to let data persist between formats. To aid in this, you may use defined constants.
+| Properties | Description                                 |
+| ----------| ------------------------------------------: |  
+| `AUTHOR`    | Author name or names (comma separated)    |
+| `TITLE`    | Main title for document   |

@@ -1426,7 +1426,8 @@ function download_format2(y) {
 }
 function formatShift2(d) {
 	//Set up parameters
-    //TODO Insert Content
+    //TODO Test Code!!
+    $('.content_textarea').html(localStorage[file.getFileid()+"_c"]);
 	if(d == undefined)
 		d = file.jsonsave.gluten_doc.metadata;
 	else

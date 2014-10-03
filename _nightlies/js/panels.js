@@ -120,7 +120,7 @@ function PanelManager() {
         Main_Guide: new Panel("Main_Guide", "Style Guide"),
         Main_Idea: new Panel("Main_Idea", "My Ideas"),
         Main_Notifications: new Panel("Main_Notifications", "Notifications"),
-        Main_Offline: new Panel("Main_Offline"),
+        /*Main_Offline: new Panel("Main_Offline"),*/
         Main_Outline: new Panel("Main_Outline", "Outline Editor"),
         Main_Pagecount: new Panel("Main_Pagecount", "Page Count"),
         Main_Sync: new Panel("Main_Sync", "Synchronization Status"),

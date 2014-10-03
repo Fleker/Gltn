@@ -4,6 +4,10 @@ file.clearMetadata();
 window.metadata = [];
 format_js_index = 0;
 
+//Metadata Constants
+AUTHOR = "Author";
+TITLE = "Title";
+
 function Metadata(type, ops) {
     this.type = type || "";
     this.label = ops.label || "";
@@ -48,7 +52,7 @@ MetadataTypes = {
         return post_format_mltext(file.metadata[i]);
     }),
     label: new MetadataHtml("label", function(i) {
-        return "<div style='font-weight:bold;border-bottom:solid 1px #888;width:90%;margin-left:5%;'>"+file.metadata[i].label+"</div><br><span style='margin-left:4em;font-size:9pt;opacity:0.8;'>"+file.metadata[i].description+"</span>";
+        return "<div style='font-weight:bold;border-bottom:solid 1px #888;width:90%;margin-left:0%;font-size:14pt;'>"+file.metadata[i].label+"</div><br><span style='margin-left:2em;font-size:9pt;opacity:0.8;margin-top:-8px;display:block;margin-bottom:1em;'>"+file.metadata[i].description+"</span>";
     }),
     date: new MetadataHtml("date", function(i) {
         return post_format_date(file.metadata[i]);
@@ -212,7 +216,7 @@ function post_format_text(m, inv) {
 	else {
 		out = out + m.label+":&nbsp;";
 		if(m.description.length)
-			out = out + "<br><span class='format_description'>"+m.description+"</span><br>";
+			out = out + "<br><span class='format_description' style='opacity:0.8'>"+m.description+"</span><br>";
 	}
 	out = out + "<input type='text' id='format_item_"+m.index+"' placeholder='"+m.placeholder+"' style='width:55%'>";
 	if(m.isCounterEnabled()) {
@@ -229,7 +233,7 @@ function post_format_date(m, inv) {
 	else {
 		out = out + m.label+":&nbsp;";
 		if(m.hasDescription())
-			out = out + "<br><span class='format_description'>"+m.description+"</span><br>";
+			out = out + "<br><span class='format_description' style='opacity:0.8'>"+m.description+"</span><br>";
 	}
 	out = out + "<input type='date' id='format_item_"+m.index+"' placeholder='"+m.placeholder+"'>";
 	if(m.isCounterEnabled()) {
@@ -241,7 +245,7 @@ function post_format_mltext(m) {
 	var out = "";
 	out = out + m.label + "<br>";
 	if(m.description.length)
-		out = out + "<span class='format_description'>"+m.description+"</span><br>";	
+		out = out + "<span class='format_description' style='opacity:0.8'>"+m.description+"</span><br>";	
 	out = out + "<div class='post_format_mltext' contenteditable id='format_item_"+m.index+"'></div>";
 	if(m.min.length !==0 || m.max.length !== 0) {
 		out = out + "<div class='format_count' id='format_count_"+m.index+"'></div>";	
