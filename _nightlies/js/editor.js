@@ -1,6 +1,6 @@
-var GLTN_VERSION = "1.4.0.8";
+var GLTN_VERSION = "1.4.1.1";
 var GLTN_VNAME = "Isidore";
-var GLTN_BUILD = 2;
+var GLTN_BUILD = 3;
 //For backwards compatibility, will return true 
 function greaterThanVersion(version) {
     var split = version.split(".");

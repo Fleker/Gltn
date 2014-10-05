@@ -259,6 +259,12 @@ function setUpGlobalSettings() {
 	}   
     
     //Now we need to grab settings if necessary
+    if(hasSetting("formats")) {
+        formatManager.fromString(getSettings("formats"));   
+        console.log(getSettings("formats"));
+        console.log(localStorage.settings);
+        console.log(formatManager.formats);
+    }
     if(hasSetting('inkblob_url')) {
         //pull, check for date, sync if needed. Then continue
          filepicker.read(getSettings("inkblob_url"), function(data){
@@ -494,12 +500,7 @@ function restoreFile(full) {
         full = true;
     else
         full = false;
-    
-	$("#file_format").on("input", function() {
-		console.log($(this).val());
-		formatShift();
-	});
-	
+
 	//var x = xml2json(jQuery.parseHTML(localStorage[fileid]),"  ");
     //TODO Check for password
     if(localStorage[fileid]) {
@@ -522,9 +523,12 @@ function restoreFile(full) {
     }
 	//$.xml2json(xml);
 	xc = localStorage[fileid+"_c"];
-    if(hasSetting("formats")) {
-        formatManager.fromString(getSettings("formats"));   
-    }
+        
+    $("#file_format").on("input", function() {
+		console.log($(this).val());
+		formatShift();
+	});
+    
     if(x == undefined)
          x = {file: undefined};
 	if(x.file != undefined) {
@@ -1383,7 +1387,12 @@ function formatShift() {
     var f2txt = $('#file_format').val() || "MLA";
     var f2;
     console.log(f1.name, f2txt);
+    console.log(formatManager.getFormats());
     for(i in formatManager.getFormats()) {
+        console.log(formatManager.getFormats()[i]);
+    }   
+    for(i in formatManager.getFormats()) {
+        console.log(":"+formatManager.getFormats()[i].name+", "+f2txt+"--"+(formatManager.getFormats()[i].name == f2txt));
         if(formatManager.getFormats()[i].name == f2txt) {
             f2 = formatManager.getFormats()[i];   
         } 

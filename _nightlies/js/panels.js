@@ -2373,9 +2373,8 @@ panelManager.getAvailablePanels().Main_Dictionary.onRun = function() {
                  $('.dictionaryNav').html("<button id='dicNavB'><span class='fa fa-arrow-left'></span></button>&nbsp;<button id='dicNavF'><span class='fa fa-arrow-right'></span></button>&nbsp;<button id='dicNavC' style='display:none'><span class='fa fa-file-code-o'></span></button>");
             });
             
-            if($('#DictionaryOut .spin').length === 0) {
+            if($('#DictionaryOut .spinner').length === 0) {
                 $('#DictionaryOut').append(getloader());
-                spinloader(false);
             }
 			for(i in ajaxrequests) {
 				ajaxrequests[i].abort();	

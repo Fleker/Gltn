@@ -7,6 +7,7 @@ format_js_index = 0;
 //Metadata Constants
 AUTHOR = "Author";
 TITLE = "Title";
+ABSTRACT = "Abstract";
 
 function Metadata(type, ops) {
     this.type = type || "";
@@ -29,7 +30,7 @@ function Metadata(type, ops) {
         return this.description.length;  
     };
     Metadata.prototype.isCounterEnabled = function() {
-        return this.max !== 0 || this.min !== 0;  
+        return this.max !== 0 || this.min !== 0 && this.max !== undefined && this.min !== undefined;  
     };
 }
 
@@ -130,7 +131,7 @@ function post_format() {
 	$('#file_metadata').html(out);
 	
 	for(i in file.metadata) {
-		if(file.metadata[i].min.length !== 0 || file.metadata[i].max.length !== 0) {
+		if(file.metadata[i].isCounterEnabled()) {
 			setInterval("format_check_count("+i+")", 100);
 		} else
             setInterval("setFormatItemWidth("+i+")", 100);
