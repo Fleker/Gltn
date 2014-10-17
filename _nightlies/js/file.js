@@ -261,9 +261,9 @@ function setUpGlobalSettings() {
     //Now we need to grab settings if necessary
     if(hasSetting("formats")) {
         formatManager.fromString(getSettings("formats"));   
-        console.log(getSettings("formats"));
+        /*console.log(getSettings("formats"));
         console.log(localStorage.settings);
-        console.log(formatManager.formats);
+        console.log(formatManager.formats);*/
     }
     if(hasSetting('inkblob_url')) {
         //pull, check for date, sync if needed. Then continue
@@ -378,6 +378,7 @@ function saveFile(fileObj) {
     if(fileObj.getFileid() === file.getFileid()) {
         isSameFile = true;
     }
+//    console.log(fileObj.getFileid(), file.getFileid(), isSameFile);
 //    console.error("File builder is not "+isSameFile);
     if(fileObj.getFileid() === undefined) {
         console.error('fileid had no value');
@@ -387,7 +388,7 @@ function saveFile(fileObj) {
     if(isSameFile) {
         $('.content_save').hide();
 //        console.warn((fileObj.jsonsave === undefined) + " isf");
-        console.warn(fileObj);
+//        console.warn(fileObj);
         if(fileObj.jsonsave === undefined) 
             obj = {};
         else if(fileObj.jsonsave.gluten_doc !== undefined)
@@ -407,7 +408,8 @@ function saveFile(fileObj) {
 		if(fileObj.citations().getArray()[i] === undefined)
 			fileObj.citations().getArray()[i] = "undefined";
 	}
-    console.log(obj);
+//    console.log(obj);
+    //TODO Metadata is broken, is a "" but instead should be stuff
 	obj.citation = fileObj.citations().getArray();
 	obj.citationi = fileObj.citations().getIndex();
 	obj.idea = fileObj.ideas().getArray();
@@ -445,28 +447,32 @@ function saveFile(fileObj) {
 			}
 		}
 	}
-    if(obj.metadata === undefined) 
+    if(obj.metadata === undefined || obj.metadata == "") 
 		obj.metadata = {};
-    
+    console.log(obj.metadata);
     if(isSameFile) {
-        for(i in window.metadata) {
-            var att = window.metadata[i].id.replace(/ /g, '_');
+        for(i in file.metadata) {
+            if(i != parseInt(i))
+                continue;
+            console.log(file.metadata[i].id);
+            var att = file.metadata[i].id.replace(/ /g, '_');
+            console.log(att, valMetadata(att));
             if(att.length > 0)
-                obj['metadata'][att] = encodeURIComponent(grabMetadata(i).value);
+                obj.metadata[att] = encodeURIComponent(grabMetadata(i).value);
         }
         content = $('.content_textarea').html();
-        
     } else {
         content = "";   
     }
+    console.log(obj);
     o = {};
     o.gluten_doc = obj;
     fileObj.jsonsave = o;
 
 	xo = json2xml(o, "");
     if(isSameFile) {
-        localStorage[fileid] = xo;
-        localStorage[fileid+"_c"] = content;
+        localStorage[fileObj.getFileid()] = xo;
+        localStorage[fileObj.getFileid()+"_c"] = content;
     }
 	 
 	//Save global settings - Integrated saves

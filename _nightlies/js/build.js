@@ -50,6 +50,200 @@ function startBuild(el) {
     );
     setTimeout('updateBuildProgress("Compiling...");',40);
 }
+//CLASSES STRUCTURE
+//Doc Class
+//A collection of sections that are put into an order and form a complete document
+function Doc() {
+    this.sections = {};
+    this.marginLeft = 1;
+    this.marginRight = 1;
+    this.marginTop = 1;
+    this.marginBottom = 1;
+    this.paddingTop = 0.4; //TODO This should in theory be 0.5, but it WORKS with 0.4. Go figure.
+    this.paddingBottom = 0.5;
+    this.height = 11;
+    this.width = 8.5;
+    Doc.prototype.find = function(id) {
+        //Find section name, page name, or pg num  
+        for(index in this.sections) {
+            if(index == id) {
+                return this.sections[index];   
+            }
+        }
+        for(index in this.sections) {
+            for(index2 in this.sections[index].pages) {
+                if(index2 == id) {
+                    return this.sections[index].pages[index2];   
+                }
+            }
+        }
+    };
+    Doc.prototype.newPage = function(name, section) {
+        if(section === undefined)
+            section = "Primary";
+        return this.sections[section].newPage(name);
+    };
+    Doc.prototype.newSection = function(name) {
+        this.sections[name] = new Section(name);
+        this.sections[name].doc = this;
+        $('#build').append("<div class='section' id='section"+name+"'></div>");
+        return this.sections[name];
+    };
+    Doc.prototype.add = function(cnt, name) {
+        //Add general HTML to the last page or to a specific section
+        var s = undefined;
+        if(name === undefined) {
+            //Get last section            
+            for(index in this.sections) {
+                s = this.sections[index];
+            }
+        } else {
+            s = this.sections[name];
+        }
+        //Get content -- but we have to parse this too. I'm not sure when that goes.
+        s.addBody(cnt);
+    }
+    Doc.prototype.insertContent = function(name) {
+        var s = undefined;
+        if(name === undefined) {
+            //Get last section            
+            for(index in this.sections) {
+                s = this.sections[index];
+            }
+        } else {
+            s = this.sections[name];
+        }
+        //Get content -- but we have to parse this too. I'm not sure when that goes.
+        var c = $('.content_textarea').html();
+        s.addBody(c);
+    };
+    Doc.prototype.getSectionCount = function() {
+        var i = 0;
+        for(index in this.sections) {
+            i++;   
+        }
+        return i;
+    };
+    Doc.prototype.getPageCount = function() {
+        var i = 0;
+        for(index in this.sections) {
+            i+= this.sections[index].getPageCount();
+        }
+        return i;
+    };
+    Doc.prototype.getPage = function(id) {
+        //Gets a template page with variables discussed above for size 
+        var out = "<div class='page' ";
+        if(id !== undefined)
+            out += "id='"+id+"' style='padding-left:"+this.marginLeft+"in;padding-right:"+this.marginRight+"in;padding-top:"+this.paddingTop+"in;padding-bottom:"+this.paddingBottom+"in;height:"+this.height+"in;width:"+this.width+"in'>";
+        out += '<div class="pageheader '+id+'_header" style="height:'+(this.marginTop-this.paddingTop)+'in"></div> <div class="pagebody '+id+'body"></div> <div class="pagefooter '+id+'footer" style="height:'+(this.marginTop-this.paddingTop)+'in"></div></div><hr style="height:2px;width:90%;margin-left:5%;">';
+        out += "</div>";
+        return out;
+    };
+    $('.page, .section').remove();
+    this.newSection("Primary");
+}
+//Section Class - Group of pages
+function Section(name) {
+    this.name = name;
+    this.pages = {}; //Named and/or numbered
+    this.doc; //parent of object
+    Section.prototype.newPage = function(name) {
+        if(name === undefined)
+            name = this.doc.getPageCount();
+        var id = this.name+"_"+name;
+        var p = new Page(id);
+        p.section = this;
+        //Inject HTML
+        //Adds to doc as last item
+        //Future adaptions can put after any item
+        if(this.getPageCount() > 0)
+            $(this.pages[this.getPageCount()-1].element).after(this.doc.getPage(id));
+        else
+            $('#section'+this.name).html(this.doc.getPage(id));
+        p.element = '#'+id;
+        this.pages[id] = p;
+        return p;
+    };
+    Section.prototype.getPageCount = function() {
+        var i = 0;
+        for(index in this.pages) {
+            i++;   
+        }
+        return i;
+    };
+    Section.prototype.addBody = function(cnt, page) {
+        var p = undefined;
+        //Add to the last page if none's provided
+        if(page === undefined) {
+            for(index in this.pages) {
+                p = this.pages[index];   
+            }
+        } else {
+           p = this.pages[page];
+        }
+        p.addBody(cnt);
+    };
+}
+//Page Class - A single isolated page of content
+global_footnote = 0;
+function Page(name) {
+    this.name = name;
+    this.element;
+    this.section; //parent of object
+    Page.prototype.addBody = function(cnt) {
+        //Add this to the body
+        //Splice
+        var ar = smartSplit(cnt);
+        for(i in ar) {
+            if(!this.isBodyFull(ar[i])) {
+                //HTML injection   
+                $(this.element+" .pagebody").append(ar[i]);
+                //Footnote injection -- this isn't very modular. I'm not sure how to make it modular though
+                if($(ar[i]).find('.footnote'))
+                    global_footnote++;
+                this.appendFooter(footnoteFormatted(onGetFormats().footnote, global_footnote, $(ar[i]).find('.footnote').attr('data-note')));
+            } else {
+                var pass = ar.splice(i, ar.length-i).join(' ');
+                this.section.newPage().addBody(pass);
+                return;
+            }
+        }
+    };  
+    Page.prototype.addHeader = function(cnt) {
+        //setHeader fnc or inline  
+        //HTML injection
+        $(this.element+' .pageheader').html(cnt);
+    };
+    Page.prototype.addFooter = function(cnt) {
+        //same as header
+        //HTML injection
+        $(this.element+' .pagefooter').html(cnt);
+    };
+    Page.prototype.appendFooter = function(cnt) {
+        $(this.element+' .pagefooter').append(cnt);  
+    };
+    Page.prototype.isBodyFull = function(text) {
+        //Pings w/scale, can check with data
+        $(this.element+' .pagebody').append("<span class='removeme'>"+text+"</span>");
+        //get height
+        var h = $(this.element+' .pageheader').height() + $(this.element+" .pagebody").height() + $(this.element+" .pagefooter").height();
+        //get scale's height -- it is one inch
+        var s = $('.scale').height();
+        //get supposed height
+        var d = (this.section.doc.height - this.section.doc.paddingTop - this.section.doc.paddingBottom)*s;
+        //compare
+        $('.removeme').remove();    
+        console.log(h, ">", d);
+        if(h > d) {
+            return true;
+        } else {
+            return false;   
+        }
+    };   
+}
+
+
 function add_export_button(title, icon, fnc) {
     $('.buildRow').append('<button class="export_'+title+'" style="width:60px">'+icon+"&nbsp;"+title+"</button>"); 
     $('.export_'+title).on('click', function() {
@@ -127,8 +321,6 @@ function continueBuild(el) {
 	//console.log(cont);
     window.predraft = cont;
 	$('.draft').html(cont/*.replace(/&nbsp;/g, " ").trim()*/);
-    //FIXME
-//	$('.draft span').css('border','none');
     window.predraft2 = $('.draft').html();
 	
 	//To {format}.js
@@ -146,13 +338,16 @@ function continueBuild(el) {
             dfd.reject("on build format");   
         }
 				
-		onGetFormats();
+//		onGetFormats();
+        post_content_formatting(onGetFormats());
+        //Get reformatted content, then add it to doc
 			updateBuildProgress('Formatting Content...');
 		if($('.content_textarea .citation').length) {
-			onBuildBibliography();
-				updateBuildProgress('Building Bibliography...');
+			post_bibliography(onBuildBibliography()[0], onBuildBibliography()[1]);
+			updateBuildProgress('Building Bibliography...');
 		}
 		try {
+            //TODO Header API
 			onSetHeader();
 		} catch(e) {
 			dfd.reject("on set header");
@@ -196,6 +391,7 @@ function finishBuild() {
 	setTimeout("closePopup();",1000);
 	$('.header').hide(1000);
 	window.scrollTo(0,0);
+    //TODO footer demarkation
 		//stopgf;
 	//$('.page').css('width','70%');
 }
@@ -336,7 +532,7 @@ function customize_this_header(page, text) {
 	$('.page'+page+'header').html(text);	
 }
 function lcr_split(left, center, right) {
-	return "<table style='width:100%'><tr><td>"+left+"</td><td style='text-align:center'>"+center+"</td><td style='text-align:right'>"+right+"</td></tr></table>";	
+	return "<table style='width:100%'><tr><td data-theme='false'>"+left+"</td><td style='text-align:center' data-theme='false'>"+center+"</td><td style='text-align:right' data-theme='false'>"+right+"</td></tr></table>";	
 }
 
 //Content Formatting
@@ -609,6 +805,12 @@ function latexFormatted(input,eqn,fig,title) {
     string = string.replace(/EQN/g, eqn);
 	return string;
 }
+function footnoteFormatted(input, index, note) {
+    var string = input;
+    string = string.replace(/INDEX/g, index);
+    string = string.replace(/NOTE/g, note);
+    return string;
+}
 function smallcaps(string) {
     return "<span style='font-variant:small-caps'>"+string+"</span>";   
 }
@@ -650,6 +852,185 @@ function numToRoman(capy, num) {
 function numToOrdinal(number) {
 	var ord = ["th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th", "th"];
 	return number+ord[number];
+}
+function smartSplit(cnt) {
+    var object = onGetFormats();
+    $('.draft span').css('color', 'inherit');
+	//Paragraph detection
+    if(object.paragraph_indent == undefined)
+		object.paragraph_indent = "";
+//	window.cont = $('.draft').html().replace(/&nbsp;/g, " ");
+//  window.predraft3 = $('.draft').html();
+    cnt = cnt.replace(/<div><\/div>/g, " ");
+    cnt = cnt.replace(/<div>(.*)<\/div>/g, "$1");
+    cnt = cnt.replace(/<div>(.*)<\/div>/g, "$1");
+    cnt = cnt.replace(/<span style="line-height: inherit; font-size: inherit; font-family: inherit; border: none; color: inherit; background-color: inherit;">(.*)<\/span>/g, "$1");
+    cnt = cnt.replace(/<div><br>/g, "<div>");
+	cnt = cnt.replace(/<\/div><div><br><\/div><div>/g, "<br>"+object.paragraph_indent);
+	cnt = cnt.replace(/<div><br><\/div><div>/g, "<br>"+object.paragraph_indent);
+    cnt = cnt.replace(/<\/div><div>/g, "<br>"+object.paragraph_indent);
+    cnt = cnt.replace(/<\/div> <div>/g, "<br>"+object.paragraph_indent);
+    cnt = cnt.replace(/<\/div><\/span><div>/g, "</div>"+object.paragraph_indent);
+    cnt = cnt.replace(/<\/div><div><br><div>/g, "<br>"+object.paragraph_indent);
+    cnt = cnt.replace(/<div><br><div>/g, "</div>"+object.paragraph_indent);
+    cnt = cnt.replace(/<br><div>/g, ""+object.paragraph_indent);
+    cnt = cnt.replace(/<br>&emsp;<kbd/g, "</div><br>"+object.paragraph_indent+"<kbd");
+    cnt = cnt.replace(/<br> &nbsp;<br>/g, "<br>"+object.paragraph_indent);
+    cnt = cnt.replace(/<br>&emsp;<br>&emsp;/g, "<br>"+object.paragraph_indent);
+    cnt = cnt.replace(/<br>&emsp;  <br>&emsp;/g, "<br>"+object.paragraph_indent);
+    cnt = cnt.replace(/<div>/g, "<br>"+object.paragraph_indent);
+    cnt = cnt.replace(/<br>&emsp;<br>/g, "<br>");
+    cnt = cnt.replace(/<br>&emsp;<br>/g, "<br>");
+//    console.warn(cnt);
+    function c(s) {
+//        console.log(s);	 
+        //s = s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    //	$('body').append(s+"<br>");
+    }
+    function output(e, tag, w) {
+        var out = "";
+    //    console.log(e+",", tag+",", w+",");
+        if(e.substr(-1) != ">")
+            e = e+">";
+        if(w.length) {
+            if(e == "<br>") {
+                out = e+w;
+            } else if(tag.length) {
+                c("Output: "+tag+w+"</"+e.substr(1)+" ");
+                out = tag+w+"</"+e.substr(1)+" ";
+                //return tag+w+"</"+e.substr(1)+" ";
+            } else {
+                c("Output: "+w+" ");
+                out = w+" ";
+                //return w+" ";
+            }
+        } else {
+            //return "";
+            if(e == "<kbd>") {
+                out = tag;   
+            }
+        }
+        if(out.length)
+            d.push(out);
+    //    console.log(out);
+    //    console.log(d);
+        return out;
+
+    }
+
+    //var a = document.getElementById('a').innerHTML;
+    var a = cnt;
+    var b = a.split('');
+    var d = new Array();
+    var e = '';
+    var w = '';
+    var tag = '';
+    var intag = false;
+    var inend = false;
+    var ine = false;
+    var parsingdiv = false;
+    var out = "";
+    var breakk = false;
+    //console.error(object.paragraph_indent);
+    //console.log(b);
+    //a.unshift(object.paragraph_indent);
+    //$('body').append("<hr>");
+    for(i in b) {
+        var b1 = (parseInt(i)+1);
+        c(": "+b[i]);
+        breakk = false;
+        if(b[i] == "<") {
+            if((b[b1] == "/" && !parsingdiv) || (b[b1] == "/" && b[ (parseInt(i)+2) ] == e.substr(1,1) && parsingdiv)) {
+                 /***/
+                 out += output(e, tag, w);
+                 if(e == "<br>") {
+                    e = "";
+                }
+                //$('body').append(tag+",<br>"+e+"; "+w+"<br>");
+                c(tag+", "+e+"; "+w);
+                w = '';
+
+                inend = true;  
+                intag = false;
+                ine = false;
+                tag = "";
+                parsingdiv = false;
+                c("End of tag");
+
+            } else if(b[i] == "<") {
+                 /***/
+                //$('body').append(tag+",<br>"+e+"; "+w+"<br>");
+                c(tag+", "+e+"; "+w+"  "+parsingdiv);
+
+                 inend = false;
+                 if(!parsingdiv) {
+                     intag = true;
+                     ine = true;
+                     c("Outputting from last tag");
+                     out += output(e,  tag, w);
+                     tag = "";
+                     e = "";
+                     w = '';
+                 }		
+
+            }
+            c("<"+b[b1]+" !  "+b[ (parseInt(i)+2) ]+"=?"+e.substr(1,1)+";"+parsingdiv);
+        }
+        if(b[i] == " ") {
+            if(ine) {
+                ine = false; 
+                c("ine "+e);  
+            }
+            if(!intag  && e.substr(0,4) != "<div" && e.substr(0,4) != "<kbd") {
+                out = out + output(e, tag, w);
+                c("___"+tag+", "+e+"; "+w);
+                if(e == "<br>") {
+                    e = "";
+                    tag = "";
+                }
+                //$('body').append(tag+",<br>"+e+"; "+w+"<br>");
+                w = '';
+                breakk = true;
+            }
+        }
+        if(!breakk) {
+            if(intag) {
+                tag = tag + b[i]; 
+                c("tag "+tag);
+            } else if(!inend) {
+                 w = w + b[i];
+                 c("w "+w);
+            }
+            if(ine) {
+                e = e + b[i];
+                if(e == "<div" || e == "<kbd") {
+                    parsingdiv = true;
+                    c(e+" "+parsingdiv);
+                }
+                c("E "+e);
+            }
+
+            if(b[i] == ">") {
+                intag = false;
+                c("Intag is off");
+                if((e.indexOf('div') > -1 || e.indexOf('br') > -1) && e.length && inend && object.paragraph_indent != undefined && !parsingdiv) { /** OR if some other type of break is detected*/
+                    c("Logged the new paragraph");
+                    out = out + output('', '', object.paragraph_indent);
+                }
+                if(e.indexOf('br') > -1) {
+                    //out = out + output('','','<br>');	
+                    c("Logged the linebreaker");
+                    d.push("<br>");
+                }
+                if(inend) 
+                     e = "";
+                 inend = false;
+                 ine = false;
+            }
+        }
+    }
+    output("","",w);   
+    return d;
 }
 function post_content_formatting(object) {
 	updateBuildProgress("Formatting...");
@@ -778,8 +1159,10 @@ function post_content_formatting(object) {
         //Include a title
 		$(this).html(latexFormatted(object.latex,$(this).html(),$(this).attr('data-figure-number'),$(this).attr('data-figure-number')));
         $('.reftext[data-ref=latex'+$(this).attr('data-id')+']').html($(this).attr('data-figure-number'));
-        
 	});
+    $('.draft .footnote').each(function(n, e) {
+        $(this).html(footnoteFormatted(object.footnote, n, $(this).attr('data-note')));
+    }); 
 	
 	//Now all formatting is complete. We shall port the content over to the actual paper
 	//Prevent divs from registering a split, replicate for spans so parent is kept
@@ -838,7 +1221,6 @@ function post_content_formatting(object) {
 	
 	//ca =  cont.split(' ');
 	
-	/*** Replace output function so that it places every item into an array instead of just outputting ***/
 function c(s) {
 	//console.log(s);	 
 	//s = s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -1065,24 +1447,6 @@ for(i in b) {
 	}
 	$('.build').html($('.build').html().replace(/===/g,' ').replace(/~~~/g, ' ')/*.replace(/<span[^<]+?>/g, "")*/);
 	$('.pagebody').css('height', maxh+"px");
-    
-    //FIXME Do some LaTeX corrections to display properly
-    window.fracArr = ($('.build .mfrac > span > span:last-child'));
-//    console.log(fracArr);
-   for(j=0;j<fracArr.length;j++) {
-        frac = fracArr[j];
-        var num = $(frac).prev().prev().width();
-        var den = $(frac).prev().width();
-        if(num > den)
-            den = num;
-        //var fracin = frac;
-        //.children()[0];
-//        console.log("! FRAC");
-//        console.log(frac);
-//        $(frac).css('width', den).css('color', 'black').css('border', 'solid 2px').css('background-color', 'black').css('top', '-1.096em').css('height', '15px');
-//        .css('top', '-1.096em').css('height', '11px');
-    
-    }
     $('.build .pagebreak').css('display','none');
 	/*if(column > 0) {
 		$('.pagebody').css('column-count', column).css('-webkit-column-count', column).css('-moz-column-count');	

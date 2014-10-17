@@ -23,9 +23,6 @@ This function creates a new page. (By default, you will not have any pages, so y
 * `add_to_page(content, [pageno, pagename])`
 This function will be used most of the time. It adds content, an image, text, etc. to a page. By default it will add this to the last page, but you may specify either the number of a page or the name of a page to put content in there. (It will be placed at the bottom of that page.)
 
-* `pasteContent()`
-This command MUST be placed last in order for the paper to render properly. It will deposit all the text from the content box to the paper, formatting it properly using the established settings.
-
 If you don't know the page number, you can find it:
 
 * `find_page(pagename)`

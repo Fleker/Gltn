@@ -2706,7 +2706,7 @@ panelManager.getAvailablePanels().Main_Context.onRun = function() {
 		parseCT();
 	});
 }
-var p = panelManager.getAvailablePanels().Main_Offline;
+/*var p = panelManager.getAvailablePanels().Main_Offline;
 p.setManifest({
     title: "<span class='fa fa-plane'></span>&nbsp;Offline",
     name: "Offline",
@@ -2716,7 +2716,7 @@ p.setManifest({
 p.onRun = function() {
 	out = "<span style='font-size:16pt'>This App is Available Offline</span><br>What Does this Mean?<br><br>If your device is not connected to the Internet, you can still open Gltn in your browser. Of course, not every feature will be available such as the Dictionary and the Gltn Store, but you will be able to edit and build documents like always.<br><br><span style='font-weight:bold;font-size:10pt;color:#ff9900'>"+window.appcachestatus+"</span>";
 	postPanelOutput(out);
-}
+}*/
 panelManager.getAvailablePanels().Main_Table.setManifest({
     name: "Grid",
     title: "Grid",

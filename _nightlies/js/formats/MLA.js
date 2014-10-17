@@ -22,20 +22,35 @@ function onStyleGuide() {
 	out = "<b>MLA Format</b><br>This is a general guide to the best practices for the MLA Format. Unfortunately, it is not populated right now.";
 	return out;	
 }
+//Note new class structure
 function onBuildFormat() {
-	add_new_page();
+	/*add_new_page();
 		add_to_page(valMetadata("Author")+"<br>");
 		add_to_page(valMetadata("Professor")+"<br>");
 		add_to_page(valMetadata("Class")+"<br>");
-		var due = valMetadata("DueDate");
-		var duedate = Date.parse(due);
-		var duedate = new Date(duedate);
-		var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-		var dueout = (duedate.getUTCDate()) + " " + months[duedate.getUTCMonth()] + " " + duedate.getUTCFullYear();
+		
 		add_to_page(dueout+"<br>");
-		add_to_page(centerText(valMetadata("Title")));
-//		paste_content();
+		add_to_page(centerText(valMetadata("Title")));*/
+    var d = new Doc();
+    d.newPage();
+    d.add(valMetadata("Author")+"<br>");
+    d.add(valMetadata("Professor")+"<br>");
+    d.add(valMetadata("Class")+"<br>");
+    
+    var due = valMetadata("DueDate");
+    var duedate = Date.parse(due);
+    if(!isNaN(duedate)) {
+        var duedate = new Date(duedate);
+        var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        var dueout = (duedate.getUTCDate()) + " " + months[duedate.getUTCMonth()] + " " + duedate.getUTCFullYear();
+    } else {
+        dueout = "";   
+    }
+    d.add(dueout+"<br>");
+    d.add(centerText(valMetadata("Title")));
 }
+//TODO Get Header API Changed
+//FIXME Change Header Color
 function onSetHeader() {
 	var auth_array = valMetadata("Author").split(" ");
 	var last_name = auth_array[auth_array.length - 1];
@@ -78,8 +93,9 @@ function onGetFormats() {
 	obj.citation_bible = '<div style="display:inline">(<i>TITLE,</i> BIBLEBOOK. BIBLECHAPTER.BIBLEVERSE)</div>';
 	obj.citation_bible_main = '(BIBLEBOOK. BIBLECHAPTER.BIBLEVERSE)';
 	obj.citation_editions = "";
-	post_content_formatting(obj);
+    return obj;
 } 
+//TODO NEW API
 function onBuildBibliography() {
 	add_new_section('bibliography');
 		add_to_page(centerText('Works Cited'));
@@ -129,5 +145,6 @@ function onBuildBibliography() {
 	obj.def = "cAUTHOR cTITLE cEDITOR cTRANSLATOR cEDITION cPUBCITY cPUBCOMP cYEAR cMEDIUM";
 	obj.style = "text-indent:-.5in;margin-left:.5in";
 	obj.annotation = "<br>";
-	post_bibliography(obj, cob);	
+//	post_bibliography(obj, cob);	
+    return [obj, cob];
 }

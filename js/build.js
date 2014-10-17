@@ -1,4 +1,4 @@
-﻿builddate = 0;
+builddate = 0;
 buildPrint = '<button onclick="window.print()" class="noprint textbutton"><span class="fa fa-print"></span>&nbsp;Print</button><button onclick="printHelp()" class="noprint textbutton"><span class="fa fa-question"></span>&nbsp;Print Help</button><button onclick="convertDoc()" class="noprint textbutton">Export</button>';
 function falseBuild(printr) {
 	window.section_name = "";
@@ -310,7 +310,7 @@ function customize_this_header(page, text) {
 	$('.page'+page+'header').html(text);	
 }
 function lcr_split(left, center, right) {
-	return "<table style='width:100%'><tr><td>"+left+"</td><td style='text-align:center'>"+center+"</td><td style='text-align:right'>"+right+"</td></tr></table>";	
+	return "<table style='width:100%'><tr><td data-theme='false'>"+left+"</td><td style='text-align:center' data-theme='false'>"+center+"</td><td style='text-align:right' data-theme='false'>"+right+"</td></tr></table>";	
 }
 
 //Content Formatting
@@ -582,6 +582,12 @@ function latexFormatted(input,eqn,fig,title) {
     string = string.replace(/EQN/g, eqn);
 	return string;
 }
+function footnoteFormatted(input, index, note) {
+    var string = input;
+    string = string.replace(/INDEX/g, index);
+    string = string.replace(/NOTE/g, note);
+    return string;
+}
 function smallcaps(inp) {
 	//console.warn(inp);
     if(inp == undefined)
@@ -613,6 +619,8 @@ function numToOrdinal(number) {
 	return number+ord[number];
 }
 function post_content_formatting(object) {
+    if(object === undefined)
+        return;
 	updateBuildProgress("Formatting...");
 	//Format Citations
 	//First, find all authors who have the same last names
@@ -744,7 +752,10 @@ function post_content_formatting(object) {
         $('.reftext[data-ref=latex'+$(this).attr('data-id')+']').html($(this).attr('data-figure-number'));
         
 	});
-	
+	$('.draft .footnote').each(function(n, e) {
+        $(this).html(footnoteFormatted(object.footnote, n, $(this).attr('data-note')));
+    }); 
+    
 	//Now all formatting is complete. We shall port the content over to the actual paper
 	//Prevent divs from registering a split, replicate for spans so parent is kept
 	//console.warn($('.draft').html());
