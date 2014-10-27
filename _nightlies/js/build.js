@@ -43,7 +43,7 @@ function startBuild(el) {
             console.log("Build: "+status);   
         }, function(status) {
             updateBuildProgress("<span style='color:#c00'>Error Building: "+status+"</span>");
-            console.log("Build2: "+status);   
+            console.error("Build2: "+status);   
         }, function(status) {
             console.log("Build3: "+status);   
         }
@@ -63,6 +63,8 @@ function Doc() {
     this.paddingBottom = 0.5;
     this.height = 11;
     this.width = 8.5;
+    //TODO Make this class object
+    this.global_footnote = 0;
     Doc.prototype.find = function(id) {
         //Find section name, page name, or pg num  
         for(index in this.sections) {
@@ -79,8 +81,13 @@ function Doc() {
         }
     };
     Doc.prototype.newPage = function(name, section) {
-        if(section === undefined)
-            section = "Primary";
+        if(section === undefined) {
+            var s = "";
+            for(i in this.sections) {
+                s = i;
+            }
+            section = s;
+        }
         return this.sections[section].newPage(name);
     };
     Doc.prototype.newSection = function(name) {
@@ -101,6 +108,7 @@ function Doc() {
             s = this.sections[name];
         }
         //Get content -- but we have to parse this too. I'm not sure when that goes.
+
         s.addBody(cnt);
     }
     Doc.prototype.insertContent = function(name) {
@@ -136,7 +144,7 @@ function Doc() {
         var out = "<div class='page' ";
         if(id !== undefined)
             out += "id='"+id+"' style='padding-left:"+this.marginLeft+"in;padding-right:"+this.marginRight+"in;padding-top:"+this.paddingTop+"in;padding-bottom:"+this.paddingBottom+"in;height:"+this.height+"in;width:"+this.width+"in'>";
-        out += '<div class="pageheader '+id+'_header" style="height:'+(this.marginTop-this.paddingTop)+'in"></div> <div class="pagebody '+id+'body"></div> <div class="pagefooter '+id+'footer" style="height:'+(this.marginTop-this.paddingTop)+'in"></div></div><hr style="height:2px;width:90%;margin-left:5%;">';
+        out += '<div class="pageheader '+id+'_header" style="min-height:'+(this.marginTop-this.paddingTop)+'in"></div> <div class="pagebody '+id+'body"></div> <div class="pagefooter '+id+'footer" style="min-height:'+(this.marginTop-this.paddingTop)+'in"></div></div>';
         out += "</div>";
         return out;
     };
@@ -157,9 +165,17 @@ function Section(name) {
         //Inject HTML
         //Adds to doc as last item
         //Future adaptions can put after any item
-        if(this.getPageCount() > 0)
-            $(this.pages[this.getPageCount()-1].element).after(this.doc.getPage(id));
-        else
+        if(this.getPageCount() > 0) {
+            //Get the n-1th element
+            var index = 0;
+            var lastpage;
+            for(i in this.pages) {
+                if(index == this.getPageCount()-1 && this.pages[i] !== undefined) {
+                    lastpage = this.pages[i];   
+                }
+            }
+            $(lastpage.element).after(this.doc.getPage(id));
+        } else
             $('#section'+this.name).html(this.doc.getPage(id));
         p.element = '#'+id;
         this.pages[id] = p;
@@ -186,7 +202,6 @@ function Section(name) {
     };
 }
 //Page Class - A single isolated page of content
-global_footnote = 0;
 function Page(name) {
     this.name = name;
     this.element;
@@ -200,28 +215,54 @@ function Page(name) {
                 //HTML injection   
                 $(this.element+" .pagebody").append(ar[i]);
                 //Footnote injection -- this isn't very modular. I'm not sure how to make it modular though
-                if($(ar[i]).find('.footnote'))
-                    global_footnote++;
-                this.appendFooter(footnoteFormatted(onGetFormats().footnote, global_footnote, $(ar[i]).find('.footnote').attr('data-note')));
+                /*
+                    Call pageBuilder fnc
+                    That'll pull in settings, find functions
+                    Run functions with whatever parameters are possible
+                    Return to this func
+                */
+                console.log(":"+ar[i]);
+                if(ar[i].match('<')) {
+                    if($(ar[i]).find('.footnote').length > 0) {
+                        console.log("Found you in "+ar[i]);
+                        this.section.doc.global_footnote++;
+                        //if this page has no footer already add one
+                        if($(this.element+' .pagefooter').html() == "") {
+                            this.addFooter(onGetFormats().footnoteDivider);   
+                        }
+                        this.appendFooter(footnoteFormatted(onGetFormats().footnote, this.section.doc.global_footnote, $(ar[i]).find('.footnote').attr('data-note')+"<br>"));
+                    }
+                } else {
+                    //Nothing -- probably not HTML
+                    //FIXME This is a really ugly hack
+                }
             } else {
                 var pass = ar.splice(i, ar.length-i).join(' ');
                 this.section.newPage().addBody(pass);
                 return;
             }
         }
+        this.fixHeight();
     };  
     Page.prototype.addHeader = function(cnt) {
         //setHeader fnc or inline  
         //HTML injection
         $(this.element+' .pageheader').html(cnt);
+        this.fixHeight();
     };
     Page.prototype.addFooter = function(cnt) {
         //same as header
         //HTML injection
-        $(this.element+' .pagefooter').html(cnt);
+        $(this.element+" .pagefooter").html("");
+        if($(this.element+' .pagefooter').html() == "") {
+            $(this.element+' .pagefooter').html(onGetFormats().footnoteDivider);   
+        }
+        $(this.element+' .pagefooter').append(cnt);
+        this.fixHeight();
     };
     Page.prototype.appendFooter = function(cnt) {
         $(this.element+' .pagefooter').append(cnt);  
+        this.fixHeight();
     };
     Page.prototype.isBodyFull = function(text) {
         //Pings w/scale, can check with data
@@ -235,12 +276,24 @@ function Page(name) {
         //compare
         $('.removeme').remove();    
         console.log(h, ">", d);
-        if(h > d) {
+        if(Math.round(h) > Math.round(d)) {
             return true;
         } else {
             return false;   
         }
-    };   
+    };  
+    Page.prototype.fixHeight = function() {
+        //Reset body height in accordance with what is needed
+        //get height
+        var h = $(this.element+' .pageheader').height() + $(this.element+" .pagebody").height() + $(this.element+" .pagefooter").height();
+        //get scale's height -- it is one inch
+        var s = $('.scale').height();
+        //get supposed height
+        var d = (this.section.doc.height - this.section.doc.paddingTop - this.section.doc.paddingBottom);
+        var docheight = d*s;
+        $(this.element+" .pagebody").height(docheight-$(this.element+' .pageheader').height()-$(this.element+" .pagefooter").height());
+        return docheight-$(this.element+' .pageheader').height()-$(this.element+" .pagefooter").height();
+    };
 }
 
 
@@ -328,27 +381,30 @@ function continueBuild(el) {
 		try {
 			onStylePaper();	
 		} catch(e) {
-			dfd.reject("on style paper");
+			dfd.reject("Error at `onStylePaper`: "+e.message);
 		}
 		updateBuildProgress('Building Text...');
+        var d;
         try {
-            onBuildFormat();
+            //NOTE Return
+            d = onBuildFormat();
 			updateBuildProgress('Setting Headers...');	
         } catch(e) {
-            dfd.reject("on build format");   
+            console.error(e.message);
+            dfd.reject("Error at 'onBuildFormat': "+e.message);   
         }
 				
 //		onGetFormats();
-        post_content_formatting(onGetFormats());
+        post_content_formatting(onGetFormats(), d);
         //Get reformatted content, then add it to doc
 			updateBuildProgress('Formatting Content...');
 		if($('.content_textarea .citation').length) {
-			post_bibliography(onBuildBibliography()[0], onBuildBibliography()[1]);
+			post_bibliography(onBuildBibliography(d)[0], onBuildBibliography(d)[1]);
 			updateBuildProgress('Building Bibliography...');
 		}
 		try {
             //TODO Header API
-			onSetHeader();
+			onSetHeader(d);
 		} catch(e) {
 			dfd.reject("on set header");
 			
@@ -359,6 +415,15 @@ function continueBuild(el) {
 	}
 		updateBuildProgress('Setting up display...');
 		
+    //NOTE
+    if(onFinishBuild !== undefined) {
+        try {
+            onFinishBuild(d);
+        } catch(e) {
+            dfd.reject("Error in `onFinishBuild`: "+e.message);   
+        }
+    }
+        
 	//To stuff
 		//$('.body').css('display', 'none');
     $('.main').fadeOut(500);
@@ -482,7 +547,7 @@ function add_new_page(pagename) {
 			secname = window.section_name+psec+" "+window.section_name;
 		} else
 			secname = ""
-		$('.build').append('<div class="page '+pagename+' page'+p+' '+secname+'" data-p="'+p+'"><div class="pageheader page'+p+'header"></div> <div class="pagebody page'+p+'body"></div> <div class="pagefooter"></div></div><hr style="height:2px;width:90%;margin-left:5%;>');
+		$('.build').append('<div class="page '+pagename+' page'+p+' '+secname+'" data-p="'+p+'"><div class="pageheader page'+p+'header"></div> <div class="pagebody page'+p+'body"></div> <div class="pagefooter"></div></div>');
 }
 function add_new_section(section_name) {
 	window.section_name = section_name;
@@ -1032,7 +1097,7 @@ function smartSplit(cnt) {
     output("","",w);   
     return d;
 }
-function post_content_formatting(object) {
+function post_content_formatting(object, compile_doc) {
 	updateBuildProgress("Formatting...");
 	//Format Citations
 	//First, find all authors who have the same last names
@@ -1214,7 +1279,8 @@ function post_content_formatting(object) {
 //    console.log( cont.match(/<br> &nbsp;<br>/g));
     
    
-//	console.log(cont);
+	console.log(cont);
+    console.log("Generating HTML...");
 	updateBuildProgress("Generating HTML...");
 	//cont = cont.replace(/<span[^<]+?>/g, "");
 	//cont = cont.replace("</span>", "",'g');
@@ -1390,7 +1456,7 @@ for(i in b) {
 //		console.warn("getColumnOut("+p+")");
 		return cout;
 	}
-	add_to_page(getColumnOut($('.page').length-1));
+	//add_to_page(getColumnOut($('.page').length-1));
 	if(column == 0)
 		col_count = 0;
 	else
@@ -1403,13 +1469,13 @@ for(i in b) {
         var dspan = d[j]+'';
         if(dspan.indexOf('<kbd class="pagebreak"') > -1) {
             console.warn("Found page break.");
-            add_new_page();
+            compile_doc.addPage();
             dspan = "";
             continue;
         }
         dspan = dspan.replace('</span>  ', '</span>');
         console.log(dspan);
-		add_to_page("<span class='hideme'>"+dspan +" "+"</span>", undefined, undefined, col_count);
+		compile_doc.add("<span class='hideme'>"+dspan +" "+"</span>", undefined, undefined, col_count);
 		//console.warn($('.page'+p+'body').height(), maxh);
 		//console.warn(('.page'+p+'col'+(col_count-1)), $('.page'+p+'col'+(col_count-1)).height(), maxh, $('.page'+p+'col'+(col_count-1)).html().length);
 		//console.warn(('.page'+p+'col'+(col_count-1)), $('.page'+p+'col'+(col_count-1)).html().length, $('.page'+p+'col'+(col_count-1)).height());
@@ -1418,7 +1484,7 @@ for(i in b) {
 			if($('.page'+p+'body').height() >= maxh) {
 //                console.log(dspan+" PAGE TOO LONG",$('.page'+p+'body').height(),maxh,p);    
 				c('page too long');
-				add_new_page();
+				compile_doc.addPage();
 				/*hm = $('.hideme').length;
 				he = $('.hideme')[hm-1]
 				$(he).css('display','none');*/
@@ -1444,9 +1510,10 @@ for(i in b) {
         dspan = dspan.replace('</span>  ', '</span>');
         //console.log("'"+dspan+"'");
 		add_to_page(dspan, undefined, undefined, col_count);
+        compile_doc.add(dspan);
 	}
 	$('.build').html($('.build').html().replace(/===/g,' ').replace(/~~~/g, ' ')/*.replace(/<span[^<]+?>/g, "")*/);
-	$('.pagebody').css('height', maxh+"px");
+//	$('.pagebody').css('height', maxh+"px"); FIXME I want the middle to have ambiguous height
     $('.build .pagebreak').css('display','none');
 	/*if(column > 0) {
 		$('.pagebody').css('column-count', column).css('-webkit-column-count', column).css('-moz-column-count');	

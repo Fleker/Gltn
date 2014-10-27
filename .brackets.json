@@ -1,6 +1,7 @@
 {
     "jscodehints.detectedExclusions": [
         "C:/Users/N/Documents/GitHub/Gluten_2/_nightlies/js/foundation/foundation.orbit.js",
-        "C:/Users/N/Documents/GitHub/Gluten_2/_nightlies/js/foundation/foundation.reveal.js"
+        "C:/Users/N/Documents/GitHub/Gluten_2/_nightlies/js/foundation/foundation.reveal.js",
+        "C:/Users/N/Documents/GitHub/Gluten_2/_nightlies/js/foundation/foundation.accordion.js"
     ]
 }

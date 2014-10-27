@@ -1,4 +1,4 @@
-var GLTN_VERSION = "1.4.1.2";
+var GLTN_VERSION = "1.4.1.3";
 var GLTN_VNAME = "Isidore";
 var GLTN_BUILD = 3;
 //For backwards compatibility, will return true 

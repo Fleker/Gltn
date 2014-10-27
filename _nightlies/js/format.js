@@ -136,7 +136,8 @@ function post_format() {
 		} else
             setInterval("setFormatItemWidth("+i+")", 100);
 	}
-	onInitToolbar();
+//	onInitToolbar();
+    post_toolbar(onGetToolbar().tools, onGetToolbar().allowCustom);
 	
 	//Set up selection parameters
 //			 document.getElementsByClassName("content_textarea")[0].onmouseup = function() {

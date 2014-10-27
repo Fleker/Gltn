@@ -15,6 +15,10 @@ function onInitToolbar() {
 	var toolbar = ["citation", "heading1", "heading2", "heading3"];
 	post_toolbar(toolbar);
 }	
+function onGetToolbar() {
+    var toolbar = ["citation", "heading1", "heading2", "heading3"];
+    return {tools: toolbar, allowCustom: true};
+}
 function onStylePaper() {
 	enable_format("double space");	
 }
@@ -48,6 +52,7 @@ function onBuildFormat() {
     }
     d.add(dueout+"<br>");
     d.add(centerText(valMetadata("Title")));
+    return d;
 }
 //TODO Get Header API Changed
 //FIXME Change Header Color
@@ -96,9 +101,9 @@ function onGetFormats() {
     return obj;
 } 
 //TODO NEW API
-function onBuildBibliography() {
-	add_new_section('bibliography');
-		add_to_page(centerText('Works Cited'));
+function onBuildBibliography(doc) {
+    var b = doc.newSection('Bibliography');
+    b.add(centerText("Works Cited"));
 	
 	obj = {};
 	cob = {};

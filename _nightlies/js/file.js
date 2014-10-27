@@ -449,14 +449,14 @@ function saveFile(fileObj) {
 	}
     if(obj.metadata === undefined || obj.metadata == "") 
 		obj.metadata = {};
-    console.log(obj.metadata);
+//    console.log(obj.metadata);
     if(isSameFile) {
         for(i in file.metadata) {
             if(i != parseInt(i))
                 continue;
-            console.log(file.metadata[i].id);
+//            console.log(file.metadata[i].id);
             var att = file.metadata[i].id.replace(/ /g, '_');
-            console.log(att, valMetadata(att));
+//            console.log(att, valMetadata(att));
             if(att.length > 0)
                 obj.metadata[att] = encodeURIComponent(grabMetadata(i).value);
         }
@@ -464,7 +464,7 @@ function saveFile(fileObj) {
     } else {
         content = "";   
     }
-    console.log(obj);
+//    console.log(obj);
     o = {};
     o.gluten_doc = obj;
     fileObj.jsonsave = o;
