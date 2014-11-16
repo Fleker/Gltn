@@ -132,9 +132,9 @@ function post_format() {
 	
 	for(i in file.metadata) {
 		if(file.metadata[i].isCounterEnabled()) {
-			setInterval("format_check_count("+i+")", 100);
+			setInterval("format_check_count("+i+")", 1000);
 		} else
-            setInterval("setFormatItemWidth("+i+")", 100);
+            setInterval("setFormatItemWidth("+i+")", 1000);
 	}
 //	onInitToolbar();
     post_toolbar(onGetToolbar().tools, onGetToolbar().allowCustom);

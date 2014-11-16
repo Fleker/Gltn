@@ -1,4 +1,4 @@
-var GLTN_VERSION = "1.4.1.3";
+var GLTN_VERSION = "1.4.1.4";
 var GLTN_VNAME = "Isidore";
 var GLTN_BUILD = 3;
 //For backwards compatibility, will return true 
@@ -1024,7 +1024,7 @@ window.applicationCache.addEventListener('error', function() {
 		initService("Main_Offline", "App caching", "&nbsp;");
 	} else {
 		window.appcachestatus = "You are currently working offline";
-		setTimeout('initService("Main_Offline", "App available offline", "<span class=\'fa fa-plane\'></span>");', 2000);
+//		setTimeout('initService("Main_Offline", "App available offline", "<span class=\'fa fa-plane\'></span>");', 2000);
 	}
 });
 
@@ -1032,7 +1032,7 @@ window.appcachestatus = "App available offline";
 
 function appcache() {
 	console.log("App is now available for offline use.");
-    setTimeout('initService("Main_Offline", "App available offline", "<span class=\'fa fa-plane\'></span>");', 2000);
+//    setTimeout('initService("Main_Offline", "App available offline", "<span class=\'fa fa-plane\'></span>");', 2000);
 	//hot swap	
 	try {
 		window.applicationCache.swapCache();

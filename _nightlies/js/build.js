@@ -38,6 +38,7 @@ function startBuild(el) {
             console.error(e.message);
         }
     },500);*/
+    setTimeout('updateBuildProgress("Compiling...");',40);
     $.when(continueBuild()).then(
         function(status) {
             console.log("Build: "+status);   
@@ -48,7 +49,6 @@ function startBuild(el) {
             console.log("Build3: "+status);   
         }
     );
-    setTimeout('updateBuildProgress("Compiling...");',40);
 }
 //CLASSES STRUCTURE
 //Doc Class
@@ -63,7 +63,6 @@ function Doc() {
     this.paddingBottom = 0.5;
     this.height = 11;
     this.width = 8.5;
-    //TODO Make this class object
     this.global_footnote = 0;
     Doc.prototype.find = function(id) {
         //Find section name, page name, or pg num  
@@ -79,6 +78,10 @@ function Doc() {
                 }
             }
         }
+    };
+    //TODO 
+    Doc.prototype.getPageNumber = function(pg) {
+        //Feed in a page object, this will give you the number of that page in this document
     };
     Doc.prototype.newPage = function(name, section) {
         if(section === undefined) {
@@ -125,6 +128,9 @@ function Doc() {
         var c = $('.content_textarea').html();
         s.addBody(c);
     };
+    Doc.prototype.getHtml = function() {
+        return $('#build').html();   
+    }
     Doc.prototype.getSectionCount = function() {
         var i = 0;
         for(index in this.sections) {
@@ -147,6 +153,17 @@ function Doc() {
         out += '<div class="pageheader '+id+'_header" style="min-height:'+(this.marginTop-this.paddingTop)+'in"></div> <div class="pagebody '+id+'body"></div> <div class="pagefooter '+id+'footer" style="min-height:'+(this.marginTop-this.paddingTop)+'in"></div></div>';
         out += "</div>";
         return out;
+    };
+    Doc.prototype.assignPages = function() {
+        //This will go through each page and give it data-page-num. This should be called several times through the compilation process to ensure that the pages are correct.
+        //This value starts at 1
+        var pn = 1;
+        for(i in this.sections) {
+            for(index in this.sections[i].pages) {
+                $(this.sections[i].pages[index].element).attr('data-page-num', pn);
+                pn++;
+            }
+        }
     };
     $('.page, .section').remove();
     this.newSection("Primary");
@@ -210,6 +227,7 @@ function Page(name) {
         //Add this to the body
         //Splice
         var ar = smartSplit(cnt);
+        console.log(ar);
         for(i in ar) {
             if(!this.isBodyFull(ar[i])) {
                 //HTML injection   
@@ -221,16 +239,18 @@ function Page(name) {
                     Run functions with whatever parameters are possible
                     Return to this func
                 */
-                console.log(":"+ar[i]);
+//                console.log(i, ar.length);
+                console.log(i, ":"+ar[i]); 
                 if(ar[i].match('<')) {
-                    if($(ar[i]).find('.footnote').length > 0) {
+//                    console.log("<");
+                    if($(ar[i]).filter('.footnote').length > 0) {
                         console.log("Found you in "+ar[i]);
                         this.section.doc.global_footnote++;
                         //if this page has no footer already add one
                         if($(this.element+' .pagefooter').html() == "") {
-                            this.addFooter(onGetFormats().footnoteDivider);   
+                            this.addFooter("");   
                         }
-                        this.appendFooter(footnoteFormatted(onGetFormats().footnote, this.section.doc.global_footnote, $(ar[i]).find('.footnote').attr('data-note')+"<br>"));
+                        this.appendFooter(footnoteFormatted(onGetFormats().footnote, this.section.doc.global_footnote, decodeURIComponent($(ar[i]).filter('.footnote').attr('data-note')+"<br>")));
                     }
                 } else {
                     //Nothing -- probably not HTML
@@ -250,7 +270,7 @@ function Page(name) {
         $(this.element+' .pageheader').html(cnt);
         this.fixHeight();
     };
-    Page.prototype.addFooter = function(cnt) {
+d    Page.prototype.addFooter = function(cnt) {
         //same as header
         //HTML injection
         $(this.element+" .pagefooter").html("");
@@ -266,7 +286,7 @@ function Page(name) {
     };
     Page.prototype.isBodyFull = function(text) {
         //Pings w/scale, can check with data
-        $(this.element+' .pagebody').append("<span class='removeme'>"+text+"</span>");
+        $(this.element+' .pagebody').append("<div class='removeme' style='display:inline'>"+text+"</div>");
         //get height
         var h = $(this.element+' .pageheader').height() + $(this.element+" .pagebody").height() + $(this.element+" .pagefooter").height();
         //get scale's height -- it is one inch
@@ -291,7 +311,7 @@ function Page(name) {
         //get supposed height
         var d = (this.section.doc.height - this.section.doc.paddingTop - this.section.doc.paddingBottom);
         var docheight = d*s;
-        $(this.element+" .pagebody").height(docheight-$(this.element+' .pageheader').height()-$(this.element+" .pagefooter").height());
+        $(this.element+" .pagebody").css('max-height', docheight-$(this.element+' .pageheader').height()-$(this.element+" .pagefooter").height());
         return docheight-$(this.element+' .pageheader').height()-$(this.element+" .pagefooter").height();
     };
 }
@@ -384,10 +404,11 @@ function continueBuild(el) {
 			dfd.reject("Error at `onStylePaper`: "+e.message);
 		}
 		updateBuildProgress('Building Text...');
-        var d;
+        var d = new Doc();
+        d.newPage();
         try {
             //NOTE Return
-            d = onBuildFormat();
+            d = onBuildFormat(d);
 			updateBuildProgress('Setting Headers...');	
         } catch(e) {
             console.error(e.message);
@@ -416,6 +437,7 @@ function continueBuild(el) {
 		updateBuildProgress('Setting up display...');
 		
     //NOTE
+    d.assignPages();
     if(onFinishBuild !== undefined) {
         try {
             onFinishBuild(d);
@@ -434,10 +456,12 @@ function continueBuild(el) {
 	//console.log(finishdate, builddate);
 	$('.buildtime').html('&emsp;Built in '+(finishdate - builddate)/1000+' seconds.');
     var i = 0;
+    console.log("Word counter");
     for(j in $('.pagebody').text().split(' ')) {
         if($('.pagebody').text().split(' ')[j].length >= 1)
             i++;
     }
+    console.log("Counter done -- yay!");
     $('.buildtime').append('&emsp;Stats: '+i+' words, '+$('.pagebody').text().length+' chars');
     $("#PanelBuildEvent").click();
     dfd.resolve("yay");
@@ -470,10 +494,10 @@ function exitBuild() {
 function grabMetadata(i) {
 	var o = file.metadata;
 //	console.log(i);
-	o.value = $('#format_item_'+i).val();
-	if(o.value == undefined)
-		o.value = $('#format_item_'+i).html();
-	return o;	
+	o[i].value = $('#format_item_'+i).val();
+	if(o[i].type == "mltext")
+		o[i].value = $('#format_item_'+i).html();
+	return o[i];	
 }
 function searchMetadata(request) {
 	for(i=0;i<file.metadata.length;i++) {
@@ -482,7 +506,7 @@ function searchMetadata(request) {
 	}
 }
 function valMetadata(label) {
-	return grabMetadata(searchMetadata(label)).value;	
+	return (grabMetadata(searchMetadata(label)).value !== undefined)?grabMetadata(searchMetadata(label)).value:"";	
 }
 function fileMetadata(name) {
 	return $('#file_'+name).val();	
@@ -541,6 +565,7 @@ function enable_format(setting, param1) {
 
 //Page generator and manager
 function add_new_page(pagename) {
+    return;
 		p = $('.page').length;
 		if(window.section_name.length) {
 			psec = $('.'+section_name).length;
@@ -550,6 +575,7 @@ function add_new_page(pagename) {
 		$('.build').append('<div class="page '+pagename+' page'+p+' '+secname+'" data-p="'+p+'"><div class="pageheader page'+p+'header"></div> <div class="pagebody page'+p+'body"></div> <div class="pagefooter"></div></div>');
 }
 function add_new_section(section_name) {
+    return;
 	window.section_name = section_name;
 	p = $('.'+section_name).length;
 	//add_new_page(section_name+p);
@@ -562,6 +588,7 @@ function find_page(pagename) {
 	return $('.'+pagename).attr('data-p');
 }
 function add_to_page(text, i, name, col) {
+    return;
 	//console.error("add_to_page("+text+", "+i+", "+name+", "+column+");");
 	if(i != undefined) {
 		$('.page'+i+'body').append(text);		
@@ -1172,6 +1199,8 @@ function post_content_formatting(object, compile_doc) {
 	var h1 = 1;
 	var h2 = 1;
 	var h3 = 1;
+    var h4 = 1;
+    var h5 = 1;
 	$('.draft  .heading').each(function() {
 		//$(this).css('display','inline');
 		$(this).css('border','none');
@@ -1180,13 +1209,26 @@ function post_content_formatting(object, compile_doc) {
 			h1++;
 			h2 = 1;
 			h3 = 1;	
+            h4 = 1;
+            h5 = 1;
 		} else if($(this).attr('class').indexOf('heading2') > -1) {
 			$(this).html(headingFormatted(object.heading2,$(this).text(),h2));
 			h2++;
-			h3 = 1;	
+			h3 = 1;
+            h4 = 1;
+            h5 = 1;
 		} else if($(this).attr('class').indexOf('heading3') > -1) {
 			$(this).html(headingFormatted(object.heading3,$(this).text(),h3));
 			h3++;
+            h4 = 1;
+            h5 = 1;
+		} else if($(this).attr('class').indexOf('heading4') > -1) {
+			$(this).html(headingFormatted(object.heading4,$(this).text(),h4));
+			h4++;
+            h5 = 1;
+		} else if($(this).attr('class').indexOf('heading5') > -1) {
+			$(this).html(headingFormatted(object.heading5,$(this).text(),h5));
+			h5++;
 		}
 	});
 	
@@ -1226,7 +1268,7 @@ function post_content_formatting(object, compile_doc) {
         $('.reftext[data-ref=latex'+$(this).attr('data-id')+']').html($(this).attr('data-figure-number'));
 	});
     $('.draft .footnote').each(function(n, e) {
-        $(this).html(footnoteFormatted(object.footnote, n, $(this).attr('data-note')));
+        $(this).html(footnoteFormatted(object.inlineFootnote, n+1, $(this).attr('data-note')));
     }); 
 	
 	//Now all formatting is complete. We shall port the content over to the actual paper
@@ -1474,8 +1516,8 @@ for(i in b) {
             continue;
         }
         dspan = dspan.replace('</span>  ', '</span>');
-        console.log(dspan);
-		compile_doc.add("<span class='hideme'>"+dspan +" "+"</span>", undefined, undefined, col_count);
+        console.log(j, dspan);
+//		compile_doc.add("<span class='hideme'>"+dspan +" "+"</span>", undefined, undefined, col_count);
 		//console.warn($('.page'+p+'body').height(), maxh);
 		//console.warn(('.page'+p+'col'+(col_count-1)), $('.page'+p+'col'+(col_count-1)).height(), maxh, $('.page'+p+'col'+(col_count-1)).html().length);
 		//console.warn(('.page'+p+'col'+(col_count-1)), $('.page'+p+'col'+(col_count-1)).html().length, $('.page'+p+'col'+(col_count-1)).height());
