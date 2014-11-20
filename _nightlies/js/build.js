@@ -311,7 +311,7 @@ d    Page.prototype.addFooter = function(cnt) {
         //get supposed height
         var d = (this.section.doc.height - this.section.doc.paddingTop - this.section.doc.paddingBottom);
         var docheight = d*s;
-        $(this.element+" .pagebody").css('max-height', docheight-$(this.element+' .pageheader').height()-$(this.element+" .pagefooter").height());
+        $(this.element+" .pagebody").css('height', docheight-$(this.element+' .pageheader').height()-$(this.element+" .pagefooter").height());
         return docheight-$(this.element+' .pageheader').height()-$(this.element+" .pagefooter").height();
     };
 }
