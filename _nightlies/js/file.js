@@ -116,6 +116,7 @@ currentformat = "";
 
 $(document).ready(function() {
     console.log('Gltn has awakened: v '+GLTN_VERSION);
+    setLocale('en_us');
     GET = window.location.search.substring(1);
     GETarr = GET.split("&");
     for(var i in GETarr) {
@@ -1464,6 +1465,10 @@ function formatShift2(d) {
 		}
 	}
 	console.log("The document's format has shifted.");
+    if(file.getLanguage() !== undefined) {
+        if(file.getLanguage().length < 1)
+            setLocale('en_us');
+    }
     markAsDirty();
 }
 function renameFile() {

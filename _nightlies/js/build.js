@@ -270,7 +270,7 @@ function Page(name) {
         $(this.element+' .pageheader').html(cnt);
         this.fixHeight();
     };
-d    Page.prototype.addFooter = function(cnt) {
+    Page.prototype.addFooter = function(cnt) {
         //same as header
         //HTML injection
         $(this.element+" .pagefooter").html("");
@@ -287,7 +287,8 @@ d    Page.prototype.addFooter = function(cnt) {
     Page.prototype.isBodyFull = function(text) {
         //Pings w/scale, can check with data
         $(this.element+' .pagebody').append("<div class='removeme' style='display:inline'>"+text+"</div>");
-        //get height
+        //get height, but first need real height
+        $(this.element+" .pagebody").css('height', '');
         var h = $(this.element+' .pageheader').height() + $(this.element+" .pagebody").height() + $(this.element+" .pagefooter").height();
         //get scale's height -- it is one inch
         var s = $('.scale').height();
@@ -423,6 +424,7 @@ function continueBuild(el) {
 			post_bibliography(onBuildBibliography(d)[0], onBuildBibliography(d)[1]);
 			updateBuildProgress('Building Bibliography...');
 		}
+        d.assignPages();
 		try {
             //TODO Header API
 			onSetHeader(d);
@@ -438,13 +440,13 @@ function continueBuild(el) {
 		
     //NOTE
     d.assignPages();
-    if(onFinishBuild !== undefined) {
+//    if(onFinishBuild !== undefined) {
         try {
             onFinishBuild(d);
         } catch(e) {
             dfd.reject("Error in `onFinishBuild`: "+e.message);   
         }
-    }
+//    }
         
 	//To stuff
 		//$('.body').css('display', 'none');
@@ -1506,6 +1508,8 @@ for(i in b) {
 	d.unshift(object.paragraph_indent);
     console.log(d);
 	for(j in d) {
+//        if(j > 200) //FIXME Debugging
+//            continue;
 		//TODO - Find a way to grab the current page, not necessarily the last one. This will be handy for things that are added after content
 		p = $('.page').length-1;
         var dspan = d[j]+'';

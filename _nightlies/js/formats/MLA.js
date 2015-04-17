@@ -23,20 +23,11 @@ function onStylePaper() {
 	enable_format("double space");	
 }
 function onStyleGuide() {
-	out = "<b>MLA Format</b><br>This is a general guide to the best practices for the MLA Format. Unfortunately, it is not populated right now.";
+	out = "<b>MLA Format</b><br>There are no distinct rules in writing papers in this format.";
 	return out;	
 }
 //Note new class structure
-function onBuildFormat() {
-	/*add_new_page();
-		add_to_page(valMetadata("Author")+"<br>");
-		add_to_page(valMetadata("Professor")+"<br>");
-		add_to_page(valMetadata("Class")+"<br>");
-		
-		add_to_page(dueout+"<br>");
-		add_to_page(centerText(valMetadata("Title")));*/
-    var d = new Doc();
-    d.newPage();
+function onBuildFormat(d) {
     d.add(valMetadata("Author")+"<br>");
     d.add(valMetadata("Professor")+"<br>");
     d.add(valMetadata("Class")+"<br>");
@@ -56,10 +47,20 @@ function onBuildFormat() {
 }
 //TODO Get Header API Changed
 //FIXME Change Header Color
-function onSetHeader() {
+function onSetHeader(doc) {
+    console.log(doc);
 	var auth_array = valMetadata("Author").split(" ");
 	var last_name = auth_array[auth_array.length - 1];
-	push_header(lcr_split("", "", "<span style='font-size:12pt'>"+last_name+" PAGE</span>"));
+    for(index in doc.sections) {
+        for(i in doc.sections[index].pages) {
+            var page = doc.sections[index].pages[i];
+            console.log(page);
+            console.log((lcr_split("", "", "<span style='font-size:12pt'>"+last_name+" "+$(page.element).attr('data-page-num')+"</span>"), $(page.element).attr('data-page-num')));
+            page.addHeader(lcr_split("", "", "<span style='font-size:12pt'>"+last_name+" "+$(page.element).attr('data-page-num')+"</span>"));
+            
+        }
+    }
+//	push_header(lcr_split("", "", "<span style='font-size:12pt'>"+last_name+" PAGE</span>"));
 }
 function onGetFormats() {
 	var obj = {};
@@ -152,4 +153,8 @@ function onBuildBibliography(doc) {
 	obj.annotation = "<br>";
 //	post_bibliography(obj, cob);	
     return [obj, cob];
+}
+function onFinishBuild(doc) {
+    //Runs when pages finish compiling, can be used for last minute adjustments
+    //Table of contents
 }

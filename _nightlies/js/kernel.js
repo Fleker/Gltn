@@ -1706,6 +1706,7 @@ function initThemeDefault() {
 	$('.popuptop').css('color', 'white').css('background-color', theme.bodyColor);
 	$('.content_textarea').css('line-height','1.4em').css('padding-right', '5px');
 	$('.hovertag').css('font-size', '10pt');
+    $('.toolbar').css('margin-bottom','4px').css('padding-top', '4px').css('border-top', 'solid 1px #333');
 //    $('.main').css('padding-top', '100px');
     themeCss('font-family', '"Roboto", sans-serif');
     themeCss('font-size', '10pt');

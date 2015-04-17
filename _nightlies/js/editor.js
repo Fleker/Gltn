@@ -1,4 +1,4 @@
-var GLTN_VERSION = "1.4.1.4";
+var GLTN_VERSION = "1.4.2.1";
 var GLTN_VNAME = "Isidore";
 var GLTN_BUILD = 3;
 //For backwards compatibility, will return true 
@@ -736,6 +736,7 @@ function setHeader() {
 	newRibbon('.header', holoribbon_std);
 	ribbonSwitch(0,false);
 	ribbonLoad();
+    
 }
 
 function ribbonLoad() {
