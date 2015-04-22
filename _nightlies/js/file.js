@@ -830,7 +830,7 @@ function downloadXMLX() {
 function downloadXML() {
     content = $('.content_textarea').html();
 	filename = valMetadata('Title')+".gltn";
-	filename = fileid+".gltn";
+	filename = file.getFileid()+".gltn";
     var pom = document.createElement('a');
     input = json2xml(o, "")+content;
     pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(input));
@@ -848,14 +848,14 @@ function cloudXML() {
     initiatePopup({title:'Saving File Online',ht:'<div class="progress" style="font-size:14pt;text-align:center;width:100%;"></div>',bordercolor:'#7f8c8d', ht:"&emsp;&emsp;&emsp;Please wait as the export menu loads."});
     content = $('.content_textarea').html();
     saveFile();
-    input = json2xml(jsonsave, "")+content;
+    input = json2xml(file.jsonsave, "")+content;
 //    console.log(input);
     filepicker.store(input, function(InkBlob){
             filepicker.exportFile(
               InkBlob,
               {extension:'.gltn',
                  /*mimetype: 'text/gltn',*/
-                suggestedFilename: fileid,
+                suggestedFilename: file.getFileid(),
                base64decode: false
               },
               function(InkBlob){
@@ -863,7 +863,7 @@ function cloudXML() {
                   cloudSaveInkblob(InkBlob);
                   saveFile();
                   filepicker.write(InkBlob,
-                     json2xml(o, "")+content,
+                     json2xml(file.jsonsave, "")+content,
                     function(InkBlob){
                         saveFile();
                         console.log("Complete sync for now");

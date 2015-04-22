@@ -39,16 +39,18 @@ function startBuild(el) {
         }
     },500);*/
     setTimeout('updateBuildProgress("Compiling...");',40);
-    $.when(continueBuild()).then(
-        function(status) {
-            console.log("Build: "+status);   
-        }, function(status) {
-            updateBuildProgress("<span style='color:#c00'>Error Building: "+status+"</span>");
-            console.error("Build2: "+status);   
-        }, function(status) {
-            console.log("Build3: "+status);   
-        }
-    );
+    setTimeout(function() {
+        $.when(continueBuild()).then(
+            function(status) {
+                console.log("Build: "+status);   
+            }, function(status) {
+                updateBuildProgress("<span style='color:#c00'>Error Building: "+status+"</span>");
+                console.error("Build2: "+status);   
+            }, function(status) {
+                console.log("Build3: "+status);   
+            }
+        );
+    }, 500);
 }
 //CLASSES STRUCTURE
 //Doc Class
@@ -99,7 +101,7 @@ function Doc() {
         $('#build').append("<div class='section' id='section"+name+"'></div>");
         return this.sections[name];
     };
-    Doc.prototype.add = function(cnt, name) {
+    Doc.prototype.add = function(cnt, name, smartSplit) {
         //Add general HTML to the last page or to a specific section
         var s = undefined;
         if(name === undefined) {
@@ -112,7 +114,7 @@ function Doc() {
         }
         //Get content -- but we have to parse this too. I'm not sure when that goes.
 
-        s.addBody(cnt);
+        s.addBody(cnt, undefined, smartSplit);
     }
     Doc.prototype.insertContent = function(name) {
         var s = undefined;
@@ -179,6 +181,8 @@ function Section(name) {
         var id = this.name+"_"+name;
         var p = new Page(id);
         p.section = this;
+//        console.log("Creating new page for this section");
+//        console.log(this.doc);
         //Inject HTML
         //Adds to doc as last item
         //Future adaptions can put after any item
@@ -187,13 +191,17 @@ function Section(name) {
             var index = 0;
             var lastpage;
             for(i in this.pages) {
+//                console.log("Scrolling to page "+i);
                 if(index == this.getPageCount()-1 && this.pages[i] !== undefined) {
                     lastpage = this.pages[i];   
                 }
+                index++;
             }
+//            console.log(lastpage);
             $(lastpage.element).after(this.doc.getPage(id));
         } else
             $('#section'+this.name).html(this.doc.getPage(id));
+//        console.log(p);
         p.element = '#'+id;
         this.pages[id] = p;
         return p;
@@ -205,7 +213,7 @@ function Section(name) {
         }
         return i;
     };
-    Section.prototype.addBody = function(cnt, page) {
+    Section.prototype.addBody = function(cnt, page, smartSplit) {
         var p = undefined;
         //Add to the last page if none's provided
         if(page === undefined) {
@@ -215,18 +223,22 @@ function Section(name) {
         } else {
            p = this.pages[page];
         }
-        p.addBody(cnt);
+        p.addBody(cnt, smartSplit);
     };
 }
 //Page Class - A single isolated page of content
 function Page(name) {
     this.name = name;
+    this.id = name;
     this.element;
     this.section; //parent of object
-    Page.prototype.addBody = function(cnt) {
+    Page.prototype.addBody = function(cnt, split) {
         //Add this to the body
         //Splice
-        var ar = smartSplit(cnt);
+        if(split != false)
+            var ar = smartSplit(cnt);
+        else
+            var ar = [cnt];
         console.log(ar);
         for(i in ar) {
             if(!this.isBodyFull(ar[i])) {
@@ -296,7 +308,7 @@ function Page(name) {
         var d = (this.section.doc.height - this.section.doc.paddingTop - this.section.doc.paddingBottom)*s;
         //compare
         $('.removeme').remove();    
-        console.log(h, ">", d);
+//*        console.log(h, ">", d);
         if(Math.round(h) > Math.round(d)) {
             return true;
         } else {
@@ -377,7 +389,7 @@ function convertDoc() {
 }
 
 function continueBuild(el) {
-    var dfd = new jQuery.Deferred();
+    var dfd = jQuery.Deferred();
         
     window.build_ln = new Array();
     window.build_fn = new Array();
@@ -413,6 +425,7 @@ function continueBuild(el) {
 			updateBuildProgress('Setting Headers...');	
         } catch(e) {
             console.error(e.message);
+            updateBuildProgress('Compile Error: '+e.message);	
             dfd.reject("Error at 'onBuildFormat': "+e.message);   
         }
 				
@@ -958,6 +971,129 @@ function smartSplit(cnt) {
     cnt = cnt.replace(/<div><\/div>/g, " ");
     cnt = cnt.replace(/<div>(.*)<\/div>/g, "$1");
     cnt = cnt.replace(/<div>(.*)<\/div>/g, "$1");
+    cnt = cnt.replace(/<span style="line-height: inherit; font-size: inherit; font-family: inherit; border: none; color: inherit; background-color: inherit;">(.*)<\/span>/g, "$1");cnt = cnt.replace(/<span style="font-size: inherit; line-height: inherit; font-family: inherit; border: none; color: inherit; background-color: inherit;">(.*)<\/span>/g, "$1");
+    cnt = cnt.replace(/<div><br>/g, "<div>");
+	cnt = cnt.replace(/<\/div><div><br><\/div><div>/g, "<br>"+object.paragraph_indent);
+	cnt = cnt.replace(/<div><br><\/div><div>/g, "<br>"+object.paragraph_indent);
+    cnt = cnt.replace(/<\/div><div>/g, "<br>"+object.paragraph_indent);
+    cnt = cnt.replace(/<\/div> <div>/g, "<br>"+object.paragraph_indent);
+    cnt = cnt.replace(/<\/div><\/span><div>/g, "</div>"+object.paragraph_indent);
+    cnt = cnt.replace(/<\/div><div><br><div>/g, "<br>"+object.paragraph_indent);
+    cnt = cnt.replace(/<div><br><div>/g, "</div>"+object.paragraph_indent);
+    cnt = cnt.replace(/<br><div>/g, ""+object.paragraph_indent);
+    cnt = cnt.replace(/<br>&emsp;<kbd/g, "</div><br>"+object.paragraph_indent+"<kbd");
+    cnt = cnt.replace(/<br> &nbsp;<br>/g, "<br>"+object.paragraph_indent);
+    cnt = cnt.replace(/<br>&emsp;<br>&emsp;/g, "<br>"+object.paragraph_indent);
+    cnt = cnt.replace(/<br>&emsp;  <br>&emsp;/g, "<br>"+object.paragraph_indent);
+    cnt = cnt.replace(/<div>/g, "<br>"+object.paragraph_indent);
+    cnt = cnt.replace(/<br>&emsp;<br>/g, "<br>");
+    cnt = cnt.replace(/<br>&emsp;<br>/g, "<br>");
+    
+    var b = document.createElement('div');
+    b.innerHTML = cnt;
+    window.smartsplitelement = b;
+    console.log(cnt);
+    console.log(b.childNodes);
+    var d = []; //New array of text blobs
+//    d.push(object.paragraph_indent);
+    for(i=0;i<b.childNodes.length;i++) {
+        console.log("Parsing node "+i);
+        var node = b.childNodes[i];
+        console.log(node.nodeName+" "+node.nodeType);
+        if(node.nodeType == 3) {
+            //Is text   
+            var textArray = node.nodeValue.split(' ');
+            for(ii=0;ii<textArray.length;ii++) {
+                d.push(textArray[ii]);   
+                if(ii+1 != textArray.length)
+                    d.push(" ");
+            }
+        } else {
+            //Need to grab text
+            var tag = node.nodeName.toLowerCase();
+            if(node.style !== undefined)
+                var style = node.style.cssText;
+            else
+                var style = '';
+            var tagPush = "<"+tag+" style='"+style+"'>";
+            var tagPushEnd = "</"+tag+">";
+            if(node.childNodes[0] !== undefined) {
+                if(node.nodeName == "DIV" || node.nodeName == "KBD") 
+                    var textArray = [node.childNodes[0].nodeValue];
+                else if(node.nodeName == "BR")
+                    d.push("<br>");
+                else
+                    var textArray = node.childNodes[0].nodeValue.split(' ');
+                for(ii=0;ii<textArray.length;ii++) {
+                    d.push(tagPush+textArray[ii]+tagPushEnd);   
+                    if(ii+1 != textArray.length)
+                        d.push(" ");
+                }
+            } else {
+                if(node.nodeName == "BR") {
+                    d.push("<br>");
+                }   
+            }
+        }
+        console.log(d);
+    }
+    /*
+        var node = b.childNodes[i];
+        console.log(i+" "+node.nodeName+" "+node.nodeType);
+        if(node === undefined)
+            continue;
+        if(node.nodeType == 1 && node.nodeName != "BR") {
+            var tag = node.nodeName.toLowerCase();
+            if(node.style !== undefined)
+                var style = node.style.cssText;
+            else
+                var style = '';
+            var tagPush = "<"+tag+" style='"+style+"'>";
+            var tagPushEnd = "</"+tag+">";
+        } else {
+            tagPush = "";
+            tagPushEnd = "";
+        }
+        var textOutput = "";
+        if(node.nodeType == 1) {
+            if(node.childNodes[0] == undefined) { 
+                console.error("Wut?");
+                continue;
+            } else
+                textOutput = node.childNodes[0].nodeValue;
+        } else {
+            textOutput = node.nodeValue;
+        }
+        
+        //Just add text!
+        console.log(node, textOutput);
+        if(node.nodeName != "DIV") {
+            var textArray = textOutput.split(' ');
+            for(i=0;i<textArray.length;i++) {
+                d.push(tagPush+textArray[i]+tagPushEnd);   
+                if(i+1 != textArray.length)
+                    d.push(" ");
+            }
+        } else {
+            d.push(tagPush+textOutput+tagPushEnd);
+        }
+        console.log(d);
+    }*/
+    console.log(d);
+    return d;
+    
+}
+function smartSplit2(cnt) {
+    var object = onGetFormats();
+    $('.draft span').css('color', 'inherit');
+	//Paragraph detection
+    if(object.paragraph_indent == undefined)
+		object.paragraph_indent = "";
+//	window.cont = $('.draft').html().replace(/&nbsp;/g, " ");
+//  window.predraft3 = $('.draft').html();
+    cnt = cnt.replace(/<div><\/div>/g, " ");
+    cnt = cnt.replace(/<div>(.*)<\/div>/g, "$1");
+    cnt = cnt.replace(/<div>(.*)<\/div>/g, "$1");
     cnt = cnt.replace(/<span style="line-height: inherit; font-size: inherit; font-family: inherit; border: none; color: inherit; background-color: inherit;">(.*)<\/span>/g, "$1");
     cnt = cnt.replace(/<div><br>/g, "<div>");
 	cnt = cnt.replace(/<\/div><div><br><\/div><div>/g, "<br>"+object.paragraph_indent);
@@ -1128,6 +1264,7 @@ function smartSplit(cnt) {
 }
 function post_content_formatting(object, compile_doc) {
 	updateBuildProgress("Formatting...");
+    console.log("Formatting...");
 	//Format Citations
 	//First, find all authors who have the same last names
 	var ln = new Array();
@@ -1294,34 +1431,11 @@ function post_content_formatting(object, compile_doc) {
     /*** PARAGRAPH DETECTION ***/
 //    console.log($('.draft').html());
     $('.draft span').css('color', 'inherit');
-	if(object.paragraph_indent == undefined)
+    if(object.paragraph_indent == undefined)
 		object.paragraph_indent = "";
-//	window.cont = $('.draft').html().replace(/&nbsp;/g, " ");
+
     window.predraft3 = $('.draft').html();
     window.cont = $('.draft').html().replace(/<div><\/div>/g, " ");
-    window.cont = cont.replace(/<div>(.*)<\/div>/g, "$1");
-    window.cont = cont.replace(/<div>(.*)<\/div>/g, "$1");
-    window.cont = cont.replace(/<span style="line-height: inherit; font-size: inherit; font-family: inherit; border: none; color: inherit; background-color: inherit;">(.*)<\/span>/g, "$1");
-//    window.cont = cont.replace(/<div><span .*>(.*)<\/span>/g, "$1");
-    window.cont = cont.replace(/<div><br>/g, "<div>");
-	window.cont = cont.replace(/<\/div><div><br><\/div><div>/g, "<br>"+object.paragraph_indent);
-	window.cont = cont.replace(/<div><br><\/div><div>/g, "<br>"+object.paragraph_indent);
-//	window.cont = cont.replace(/<br><\/div>/g, "");
-    window.cont = cont.replace(/<\/div><div>/g, "<br>"+object.paragraph_indent);
-    window.cont = cont.replace(/<\/div> <div>/g, "<br>"+object.paragraph_indent);
-    window.cont = cont.replace(/<\/div><\/span><div>/g, "</div>"+object.paragraph_indent);
-    window.cont = cont.replace(/<\/div><div><br><div>/g, "<br>"+object.paragraph_indent);
-    window.cont = cont.replace(/<div><br><div>/g, "</div>"+object.paragraph_indent);
-    window.cont = cont.replace(/<br><div>/g, ""+object.paragraph_indent);
-    window.cont = cont.replace(/<br>&emsp;<kbd/g, "</div><br>"+object.paragraph_indent+"<kbd");
-    window.cont = cont.replace(/<br> &nbsp;<br>/g, "<br>"+object.paragraph_indent);
-    window.cont = cont.replace(/<br>&emsp;<br>&emsp;/g, "<br>"+object.paragraph_indent);
-    window.cont = cont.replace(/<br>&emsp;  <br>&emsp;/g, "<br>"+object.paragraph_indent);
-    window.cont = cont.replace(/<div>/g, "<br>"+object.paragraph_indent);
-    window.cont = cont.replace(/<br>&emsp;<br>/g, "<br>");
-    window.cont = cont.replace(/<br>&emsp;<br>/g, "<br>");
-//    console.log( cont.match(/<br> &nbsp;<br>/g));
-    
    
 	console.log(cont);
     console.log("Generating HTML...");
@@ -1331,161 +1445,9 @@ function post_content_formatting(object, compile_doc) {
 	
 	//ca =  cont.split(' ');
 	
-function c(s) {
-	//console.log(s);	 
-	//s = s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-//	$('body').append(s+"<br>");
-}
-function output(e, tag, w) {
-	var out = "";
-//    console.log(e+",", tag+",", w+",");
-	if(e.substr(-1) != ">")
-		e = e+">";
-	if(w.length) {
-		if(e == "<br>") {
-			out = e+w;
-		} else if(tag.length) {
-			c("Output: "+tag+w+"</"+e.substr(1)+" ");
-			out = tag+w+"</"+e.substr(1)+" ";
-			//return tag+w+"</"+e.substr(1)+" ";
-		} else {
-			c("Output: "+w+" ");
-			out = w+" ";
-			//return w+" ";
-		}
-	} else {
-		//return "";
-        if(e == "<kbd>") {
-            out = tag;   
-        }
-	}
-	if(out.length)
-		d.push(out);
-//    console.log(out);
-//    console.log(d);
-	return out;
-	
-}
+    function c() {}
 
-
-//var a = document.getElementById('a').innerHTML;
-var a = cont;
-var b = a.split('');
-d = new Array();
-var e = '';
-var w = '';
-var tag = '';
-var intag = false;
-var inend = false;
-var ine = false;
-var parsingdiv = false;
-var out = "";
-var breakk = false;
-//console.error(object.paragraph_indent);
-//console.log(b);
-//a.unshift(object.paragraph_indent);
-//$('body').append("<hr>");
-for(i in b) {
-	var b1 = (parseInt(i)+1);
-	c(": "+b[i]);
-	breakk = false;
-    if(b[i] == "<") {
-        if((b[b1] == "/" && !parsingdiv) || (b[b1] == "/" && b[ (parseInt(i)+2) ] == e.substr(1,1) && parsingdiv)) {
-			 /***/
-			 out += output(e, tag, w);
-			 if(e == "<br>")
-			 	e = "";
-            //$('body').append(tag+",<br>"+e+"; "+w+"<br>");
-			c(tag+", "+e+"; "+w);
-            w = '';
-			
-            inend = true;  
-			intag = false;
-			ine = false;
-            tag = "";
-			parsingdiv = false;
-			c("End of tag");
-            
-        } else if(b[i] == "<") {
-             /***/
-            //$('body').append(tag+",<br>"+e+"; "+w+"<br>");
-			c(tag+", "+e+"; "+w+"  "+parsingdiv);
-			
-			 inend = false;
-			 if(!parsingdiv) {
-				 intag = true;
-	             ine = true;
-				 c("Outputting from last tag");
-				 out += output(e,  tag, w);
-				 tag = "";
-				 e = "";
-				 w = '';
-			 }		
-			 	
-        }
-		c("<"+b[b1]+" !  "+b[ (parseInt(i)+2) ]+"=?"+e.substr(1,1)+";"+parsingdiv);
-    }
-    if(b[i] == " ") {
-        if(ine) {
-            ine = false; 
-			c("ine "+e);  
-        }
-        if(!intag  && e.substr(0,4) != "<div" && e.substr(0,4) != "<kbd") {
-			out = out + output(e, tag, w);
-			c("___"+tag+", "+e+"; "+w);
-			if(e == "<br>") {
-				e = "";
-				tag = "";
-			}
-            //$('body').append(tag+",<br>"+e+"; "+w+"<br>");
-            w = '';
-            breakk = true;
-        }
-    }
-	if(!breakk) {
-		if(intag) {
-			tag = tag + b[i]; 
-			c("tag "+tag);
-		} else if(!inend) {
-			 w = w + b[i];
-			 c("w "+w);
-		}
-		if(ine) {
-			e = e + b[i];
-			if(e == "<div" || e == "<kbd") {
-				parsingdiv = true;
-				c(e+" "+parsingdiv);
-			}
-			c("E "+e);
-		}
-		
-		if(b[i] == ">") {
-			intag = false;
-			c("Intag is off");
-			c(object.paragraph_indent+", "+inend + ", " + e);
-			if((e.indexOf('div') > -1 || e.indexOf('br') > -1) && e.length && inend && object.paragraph_indent != undefined && !parsingdiv) { /** OR if some other type of break is detected*/
-				out = out + output('', '', object.paragraph_indent);
-			}
-			if(e.indexOf('br') > -1) {
-				//out = out + output('','','<br>');	
-			}
-			if(inend) 
-				 e = "";
-			 inend = false;
-			 ine = false;
-		}
-	}
-}
-//console.warn(w);
-    output("","",w);
- /***/
-	 /*out = out + output(e, tag, w);
-		//$('body').append(tag+",<br>"+e+"; "+w+"<br>");
-		c(tag+", "+e+"; "+w);
-		w = '';
-	//div splitter
-	out = out.replace(/---/g, ' ');*/
-//console.log(d);
+    
 	/*** *** Now implement the project **/
 	updateBuildProgress("Generating pages...");
 	maxh = $('.scale').height()*8.56; //Add 9+2 for body margins just because it works. Don't question it. (It probably has to do with the 1 in padding on the top and bottom, making total height 13 and body 11.
@@ -1505,6 +1467,8 @@ for(i in b) {
 		col_count = 0;
 	else
 		col_count = 1;
+    console.log("Now to split");
+    d = smartSplit(window.cont);
 	d.unshift(object.paragraph_indent);
     console.log(d);
 	for(j in d) {
@@ -1520,7 +1484,7 @@ for(i in b) {
             continue;
         }
         dspan = dspan.replace('</span>  ', '</span>');
-        console.log(j, dspan);
+//        console.log(j, dspan);
 //		compile_doc.add("<span class='hideme'>"+dspan +" "+"</span>", undefined, undefined, col_count);
 		//console.warn($('.page'+p+'body').height(), maxh);
 		//console.warn(('.page'+p+'col'+(col_count-1)), $('.page'+p+'col'+(col_count-1)).height(), maxh, $('.page'+p+'col'+(col_count-1)).html().length);
@@ -1555,8 +1519,8 @@ for(i in b) {
 //        console.log("'"+dspan+"'");
         dspan = dspan.replace('</span>  ', '</span>');
         //console.log("'"+dspan+"'");
-		add_to_page(dspan, undefined, undefined, col_count);
-        compile_doc.add(dspan);
+		//add_to_page(dspan, undefined, undefined, col_count);
+        compile_doc.add(dspan, undefined, false);
 	}
 	$('.build').html($('.build').html().replace(/===/g,' ').replace(/~~~/g, ' ')/*.replace(/<span[^<]+?>/g, "")*/);
 //	$('.pagebody').css('height', maxh+"px"); FIXME I want the middle to have ambiguous height
