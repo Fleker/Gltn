@@ -239,7 +239,7 @@ function Page(name) {
             var ar = smartSplit(cnt);
         else
             var ar = [cnt];
-        console.log(ar);
+//*        console.log(ar);
         for(i in ar) {
             if(!this.isBodyFull(ar[i])) {
                 //HTML injection   
@@ -252,7 +252,7 @@ function Page(name) {
                     Return to this func
                 */
 //                console.log(i, ar.length);
-                console.log(i, ":"+ar[i]); 
+//*                console.log(i, ":"+ar[i]); 
                 if(ar[i].match('<')) {
 //                    console.log("<");
                     if($(ar[i]).filter('.footnote').length > 0) {
@@ -971,7 +971,8 @@ function smartSplit(cnt) {
     cnt = cnt.replace(/<div><\/div>/g, " ");
     cnt = cnt.replace(/<div>(.*)<\/div>/g, "$1");
     cnt = cnt.replace(/<div>(.*)<\/div>/g, "$1");
-    cnt = cnt.replace(/<span style="line-height: inherit; font-size: inherit; font-family: inherit; border: none; color: inherit; background-color: inherit;">(.*)<\/span>/g, "$1");cnt = cnt.replace(/<span style="font-size: inherit; line-height: inherit; font-family: inherit; border: none; color: inherit; background-color: inherit;">(.*)<\/span>/g, "$1");
+    cnt = cnt.replace(/<span style="line-height: inherit; font-size: inherit; font-family: inherit; border: none; color: inherit; background-color: inherit;">(.*)<\/span>/g, "$1");
+    cnt = cnt.replace(/<span style="font-size: inherit; line-height: inherit; font-family: inherit; border: none; color: inherit; background-color: inherit;">(.*)<\/span>/g, "$1");
     cnt = cnt.replace(/<div><br>/g, "<div>");
 	cnt = cnt.replace(/<\/div><div><br><\/div><div>/g, "<br>"+object.paragraph_indent);
 	cnt = cnt.replace(/<div><br><\/div><div>/g, "<br>"+object.paragraph_indent);
@@ -988,6 +989,7 @@ function smartSplit(cnt) {
     cnt = cnt.replace(/<div>/g, "<br>"+object.paragraph_indent);
     cnt = cnt.replace(/<br>&emsp;<br>/g, "<br>");
     cnt = cnt.replace(/<br>&emsp;<br>/g, "<br>");
+    cnt = cnt.replace(/<\/span><br><\/div>/g, "</span><br>"+object.paragraph_indent);
     
     var b = document.createElement('div');
     b.innerHTML = cnt;
@@ -1514,8 +1516,9 @@ function post_content_formatting(object, compile_doc) {
 		$('.hideme').remove();
 		//$('.pasteContent').append(ca[j]+" ");	
         dspan = d[j]+'';
-        if(dspan.substr(-1) != " ")
-          dspan += "&nbsp;";
+/*  Spacing is now handled in the split function, for better control
+/*        if(dspan.substr(-1) != " ")
+          dspan += "&nbsp;";*/
 //        console.log("'"+dspan+"'");
         dspan = dspan.replace('</span>  ', '</span>');
         //console.log("'"+dspan+"'");
