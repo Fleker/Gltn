@@ -1465,6 +1465,8 @@ function formatShift2(d) {
 		}
 	}
 	console.log("The document's format has shifted.");
+    //Now we should reset the Context Engine
+    initContext();
     if(file.getLanguage() !== undefined) {
         if(file.getLanguage().length < 1)
             setLocale('en_us');

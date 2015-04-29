@@ -1,4 +1,6 @@
 console.log("Lab.js");
+// Sample Format
+currentformat = "IMRAD";
 function onInitFormat() {
 	new_format();
 	new_format_item("text", {label: "Title", description: "", mtype:"w", max:12, id:"Title"});
@@ -9,10 +11,14 @@ function onInitFormat() {
 	set_up_format("word count", {min:150});
 	post_format();
 }
-onInitFormat();
+//onInitFormat();
 function onInitToolbar() {
-    var tools = ["heading1", "heading2", "heading3", "image", "table", "reftext", "LaTeX", "citation", "break"]; 
+    var tools = ["heading1", "heading2", "heading3", "image", "table", "reftext", "LaTeX", "citation", "pbreak"]; 
     post_toolbar(tools);
+}
+function onGetToolbar() {
+    var toolbar = ["citation", "heading1", "heading2", "heading3", "image", "table", "reftext", "LaTeX", "pbreak"];
+    return {tools: toolbar, allowCustom: true};
 }
 function onStylePaper() {
 	enable_format('double space');	

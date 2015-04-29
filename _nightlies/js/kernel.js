@@ -1975,11 +1975,22 @@ function initContext() {
 	if(window.context === undefined)
 		window.context = [];
 	parseCT();
+    $('document').on('keydown', function(event) {
+        console.log("Something happened"); 
+    });
 	$('.content_textarea').on('keydown', function( event ) {
+        console.log(event);
 	  if (event.which == 32 || event.which == 8 || event.which == 46 || event.which == 13) {
+            console.log("refreshing hovertags b/c of keypress");
+          hovertagManager.refresh();
           parseCT();
 	  }
 	});
+    $('.content_textarea').on('click', function(event) {
+        console.log("refreshed hovertags");
+        hovertagManager.refresh();
+    });
+    console.log("Context Engine Initialized");
 }
 
 function parseCT() {
@@ -2025,7 +2036,9 @@ function parseCT() {
     }
 	try {
 		restoreSelection();	
+        
     } catch(e) {}
+    hovertagManager.refresh();
 }
 
 function contextPanel(e) {

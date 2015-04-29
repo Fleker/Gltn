@@ -25,7 +25,7 @@ function initTheme() {
     $('input[data-theme!=false]').css('background-color', '#444').css('color', theme.fontColor).css('font-family', '"Roboto Condensed", sans-serif').css('font-size', '11pt');
     $('td[data-theme!=false]').css('color', theme.fontColor);
     $('button').css('font-family', '"Roboto Condensed", sans-serif');
-	$('.toolbar, .overflow').css('background-color', '#444');
+	$('.toolbar, .overflow').css('background-color', '#444').css('padding-top', '4px').css('padding-bottom', '4px');
 	$('.popuptop').css('color', 'white').css('background-color', theme.bodyColor);
 	$('.content_textarea[data-fullscreen!=true]').css('line-height','1.4em').css('padding-right', '5px');
 	$('.hovertag').css('font-size', '10pt');
@@ -51,8 +51,8 @@ function runThemeSettings() {
     });   
 }
 function executeSettings() {
-    writeCss("button:hover {	background-color:"+theme.ribbon.highlight+";color:black;}button:active {	position:relative;	top:1px;}");
-    writeCss("button.ribbonbutton:hover, button.toolbutton:hover {	background-color:"+theme.ribbon.highlight+";color:black;}button:active {	position:relative;	top:1px;}");
+    writeCss("button:hover { background-color:"+theme.ribbon.highlight+"; color:black; } button:active { position:relative; top:1px; }");
+    writeCss("button.ribbonbutton:hover, button.toolbutton:hover { background-color:"+theme.ribbon.highlight+"; color:black; } button:active {	position:relative; top:1px; }");
     writeCss("button.close:hover { background-color:"+theme.palette.red.thick+"}");
     writeCss("::selection {color:white;background:"+theme.ribbon.highlight+";}::-moz-selection {color:white;background:"+theme.ribbon.highlight+";}");  
     writeCss("input:focus, div:focus, button:focus{ outline: solid 1px "+theme.ribbon.highlight+";} input:-webkit-autofill { -webkit-box-shadow: 0 0 0px 1000px "+theme.ribbon.highlight+" inset}");

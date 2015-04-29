@@ -213,6 +213,9 @@ function Section(name) {
         }
         return i;
     };
+    Section.prototype.add = function(cnt, page, smartSplit) {
+        this.addBody(cnt, page, smartSplit);     
+    };
     Section.prototype.addBody = function(cnt, page, smartSplit) {
         var p = undefined;
         //Add to the last page if none's provided
@@ -239,7 +242,7 @@ function Page(name) {
             var ar = smartSplit(cnt);
         else
             var ar = [cnt];
-//*        console.log(ar);
+        console.log(ar);
         for(i in ar) {
             if(!this.isBodyFull(ar[i])) {
                 //HTML injection   
@@ -252,7 +255,7 @@ function Page(name) {
                     Return to this func
                 */
 //                console.log(i, ar.length);
-//*                console.log(i, ":"+ar[i]); 
+                console.log(i, ":"+ar[i]); 
                 if(ar[i].match('<')) {
 //                    console.log("<");
                     if($(ar[i]).filter('.footnote').length > 0) {
@@ -434,7 +437,8 @@ function continueBuild(el) {
         //Get reformatted content, then add it to doc
 			updateBuildProgress('Formatting Content...');
 		if($('.content_textarea .citation').length) {
-			post_bibliography(onBuildBibliography(d)[0], onBuildBibliography(d)[1]);
+            var obb = onBuildBibliography(d)
+			post_bibliography(obb[0], obb[1], obb[2]);
 			updateBuildProgress('Building Bibliography...');
 		}
         d.assignPages();
@@ -1532,7 +1536,7 @@ function post_content_formatting(object, compile_doc) {
 		$('.pagebody').css('column-count', column).css('-webkit-column-count', column).css('-moz-column-count');	
 	}*/
 }	
-function post_bibliography(object, cob) {
+function post_bibliography(object, cob, doc) {
 	//Get all citations, limit only to those used in the paper
 	console.log("Bibliography");
 	citationSorted = new Array();
@@ -1592,22 +1596,25 @@ function post_bibliography(object, cob) {
 	
 	
 	//Add part by part by running through citation. If too much, new page in same method as above.	
-	ca = $('.draft').html().split('<div');
-	var maxh = $('.scale').height()*8.56;
+	ca = $('.draft').html().split("<div");
+    console.log(ca, citationSorted);
+	var maxh = $('.scale').height()*8.56; //TODO Get paper stats
+    console.log(doc);
 	for(j in ca) {
-		//TODO - Find a way to grab the current page, not necessarily the last one. This will be handy for things that are added after content
-		p = $('.page').length-1;
+        if(ca[j] != "")
+            doc.add("<div"+ca[j]+" ", undefined, false);
+/*
 		add_to_page("<div class='hideme'>"+ca[j]+" "+"</div>");
 		if($('.page'+p+'body').height() > maxh) {
 			add_new_page();
-			/*hm = $('.hideme').length;
+			hm = $('.hideme').length;
 			he = $('.hideme')[hm-1]
-			$(he).css('display','none');*/
+			$(he).css('display','none');
 		} 
 		$('.hideme').remove();
 		//$('.pasteContent').append(ca[j]+" ");	
-		add_to_page("<div"+ca[j]+' ');
-
+		add_to_page();
+*/
 	}
 }
 function findCitation(cite) {

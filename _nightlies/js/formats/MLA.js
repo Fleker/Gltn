@@ -103,8 +103,11 @@ function onGetFormats() {
 } 
 //TODO NEW API
 function onBuildBibliography(doc) {
+    console.log(doc);
     var b = doc.newSection('Bibliography');
-    b.add(centerText("Works Cited"));
+    b.newPage();
+    console.log(b);
+    b.addBody(centerText("Works Cited"));
 	
 	obj = {};
 	cob = {};
@@ -152,7 +155,8 @@ function onBuildBibliography(doc) {
 	obj.style = "text-indent:-.5in;margin-left:.5in";
 	obj.annotation = "<br>";
 //	post_bibliography(obj, cob);	
-    return [obj, cob];
+    //Returns the different format types, an abstract version of these types, and the section/document you want to add stuff to
+    return [obj, cob, b];
 }
 function onFinishBuild(doc) {
     //Runs when pages finish compiling, can be used for last minute adjustments
